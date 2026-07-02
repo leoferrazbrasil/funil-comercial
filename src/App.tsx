@@ -18,6 +18,8 @@ import {
   Target,
   TrendingUp,
   UsersRound,
+  Moon,
+  Sun,
   X,
 } from "lucide-react";
 import type { FormEvent, ReactNode } from "react";
@@ -131,6 +133,24 @@ function App() {
   const [query, setQuery] = useState("");
   const [modal, setModal] = useState<ModalType | null>(null);
   const [isBooting, setIsBooting] = useState(true);
+
+  const [theme, setTheme] = useState<"light" | "dark">(() => {
+    const saved = localStorage.getItem("theme");
+    return (
+      (saved as "light" | "dark") ||
+      (window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light")
+    );
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  const toggleTheme = () =>
+    setTheme((prev) => (prev === "light" ? "dark" : "light"));
   const [isLoadingData, setIsLoadingData] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
@@ -381,30 +401,30 @@ function App() {
   };
 
   const handleDragEnd = async (event: any) => {
-    const { active, over } = event
-    if (!over) return
+    const { active, over } = event;
+    if (!over) return;
 
-    const opportunityId = active.id
-    const novaEtapa = over.id
-    
+    const opportunityId = active.id;
+    const novaEtapa = over.id;
+
     setSnapshot((prev: any) => {
-      if(!prev) return prev;
+      if (!prev) return prev;
       return {
         ...prev,
-        opportunities: prev.opportunities.map((opp: any) => 
-          opp.id === opportunityId ? { ...opp, etapa: novaEtapa } : opp
-        )
-      }
+        opportunities: prev.opportunities.map((opp: any) =>
+          opp.id === opportunityId ? { ...opp, etapa: novaEtapa } : opp,
+        ),
+      };
     });
 
     try {
-      await updateOpportunityStage(opportunityId, novaEtapa)
-      toast.success('Movido para ' + novaEtapa)
+      await updateOpportunityStage(opportunityId, novaEtapa);
+      toast.success("Movido para " + novaEtapa);
     } catch (error) {
-      toast.error('Erro ao mover')
-      reloadData()
+      toast.error("Erro ao mover");
+      reloadData();
     }
-  }
+  };
 
   if (isBooting) {
     return <LoadingScreen label="Conectando ao Supabase..." />;
@@ -424,6 +444,8 @@ function App() {
       />
       <main className="workspace">
         <Header
+          theme={theme}
+          toggleTheme={toggleTheme}
           profileName={
             snapshot.profile?.nome ?? session.user.email ?? "Usuário"
           }
@@ -701,14 +723,18 @@ function Header({
   profileName,
   query,
   route,
+  theme,
   onQueryChange,
   onSignOut,
+  toggleTheme,
 }: {
   profileName: string;
   query: string;
   route: Route;
-  onQueryChange: (value: string) => void;
+  theme?: "light" | "dark";
+  onQueryChange: (q: string) => void;
   onSignOut: () => void;
+  toggleTheme?: () => void;
 }) {
   const title =
     navItems.find((item) => item.id === route)?.label ?? "Dashboard";
@@ -734,6 +760,13 @@ function Header({
             placeholder="Buscar..."
           />
         </label>
+        
+        {toggleTheme && (
+          <button className="icon-button" aria-label="Alternar Tema" onClick={toggleTheme}>
+            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
+        )}
+
         <button className="icon-button" aria-label="Notificações">
           <Bell size={18} />
         </button>
