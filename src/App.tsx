@@ -1,3 +1,4 @@
+import type { Session } from '@supabase/supabase-js'
 import type { LucideIcon } from 'lucide-react'
 import {
   Bell,
@@ -5,7 +6,6 @@ import {
   CircleDollarSign,
   Clock3,
   ContactRound,
-  Filter,
   Inbox,
   LayoutDashboard,
   LogOut,
@@ -18,10 +18,22 @@ import {
   Target,
   TrendingUp,
   UsersRound,
+  X,
 } from 'lucide-react'
+import type { FormEvent, ReactNode } from 'react'
 import { useEffect, useMemo, useState } from 'react'
-
-type Route = 'login' | 'dashboard' | 'inbox' | 'contatos' | 'leads' | 'funil'
+import {
+  convertContactToLead,
+  createContact,
+  createInboxMessage,
+  createLead,
+  createOpportunity,
+  ensureDefaultStages,
+  getCrmSnapshot,
+  upsertProfile,
+} from './lib/crmService'
+import { isSupabaseConfigured, supabase } from './lib/supabase'
+import type { Contact, CrmSnapshot, InboxMessage, Lead, OpportunityStage, Route } from './lib/types'
 
 type NavItem = {
   id: Route
@@ -29,9 +41,7 @@ type NavItem = {
   icon: LucideIcon
 }
 
-type LeadStatus = 'novo' | 'em atendimento' | 'qualificado' | 'convertido'
-
-type OpportunityStage = 'Novo' | 'Em atendimento' | 'Qualificado' | 'Proposta' | 'Negociação' | 'Ganho'
+type ModalType = 'contact' | 'lead' | 'opportunity' | 'message'
 
 const navItems: NavItem[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -41,37 +51,15 @@ const navItems: NavItem[] = [
   { id: 'funil', label: 'Funil de vendas', icon: BriefcaseBusiness },
 ]
 
-const contacts = [
-  { name: 'Marina Costa', phone: '5511999214455', email: 'marina@exemplo.com', origin: 'WhatsApp', owner: 'Rafaela', score: 'Alto' },
-  { name: 'Grupo Salute', phone: '5541998401212', email: 'comercial@salute.com', origin: 'Indicação', owner: 'Daniel', score: 'Médio' },
-  { name: 'João Henrique', phone: '5531997883344', email: 'joao@exemplo.com', origin: 'Landing page', owner: 'Rafaela', score: 'Alto' },
-  { name: 'Clínica Verona', phone: '5551993112255', email: 'contato@verona.com', origin: 'Meta Ads', owner: 'Paulo', score: 'Novo' },
-]
+const stages: OpportunityStage[] = ['Novo', 'Em atendimento', 'Qualificado', 'Proposta', 'Negociação', 'Ganho', 'Perdido']
 
-const leads: Array<{ name: string; interest: string; status: LeadStatus; value: string; next: string; owner: string }> = [
-  { name: 'Marina Costa', interest: 'Implantação de CRM', status: 'qualificado', value: 'R$ 8.500', next: 'Enviar proposta hoje', owner: 'Rafaela' },
-  { name: 'Clínica Verona', interest: 'Atendimento WhatsApp', status: 'novo', value: 'R$ 4.200', next: 'Primeiro contato', owner: 'Paulo' },
-  { name: 'Grupo Salute', interest: 'Organização comercial', status: 'em atendimento', value: 'R$ 12.000', next: 'Retorno às 16h', owner: 'Daniel' },
-  { name: 'João Henrique', interest: 'Funil de vendas', status: 'convertido', value: 'R$ 6.800', next: 'Oportunidade criada', owner: 'Rafaela' },
-]
-
-const conversations = [
-  { name: 'Clínica Verona', message: 'Tenho interesse em organizar o atendimento comercial da clínica.', time: '3 min', status: 'Novo lead', unread: 2 },
-  { name: 'Marina Costa', message: 'Podemos marcar uma demonstração para amanhã?', time: '18 min', status: 'Qualificado', unread: 0 },
-  { name: 'Grupo Salute', message: 'Preciso entender se funciona para equipe com 6 vendedores.', time: '42 min', status: 'Em atendimento', unread: 1 },
-  { name: 'João Henrique', message: 'Me envie os próximos passos para avançarmos.', time: '1 h', status: 'Oportunidade', unread: 0 },
-]
-
-const stages: OpportunityStage[] = ['Novo', 'Em atendimento', 'Qualificado', 'Proposta', 'Negociação', 'Ganho']
-
-const opportunities = [
-  { title: 'Clínica Verona', stage: 'Novo', value: 4200, owner: 'Paulo', action: 'Responder WhatsApp' },
-  { title: 'Grupo Salute', stage: 'Em atendimento', value: 12000, owner: 'Daniel', action: 'Confirmar diagnóstico' },
-  { title: 'Marina Costa', stage: 'Qualificado', value: 8500, owner: 'Rafaela', action: 'Enviar proposta' },
-  { title: 'Academia Flux', stage: 'Proposta', value: 6200, owner: 'Paulo', action: 'Follow-up amanhã' },
-  { title: 'SolarPrime', stage: 'Negociação', value: 15400, owner: 'Daniel', action: 'Validar escopo' },
-  { title: 'João Henrique', stage: 'Ganho', value: 6800, owner: 'Rafaela', action: 'Onboarding' },
-] as const
+const emptySnapshot: CrmSnapshot = {
+  profile: null,
+  contacts: [],
+  leads: [],
+  opportunities: [],
+  messages: [],
+}
 
 const formatMoney = (value: number) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(value)
@@ -82,10 +70,49 @@ const getRoute = (): Route => {
   return 'login'
 }
 
+const normalizeSearch = (value: string) =>
+  value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+
+const matchesQuery = (query: string, values: Array<string | number | null | undefined>) => {
+  const normalizedQuery = normalizeSearch(query.trim())
+  if (!normalizedQuery) return true
+  return values.some((value) => normalizeSearch(String(value ?? '')).includes(normalizedQuery))
+}
+
+const getErrorMessage = (error: unknown) => {
+  const message = error instanceof Error ? error.message : 'Não foi possível concluir a operação.'
+  if (message.toLowerCase().includes('duplicate')) return 'Este telefone já está cadastrado nesta conta.'
+  return message
+}
+
+const getFormValue = (formData: FormData, key: string) => String(formData.get(key) ?? '').trim()
+
 function App() {
   const [route, setRoute] = useState<Route>(getRoute)
-  const [isAuthed, setIsAuthed] = useState(() => window.location.hash !== '' && getRoute() !== 'login')
+  const [session, setSession] = useState<Session | null>(null)
+  const [snapshot, setSnapshot] = useState<CrmSnapshot>(emptySnapshot)
   const [query, setQuery] = useState('')
+  const [modal, setModal] = useState<ModalType | null>(null)
+  const [isBooting, setIsBooting] = useState(true)
+  const [isLoadingData, setIsLoadingData] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+  const [authError, setAuthError] = useState<string | null>(null)
+  const [crmError, setCrmError] = useState<string | null>(null)
+  const [refreshKey, setRefreshKey] = useState(0)
+
+  const navigate = (nextRoute: Route) => {
+    if (nextRoute === 'login') {
+      window.location.hash = ''
+      setRoute('login')
+      return
+    }
+
+    window.location.hash = `/${nextRoute}`
+    setRoute(nextRoute)
+  }
 
   useEffect(() => {
     const onHashChange = () => setRoute(getRoute())
@@ -93,41 +120,294 @@ function App() {
     return () => window.removeEventListener('hashchange', onHashChange)
   }, [])
 
-  const navigate = (nextRoute: Route) => {
-    if (nextRoute === 'login') {
-      setIsAuthed(false)
-      window.location.hash = ''
-      setRoute('login')
+  useEffect(() => {
+    if (!isSupabaseConfigured || !supabase) {
+      setIsBooting(false)
+      return undefined
+    }
+
+    let mounted = true
+
+    supabase.auth
+      .getSession()
+      .then(({ data }) => {
+        if (!mounted) return
+        setSession(data.session)
+        if (data.session && getRoute() === 'login') navigate('dashboard')
+      })
+      .finally(() => {
+        if (mounted) setIsBooting(false)
+      })
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      setSession(nextSession)
+      if (!nextSession) {
+        setSnapshot(emptySnapshot)
+        navigate('login')
+      }
+    })
+
+    return () => {
+      mounted = false
+      subscription.unsubscribe()
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!session?.user) {
+      setSnapshot(emptySnapshot)
       return
     }
 
-    setIsAuthed(true)
-    window.location.hash = `/${nextRoute}`
-    setRoute(nextRoute)
+    let cancelled = false
+    const currentUser = session.user
+
+    async function loadData() {
+      setIsLoadingData(true)
+      setCrmError(null)
+
+      try {
+        await upsertProfile(currentUser)
+        await ensureDefaultStages(currentUser.id)
+        const nextSnapshot = await getCrmSnapshot(currentUser.id)
+        if (!cancelled) setSnapshot(nextSnapshot)
+      } catch (error) {
+        if (!cancelled) setCrmError(getErrorMessage(error))
+      } finally {
+        if (!cancelled) setIsLoadingData(false)
+      }
+    }
+
+    loadData()
+
+    return () => {
+      cancelled = true
+    }
+  }, [session?.user, refreshKey])
+
+  const reloadData = () => setRefreshKey((current) => current + 1)
+
+  const handleAuth = async (email: string, password: string, mode: 'login' | 'signup') => {
+    if (!supabase) {
+      setAuthError('Configure a chave VITE_SUPABASE_ANON_KEY antes de acessar a plataforma.')
+      return
+    }
+
+    setAuthError(null)
+
+    const request =
+      mode === 'login'
+        ? supabase.auth.signInWithPassword({ email, password })
+        : supabase.auth.signUp({
+            email,
+            password,
+            options: {
+              data: { nome: email.split('@')[0] },
+            },
+          })
+
+    const { data, error } = await request
+    if (error) {
+      setAuthError(getErrorMessage(error))
+      return
+    }
+
+    if (data.session) {
+      setSession(data.session)
+      navigate('dashboard')
+      return
+    }
+
+    setAuthError('Conta criada. Confirme o e-mail, se a confirmação estiver ativada no Supabase, e faça login.')
   }
 
-  if (!isAuthed || route === 'login') {
-    return <LoginScreen onEnter={() => navigate('dashboard')} />
+  const handleSignOut = async () => {
+    await supabase?.auth.signOut()
+    setSession(null)
+    navigate('login')
+  }
+
+  const runMutation = async (mutation: () => Promise<unknown>) => {
+    setIsSaving(true)
+    setCrmError(null)
+
+    try {
+      await mutation()
+      setModal(null)
+      reloadData()
+    } catch (error) {
+      setCrmError(getErrorMessage(error))
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const ownerId = session?.user.id
+
+  const createContactFromForm = async (formData: FormData) => {
+    if (!ownerId) return
+    await runMutation(() =>
+      createContact(ownerId, {
+        nome: getFormValue(formData, 'nome'),
+        telefone: getFormValue(formData, 'telefone'),
+        email: getFormValue(formData, 'email'),
+        origem: getFormValue(formData, 'origem'),
+        potencial: getFormValue(formData, 'potencial'),
+      }),
+    )
+  }
+
+  const createLeadFromForm = async (formData: FormData) => {
+    if (!ownerId) return
+    await runMutation(() =>
+      createLead(ownerId, {
+        nome: getFormValue(formData, 'nome'),
+        telefone: getFormValue(formData, 'telefone'),
+        email: getFormValue(formData, 'email'),
+        interesse: getFormValue(formData, 'interesse'),
+        origem: getFormValue(formData, 'origem'),
+        valor_estimado: Number(getFormValue(formData, 'valor_estimado') || 0),
+      }),
+    )
+  }
+
+  const createOpportunityFromForm = async (formData: FormData) => {
+    if (!ownerId) return
+    await runMutation(() =>
+      createOpportunity(ownerId, {
+        lead_id: getFormValue(formData, 'lead_id') || null,
+        titulo: getFormValue(formData, 'titulo'),
+        etapa: (getFormValue(formData, 'etapa') || 'Novo') as OpportunityStage,
+        valor: Number(getFormValue(formData, 'valor') || 0),
+        responsavel: getFormValue(formData, 'responsavel'),
+        proxima_acao: getFormValue(formData, 'proxima_acao'),
+      }),
+    )
+  }
+
+  const createMessageFromForm = async (formData: FormData) => {
+    if (!ownerId) return
+    await runMutation(() =>
+      createInboxMessage(ownerId, {
+        remetente_nome: getFormValue(formData, 'remetente_nome'),
+        telefone: getFormValue(formData, 'telefone'),
+        mensagem: getFormValue(formData, 'mensagem'),
+        status: getFormValue(formData, 'status'),
+      }),
+    )
+  }
+
+  const handleConvertContact = async (contact: Contact) => {
+    if (!ownerId) return
+    await runMutation(() => convertContactToLead(ownerId, contact))
+  }
+
+  const handleCreateOpportunityFromLead = async (lead: Lead) => {
+    if (!ownerId) return
+    await runMutation(() =>
+      createOpportunity(ownerId, {
+        lead_id: lead.id,
+        titulo: lead.nome,
+        etapa: 'Novo',
+        valor: lead.valor_estimado,
+        responsavel: snapshot.profile?.nome ?? 'Equipe comercial',
+        proxima_acao: lead.proxima_acao,
+      }),
+    )
+  }
+
+  if (isBooting) {
+    return <LoadingScreen label="Conectando ao Supabase..." />
+  }
+
+  if (!session || route === 'login') {
+    return <LoginScreen authError={authError} onAuth={handleAuth} />
   }
 
   return (
     <div className="shell">
-      <Sidebar activeRoute={route} onNavigate={navigate} />
+      <Sidebar activeRoute={route} onNavigate={navigate} onSignOut={handleSignOut} />
       <main className="workspace">
-        <Header route={route} query={query} onQueryChange={setQuery} />
+        <Header
+          profileName={snapshot.profile?.nome ?? session.user.email ?? 'Usuário'}
+          query={query}
+          route={route}
+          onQueryChange={setQuery}
+          onSignOut={handleSignOut}
+        />
         <section className="content">
-          {route === 'dashboard' && <Dashboard />}
-          {route === 'inbox' && <InboxPage />}
-          {route === 'contatos' && <ContactsPage />}
-          {route === 'leads' && <LeadsPage />}
-          {route === 'funil' && <PipelinePage />}
+          {crmError && (
+            <div className="alert error" role="alert">
+              {crmError}
+            </div>
+          )}
+          {isLoadingData && <div className="loading-strip">Atualizando dados do CRM...</div>}
+          {route === 'dashboard' && <Dashboard snapshot={snapshot} onOpenModal={setModal} />}
+          {route === 'inbox' && <InboxPage messages={snapshot.messages} query={query} onOpenModal={setModal} />}
+          {route === 'contatos' && (
+            <ContactsPage
+              contacts={snapshot.contacts}
+              query={query}
+              isSaving={isSaving}
+              onConvertContact={handleConvertContact}
+              onOpenModal={setModal}
+            />
+          )}
+          {route === 'leads' && (
+            <LeadsPage
+              isSaving={isSaving}
+              leads={snapshot.leads}
+              query={query}
+              onCreateOpportunity={handleCreateOpportunityFromLead}
+              onOpenModal={setModal}
+            />
+          )}
+          {route === 'funil' && (
+            <PipelinePage leads={snapshot.leads} opportunities={snapshot.opportunities} onOpenModal={setModal} />
+          )}
         </section>
       </main>
+
+      {modal === 'contact' && (
+        <ContactModal isSaving={isSaving} onClose={() => setModal(null)} onSubmit={createContactFromForm} />
+      )}
+      {modal === 'lead' && <LeadModal isSaving={isSaving} onClose={() => setModal(null)} onSubmit={createLeadFromForm} />}
+      {modal === 'opportunity' && (
+        <OpportunityModal
+          isSaving={isSaving}
+          leads={snapshot.leads}
+          onClose={() => setModal(null)}
+          onSubmit={createOpportunityFromForm}
+        />
+      )}
+      {modal === 'message' && (
+        <MessageModal isSaving={isSaving} onClose={() => setModal(null)} onSubmit={createMessageFromForm} />
+      )}
     </div>
   )
 }
 
-function LoginScreen({ onEnter }: { onEnter: () => void }) {
+function LoginScreen({
+  authError,
+  onAuth,
+}: {
+  authError: string | null
+  onAuth: (email: string, password: string, mode: 'login' | 'signup') => Promise<void>
+}) {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const formData = new FormData(event.currentTarget)
+    const submitter = (event.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null
+    const mode = submitter?.value === 'signup' ? 'signup' : 'login'
+    setIsSubmitting(true)
+    await onAuth(getFormValue(formData, 'email'), getFormValue(formData, 'password'), mode)
+    setIsSubmitting(false)
+  }
+
   return (
     <main className="login-page">
       <section className="login-visual" aria-label="Funil Comercial">
@@ -137,9 +417,7 @@ function LoginScreen({ onEnter }: { onEnter: () => void }) {
         </div>
         <p className="eyebrow">Funil Comercial</p>
         <h1>Organize conversas, leads e oportunidades em um só fluxo comercial.</h1>
-        <p>
-          Um protótipo navegável para validar uma operação simples: WhatsApp, contatos, leads, funil e métricas.
-        </p>
+        <p>Uma fundação simples para operar WhatsApp, contatos, leads, funil e métricas comerciais com Supabase.</p>
         <div className="flow-line" aria-hidden="true">
           <i />
           <i />
@@ -148,31 +426,63 @@ function LoginScreen({ onEnter }: { onEnter: () => void }) {
         </div>
       </section>
 
-      <section className="login-card" aria-label="Entrar na plataforma">
+      <form className="login-card" aria-label="Entrar na plataforma" onSubmit={handleSubmit}>
         <div>
           <p className="eyebrow">Acesso ao MVP</p>
           <h2>Entrar na plataforma</h2>
-          <p className="muted">Use o acesso de demonstração para navegar pelo protótipo.</p>
+          <p className="muted">Use uma conta cadastrada no Supabase para acessar o CRM.</p>
         </div>
+
+        {!isSupabaseConfigured && (
+          <p className="config-warning">Configure `VITE_SUPABASE_ANON_KEY` para ativar login, cadastro e dados reais.</p>
+        )}
+
+        {authError && (
+          <p className="alert error" role="alert">
+            {authError}
+          </p>
+        )}
 
         <label>
           E-mail corporativo
-          <input defaultValue="gestor@funilcomercial.com.br" type="email" />
+          <input name="email" placeholder="gestor@empresa.com.br" required type="email" />
         </label>
         <label>
           Senha
-          <input defaultValue="prototipo" type="password" />
+          <input minLength={6} name="password" placeholder="Mínimo 6 caracteres" required type="password" />
         </label>
 
-        <button className="primary-button" onClick={onEnter}>
-          Acessar protótipo <MoveRight size={18} />
+        <button
+          className="primary-button"
+          disabled={!isSupabaseConfigured || isSubmitting}
+          type="submit"
+          value="login"
+        >
+          {isSubmitting ? 'Entrando...' : 'Entrar na plataforma'} <MoveRight size={18} />
         </button>
-      </section>
+
+        <button
+          className="secondary-button"
+          disabled={!isSupabaseConfigured || isSubmitting}
+          type="submit"
+          value="signup"
+        >
+          Criar conta de teste
+        </button>
+      </form>
     </main>
   )
 }
 
-function Sidebar({ activeRoute, onNavigate }: { activeRoute: Route; onNavigate: (route: Route) => void }) {
+function Sidebar({
+  activeRoute,
+  onNavigate,
+  onSignOut,
+}: {
+  activeRoute: Route
+  onNavigate: (route: Route) => void
+  onSignOut: () => void
+}) {
   return (
     <aside className="sidebar">
       <button className="logo-button" onClick={() => onNavigate('dashboard')}>
@@ -202,9 +512,9 @@ function Sidebar({ activeRoute, onNavigate }: { activeRoute: Route; onNavigate: 
       <div className="sidebar-footer">
         <div className="health-pill">
           <ShieldCheck size={16} />
-          MVP navegável
+          Supabase ativo
         </div>
-        <button onClick={() => onNavigate('login')}>
+        <button onClick={onSignOut}>
           <LogOut size={18} />
           Sair
         </button>
@@ -214,15 +524,25 @@ function Sidebar({ activeRoute, onNavigate }: { activeRoute: Route; onNavigate: 
 }
 
 function Header({
-  route,
+  profileName,
   query,
+  route,
   onQueryChange,
+  onSignOut,
 }: {
-  route: Route
+  profileName: string
   query: string
+  route: Route
   onQueryChange: (value: string) => void
+  onSignOut: () => void
 }) {
   const title = navItems.find((item) => item.id === route)?.label ?? 'Dashboard'
+  const initials = profileName
+    .split(' ')
+    .map((part) => part[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase()
 
   return (
     <header className="topbar">
@@ -238,46 +558,74 @@ function Header({
         <button className="icon-button" aria-label="Notificações">
           <Bell size={18} />
         </button>
-        <span className="user-chip">GC</span>
+        <span className="user-chip" title={profileName}>
+          {initials || 'FC'}
+        </span>
+        <button className="icon-button" aria-label="Sair" onClick={onSignOut}>
+          <LogOut size={18} />
+        </button>
       </div>
     </header>
   )
 }
 
-function Dashboard() {
-  const totalPipeline = opportunities
-    .filter((item) => item.stage !== 'Ganho')
-    .reduce((sum, item) => sum + item.value, 0)
+function Dashboard({ snapshot, onOpenModal }: { snapshot: CrmSnapshot; onOpenModal: (modal: ModalType) => void }) {
+  const activeLeads = snapshot.leads.filter((lead) => !['convertido', 'perdido'].includes(lead.status))
+  const openPipeline = snapshot.opportunities
+    .filter((item) => !['Ganho', 'Perdido'].includes(item.etapa))
+    .reduce((sum, item) => sum + Number(item.valor), 0)
+  const conversionRate = snapshot.leads.length
+    ? Math.round((snapshot.opportunities.length / snapshot.leads.length) * 100)
+    : 0
+  const pendingMessages = snapshot.messages.filter((message) => message.unread_count > 0 || message.status !== 'Resolvido')
 
   return (
     <div className="page-stack">
       <HeroPanel
+        action="Novo lead"
+        description="Visão rápida para priorizar conversas, leads e oportunidades sem depender de planilhas."
         eyebrow="Centro de comando"
         title="O que precisa de atenção comercial agora?"
-        description="Visão rápida para priorizar conversas, leads e oportunidades sem depender de planilhas."
-        action="Revisar pendências"
+        onAction={() => onOpenModal('lead')}
       />
 
       <section className="metrics-grid">
-        <MetricCard icon={UsersRound} label="Leads ativos" value="18" hint="+4 nas últimas 24h" />
-        <MetricCard icon={MessageCircle} label="Conversas pendentes" value="3" hint="SLA crítico em 1 conversa" tone="warning" />
-        <MetricCard icon={CircleDollarSign} label="Pipeline aberto" value={formatMoney(totalPipeline)} hint="5 oportunidades em andamento" />
-        <MetricCard icon={TrendingUp} label="Conversão base" value="24%" hint="Lead para oportunidade" tone="success" />
+        <MetricCard icon={UsersRound} label="Leads ativos" value={String(activeLeads.length)} hint="Leads não convertidos" />
+        <MetricCard
+          icon={MessageCircle}
+          label="Conversas pendentes"
+          value={String(pendingMessages.length)}
+          hint="Inbox com ação necessária"
+          tone={pendingMessages.length ? 'warning' : 'neutral'}
+        />
+        <MetricCard icon={CircleDollarSign} label="Pipeline aberto" value={formatMoney(openPipeline)} hint="Oportunidades em andamento" />
+        <MetricCard icon={TrendingUp} label="Conversão base" value={`${conversionRate}%`} hint="Oportunidades sobre leads" tone="success" />
       </section>
 
       <section className="split-grid">
         <Panel title="Prioridades do dia" eyebrow="Ação comercial">
           <div className="action-list">
-            <ActionItem title="Responder Clínica Verona" description="Lead novo chegou pelo WhatsApp há 3 minutos." priority="Alta" />
-            <ActionItem title="Enviar proposta para Marina" description="Lead qualificado já pediu demonstração." priority="Alta" />
-            <ActionItem title="Confirmar retorno Grupo Salute" description="Retorno combinado para hoje às 16h." priority="Média" />
+            {pendingMessages.slice(0, 2).map((message) => (
+              <ActionItem
+                key={message.id}
+                description={message.mensagem}
+                priority="Alta"
+                title={`Responder ${message.remetente_nome}`}
+              />
+            ))}
+            {activeLeads.slice(0, 2).map((lead) => (
+              <ActionItem key={lead.id} description={lead.proxima_acao} priority="Média" title={`Avançar ${lead.nome}`} />
+            ))}
+            {pendingMessages.length === 0 && activeLeads.length === 0 && (
+              <EmptyState action="Criar primeiro contato" description="Cadastre um contato ou lead para iniciar a operação." onAction={() => onOpenModal('contact')} />
+            )}
           </div>
         </Panel>
 
         <Panel title="Funil resumido" eyebrow="Oportunidades">
           <div className="funnel-mini">
-            {stages.slice(0, 5).map((stage) => {
-              const count = opportunities.filter((item) => item.stage === stage).length
+            {stages.slice(0, 6).map((stage) => {
+              const count = snapshot.opportunities.filter((item) => item.etapa === stage).length
               return (
                 <div key={stage}>
                   <span>{stage}</span>
@@ -292,116 +640,207 @@ function Dashboard() {
   )
 }
 
-function InboxPage() {
-  const [selected, setSelected] = useState(conversations[0])
+function InboxPage({
+  messages,
+  query,
+  onOpenModal,
+}: {
+  messages: InboxMessage[]
+  query: string
+  onOpenModal: (modal: ModalType) => void
+}) {
+  const filteredMessages = messages.filter((message) =>
+    matchesQuery(query, [message.remetente_nome, message.telefone, message.mensagem, message.status]),
+  )
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const selected = filteredMessages.find((message) => message.id === selectedId) ?? filteredMessages[0]
 
   return (
     <div className="page-stack">
       <HeroPanel
+        action="Simular entrada"
+        description="O inbox centraliza conversas vindas do WhatsApp e prepara o lead para o funil."
         eyebrow="WhatsApp comercial"
         title="Converse, qualifique e transforme mensagens em oportunidades."
-        description="O inbox do MVP centraliza conversas e orienta o próximo passo da equipe."
-        action="Conectar provedor"
+        onAction={() => onOpenModal('message')}
       />
 
-      <section className="inbox-layout">
-        <Panel title="Conversas" eyebrow="Entrada">
-          <div className="conversation-list">
-            {conversations.map((conversation) => (
-              <button
-                key={conversation.name}
-                className={selected.name === conversation.name ? 'selected conversation-item' : 'conversation-item'}
-                onClick={() => setSelected(conversation)}
-              >
-                <span>
-                  <strong>{conversation.name}</strong>
-                  <small>{conversation.message}</small>
-                </span>
-                <em>{conversation.time}</em>
-              </button>
-            ))}
-          </div>
-        </Panel>
+      {filteredMessages.length === 0 ? (
+        <EmptyState action="Criar mensagem de teste" description="Nenhuma conversa encontrada para esta conta." onAction={() => onOpenModal('message')} />
+      ) : (
+        <section className="inbox-layout">
+          <Panel title="Conversas" eyebrow="Entrada">
+            <div className="conversation-list">
+              {filteredMessages.map((conversation) => (
+                <button
+                  key={conversation.id}
+                  className={selected?.id === conversation.id ? 'selected conversation-item' : 'conversation-item'}
+                  onClick={() => setSelectedId(conversation.id)}
+                >
+                  <span>
+                    <strong>{conversation.remetente_nome}</strong>
+                    <small>{conversation.mensagem}</small>
+                  </span>
+                  <em>{conversation.unread_count ? `${conversation.unread_count} nova` : conversation.canal}</em>
+                </button>
+              ))}
+            </div>
+          </Panel>
 
-        <Panel title={selected.name} eyebrow={selected.status}>
-          <div className="chat-window">
-            <p className="message inbound">{selected.message}</p>
-            <p className="message outbound">Perfeito. Vou entender seu momento comercial e te mostrar o próximo passo.</p>
-          </div>
-          <div className="composer">
-            <input placeholder="Escreva uma resposta..." />
-            <button className="primary-button">Enviar</button>
-          </div>
-        </Panel>
-      </section>
+          <Panel title={selected.remetente_nome} eyebrow={selected.status}>
+            <div className="chat-window">
+              <p className="message inbound">{selected.mensagem}</p>
+              <p className="message outbound">Recebido. Vou qualificar seu interesse e indicar o próximo passo comercial.</p>
+            </div>
+            <div className="composer">
+              <input placeholder="Escreva uma resposta..." />
+              <button className="primary-button">Enviar</button>
+            </div>
+          </Panel>
+        </section>
+      )}
     </div>
   )
 }
 
-function ContactsPage() {
+function ContactsPage({
+  contacts,
+  query,
+  isSaving,
+  onConvertContact,
+  onOpenModal,
+}: {
+  contacts: Contact[]
+  query: string
+  isSaving: boolean
+  onConvertContact: (contact: Contact) => Promise<void>
+  onOpenModal: (modal: ModalType) => void
+}) {
+  const filteredContacts = contacts.filter((contact) =>
+    matchesQuery(query, [contact.nome, contact.telefone, contact.email, contact.origem, contact.potencial]),
+  )
+
   return (
     <div className="page-stack">
       <PageIntro
+        action="Novo contato"
+        description="Cadastre, organize e encontre rapidamente pessoas e empresas que podem virar leads."
         eyebrow="Base comercial"
         title="Contatos"
-        description="Cadastre, organize e encontre rapidamente pessoas e empresas que podem virar leads."
-        action="Novo contato"
+        onAction={() => onOpenModal('contact')}
       />
-      <DataTable
-        columns={['Nome', 'Telefone', 'Origem', 'Responsável', 'Potencial']}
-        rows={contacts.map((contact) => [contact.name, contact.phone, contact.origin, contact.owner, contact.score])}
-      />
+      <TablePanel emptyAction={() => onOpenModal('contact')} emptyLabel="Cadastrar contato" isEmpty={filteredContacts.length === 0}>
+        <table>
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Telefone</th>
+              <th>Origem</th>
+              <th>Potencial</th>
+              <th>Ação</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredContacts.map((contact) => (
+              <tr key={contact.id}>
+                <td>{contact.nome}</td>
+                <td>{contact.telefone}</td>
+                <td>{contact.origem}</td>
+                <td>{contact.potencial}</td>
+                <td>
+                  <button className="table-action" disabled={isSaving} onClick={() => onConvertContact(contact)}>
+                    Converter em lead
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </TablePanel>
     </div>
   )
 }
 
-function LeadsPage() {
+function LeadsPage({
+  leads,
+  query,
+  isSaving,
+  onCreateOpportunity,
+  onOpenModal,
+}: {
+  leads: Lead[]
+  query: string
+  isSaving: boolean
+  onCreateOpportunity: (lead: Lead) => Promise<void>
+  onOpenModal: (modal: ModalType) => void
+}) {
+  const filteredLeads = leads.filter((lead) =>
+    matchesQuery(query, [lead.nome, lead.telefone, lead.email, lead.interesse, lead.status, lead.origem]),
+  )
+
   return (
     <div className="page-stack">
       <PageIntro
+        action="Novo lead"
+        description="Acompanhe interessados, próximos passos e conversões para oportunidade."
         eyebrow="Qualificação"
         title="Leads"
-        description="Acompanhe interessados, próximos passos e conversões para oportunidade."
-        action="Novo lead"
+        onAction={() => onOpenModal('lead')}
       />
-      <div className="lead-grid">
-        {leads.map((lead) => (
-          <article className="lead-card" key={lead.name}>
-            <span className={`status-badge ${lead.status.replace(' ', '-')}`}>{lead.status}</span>
-            <h3>{lead.name}</h3>
-            <p>{lead.interest}</p>
-            <div>
-              <strong>{lead.value}</strong>
-              <small>{lead.owner}</small>
-            </div>
-            <footer>
-              <Clock3 size={16} />
-              {lead.next}
-            </footer>
-          </article>
-        ))}
-      </div>
+      {filteredLeads.length === 0 ? (
+        <EmptyState action="Cadastrar lead" description="Nenhum lead encontrado para esta conta." onAction={() => onOpenModal('lead')} />
+      ) : (
+        <div className="lead-grid">
+          {filteredLeads.map((lead) => (
+            <article className="lead-card" key={lead.id}>
+              <span className={`status-badge ${lead.status}`}>{lead.status.replace('_', ' ')}</span>
+              <h3>{lead.nome}</h3>
+              <p>{lead.interesse}</p>
+              <div>
+                <strong>{formatMoney(Number(lead.valor_estimado))}</strong>
+                <small>{lead.origem}</small>
+              </div>
+              <footer>
+                <Clock3 size={16} />
+                {lead.proxima_acao}
+              </footer>
+              <button className="secondary-button" disabled={isSaving} onClick={() => onCreateOpportunity(lead)}>
+                Criar oportunidade
+              </button>
+            </article>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
 
-function PipelinePage() {
+function PipelinePage({
+  leads,
+  opportunities,
+  onOpenModal,
+}: {
+  leads: Lead[]
+  opportunities: CrmSnapshot['opportunities']
+  onOpenModal: (modal: ModalType) => void
+}) {
   const grouped = useMemo(
     () =>
       stages.map((stage) => ({
         stage,
-        items: opportunities.filter((item) => item.stage === stage),
+        items: opportunities.filter((item) => item.etapa === stage),
       })),
-    [],
+    [opportunities],
   )
 
   return (
     <div className="page-stack">
       <PageIntro
+        action="Nova oportunidade"
+        description="Visualize oportunidades por etapa e mantenha sempre uma próxima ação definida."
         eyebrow="Pipeline"
         title="Funil de vendas"
-        description="Visualize oportunidades por etapa e mantenha sempre uma próxima ação definida."
-        action="Nova oportunidade"
+        onAction={() => onOpenModal(leads.length ? 'opportunity' : 'lead')}
       />
 
       <section className="pipeline-board" aria-label="Funil de vendas">
@@ -413,11 +852,11 @@ function PipelinePage() {
             </header>
             <div className="pipeline-items">
               {column.items.map((item) => (
-                <article className="opportunity-card" key={item.title}>
-                  <h3>{item.title}</h3>
-                  <strong>{formatMoney(item.value)}</strong>
-                  <p>{item.action}</p>
-                  <small>{item.owner}</small>
+                <article className="opportunity-card" key={item.id}>
+                  <h3>{item.titulo}</h3>
+                  <strong>{formatMoney(Number(item.valor))}</strong>
+                  <p>{item.proxima_acao}</p>
+                  <small>{item.responsavel}</small>
                 </article>
               ))}
               {column.items.length === 0 && <p className="empty-column">Sem oportunidades nesta etapa.</p>}
@@ -434,11 +873,13 @@ function HeroPanel({
   title,
   description,
   action,
+  onAction,
 }: {
   eyebrow: string
   title: string
   description: string
   action: string
+  onAction: () => void
 }) {
   return (
     <section className="hero-panel">
@@ -447,7 +888,7 @@ function HeroPanel({
         <h2>{title}</h2>
         <p>{description}</p>
       </div>
-      <button className="secondary-button">
+      <button className="secondary-button" onClick={onAction}>
         <Sparkles size={17} />
         {action}
       </button>
@@ -460,11 +901,13 @@ function PageIntro({
   title,
   description,
   action,
+  onAction,
 }: {
   eyebrow: string
   title: string
   description: string
   action: string
+  onAction: () => void
 }) {
   return (
     <section className="page-intro">
@@ -473,7 +916,7 @@ function PageIntro({
         <h2>{title}</h2>
         <p>{description}</p>
       </div>
-      <button className="primary-button">
+      <button className="primary-button" onClick={onAction}>
         <Plus size={17} />
         {action}
       </button>
@@ -506,7 +949,7 @@ function MetricCard({
   )
 }
 
-function Panel({ title, eyebrow, children }: { title: string; eyebrow: string; children: React.ReactNode }) {
+function Panel({ title, eyebrow, children }: { title: string; eyebrow: string; children: ReactNode }) {
   return (
     <section className="panel">
       <header>
@@ -531,40 +974,251 @@ function ActionItem({ title, description, priority }: { title: string; descripti
   )
 }
 
-function DataTable({ columns, rows }: { columns: string[]; rows: string[][] }) {
+function TablePanel({
+  children,
+  emptyAction,
+  emptyLabel,
+  isEmpty,
+}: {
+  children: ReactNode
+  emptyAction: () => void
+  emptyLabel: string
+  isEmpty: boolean
+}) {
   return (
     <section className="table-panel">
-      <div className="table-toolbar">
-        <label className="search-box">
-          <Search size={18} />
-          <input placeholder="Buscar registros..." />
-        </label>
-        <button className="secondary-button">
-          <Filter size={17} />
-          Filtros
-        </button>
-      </div>
-      <div className="table-scroll">
-        <table>
-          <thead>
-            <tr>
-              {columns.map((column) => (
-                <th key={column}>{column}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row) => (
-              <tr key={row.join('-')}>
-                {row.map((cell) => (
-                  <td key={cell}>{cell}</td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {isEmpty ? (
+        <EmptyState action={emptyLabel} description="Nenhum registro encontrado. Comece criando o primeiro item." onAction={emptyAction} />
+      ) : (
+        <div className="table-scroll">{children}</div>
+      )}
     </section>
+  )
+}
+
+function EmptyState({
+  action,
+  description,
+  onAction,
+}: {
+  action: string
+  description: string
+  onAction: () => void
+}) {
+  return (
+    <div className="empty-state">
+      <p>{description}</p>
+      <button className="secondary-button" onClick={onAction}>
+        <Plus size={16} />
+        {action}
+      </button>
+    </div>
+  )
+}
+
+function Modal({
+  title,
+  children,
+  onClose,
+}: {
+  title: string
+  children: ReactNode
+  onClose: () => void
+}) {
+  return (
+    <div className="modal-backdrop" role="presentation">
+      <section aria-modal="true" className="modal-card" role="dialog">
+        <header>
+          <h2>{title}</h2>
+          <button aria-label="Fechar" className="icon-button" onClick={onClose}>
+            <X size={18} />
+          </button>
+        </header>
+        {children}
+      </section>
+    </div>
+  )
+}
+
+function ContactModal({
+  isSaving,
+  onClose,
+  onSubmit,
+}: {
+  isSaving: boolean
+  onClose: () => void
+  onSubmit: (formData: FormData) => Promise<void>
+}) {
+  return (
+    <Modal title="Novo contato" onClose={onClose}>
+      <EntityForm isSaving={isSaving} submitLabel="Salvar contato" onClose={onClose} onSubmit={onSubmit}>
+        <TextField label="Nome" name="nome" required />
+        <TextField label="Telefone" name="telefone" placeholder="5511999999999" required />
+        <TextField label="E-mail" name="email" type="email" />
+        <TextField label="Origem" name="origem" placeholder="WhatsApp, indicação, landing page..." />
+        <TextField label="Potencial" name="potencial" placeholder="Novo, alto, médio..." />
+      </EntityForm>
+    </Modal>
+  )
+}
+
+function LeadModal({
+  isSaving,
+  onClose,
+  onSubmit,
+}: {
+  isSaving: boolean
+  onClose: () => void
+  onSubmit: (formData: FormData) => Promise<void>
+}) {
+  return (
+    <Modal title="Novo lead" onClose={onClose}>
+      <EntityForm isSaving={isSaving} submitLabel="Salvar lead" onClose={onClose} onSubmit={onSubmit}>
+        <TextField label="Nome" name="nome" required />
+        <TextField label="Telefone" name="telefone" placeholder="5511999999999" required />
+        <TextField label="E-mail" name="email" type="email" />
+        <TextField label="Interesse" name="interesse" placeholder="Produto, serviço ou necessidade" required />
+        <TextField label="Origem" name="origem" placeholder="WhatsApp, Meta Ads, indicação..." />
+        <TextField label="Valor estimado" name="valor_estimado" type="number" />
+      </EntityForm>
+    </Modal>
+  )
+}
+
+function OpportunityModal({
+  isSaving,
+  leads,
+  onClose,
+  onSubmit,
+}: {
+  isSaving: boolean
+  leads: Lead[]
+  onClose: () => void
+  onSubmit: (formData: FormData) => Promise<void>
+}) {
+  return (
+    <Modal title="Nova oportunidade" onClose={onClose}>
+      <EntityForm isSaving={isSaving} submitLabel="Salvar oportunidade" onClose={onClose} onSubmit={onSubmit}>
+        <SelectField label="Lead vinculado" name="lead_id">
+          <option value="">Sem vínculo</option>
+          {leads.map((lead) => (
+            <option key={lead.id} value={lead.id}>
+              {lead.nome}
+            </option>
+          ))}
+        </SelectField>
+        <TextField label="Título" name="titulo" required />
+        <SelectField label="Etapa" name="etapa">
+          {stages.map((stage) => (
+            <option key={stage} value={stage}>
+              {stage}
+            </option>
+          ))}
+        </SelectField>
+        <TextField label="Valor" name="valor" type="number" />
+        <TextField label="Responsável" name="responsavel" />
+        <TextField label="Próxima ação" name="proxima_acao" />
+      </EntityForm>
+    </Modal>
+  )
+}
+
+function MessageModal({
+  isSaving,
+  onClose,
+  onSubmit,
+}: {
+  isSaving: boolean
+  onClose: () => void
+  onSubmit: (formData: FormData) => Promise<void>
+}) {
+  return (
+    <Modal title="Simular mensagem recebida" onClose={onClose}>
+      <EntityForm isSaving={isSaving} submitLabel="Salvar mensagem" onClose={onClose} onSubmit={onSubmit}>
+        <TextField label="Nome do remetente" name="remetente_nome" required />
+        <TextField label="Telefone" name="telefone" placeholder="5511999999999" required />
+        <TextField label="Status" name="status" placeholder="Novo lead" />
+        <label className="field-wide">
+          Mensagem
+          <textarea name="mensagem" placeholder="Tenho interesse em conhecer a solução." required />
+        </label>
+      </EntityForm>
+    </Modal>
+  )
+}
+
+function EntityForm({
+  children,
+  isSaving,
+  submitLabel,
+  onClose,
+  onSubmit,
+}: {
+  children: ReactNode
+  isSaving: boolean
+  submitLabel: string
+  onClose: () => void
+  onSubmit: (formData: FormData) => Promise<void>
+}) {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    await onSubmit(new FormData(event.currentTarget))
+  }
+
+  return (
+    <form className="entity-form" onSubmit={handleSubmit}>
+      <div className="form-grid">{children}</div>
+      <footer className="form-actions">
+        <button className="secondary-button" onClick={onClose} type="button">
+          Cancelar
+        </button>
+        <button className="primary-button" disabled={isSaving} type="submit">
+          {isSaving ? 'Salvando...' : submitLabel}
+        </button>
+      </footer>
+    </form>
+  )
+}
+
+function TextField({
+  label,
+  name,
+  placeholder,
+  required,
+  type = 'text',
+}: {
+  label: string
+  name: string
+  placeholder?: string
+  required?: boolean
+  type?: string
+}) {
+  return (
+    <label>
+      {label}
+      <input name={name} placeholder={placeholder} required={required} type={type} />
+    </label>
+  )
+}
+
+function SelectField({ children, label, name }: { children: ReactNode; label: string; name: string }) {
+  return (
+    <label>
+      {label}
+      <select name={name}>{children}</select>
+    </label>
+  )
+}
+
+function LoadingScreen({ label }: { label: string }) {
+  return (
+    <main className="loading-state">
+      <div className="brand-mark">
+        <span />
+        <strong>FC</strong>
+      </div>
+      <p>{label}</p>
+    </main>
   )
 }
 
