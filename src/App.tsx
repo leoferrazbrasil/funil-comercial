@@ -411,10 +411,7 @@ function LoginScreen({
   return (
     <main className="login-page">
       <section className="login-visual" aria-label="Funil Comercial">
-        <div className="brand-mark">
-          <span />
-          <strong>FC</strong>
-        </div>
+        <img src="/logo.png" alt="Logo" style={{ width: '80px', height: '80px', borderRadius: '24px', marginBottom: '32px' }} />
         <p className="eyebrow">Funil Comercial</p>
         <h1>Organize conversas, leads e oportunidades em um só fluxo comercial.</h1>
         <p>Uma fundação simples para operar WhatsApp, contatos, leads, funil e métricas comerciais com Supabase.</p>
@@ -486,7 +483,7 @@ function Sidebar({
   return (
     <aside className="sidebar">
       <button className="logo-button" onClick={() => onNavigate('dashboard')}>
-        <span className="mini-mark">FC</span>
+        <img src="/logo.png" alt="Logo" style={{ width: '42px', height: '42px', borderRadius: '14px', flex: '0 0 auto' }} />
         <span>
           <strong>Funil Comercial</strong>
           <small>Operação comercial</small>

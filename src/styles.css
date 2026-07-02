@@ -1,27 +1,28 @@
 :root {
   font-family:
-    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  color: #f7f5ef;
-  background: #0e1116;
+    Outfit, Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+  color: #041d57;
+  background: #f3f6f8;
   font-synthesis: none;
   text-rendering: geometricPrecision;
   -webkit-font-smoothing: antialiased;
-  --bg: #0e1116;
-  --surface: #151a20;
-  --surface-2: #1b212a;
-  --line: #2a303a;
-  --line-strong: #37404c;
-  --text: #f7f5ef;
-  --muted: #aeb5bf;
-  --quiet: #78818d;
-  --green: #23c483;
-  --green-soft: rgba(35, 196, 131, 0.13);
-  --amber: #f2b84b;
-  --amber-soft: rgba(242, 184, 75, 0.14);
+  --bg: #f3f6f8;
+  --surface: #ffffff;
+  --surface-2: #f8fafc;
+  --line: #e2e8f0;
+  --line-strong: #cbd5e1;
+  --text: #041d57;
+  --muted: #64748b;
+  --quiet: #94a3b8;
+  --green: #01bbb6; /* Darwin Teal */
+  --green-soft: rgba(1, 187, 182, 0.15);
+  --amber: #f59e0b;
+  --amber-soft: rgba(245, 158, 11, 0.15);
   --red: #ef4444;
-  --blue: #3b82f6;
-  --radius: 18px;
-  --shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+  --blue: #0ea5e9;
+  --navy: #041d57; /* Darwin Navy */
+  --radius: 16px;
+  --shadow: 0 12px 32px rgba(4, 29, 87, 0.08);
 }
 
 * {
@@ -39,8 +40,7 @@ body {
   min-height: 100vh;
   margin: 0;
   background:
-    radial-gradient(circle at 72% 16%, rgba(35, 196, 131, 0.16), transparent 28rem),
-    radial-gradient(circle at 16% 86%, rgba(242, 184, 75, 0.1), transparent 24rem), var(--bg);
+    radial-gradient(circle at 72% 16%, rgba(1, 187, 182, 0.1), transparent 32rem), radial-gradient(circle at 16% 86%, rgba(4, 29, 87, 0.05), transparent 32rem), var(--bg);
 }
 
 button,
@@ -73,7 +73,7 @@ textarea:focus-visible {
 .login-visual,
 .login-card {
   border: 1px solid var(--line);
-  background: rgba(21, 26, 32, 0.78);
+  background: var(--surface);
   box-shadow: var(--shadow);
 }
 
@@ -94,8 +94,7 @@ textarea:focus-visible {
   pointer-events: none;
   content: "";
   background:
-    linear-gradient(90deg, transparent 0 14%, rgba(35, 196, 131, 0.16) 14% 14.3%, transparent 14.3% 100%),
-    linear-gradient(0deg, transparent 0 36%, rgba(242, 184, 75, 0.12) 36% 36.3%, transparent 36.3% 100%);
+    linear-gradient(90deg, transparent 0 14%, rgba(1, 187, 182, 0.1) 14% 14.3%, transparent 14.3% 100%), linear-gradient(0deg, transparent 0 36%, rgba(4, 29, 87, 0.05) 36% 36.3%, transparent 36.3% 100%);
   opacity: 0.9;
 }
 
@@ -111,9 +110,9 @@ textarea:focus-visible {
   height: 78px;
   place-items: center;
   margin-bottom: 32px;
-  border: 1px solid rgba(35, 196, 131, 0.34);
+  border: 1px solid rgba(1, 187, 182, 0.34);
   border-radius: 24px;
-  background: linear-gradient(145deg, rgba(35, 196, 131, 0.24), rgba(242, 184, 75, 0.08));
+  background: var(--surface);
 }
 
 .brand-mark span {
@@ -197,7 +196,7 @@ textarea {
   min-height: 48px;
   border: 1px solid var(--line);
   border-radius: 12px;
-  background: #101419;
+  background: var(--surface);
   color: var(--text);
   padding: 0 14px;
 }
@@ -231,15 +230,15 @@ button:disabled {
 
 .primary-button {
   gap: 10px;
-  background: linear-gradient(135deg, var(--green), #70e5b5);
-  color: #07120d;
+  background: var(--green);
+  color: #ffffff;
   padding: 0 18px;
 }
 
 .secondary-button {
   gap: 9px;
   border: 1px solid var(--line-strong);
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--surface-2);
   color: var(--text);
   padding: 0 16px;
 }
@@ -264,7 +263,7 @@ button:disabled {
   height: 100vh;
   flex-direction: column;
   border-right: 1px solid var(--line);
-  background: rgba(10, 13, 17, 0.72);
+  background: var(--surface);
   backdrop-filter: blur(24px);
   padding: 20px 14px;
 }
@@ -366,8 +365,8 @@ button:disabled {
 .alert.error,
 .config-warning {
   border-color: rgba(239, 68, 68, 0.42);
-  background: rgba(239, 68, 68, 0.12);
-  color: #fecaca;
+  background: #fee2e2;
+  color: #7f1d1d;
 }
 
 .loading-strip {
@@ -385,7 +384,7 @@ button:disabled {
   justify-content: space-between;
   min-height: 76px;
   border-bottom: 1px solid var(--line);
-  background: rgba(14, 17, 22, 0.76);
+  background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(22px);
   gap: 20px;
   padding: 0 28px;
@@ -413,7 +412,7 @@ button:disabled {
   height: 44px;
   border: 1px solid var(--line);
   border-radius: 999px;
-  background: #101419;
+  background: var(--surface);
   color: var(--quiet);
   gap: 8px;
   padding: 0 14px;
@@ -454,7 +453,7 @@ button:disabled {
 .lead-card,
 .pipeline-column {
   border: 1px solid var(--line);
-  background: rgba(21, 26, 32, 0.78);
+  background: var(--surface);
   box-shadow: 0 18px 48px rgba(0, 0, 0, 0.16);
 }
 
@@ -574,7 +573,7 @@ button:disabled {
   align-items: center;
   border: 1px solid var(--line);
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.025);
+  background: var(--surface-2);
   gap: 12px;
   padding: 14px;
 }
@@ -636,7 +635,7 @@ button:disabled {
   width: 100%;
   border: 1px solid var(--line);
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.025);
+  background: var(--surface-2);
   color: var(--text);
   gap: 12px;
   padding: 14px;
@@ -845,7 +844,7 @@ th {
   display: grid;
   border: 1px solid var(--line);
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.025);
+  background: var(--surface-2);
   gap: 8px;
   padding: 14px;
 }
