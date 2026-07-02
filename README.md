@@ -24,10 +24,10 @@ npm run dev
 npm run build
 ```
 
-O projeto está configurado com `base: "/funil-comercial/"` para ser publicado em:
+O projeto está configurado com `base: "/"` para ser publicado no diretório raiz:
 
 ```text
-https://leonardobrasil.com.br/funil-comercial/
+https://leonardobrasil.com.br/
 ```
 
 ## Deploy
@@ -41,14 +41,14 @@ Configuração recomendada na hospedagem:
 
 ## Navegação
 
-O protótipo usa rotas por hash para funcionar bem em subdiretório sem exigir rewrite no servidor:
+O protótipo usa rotas por hash para funcionar bem na raiz sem exigir rewrite no servidor:
 
 ```text
-/funil-comercial/#/dashboard
-/funil-comercial/#/inbox
-/funil-comercial/#/contatos
-/funil-comercial/#/leads
-/funil-comercial/#/funil
+/#/dashboard
+/#/inbox
+/#/contatos
+/#/leads
+/#/funil
 ```
 
 ## Status
