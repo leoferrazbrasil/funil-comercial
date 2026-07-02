@@ -28,6 +28,20 @@ import { DndContext, useDraggable, useDroppable } from "@dnd-kit/core";
 import { IMaskInput } from "react-imask";
 import { useEffect, useMemo, useState } from "react";
 import {
+  BrowserRouter,
+  Routes,
+  Route,
+  useNavigate,
+  useLocation,
+  Navigate,
+} from "react-router-dom";
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+import {
   convertContactToLead,
   createContact,
   createInboxMessage,
@@ -45,11 +59,11 @@ import type {
   InboxMessage,
   Lead,
   OpportunityStage,
-  Route,
+  Route as AppRoute,
 } from "./lib/types";
 
 type NavItem = {
-  id: Route;
+  id: AppRoute;
   label: string;
   icon: LucideIcon;
 };
@@ -89,13 +103,6 @@ const formatMoney = (value: number) =>
     maximumFractionDigits: 0,
   }).format(value);
 
-const getRoute = (): Route => {
-  const route = window.location.hash.replace("#/", "") as Route;
-  if (["dashboard", "inbox", "contatos", "leads", "funil"].includes(route))
-    return route;
-  return "login";
-};
-
 const normalizeSearch = (value: string) =>
   value
     .normalize("NFD")
@@ -126,13 +133,17 @@ const getErrorMessage = (error: unknown) => {
 const getFormValue = (formData: FormData, key: string) =>
   String(formData.get(key) ?? "").trim();
 
-function App() {
-  const [route, setRoute] = useState<Route>(getRoute);
+function AppContent() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const route = (
+    location.pathname === "/" ? "dashboard" : location.pathname.slice(1)
+  ) as AppRoute;
   const [session, setSession] = useState<Session | null>(null);
-  const [snapshot, setSnapshot] = useState<CrmSnapshot>(emptySnapshot);
   const [query, setQuery] = useState("");
   const [modal, setModal] = useState<ModalType | null>(null);
   const [isBooting, setIsBooting] = useState(true);
+  const queryClient = useQueryClient();
 
   const [theme, setTheme] = useState<"light" | "dark">(() => {
     const saved = localStorage.getItem("theme");
@@ -151,28 +162,9 @@ function App() {
 
   const toggleTheme = () =>
     setTheme((prev) => (prev === "light" ? "dark" : "light"));
-  const [isLoadingData, setIsLoadingData] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const [crmError, setCrmError] = useState<string | null>(null);
-  const [refreshKey, setRefreshKey] = useState(0);
-
-  const navigate = (nextRoute: Route) => {
-    if (nextRoute === "login") {
-      window.location.hash = "";
-      setRoute("login");
-      return;
-    }
-
-    window.location.hash = `/${nextRoute}`;
-    setRoute(nextRoute);
-  };
-
-  useEffect(() => {
-    const onHashChange = () => setRoute(getRoute());
-    window.addEventListener("hashchange", onHashChange);
-    return () => window.removeEventListener("hashchange", onHashChange);
-  }, []);
 
   useEffect(() => {
     if (!isSupabaseConfigured || !supabase) {
@@ -187,7 +179,8 @@ function App() {
       .then(({ data }) => {
         if (!mounted) return;
         setSession(data.session);
-        if (data.session && getRoute() === "login") navigate("dashboard");
+        if (data.session && location.pathname === "/login")
+          navigate("/dashboard");
       })
       .finally(() => {
         if (mounted) setIsBooting(false);
@@ -198,7 +191,7 @@ function App() {
     } = supabase.auth.onAuthStateChange((_event, nextSession) => {
       setSession(nextSession);
       if (!nextSession) {
-        setSnapshot(emptySnapshot);
+        queryClient.removeQueries({ queryKey: ["crmSnapshot"] });
         navigate("login");
       }
     });
@@ -209,39 +202,32 @@ function App() {
     };
   }, []);
 
+  const {
+    data: snapshotData,
+    isLoading: isLoadingData,
+    error: fetchError,
+  } = useQuery({
+    queryKey: ["crmSnapshot", session?.user?.id],
+    queryFn: async () => {
+      const currentUser = session!.user;
+      await upsertProfile(currentUser);
+      await ensureDefaultStages(currentUser.id);
+      return await getCrmSnapshot(currentUser.id);
+    },
+    enabled: !!session?.user && !!isSupabaseConfigured && !!supabase,
+  });
+
+  const snapshot = snapshotData ?? emptySnapshot;
+
   useEffect(() => {
-    if (!session?.user) {
-      setSnapshot(emptySnapshot);
-      return;
+    if (fetchError) {
+      setCrmError(getErrorMessage(fetchError));
     }
+  }, [fetchError]);
 
-    let cancelled = false;
-    const currentUser = session.user;
-
-    async function loadData() {
-      setIsLoadingData(true);
-      setCrmError(null);
-
-      try {
-        await upsertProfile(currentUser);
-        await ensureDefaultStages(currentUser.id);
-        const nextSnapshot = await getCrmSnapshot(currentUser.id);
-        if (!cancelled) setSnapshot(nextSnapshot);
-      } catch (error) {
-        if (!cancelled) setCrmError(getErrorMessage(error));
-      } finally {
-        if (!cancelled) setIsLoadingData(false);
-      }
-    }
-
-    loadData();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [session?.user, refreshKey]);
-
-  const reloadData = () => setRefreshKey((current) => current + 1);
+  const reloadData = () => {
+    queryClient.invalidateQueries({ queryKey: ["crmSnapshot"] });
+  };
 
   const handleAuth = async (
     email: string,
@@ -407,7 +393,7 @@ function App() {
     const opportunityId = active.id;
     const novaEtapa = over.id;
 
-    setSnapshot((prev: any) => {
+    queryClient.setQueryData(["crmSnapshot", session?.user?.id], (prev: any) => {
       if (!prev) return prev;
       return {
         ...prev,
@@ -437,11 +423,14 @@ function App() {
   return (
     <div className="shell">
       <Toaster position="bottom-right" />
-      <Sidebar
-        activeRoute={route}
-        onNavigate={navigate}
-        onSignOut={handleSignOut}
-      />
+      {session ? (
+        <Sidebar
+          navItems={navItems}
+          route={route}
+          onNavigate={(path) => navigate("/" + path)}
+          onSignOut={handleSignOut}
+        />
+      ) : null}
       <main className="workspace">
         <Header
           theme={theme}
@@ -463,42 +452,59 @@ function App() {
           {isLoadingData && (
             <div className="loading-strip">Atualizando dados do CRM...</div>
           )}
-          {route === "dashboard" && (
-            <Dashboard snapshot={snapshot} onOpenModal={setModal} />
-          )}
-          {route === "inbox" && (
-            <InboxPage
-              messages={snapshot.messages}
-              query={query}
-              onOpenModal={setModal}
+          <Routes>
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route
+              path="/dashboard"
+              element={<Dashboard snapshot={snapshot} onOpenModal={setModal} />}
             />
-          )}
-          {route === "contatos" && (
-            <ContactsPage
-              contacts={snapshot.contacts}
-              query={query}
-              isSaving={isSaving}
-              onConvertContact={handleConvertContact}
-              onOpenModal={setModal}
+            <Route
+              path="/inbox"
+              element={
+                <InboxPage
+                  messages={snapshot.messages}
+                  query={query}
+                  onOpenModal={setModal}
+                />
+              }
             />
-          )}
-          {route === "leads" && (
-            <LeadsPage
-              isSaving={isSaving}
-              leads={snapshot.leads}
-              query={query}
-              onCreateOpportunity={handleCreateOpportunityFromLead}
-              onOpenModal={setModal}
+            <Route
+              path="/contatos"
+              element={
+                <ContactsPage
+                  contacts={snapshot.contacts}
+                  query={query}
+                  isSaving={isSaving}
+                  onConvertContact={handleConvertContact}
+                  onOpenModal={setModal}
+                />
+              }
             />
-          )}
-          {route === "funil" && (
-            <PipelinePage
-              leads={snapshot.leads}
-              opportunities={snapshot.opportunities}
-              onOpenModal={setModal}
-              onDragEnd={handleDragEnd}
+            <Route
+              path="/leads"
+              element={
+                <LeadsPage
+                  isSaving={isSaving}
+                  leads={snapshot.leads}
+                  query={query}
+                  onCreateOpportunity={handleCreateOpportunityFromLead}
+                  onOpenModal={setModal}
+                />
+              }
             />
-          )}
+            <Route
+              path="/funil"
+              element={
+                <PipelinePage
+                  leads={snapshot.leads}
+                  opportunities={snapshot.opportunities}
+                  onOpenModal={setModal}
+                  onDragEnd={handleDragEnd}
+                />
+              }
+            />
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
         </section>
       </main>
 
@@ -662,12 +668,14 @@ function LoginScreen({
 }
 
 function Sidebar({
-  activeRoute,
+  navItems,
+  route,
   onNavigate,
   onSignOut,
 }: {
-  activeRoute: Route;
-  onNavigate: (route: Route) => void;
+  navItems: NavItem[];
+  route: AppRoute;
+  onNavigate: (id: AppRoute) => void;
   onSignOut: () => void;
 }) {
   return (
@@ -695,7 +703,7 @@ function Sidebar({
           return (
             <button
               key={item.id}
-              className={activeRoute === item.id ? "active" : ""}
+              className={route === item.id ? "active" : ""}
               onClick={() => onNavigate(item.id)}
             >
               <Icon size={18} />
@@ -730,7 +738,7 @@ function Header({
 }: {
   profileName: string;
   query: string;
-  route: Route;
+  route: AppRoute;
   theme?: "light" | "dark";
   onQueryChange: (q: string) => void;
   onSignOut: () => void;
@@ -760,10 +768,14 @@ function Header({
             placeholder="Buscar..."
           />
         </label>
-        
+
         {toggleTheme && (
-          <button className="icon-button" aria-label="Alternar Tema" onClick={toggleTheme}>
-            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+          <button
+            className="icon-button"
+            aria-label="Alternar Tema"
+            onClick={toggleTheme}
+          >
+            {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
           </button>
         )}
 
@@ -1682,4 +1694,21 @@ function LoadingScreen({ label }: { label: string }) {
   );
 }
 
-export default App;
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      staleTime: 1000 * 60 * 5,
+    },
+  },
+});
+
+export default function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <AppContent />
+      </BrowserRouter>
+    </QueryClientProvider>
+  );
+}
