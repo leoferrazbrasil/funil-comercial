@@ -13,41 +13,11 @@
   font-synthesis: none;
   text-rendering: geometricPrecision;
   -webkit-font-smoothing: antialiased;
-  --bg: #f3f6f8;
-  --surface: #ffffff;
-  --surface-2: #f8fafc;
-  --line: #e2e8f0;
-  --line-strong: #cbd5e1;
-  --text: #041d57;
-  --muted: #64748b;
-  --quiet: #94a3b8;
-  --green: #01bbb6; /* Darwin Teal */
-  --green-soft: rgba(1, 187, 182, 0.15);
-  --amber: #f59e0b;
-  --amber-soft: rgba(245, 158, 11, 0.15);
-  --red: #ef4444;
-  --blue: #0ea5e9;
-  --navy: #041d57; /* Darwin Navy */
-  --radius: 16px;
-  --shadow: 0 12px 32px rgba(4, 29, 87, 0.08);
+  color-scheme: light;
 }
 
 [data-theme="dark"] {
-  --bg: #050505;
-  --surface: #111111;
-  --surface-2: #171717;
-  --line: #27272a;
-  --line-strong: #3f3f46;
-  --text: #ffffff;
-  --muted: #a1a1aa;
-  --quiet: #52525b;
-  --green: #23c483;
-  --green-soft: rgba(35, 196, 131, 0.14);
-  --amber: #f8b42c;
-  --amber-soft: rgba(248, 180, 44, 0.16);
-  --on-primary: #06110f;
-  --navy: #ffffff;
-  --shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+  color-scheme: dark;
 }
 
 html,
@@ -122,18 +92,7 @@ body {
   min-height: 100vh;
   margin: 0;
   color: var(--text);
-  background:
-    radial-gradient(
-      circle at 72% 16%,
-      rgba(1, 187, 182, 0.1),
-      transparent 32rem
-    ),
-    radial-gradient(
-      circle at 16% 86%,
-      rgba(4, 29, 87, 0.05),
-      transparent 32rem
-    ),
-    var(--bg);
+  background: var(--fc-body-bg);
 }
 
 button,
@@ -151,8 +110,8 @@ button:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-  outline: 2px solid var(--green);
-  outline-offset: 2px;
+  outline: 0;
+  box-shadow: var(--fc-focus-ring);
 }
 
 .login-page {
@@ -170,6 +129,10 @@ textarea:focus-visible {
   --amber-soft: rgba(248, 180, 44, 0.16);
   --navy: #f8fafc;
   --on-primary: #06110f;
+  --fc-button-secondary-bg: rgba(255, 255, 255, 0.055);
+  --fc-button-secondary-fg: #ffffff;
+  --fc-input-bg: rgba(255, 255, 255, 0.055);
+  --fc-input-border: rgba(255, 255, 255, 0.14);
   display: grid;
   grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr);
   min-height: 100vh;
@@ -393,9 +356,9 @@ select,
 textarea {
   width: 100%;
   min-height: 48px;
-  border: 1px solid var(--line);
+  border: 1px solid var(--fc-input-border);
   border-radius: 12px;
-  background: var(--surface);
+  background: var(--fc-input-bg);
   color: var(--text);
   padding: 0 14px;
 }
@@ -429,8 +392,8 @@ button:disabled {
 
 .primary-button {
   gap: 10px;
-  background: linear-gradient(90deg, var(--amber), #ffd36d);
-  color: #07110d;
+  background: var(--fc-button-primary-bg);
+  color: var(--fc-button-primary-fg);
   box-shadow: 0 16px 32px rgba(248, 180, 44, 0.18);
   padding: 0 18px;
 }
@@ -438,8 +401,8 @@ button:disabled {
 .secondary-button {
   gap: 9px;
   border: 1px solid var(--line-strong);
-  background: var(--surface-2);
-  color: var(--text);
+  background: var(--fc-button-secondary-bg);
+  color: var(--fc-button-secondary-fg);
   padding: 0 16px;
 }
 
@@ -451,43 +414,16 @@ button:disabled {
 }
 
 .shell {
-  --bg: #050505;
-  --surface: #101010;
-  --surface-2: #151515;
-  --line: #2a2a2a;
-  --line-strong: #3a3a3a;
-  --text: #f8fafc;
-  --muted: #cbd5e1;
-  --quiet: #94a3b8;
-  --green: #23c483;
-  --green-soft: rgba(35, 196, 131, 0.14);
-  --amber: #f8b42c;
-  --amber-soft: rgba(248, 180, 44, 0.16);
-  --navy: #f8fafc;
-  --on-primary: #06110f;
   display: grid;
   grid-template-columns: 272px minmax(0, 1fr);
   min-height: 100vh;
   background: var(--bg);
   color: var(--text);
-  color-scheme: dark;
+  color-scheme: light;
 }
 
-[data-theme="light"] .shell {
-  --bg: #050505;
-  --surface: #101010;
-  --surface-2: #151515;
-  --line: #2a2a2a;
-  --line-strong: #3a3a3a;
-  --text: #f8fafc;
-  --muted: #cbd5e1;
-  --quiet: #94a3b8;
-  --green: #23c483;
-  --green-soft: rgba(35, 196, 131, 0.14);
-  --amber: #f8b42c;
-  --amber-soft: rgba(248, 180, 44, 0.16);
-  --navy: #f8fafc;
-  --on-primary: #06110f;
+[data-theme="dark"] .shell {
+  color-scheme: dark;
 }
 
 .sidebar {
@@ -497,7 +433,7 @@ button:disabled {
   height: 100vh;
   flex-direction: column;
   border-right: 1px solid var(--line);
-  background: var(--surface);
+  background: var(--fc-sidebar-bg);
   backdrop-filter: blur(24px);
   padding: 20px 14px;
 }
@@ -599,13 +535,13 @@ button:disabled {
 .alert.error,
 .config-warning {
   border-color: rgba(239, 68, 68, 0.42);
-  background: #fee2e2;
-  color: #7f1d1d;
+  background: var(--fc-danger-soft);
+  color: var(--fc-danger-text);
 }
 
 .loading-strip {
-  border-color: rgba(242, 184, 75, 0.32);
-  background: rgba(242, 184, 75, 0.1);
+  border-color: color-mix(in srgb, var(--amber) 34%, transparent);
+  background: var(--amber-soft);
   color: var(--amber);
 }
 
@@ -618,14 +554,10 @@ button:disabled {
   justify-content: space-between;
   min-height: 76px;
   border-bottom: 1px solid var(--line);
-  background: rgba(16, 16, 16, 0.88);
+  background: var(--fc-topbar-bg);
   backdrop-filter: blur(22px);
   gap: 20px;
   padding: 0 28px;
-}
-
-[data-theme="light"] .topbar {
-  background: rgba(16, 16, 16, 0.88);
 }
 
 .topbar h1,
@@ -692,8 +624,8 @@ button:disabled {
 .lead-card,
 .pipeline-column {
   border: 1px solid var(--line);
-  background: linear-gradient(180deg, rgba(18, 18, 18, 0.98), rgba(10, 10, 10, 0.98));
-  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.16);
+  background: var(--fc-panel-bg);
+  box-shadow: var(--fc-shadow-card);
 }
 
 .hero-panel,
@@ -737,8 +669,8 @@ button:disabled {
   justify-content: space-between;
   border-radius: 16px;
   background:
-    radial-gradient(circle at 86% 16%, rgba(35, 196, 131, 0.1), transparent 9rem),
-    linear-gradient(180deg, rgba(18, 18, 18, 0.98), rgba(10, 10, 10, 0.98));
+    radial-gradient(circle at 86% 16%, var(--green-soft), transparent 9rem),
+    var(--fc-panel-bg);
   padding: 20px;
 }
 
@@ -889,7 +821,7 @@ button:disabled {
 
 .conversation-item.selected,
 .conversation-item:hover {
-  border-color: rgba(35, 196, 131, 0.48);
+  border-color: color-mix(in srgb, var(--green) 54%, transparent);
   background: var(--green-soft);
 }
 
@@ -1128,7 +1060,7 @@ th {
   min-height: 220px;
   border: 1px dashed var(--line-strong);
   border-radius: var(--radius);
-  background: rgba(255, 255, 255, 0.018);
+  background: color-mix(in srgb, var(--surface-2) 82%, transparent);
   gap: 14px;
   padding: 28px;
   text-align: center;

@@ -1,27 +1,101 @@
 :root {
+  /* Primitive tokens */
   --fc-color-ink-950: #06110f;
   --fc-color-ink-900: #0b1215;
   --fc-color-ink-800: #111820;
+  --fc-color-navy-900: #041d57;
+  --fc-color-navy-700: #143574;
+  --fc-color-paper-25: #fbfcfd;
   --fc-color-paper-50: #f3f6f8;
   --fc-color-paper-100: #e8eef2;
-  --fc-color-green-500: #01bbb6;
-  --fc-color-green-600: #009f9a;
-  --fc-color-amber-400: #f5b940;
+  --fc-color-paper-200: #d7e1e8;
+  --fc-color-slate-400: #94a3b8;
+  --fc-color-slate-500: #64748b;
+  --fc-color-slate-600: #475569;
+  --fc-color-teal-400: #23c483;
+  --fc-color-teal-500: #01bbb6;
+  --fc-color-teal-600: #009f9a;
+  --fc-color-amber-300: #ffd36d;
+  --fc-color-amber-400: #f8b42c;
   --fc-color-amber-500: #f59e0b;
+  --fc-color-blue-500: #0ea5e9;
+  --fc-color-red-500: #ef4444;
+  --fc-color-red-800: #7f1d1d;
   --fc-radius-sm: 10px;
   --fc-radius-md: 14px;
-  --fc-radius-lg: 18px;
-  --fc-radius-xl: 24px;
+  --fc-radius-lg: 16px;
+  --fc-radius-xl: 22px;
+  --fc-radius-2xl: 28px;
   --fc-space-1: 4px;
   --fc-space-2: 8px;
   --fc-space-3: 12px;
   --fc-space-4: 16px;
   --fc-space-5: 20px;
   --fc-space-6: 24px;
+  --fc-space-7: 28px;
   --fc-space-8: 32px;
-  --fc-shadow-card: 0 18px 48px rgba(0, 0, 0, 0.16);
-  --fc-shadow-panel: 0 12px 32px rgba(4, 29, 87, 0.08);
+  --fc-duration-fast: 150ms;
+  --fc-duration-normal: 240ms;
+
+  /* Semantic tokens - light */
+  --fc-bg: var(--fc-color-paper-50);
+  --fc-surface: #ffffff;
+  --fc-surface-2: var(--fc-color-paper-25);
+  --fc-surface-raised: rgba(255, 255, 255, 0.92);
+  --fc-line: var(--fc-color-paper-200);
+  --fc-line-strong: #c5d1dc;
+  --fc-text: var(--fc-color-navy-900);
+  --fc-muted: var(--fc-color-slate-600);
+  --fc-quiet: var(--fc-color-slate-400);
+  --fc-accent: var(--fc-color-teal-600);
+  --fc-accent-strong: var(--fc-color-teal-500);
+  --fc-accent-soft: rgba(1, 187, 182, 0.13);
+  --fc-warning: var(--fc-color-amber-500);
+  --fc-warning-soft: rgba(245, 158, 11, 0.14);
+  --fc-danger: var(--fc-color-red-500);
+  --fc-danger-soft: #fee2e2;
+  --fc-danger-text: var(--fc-color-red-800);
+  --fc-info: var(--fc-color-blue-500);
+  --fc-on-primary: var(--fc-color-ink-950);
+  --fc-shadow-panel: 0 14px 36px rgba(4, 29, 87, 0.08);
+  --fc-shadow-card: 0 18px 48px rgba(4, 29, 87, 0.1);
   --fc-focus-ring: 0 0 0 4px rgba(1, 187, 182, 0.18);
+  --fc-body-bg:
+    radial-gradient(circle at 72% 16%, rgba(1, 187, 182, 0.1), transparent 32rem),
+    radial-gradient(circle at 16% 86%, rgba(4, 29, 87, 0.05), transparent 32rem),
+    var(--fc-bg);
+
+  /* Component tokens */
+  --fc-panel-bg: linear-gradient(180deg, var(--fc-surface-raised), var(--fc-surface));
+  --fc-panel-border: var(--fc-line);
+  --fc-topbar-bg: rgba(255, 255, 255, 0.82);
+  --fc-sidebar-bg: rgba(255, 255, 255, 0.9);
+  --fc-input-bg: var(--fc-surface);
+  --fc-input-border: var(--fc-line);
+  --fc-button-primary-bg: linear-gradient(90deg, var(--fc-warning), var(--fc-color-amber-300));
+  --fc-button-primary-fg: var(--fc-on-primary);
+  --fc-button-secondary-bg: var(--fc-surface-2);
+  --fc-button-secondary-fg: var(--fc-text);
+
+  /* Compatibility aliases used by the app stylesheet */
+  --bg: var(--fc-bg);
+  --surface: var(--fc-surface);
+  --surface-2: var(--fc-surface-2);
+  --line: var(--fc-line);
+  --line-strong: var(--fc-line-strong);
+  --text: var(--fc-text);
+  --muted: var(--fc-muted);
+  --quiet: var(--fc-quiet);
+  --green: var(--fc-accent);
+  --green-soft: var(--fc-accent-soft);
+  --amber: var(--fc-warning);
+  --amber-soft: var(--fc-warning-soft);
+  --red: var(--fc-danger);
+  --blue: var(--fc-info);
+  --navy: var(--fc-text);
+  --on-primary: var(--fc-on-primary);
+  --radius: var(--fc-radius-lg);
+  --shadow: var(--fc-shadow-panel);
   --color-background: var(--bg);
   --color-surface: var(--surface);
   --color-surface-subtle: var(--surface-2);
@@ -33,6 +107,29 @@
 }
 
 [data-theme="dark"] {
+  --fc-bg: #050505;
+  --fc-surface: #101010;
+  --fc-surface-2: #151515;
+  --fc-surface-raised: rgba(18, 18, 18, 0.98);
+  --fc-line: #2a2a2a;
+  --fc-line-strong: #3a3a3a;
+  --fc-text: #f8fafc;
+  --fc-muted: #cbd5e1;
+  --fc-quiet: #94a3b8;
+  --fc-accent: var(--fc-color-teal-400);
+  --fc-accent-strong: var(--fc-color-teal-400);
+  --fc-accent-soft: rgba(35, 196, 131, 0.14);
+  --fc-warning: var(--fc-color-amber-400);
+  --fc-warning-soft: rgba(248, 180, 44, 0.16);
+  --fc-danger-soft: rgba(239, 68, 68, 0.15);
+  --fc-danger-text: #fecaca;
+  --fc-on-primary: var(--fc-color-ink-950);
   --fc-shadow-panel: 0 12px 32px rgba(0, 0, 0, 0.5);
   --fc-shadow-card: 0 18px 48px rgba(0, 0, 0, 0.32);
+  --fc-body-bg: var(--fc-bg);
+  --fc-panel-bg: linear-gradient(180deg, rgba(18, 18, 18, 0.98), rgba(10, 10, 10, 0.98));
+  --fc-topbar-bg: rgba(16, 16, 16, 0.88);
+  --fc-sidebar-bg: var(--fc-surface);
+  --fc-input-bg: var(--fc-surface-2);
+  --fc-button-secondary-bg: var(--fc-surface-2);
 }
