@@ -1,17 +1,17 @@
 export const brandConfig = {
   name: "Funil Comercial",
-  category: "Operacao comercial",
+  category: "Operação comercial",
   logoPath: "/logo.png",
   login: {
     eyebrow: "Funil Comercial",
-    headline: "Organize conversas, leads e oportunidades em um so fluxo comercial.",
+    headline: "Organize conversas, leads e oportunidades em um só fluxo comercial.",
     description:
-      "Uma fundacao simples para operar WhatsApp, contatos, leads, funil e metricas comerciais com Supabase.",
+      "Uma fundação simples para operar WhatsApp, contatos, leads, funil e métricas comerciais com Supabase.",
   },
   dashboard: {
     eyebrow: "Centro de comando",
-    headline: "O que precisa de atencao comercial agora?",
+    headline: "O que precisa de atenção comercial agora?",
     description:
-      "Visao rapida para priorizar conversas, leads e oportunidades sem depender de planilhas.",
+      "Visão rápida para priorizar conversas, leads e oportunidades sem depender de planilhas.",
   },
 } as const;

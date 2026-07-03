@@ -238,6 +238,24 @@ textarea:focus-visible {
   max-width: 760px;
 }
 
+.brand-logo {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  border: 1px solid rgba(35, 196, 131, 0.32);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.96);
+  object-fit: cover;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.32);
+}
+
+.brand-logo-login {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 32px;
+  border-radius: 24px;
+}
+
 .brand-mark {
   display: grid;
   width: 78px;
@@ -282,10 +300,42 @@ textarea:focus-visible {
   line-height: 1.7;
 }
 
+.login-proof-grid {
+  display: grid;
+  max-width: 720px;
+  margin-top: 34px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.login-proof-grid span {
+  min-height: 82px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.035);
+  padding: 16px;
+}
+
+.login-proof-grid strong,
+.login-proof-grid small {
+  display: block;
+}
+
+.login-proof-grid strong {
+  color: #ffffff;
+  font-size: 15px;
+}
+
+.login-proof-grid small {
+  margin-top: 6px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
 .flow-line {
   display: flex;
   width: min(560px, 80%);
-  margin-top: 54px;
+  margin-top: 34px;
   gap: 14px;
 }
 
@@ -315,8 +365,14 @@ textarea:focus-visible {
 .login-page input,
 .login-page select,
 .login-page textarea {
-  background: #f8fafc;
-  color: #06110f;
+  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.055);
+  color: #ffffff;
+}
+
+.login-page input::placeholder,
+.login-page textarea::placeholder {
+  color: rgba(203, 213, 225, 0.72);
 }
 
 .muted,
@@ -373,8 +429,9 @@ button:disabled {
 
 .primary-button {
   gap: 10px;
-  background: linear-gradient(90deg, var(--green), #63e6be);
-  color: var(--on-primary, #ffffff);
+  background: linear-gradient(90deg, var(--amber), #ffd36d);
+  color: #07110d;
+  box-shadow: 0 16px 32px rgba(248, 180, 44, 0.18);
   padding: 0 18px;
 }
 
@@ -413,23 +470,24 @@ button:disabled {
   min-height: 100vh;
   background: var(--bg);
   color: var(--text);
+  color-scheme: dark;
 }
 
 [data-theme="light"] .shell {
-  --bg: #f3f6f8;
-  --surface: #ffffff;
-  --surface-2: #f8fafc;
-  --line: #e2e8f0;
-  --line-strong: #cbd5e1;
-  --text: #041d57;
-  --muted: #64748b;
+  --bg: #050505;
+  --surface: #101010;
+  --surface-2: #151515;
+  --line: #2a2a2a;
+  --line-strong: #3a3a3a;
+  --text: #f8fafc;
+  --muted: #cbd5e1;
   --quiet: #94a3b8;
-  --green: #01bbb6;
-  --green-soft: rgba(1, 187, 182, 0.15);
-  --amber: #f59e0b;
-  --amber-soft: rgba(245, 158, 11, 0.15);
-  --navy: #041d57;
-  --on-primary: #ffffff;
+  --green: #23c483;
+  --green-soft: rgba(35, 196, 131, 0.14);
+  --amber: #f8b42c;
+  --amber-soft: rgba(248, 180, 44, 0.16);
+  --navy: #f8fafc;
+  --on-primary: #06110f;
 }
 
 .sidebar {
@@ -567,7 +625,7 @@ button:disabled {
 }
 
 [data-theme="light"] .topbar {
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(16, 16, 16, 0.88);
 }
 
 .topbar h1,
@@ -634,7 +692,7 @@ button:disabled {
 .lead-card,
 .pipeline-column {
   border: 1px solid var(--line);
-  background: var(--surface);
+  background: linear-gradient(180deg, rgba(18, 18, 18, 0.98), rgba(10, 10, 10, 0.98));
   box-shadow: 0 18px 48px rgba(0, 0, 0, 0.16);
 }
 
@@ -678,6 +736,9 @@ button:disabled {
   align-items: flex-start;
   justify-content: space-between;
   border-radius: 16px;
+  background:
+    radial-gradient(circle at 86% 16%, rgba(35, 196, 131, 0.1), transparent 9rem),
+    linear-gradient(180deg, rgba(18, 18, 18, 0.98), rgba(10, 10, 10, 0.98));
   padding: 20px;
 }
 

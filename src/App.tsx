@@ -564,24 +564,24 @@ function LoginScreen({
   return (
     <main className="login-page">
       <section className="login-visual" aria-label="Funil Comercial">
-        <img
-          src={brandConfig.logoPath}
-          alt={brandConfig.name}
-          style={{
-            width: "80px",
-            height: "80px",
-            borderRadius: "24px",
-            marginBottom: "32px",
-          }}
-        />
-        <p className="eyebrow">{brandConfig.name}</p>
-        <h1>
-          Organize conversas, leads e oportunidades em um só fluxo comercial.
-        </h1>
-        <p>
-          Uma fundação simples para operar WhatsApp, contatos, leads, funil e
-          métricas comerciais com Supabase.
-        </p>
+        <img className="brand-logo brand-logo-login" src={brandConfig.logoPath} alt={brandConfig.name} />
+        <p className="eyebrow">{brandConfig.login.eyebrow}</p>
+        <h1>{brandConfig.login.headline}</h1>
+        <p>{brandConfig.login.description}</p>
+        <div className="login-proof-grid" aria-label="Fluxo principal do MVP">
+          <span>
+            <strong>WhatsApp</strong>
+            <small>Conversas centralizadas</small>
+          </span>
+          <span>
+            <strong>CRM</strong>
+            <small>Contatos e leads conectados</small>
+          </span>
+          <span>
+            <strong>Funil</strong>
+            <small>Oportunidades em andamento</small>
+          </span>
+        </div>
         <div className="flow-line" aria-hidden="true">
           <i />
           <i />
@@ -673,19 +673,10 @@ function Sidebar({
   return (
     <aside className="sidebar">
       <button className="logo-button" onClick={() => onNavigate("dashboard")}>
-        <img
-          src="/logo.png"
-          alt="Logo"
-          style={{
-            width: "42px",
-            height: "42px",
-            borderRadius: "14px",
-            flex: "0 0 auto",
-          }}
-        />
+        <img className="brand-logo" src={brandConfig.logoPath} alt="Logo" />
         <span>
           <strong>{brandConfig.name}</strong>
-          <small>Operação comercial</small>
+          <small>{brandConfig.category}</small>
         </span>
       </button>
 
@@ -812,9 +803,9 @@ function Dashboard({
     <div className="page-stack">
       <HeroPanel
         action="Novo lead"
-        description="Visão rápida para priorizar conversas, leads e oportunidades sem depender de planilhas."
-        eyebrow="Centro de comando"
-        title="O que precisa de atenção comercial agora?"
+        description={brandConfig.dashboard.description}
+        eyebrow={brandConfig.dashboard.eyebrow}
+        title={brandConfig.dashboard.headline}
         onAction={() => onOpenModal("lead")}
       />
 

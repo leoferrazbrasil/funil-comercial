@@ -20,7 +20,7 @@ export const navigationItems: NavigationItem[] = [
     id: "dashboard",
     label: "Dashboard",
     icon: LayoutDashboard,
-    description: "Visao executiva da operacao comercial.",
+    description: "Visão executiva da operação comercial.",
   },
   {
     id: "inbox",
@@ -38,7 +38,7 @@ export const navigationItems: NavigationItem[] = [
     id: "leads",
     label: "Leads",
     icon: UsersRound,
-    description: "Interessados em qualificacao comercial.",
+    description: "Interessados em qualificação comercial.",
   },
   {
     id: "funil",
