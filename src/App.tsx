@@ -2,12 +2,8 @@ import type { Session } from "@supabase/supabase-js";
 import type { LucideIcon } from "lucide-react";
 import {
   Bell,
-  BriefcaseBusiness,
   CircleDollarSign,
   Clock3,
-  ContactRound,
-  Inbox,
-  LayoutDashboard,
   LogOut,
   MessageCircle,
   MoveRight,
@@ -52,6 +48,17 @@ import {
   getCrmSnapshot,
   upsertProfile,
 } from "./lib/crmService";
+import { getAllowedRoutes } from "./lib/accessControl";
+import { brandConfig } from "./lib/branding";
+import {
+  navigationItems,
+  pipelineStages,
+  type NavigationItem,
+} from "./lib/navigation";
+import {
+  buildCommercialRecommendations,
+  formatPriority,
+} from "./services/commercialIntelligence";
 import { isSupabaseConfigured, supabase } from "./lib/supabase";
 import type {
   Contact,
@@ -62,31 +69,11 @@ import type {
   Route as AppRoute,
 } from "./lib/types";
 
-type NavItem = {
-  id: AppRoute;
-  label: string;
-  icon: LucideIcon;
-};
-
 type ModalType = "contact" | "lead" | "opportunity" | "message";
 
-const navItems: NavItem[] = [
-  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { id: "inbox", label: "Inbox", icon: Inbox },
-  { id: "contatos", label: "Contatos", icon: ContactRound },
-  { id: "leads", label: "Leads", icon: UsersRound },
-  { id: "funil", label: "Funil de vendas", icon: BriefcaseBusiness },
-];
+const navItems = navigationItems;
 
-const stages: OpportunityStage[] = [
-  "Novo",
-  "Em atendimento",
-  "Qualificado",
-  "Proposta",
-  "Negociação",
-  "Ganho",
-  "Perdido",
-];
+const stages: OpportunityStage[] = pipelineStages;
 
 const emptySnapshot: CrmSnapshot = {
   profile: null,
@@ -218,6 +205,10 @@ function AppContent() {
   });
 
   const snapshot = snapshotData ?? emptySnapshot;
+  const allowedRoutes = getAllowedRoutes(snapshot.profile?.role);
+  const visibleNavItems = navItems.filter((item) =>
+    allowedRoutes.includes(item.id),
+  );
 
   useEffect(() => {
     if (fetchError) {
@@ -425,7 +416,7 @@ function AppContent() {
       <Toaster position="bottom-right" />
       {session ? (
         <Sidebar
-          navItems={navItems}
+          navItems={visibleNavItems}
           route={route}
           onNavigate={(path) => navigate("/" + path)}
           onSignOut={handleSignOut}
@@ -440,6 +431,7 @@ function AppContent() {
           }
           query={query}
           route={route}
+          navItems={visibleNavItems}
           onQueryChange={setQuery}
           onSignOut={handleSignOut}
         />
@@ -573,8 +565,8 @@ function LoginScreen({
     <main className="login-page">
       <section className="login-visual" aria-label="Funil Comercial">
         <img
-          src="/logo.png"
-          alt="Logo"
+          src={brandConfig.logoPath}
+          alt={brandConfig.name}
           style={{
             width: "80px",
             height: "80px",
@@ -582,7 +574,7 @@ function LoginScreen({
             marginBottom: "32px",
           }}
         />
-        <p className="eyebrow">Funil Comercial</p>
+        <p className="eyebrow">{brandConfig.name}</p>
         <h1>
           Organize conversas, leads e oportunidades em um só fluxo comercial.
         </h1>
@@ -673,7 +665,7 @@ function Sidebar({
   onNavigate,
   onSignOut,
 }: {
-  navItems: NavItem[];
+  navItems: NavigationItem[];
   route: AppRoute;
   onNavigate: (id: AppRoute) => void;
   onSignOut: () => void;
@@ -692,7 +684,7 @@ function Sidebar({
           }}
         />
         <span>
-          <strong>Funil Comercial</strong>
+          <strong>{brandConfig.name}</strong>
           <small>Operação comercial</small>
         </span>
       </button>
@@ -732,6 +724,7 @@ function Header({
   query,
   route,
   theme,
+  navItems,
   onQueryChange,
   onSignOut,
   toggleTheme,
@@ -740,6 +733,7 @@ function Header({
   query: string;
   route: AppRoute;
   theme?: "light" | "dark";
+  navItems: NavigationItem[];
   onQueryChange: (q: string) => void;
   onSignOut: () => void;
   toggleTheme?: () => void;
@@ -756,7 +750,7 @@ function Header({
   return (
     <header className="topbar">
       <div>
-        <p className="eyebrow">Funil Comercial</p>
+        <p className="eyebrow">{brandConfig.name}</p>
         <h1>{title}</h1>
       </div>
       <div className="topbar-actions">
@@ -812,6 +806,7 @@ function Dashboard({
   const pendingMessages = snapshot.messages.filter(
     (message) => message.unread_count > 0 || message.status !== "Resolvido",
   );
+  const recommendations = buildCommercialRecommendations(snapshot);
 
   return (
     <div className="page-stack">
@@ -855,23 +850,15 @@ function Dashboard({
       <section className="split-grid">
         <Panel title="Prioridades do dia" eyebrow="Ação comercial">
           <div className="action-list">
-            {pendingMessages.slice(0, 2).map((message) => (
+            {recommendations.map((recommendation) => (
               <ActionItem
-                key={message.id}
-                description={message.mensagem}
-                priority="Alta"
-                title={`Responder ${message.remetente_nome}`}
+                key={recommendation.id}
+                description={recommendation.summary}
+                priority={formatPriority(recommendation.priority)}
+                title={recommendation.title}
               />
             ))}
-            {activeLeads.slice(0, 2).map((lead) => (
-              <ActionItem
-                key={lead.id}
-                description={lead.proxima_acao}
-                priority="Média"
-                title={`Avançar ${lead.nome}`}
-              />
-            ))}
-            {pendingMessages.length === 0 && activeLeads.length === 0 && (
+            {recommendations.length === 0 && (
               <EmptyState
                 action="Criar primeiro contato"
                 description="Cadastre um contato ou lead para iniciar a operação."

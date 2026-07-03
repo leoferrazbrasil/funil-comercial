@@ -1,3 +1,5 @@
+@import "./styles/tokens.css";
+
 :root {
   font-family:
     Outfit,
@@ -1163,6 +1165,36 @@ th {
   .form-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.ui-state {
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  color: var(--muted);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  justify-content: center;
+  min-height: 220px;
+  padding: 32px;
+  text-align: center;
+}
+
+.ui-state h3 {
+  color: var(--text);
+  font-size: 1rem;
+  margin: 0;
+}
+
+.ui-state p {
+  line-height: 1.6;
+  margin: 0;
+  max-width: 460px;
+}
+
+.ui-state svg {
+  color: var(--amber);
 }
 
 @media (prefers-reduced-motion: reduce) {
