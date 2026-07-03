@@ -179,7 +179,7 @@ function AppContent() {
       setSession(nextSession);
       if (!nextSession) {
         queryClient.removeQueries({ queryKey: ["crmSnapshot"] });
-        navigate("login");
+        navigate("/login");
       }
     });
 
@@ -253,7 +253,7 @@ function AppContent() {
 
     if (data.session) {
       setSession(data.session);
-      navigate("dashboard");
+      navigate("/dashboard");
       return;
     }
 
@@ -265,7 +265,7 @@ function AppContent() {
   const handleSignOut = async () => {
     await supabase?.auth.signOut();
     setSession(null);
-    navigate("login");
+    navigate("/login");
   };
 
   const runMutation = async (
