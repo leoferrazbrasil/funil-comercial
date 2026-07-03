@@ -1,8 +1,8 @@
 # Funil Comercial
 
-Protótipo navegável do Funil Comercial para validação inicial do MVP em outro domínio e repositório.
+Prototipo navegavel do Funil Comercial para validacao inicial do MVP em outro dominio e repositorio.
 
-## Telas incluídas
+## Telas incluidas
 
 - Login
 - Dashboard
@@ -11,7 +11,7 @@ Protótipo navegável do Funil Comercial para validação inicial do MVP em outr
 - Leads
 - Funil de vendas
 
-## Execução local
+## Execucao local
 
 ```bash
 npm install
@@ -20,7 +20,7 @@ npm run dev
 
 ## Supabase
 
-Projeto configurado para a fundação P0:
+Projeto configurado para a fundacao P0:
 
 ```text
 https://dtdtewojmyhiegwmgmte.supabase.co
@@ -39,7 +39,7 @@ Execute a migration abaixo no SQL Editor do Supabase ou aplique via connection s
 npm run db:apply
 ```
 
-O comando `db:apply` só executa se `SUPABASE_DB_URL` pertencer ao project ref `dtdtewojmyhiegwmgmte`, evitando aplicação acidental em outro banco.
+O comando `db:apply` so executa se `SUPABASE_DB_URL` pertencer ao project ref `dtdtewojmyhiegwmgmte`, evitando aplicacao acidental em outro banco.
 
 ## Build
 
@@ -47,7 +47,7 @@ O comando `db:apply` só executa se `SUPABASE_DB_URL` pertencer ao project ref `
 npm run build
 ```
 
-O projeto está configurado com `base: "/"` para ser publicado no diretório raiz:
+O projeto esta configurado com `base: "/"` para ser publicado no diretorio raiz:
 
 ```text
 https://leonardobrasil.com.br/
@@ -55,28 +55,29 @@ https://leonardobrasil.com.br/
 
 ## Deploy
 
-Configuração recomendada na hospedagem:
+Configuracao recomendada na hospedagem:
 
 - Framework: Vite
 - Comando de build: `npm run build`
-- Diretório de saída: `dist`
-- Diretório raiz: `./`
-- Variáveis de ambiente:
+- Diretorio de saida: `dist`
+- Diretorio raiz: `./`
+- Variaveis de ambiente:
   - `VITE_SUPABASE_URL`
   - `VITE_SUPABASE_ANON_KEY`
+- O arquivo `public/.htaccess` precisa ser publicado junto com o build para que rotas internas do React Router sejam servidas por `index.html`.
 
-## Navegação
+## Navegacao
 
-O protótipo usa rotas por hash para funcionar bem na raiz sem exigir rewrite no servidor:
+O prototipo usa React Router com URLs limpas e fallback de SPA na hospedagem:
 
 ```text
-/#/dashboard
-/#/inbox
-/#/contatos
-/#/leads
-/#/funil
+/dashboard
+/inbox
+/contatos
+/leads
+/funil
 ```
 
 ## Status
 
-Esta versão já possui autenticação Supabase, sessão persistente, RLS por usuário e CRUD inicial para Inbox, Contatos, Leads e Funil de vendas. A integração com provedor real de WhatsApp fica para a próxima fase.
+Esta versao ja possui autenticacao Supabase, sessao persistente, RLS por usuario e CRUD inicial para Inbox, Contatos, Leads e Funil de vendas. A integracao com provedor real de WhatsApp fica para a proxima fase.

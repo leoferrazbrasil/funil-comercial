@@ -1,0 +1,38 @@
+:root {
+  --fc-color-ink-950: #06110f;
+  --fc-color-ink-900: #0b1215;
+  --fc-color-ink-800: #111820;
+  --fc-color-paper-50: #f3f6f8;
+  --fc-color-paper-100: #e8eef2;
+  --fc-color-green-500: #01bbb6;
+  --fc-color-green-600: #009f9a;
+  --fc-color-amber-400: #f5b940;
+  --fc-color-amber-500: #f59e0b;
+  --fc-radius-sm: 10px;
+  --fc-radius-md: 14px;
+  --fc-radius-lg: 18px;
+  --fc-radius-xl: 24px;
+  --fc-space-1: 4px;
+  --fc-space-2: 8px;
+  --fc-space-3: 12px;
+  --fc-space-4: 16px;
+  --fc-space-5: 20px;
+  --fc-space-6: 24px;
+  --fc-space-8: 32px;
+  --fc-shadow-card: 0 18px 48px rgba(0, 0, 0, 0.16);
+  --fc-shadow-panel: 0 12px 32px rgba(4, 29, 87, 0.08);
+  --fc-focus-ring: 0 0 0 4px rgba(1, 187, 182, 0.18);
+  --color-background: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-subtle: var(--surface-2);
+  --color-border: var(--line);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-accent: var(--green);
+  --color-warning: var(--amber);
+}
+
+[data-theme="dark"] {
+  --fc-shadow-panel: 0 12px 32px rgba(0, 0, 0, 0.5);
+  --fc-shadow-card: 0 18px 48px rgba(0, 0, 0, 0.32);
+}
