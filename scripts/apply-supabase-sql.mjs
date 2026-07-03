@@ -1,11 +1,11 @@
-import { readFile } from 'node:fs/promises'
+import { readdir, readFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import pg from 'pg'
 
 const { Client } = pg
 
 const projectRef = 'dtdtewojmyhiegwmgmte'
-const migrationPath = resolve('supabase/migrations/20260702162000_initial_crm_foundation.sql')
+const migrationsDir = resolve('supabase/migrations')
 const connectionString = process.env.SUPABASE_DB_URL
 
 if (!connectionString) {
@@ -18,7 +18,14 @@ if (!connectionString.includes(projectRef)) {
   )
 }
 
-const sql = await readFile(migrationPath, 'utf8')
+const migrationFiles = (await readdir(migrationsDir))
+  .filter((file) => file.endsWith('.sql'))
+  .sort()
+
+if (migrationFiles.length === 0) {
+  throw new Error('Nenhuma migration SQL encontrada em supabase/migrations.')
+}
+
 const client = new Client({
   connectionString,
   ssl: { rejectUnauthorized: false },
@@ -27,8 +34,12 @@ const client = new Client({
 await client.connect()
 
 try {
-  await client.query(sql)
-  console.log(`Migracao aplicada com sucesso no projeto ${projectRef}.`)
+  for (const migrationFile of migrationFiles) {
+    const sql = await readFile(resolve(migrationsDir, migrationFile), 'utf8')
+    await client.query(sql)
+    console.log(`Migration aplicada: ${migrationFile}`)
+  }
+  console.log(`Migrations aplicadas com sucesso no projeto ${projectRef}.`)
 } finally {
   await client.end()
 }

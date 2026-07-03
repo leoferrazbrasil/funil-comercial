@@ -78,6 +78,26 @@ O prototipo usa React Router com URLs limpas e fallback de SPA na hospedagem:
 /funil
 ```
 
+## WhatsApp / Inbox
+
+A proxima base funcional para captura automatica esta preparada em:
+
+```text
+supabase/functions/whatsapp-inbound
+```
+
+Ela recebe webhooks HTTP de WhatsApp, cria ou reaproveita contato, cria ou reaproveita lead ativo e registra a conversa no Inbox.
+
+Antes de usar em producao, aplique as migrations e configure os secrets da Edge Function no Supabase:
+
+```bash
+SUPABASE_SERVICE_ROLE_KEY
+FUNIL_WEBHOOK_SECRET
+FUNIL_DEFAULT_OWNER_ID
+```
+
+Para mapear um numero oficial ao CRM, cadastre um registro em `integration_channels` com `provider`, `numero`, `owner_id` e `status = ativo`.
+
 ## Status
 
-Esta versao ja possui autenticacao Supabase, sessao persistente, RLS por usuario e CRUD inicial para Inbox, Contatos, Leads e Funil de vendas. A integracao com provedor real de WhatsApp fica para a proxima fase.
+Esta versao ja possui autenticacao Supabase, sessao persistente, RLS por usuario, CRUD inicial para Inbox, Contatos, Leads e Funil de vendas, e uma Edge Function preparada para captura automatica de mensagens WhatsApp por webhook. A conexao com provedor real exige configurar o canal em `integration_channels` e apontar o webhook do provedor para a funcao publicada.
