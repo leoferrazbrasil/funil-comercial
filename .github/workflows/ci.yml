@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate app and Edge Functions
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check Edge Functions
+        run: deno check --no-lock supabase/functions/whatsapp-inbound/index.ts supabase/functions/whatsapp-send/index.ts
+
+      - name: Smoke test Edge Functions
+        run: npm run functions:smoke
+
+      - name: Typecheck and build
+        run: npm run check
