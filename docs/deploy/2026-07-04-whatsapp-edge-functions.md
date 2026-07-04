@@ -42,11 +42,13 @@ Antes do deploy, rode os smoke tests locais:
 
 ```powershell
 npm run functions:smoke
+npm run routes:smoke
 ```
 
 Esse teste sobe `whatsapp-inbound` e `whatsapp-send` localmente com secrets
 dummy, valida o challenge da Meta, valida ignorar eventos sem mensagem e valida
-que o envio outbound exige usuario autenticado.
+que o envio outbound exige usuario autenticado. O smoke de rotas sobe o preview
+do build e valida as rotas SPA principais antes da publicacao.
 
 Use:
 

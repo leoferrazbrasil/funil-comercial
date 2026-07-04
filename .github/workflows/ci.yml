@@ -40,3 +40,6 @@ jobs:
 
       - name: Typecheck and build
         run: npm run check
+
+      - name: Smoke test app routes
+        run: npm run routes:smoke

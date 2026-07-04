@@ -119,6 +119,7 @@ Runbook de publicacao das Edge Functions:
 
 ```bash
 npm run functions:smoke
+npm run routes:smoke
 ```
 
 ```powershell
