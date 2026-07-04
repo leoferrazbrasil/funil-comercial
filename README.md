@@ -117,6 +117,10 @@ docs/whatsapp-cloud-api-integration.md
 
 Runbook de publicacao das Edge Functions:
 
+```bash
+npm run functions:smoke
+```
+
 ```powershell
 .\scripts\deploy-supabase-functions.ps1
 ```

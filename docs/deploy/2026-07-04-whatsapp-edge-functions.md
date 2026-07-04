@@ -38,6 +38,16 @@ propria por verify token, token interno e assinatura `X-Hub-Signature-256`.
 
 ## Script seguro
 
+Antes do deploy, rode os smoke tests locais:
+
+```powershell
+npm run functions:smoke
+```
+
+Esse teste sobe `whatsapp-inbound` e `whatsapp-send` localmente com secrets
+dummy, valida o challenge da Meta, valida ignorar eventos sem mensagem e valida
+que o envio outbound exige usuario autenticado.
+
 Use:
 
 ```powershell

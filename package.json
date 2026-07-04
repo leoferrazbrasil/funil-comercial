@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit",
     "check": "npm run typecheck && npm run build",
     "db:apply": "node scripts/apply-supabase-sql.mjs",
+    "functions:smoke": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test-supabase-functions.ps1",
     "preview": "vite preview"
   },
   "devDependencies": {
