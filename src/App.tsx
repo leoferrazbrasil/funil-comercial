@@ -10,6 +10,7 @@ import {
   MoveRight,
   Pencil,
   Plus,
+  Send,
   Search,
   ShieldCheck,
   Sparkles,
@@ -477,6 +478,34 @@ function AppContent() {
     );
   };
 
+  const handleSendInboxReply = async (
+    message: InboxMessage,
+    reply: string,
+  ) => {
+    if (!ownerId) return;
+
+    await runMutation(
+      async () => {
+        await createInboxMessage(ownerId, {
+          contact_id: message.contact_id,
+          lead_id: message.lead_id,
+          canal: message.canal,
+          remetente_nome: snapshot.profile?.nome ?? "Equipe comercial",
+          telefone: message.telefone,
+          mensagem: reply,
+          status: "Resposta enviada",
+          unread_count: 0,
+          direction: "outbound",
+        });
+        await updateInboxMessageStatus(message.id, {
+          status: "Respondido",
+          unread_count: 0,
+        });
+      },
+      "Resposta registrada no inbox.",
+    );
+  };
+
   const handleConvertContact = async (contact: Contact) => {
     if (!ownerId) return;
     await runMutation(
@@ -582,6 +611,7 @@ function AppContent() {
                   messages={snapshot.messages}
                   query={query}
                   onOpenModal={openModal}
+                  onSendReply={handleSendInboxReply}
                   onUpdateMessageStatus={handleUpdateInboxStatus}
                 />
               }
@@ -1027,12 +1057,14 @@ function InboxPage({
   messages,
   query,
   onOpenModal,
+  onSendReply,
   onUpdateMessageStatus,
 }: {
   isSaving: boolean;
   messages: InboxMessage[];
   query: string;
   onOpenModal: (modal: ModalType) => void;
+  onSendReply: (message: InboxMessage, reply: string) => Promise<void>;
   onUpdateMessageStatus: (
     message: InboxMessage,
     status: string,
@@ -1047,13 +1079,63 @@ function InboxPage({
       message.status,
     ]),
   );
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const selected =
-    filteredMessages.find((message) => message.id === selectedId) ??
-    filteredMessages[0];
-  const recommendation = selected
-    ? buildInboxRecommendation(selected)
+  const conversations = useMemo(() => {
+    const grouped = new Map<string, InboxMessage[]>();
+
+    for (const message of filteredMessages) {
+      const key = message.telefone || message.id;
+      grouped.set(key, [...(grouped.get(key) ?? []), message]);
+    }
+
+    return Array.from(grouped.entries())
+      .map(([key, conversationMessages]) => {
+        const sortedMessages = [...conversationMessages].sort(
+          (a, b) =>
+            new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+        );
+        const latest = sortedMessages[sortedMessages.length - 1];
+        const latestInbound =
+          [...sortedMessages].reverse().find((item) => item.direction === "inbound") ??
+          latest;
+
+        return {
+          key,
+          latest,
+          latestInbound,
+          messages: sortedMessages,
+          unreadCount: sortedMessages.reduce(
+            (sum, item) => sum + Number(item.unread_count || 0),
+            0,
+          ),
+        };
+      })
+      .sort(
+        (a, b) =>
+          new Date(b.latest.created_at).getTime() -
+          new Date(a.latest.created_at).getTime(),
+      );
+  }, [filteredMessages]);
+  const [selectedKey, setSelectedKey] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState("");
+  const selectedConversation =
+    conversations.find((conversation) => conversation.key === selectedKey) ??
+    conversations[0];
+  const selected = selectedConversation?.latest;
+  const recommendation = selectedConversation
+    ? buildInboxRecommendation(selectedConversation.latestInbound)
     : undefined;
+
+  useEffect(() => {
+    setReplyText(recommendation?.suggestedReply ?? "");
+  }, [selectedConversation?.key, recommendation?.suggestedReply]);
+
+  const handleReplySubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!selected || !replyText.trim()) return;
+
+    await onSendReply(selected, replyText.trim());
+    setReplyText("");
+  };
 
   return (
     <div className="page-stack">
@@ -1065,7 +1147,7 @@ function InboxPage({
         onAction={() => onOpenModal("message")}
       />
 
-      {filteredMessages.length === 0 ? (
+      {conversations.length === 0 ? (
         <EmptyState
           action="Criar mensagem de teste"
           description="Nenhuma conversa encontrada para esta conta."
@@ -1075,26 +1157,26 @@ function InboxPage({
         <section className="inbox-layout">
           <Panel title="Conversas" eyebrow="Entrada">
             <div className="conversation-list">
-              {filteredMessages.map((conversation) => (
+              {conversations.map((conversation) => (
                 <button
-                  key={conversation.id}
+                  key={conversation.key}
                   className={
-                    selected?.id === conversation.id
+                    selectedConversation?.key === conversation.key
                       ? "selected conversation-item"
                       : "conversation-item"
                   }
-                  onClick={() => setSelectedId(conversation.id)}
+                  onClick={() => setSelectedKey(conversation.key)}
                 >
                   <span>
-                    <strong>{conversation.remetente_nome}</strong>
-                    <small>{conversation.mensagem}</small>
+                    <strong>{conversation.latest.remetente_nome}</strong>
+                    <small>{conversation.latest.mensagem}</small>
                   </span>
                   <em>
-                    <span>{conversation.status}</span>
+                    <span>{conversation.latest.status}</span>
                     <small>
-                      {conversation.unread_count
-                        ? `${conversation.unread_count} nova`
-                        : conversation.canal}
+                      {conversation.unreadCount
+                        ? `${conversation.unreadCount} nova`
+                        : `${conversation.messages.length} mensagem`}
                     </small>
                   </em>
                 </button>
@@ -1111,17 +1193,19 @@ function InboxPage({
               </div>
             )}
             <div className="chat-window">
-              <p className="message inbound">{selected.mensagem}</p>
-              <p className="message outbound">
-                Recebido. Vou qualificar seu interesse e indicar o próximo passo
-                comercial.
-              </p>
+              {selectedConversation.messages.map((message) => (
+                <p className={`message ${message.direction}`} key={message.id}>
+                  <small>{message.remetente_nome}</small>
+                  {message.mensagem}
+                </p>
+              ))}
             </div>
             <div className="inbox-actions">
               <button
                 className="secondary-button"
                 disabled={isSaving}
                 onClick={() =>
+                  selected &&
                   onUpdateMessageStatus(selected, "Em atendimento", 1)
                 }
                 type="button"
@@ -1132,19 +1216,31 @@ function InboxPage({
               <button
                 className="primary-button"
                 disabled={isSaving}
-                onClick={() => onUpdateMessageStatus(selected, "Resolvido", 0)}
+                onClick={() =>
+                  selected && onUpdateMessageStatus(selected, "Resolvido", 0)
+                }
                 type="button"
               >
                 <CheckCircle2 size={16} />
                 Marcar resolvida
               </button>
             </div>
-            <div className="composer">
-              <input placeholder="Escreva uma resposta..." />
-              <button className="primary-button" type="button">
-                Enviar
+            <form className="composer" onSubmit={handleReplySubmit}>
+              <input
+                aria-label="Resposta"
+                onChange={(event) => setReplyText(event.target.value)}
+                placeholder="Escreva uma resposta..."
+                value={replyText}
+              />
+              <button
+                className="primary-button"
+                disabled={isSaving || !replyText.trim()}
+                type="submit"
+              >
+                <Send size={16} />
+                Registrar resposta
               </button>
-            </div>
+            </form>
           </Panel>
         </section>
       )}

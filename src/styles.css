@@ -904,11 +904,20 @@ button:disabled {
 }
 
 .message {
+  display: grid;
+  gap: 6px;
   max-width: 74%;
   margin: 0;
   border-radius: 16px;
   padding: 14px 16px;
   line-height: 1.5;
+}
+
+.message small {
+  color: var(--quiet);
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
 }
 
 .message.inbound {
