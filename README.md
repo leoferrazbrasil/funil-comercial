@@ -126,6 +126,12 @@ npm run routes:smoke
 .\scripts\deploy-supabase-functions.ps1
 ```
 
+Tambem ha um workflow manual no GitHub Actions:
+
+```text
+Deploy Supabase Edge Functions
+```
+
 ## Status
 
 Esta versao ja possui autenticacao Supabase, sessao persistente, RLS por usuario, CRUD inicial para Inbox, Contatos, Leads e Funil de vendas, e uma Edge Function preparada para captura automatica de mensagens WhatsApp por webhook. A conexao com provedor real exige configurar o canal em `integration_channels` e apontar o webhook do provedor para a funcao publicada.

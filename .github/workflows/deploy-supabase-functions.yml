@@ -1,0 +1,82 @@
+name: Deploy Supabase Edge Functions
+
+on:
+  workflow_dispatch:
+    inputs:
+      use_api:
+        description: "Use Supabase API bundling instead of local Docker"
+        required: true
+        type: boolean
+        default: true
+      run_smoke:
+        description: "Run local Edge Function smoke tests before deploy"
+        required: true
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy WhatsApp functions
+    runs-on: windows-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check Edge Functions
+        run: deno check --no-lock supabase/functions/whatsapp-inbound/index.ts supabase/functions/whatsapp-send/index.ts
+
+      - name: Smoke test Edge Functions
+        if: ${{ inputs.run_smoke }}
+        run: npm run functions:smoke
+
+      - name: Deploy functions
+        shell: pwsh
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:SUPABASE_ACCESS_TOKEN)) {
+            throw "GitHub secret SUPABASE_ACCESS_TOKEN=missing"
+          }
+
+          $arguments = @("-File", "scripts/deploy-supabase-functions.ps1")
+          if ("${{ inputs.use_api }}" -eq "true") {
+            $arguments += "-UseApi"
+          }
+
+          powershell -NoProfile -ExecutionPolicy Bypass @arguments
+
+      - name: Deployment summary
+        shell: pwsh
+        run: |
+          @"
+          ### Supabase Edge Functions
+
+          Project ref: `dtdtewojmyhiegwmgmte`
+
+          Published functions:
+          - `whatsapp-inbound`
+          - `whatsapp-send`
+
+          Next checks:
+          - Configure Meta webhook challenge against `whatsapp-inbound`.
+          - Send a real WhatsApp message and confirm it appears in `/inbox`.
+          - Reply from `/inbox` and confirm delivery through Cloud API.
+          "@ | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append

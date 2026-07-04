@@ -56,6 +56,30 @@ Use:
 .\scripts\deploy-supabase-functions.ps1
 ```
 
+## Deploy via GitHub Actions
+
+Workflow manual:
+
+```text
+Deploy Supabase Edge Functions
+```
+
+Configure o secret do repositorio:
+
+```text
+SUPABASE_ACCESS_TOKEN
+```
+
+O token precisa ter acesso ao projeto `dtdtewojmyhiegwmgmte`. O workflow usa o
+mesmo script seguro do repositorio, portanto tambem recusa qualquer project ref
+diferente do esperado.
+
+Inputs do workflow:
+
+- `use_api`: usa empacotamento pela API do Supabase, evitando depender de Docker
+  no runner.
+- `run_smoke`: roda `npm run functions:smoke` antes do deploy.
+
 Opcionalmente, quando o ambiente nao tiver Docker local:
 
 ```powershell

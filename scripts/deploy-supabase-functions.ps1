@@ -36,9 +36,9 @@ if ([string]::IsNullOrWhiteSpace($accessToken)) {
   throw "SUPABASE_ACCESS_TOKEN=missing"
 }
 
-Invoke-Checked @("npx", "supabase", "--version")
+Invoke-Checked @("npx", "--yes", "supabase", "--version")
 
-$projectsJson = & npx supabase projects list --output json
+$projectsJson = & npx --yes supabase projects list --output json
 if ($LASTEXITCODE -ne 0) {
   throw "Nao foi possivel listar projetos Supabase com o token atual."
 }
@@ -66,6 +66,7 @@ if ($UseApi) {
 
 $deployInbound = @(
   "npx",
+  "--yes",
   "supabase",
   "functions",
   "deploy",
@@ -76,6 +77,7 @@ Invoke-Checked $deployInbound
 
 $deploySend = @(
   "npx",
+  "--yes",
   "supabase",
   "functions",
   "deploy",
