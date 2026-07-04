@@ -84,12 +84,14 @@ A captura automatica de mensagens esta preparada em:
 
 ```text
 supabase/functions/whatsapp-inbound
+supabase/functions/whatsapp-send
 ```
 
 Ela recebe webhooks da WhatsApp Business Platform Cloud API da Meta e webhooks
 HTTP compativeis, resolve o canal ativo em `integration_channels`, vincula
 contato/lead existentes por telefone e registra a conversa no Inbox sem criar
-duplicidades.
+duplicidades. As respostas do Inbox podem ser enviadas pela Cloud API quando
+`whatsapp-send` estiver publicada e configurada.
 
 Antes de usar em producao, aplique as migrations e configure os secrets da Edge Function no Supabase:
 
@@ -98,6 +100,9 @@ SUPABASE_URL
 SUPABASE_SERVICE_ROLE_KEY
 META_WEBHOOK_VERIFY_TOKEN
 META_APP_SECRET
+META_WHATSAPP_ACCESS_TOKEN
+META_WHATSAPP_PHONE_NUMBER_ID
+META_GRAPH_API_VERSION
 FUNIL_WEBHOOK_SECRET
 FUNIL_DEFAULT_OWNER_ID
 ```

@@ -33,6 +33,9 @@ flowchart LR
   Webhook --> Leads["leads"]
   Webhook --> Inbox["inbox_messages"]
   Inbox --> UI["Inbox Funil Comercial"]
+  UI --> Send["Supabase Edge Function whatsapp-send"]
+  Send --> Meta
+  Send --> Inbox
   UI --> CRM["Criar/vincular contato, lead e oportunidade"]
 ```
 
@@ -48,6 +51,9 @@ flowchart LR
 8. A funcao registra a mensagem em `inbox_messages`.
 9. O Inbox agrupa mensagens por telefone e exibe o historico.
 10. O usuario cria/vincula contato, qualifica lead e cria oportunidade.
+11. O usuario responde pelo Inbox.
+12. A funcao `whatsapp-send` envia a resposta pela Cloud API quando o canal esta
+    configurado, registra o outbound e marca a conversa como respondida.
 
 ## Modelo de dados
 
@@ -72,6 +78,7 @@ Endpoint:
 
 ```text
 GET/POST /functions/v1/whatsapp-inbound
+POST /functions/v1/whatsapp-send
 ```
 
 Webhooks envolvidos:
@@ -81,6 +88,7 @@ Webhooks envolvidos:
 - Meta incoming messages: `POST` com payload `whatsapp_business_account`.
 - Webhooks genericos: `POST` JSON ou form-urlencoded com `from`, `to`,
   `message`, `name`, `id`.
+- Outbound text message: `POST` autenticado para `whatsapp-send`.
 
 ## Variaveis de ambiente
 
@@ -90,6 +98,9 @@ Edge Function:
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `META_WEBHOOK_VERIFY_TOKEN`
 - `META_APP_SECRET`
+- `META_WHATSAPP_ACCESS_TOKEN`
+- `META_WHATSAPP_PHONE_NUMBER_ID`
+- `META_GRAPH_API_VERSION`
 - `FUNIL_WEBHOOK_SECRET`
 - `FUNIL_DEFAULT_OWNER_ID`
 
@@ -106,6 +117,8 @@ Banco local/migrations:
 
 - `supabase/functions/whatsapp-inbound/index.ts`
 - `supabase/functions/whatsapp-inbound/README.md`
+- `supabase/functions/whatsapp-send/index.ts`
+- `supabase/functions/whatsapp-send/README.md`
 - `docs/whatsapp-cloud-api-integration.md`
 - `README.md`
 
@@ -120,13 +133,15 @@ Banco local/migrations:
   limite do webhook.
 - O fluxo evita duplicidade usando telefone canonico e indice unico de
   `provider_message_id`.
+- O envio outbound exige usuario autenticado e canal ativo pertencente ao owner.
 - Dados pessoais sao limitados ao necessario: nome disponivel, telefone e corpo
   da mensagem.
 
 ## Rollback
 
 1. Reverter o commit da branch da integracao.
-2. Reimplantar a versao anterior de `supabase/functions/whatsapp-inbound`.
+2. Reimplantar a versao anterior de `supabase/functions/whatsapp-inbound` e
+   remover/desativar `supabase/functions/whatsapp-send`, se publicada.
 3. No painel da Meta, desativar temporariamente o webhook `messages` ou apontar
    para a versao anterior.
 4. Manter `integration_channels` e `inbox_messages`; nao ha migration destrutiva
@@ -140,6 +155,8 @@ Banco local/migrations:
 - Se o numero oficial nao estiver cadastrado em `integration_channels`, a funcao
   usa `FUNIL_DEFAULT_OWNER_ID` quando configurado; sem fallback, retorna erro.
 - Status de entrega/envio ainda nao atualizam mensagens outbound.
+- O envio de templates fora da janela de atendimento de 24 horas ainda nao esta
+  implementado.
 - Responsavel por atendimento e tabela dedicada de conversas ainda sao proximas
   evolucoes.
 
@@ -150,6 +167,8 @@ Banco local/migrations:
 - Mensagem duplicada com mesmo `provider_message_id` nao duplica o Inbox.
 - Remetente existente e vinculado por telefone a contato/lead.
 - Remetente desconhecido aparece como nova conversa sem criar duplicidade.
+- Resposta do Inbox e enviada pela Cloud API quando o canal esta configurado.
+- Sem secrets de envio, resposta continua registrada localmente no historico.
 - Usuario consegue criar contato, lead e oportunidade pelo Inbox.
 - Build do front-end continua passando.
 
@@ -165,5 +184,10 @@ Banco local/migrations:
    - tipo: `whatsapp`
    - nome: nome operacional do numero
    - numero: numero oficial com DDI, somente digitos
+   - ID do numero na Meta: `phone_number_id`, opcional quando houver secret
+     global `META_WHATSAPP_PHONE_NUMBER_ID`
    - status: `ativo`
-8. Enviar mensagem de teste para o numero e conferir a entrada no Inbox.
+8. Configurar `META_WHATSAPP_ACCESS_TOKEN` e `META_WHATSAPP_PHONE_NUMBER_ID`
+   para permitir respostas reais.
+9. Enviar mensagem de teste para o numero e conferir a entrada no Inbox.
+10. Responder pelo Inbox e conferir a chegada no WhatsApp.
