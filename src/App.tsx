@@ -2679,6 +2679,8 @@ function ChannelModal({
   onClose: () => void;
   onSubmit: (formData: FormData) => Promise<void>;
 }) {
+  const [provider, setProvider] = useState("whatsapp");
+
   return (
     <Modal title="Configurar canal de entrada" onClose={onClose}>
       <EntityForm
@@ -2687,13 +2689,15 @@ function ChannelModal({
         onClose={onClose}
         onSubmit={onSubmit}
       >
-        <TextField
+        <SelectField
           defaultValue="whatsapp"
           label="Tipo de canal"
           name="provider"
-          placeholder="whatsapp ou twilio"
-          required
-        />
+          onChange={(e) => setProvider(e.target.value)}
+        >
+          <option value="whatsapp">WhatsApp Oficial (Cloud API)</option>
+          <option value="evolution_api">WhatsApp QR Code (Evolution API)</option>
+        </SelectField>
         <TextField
           label="Nome do canal"
           name="nome"
@@ -2706,11 +2710,27 @@ function ChannelModal({
           placeholder="5511999999999"
           required
         />
-        <TextField
-          label="ID do numero na Meta"
-          name="phone_number_id"
-          placeholder="Opcional"
-        />
+        {provider === "whatsapp" ? (
+          <TextField
+            label="ID do numero na Meta"
+            name="phone_number_id"
+            placeholder="Opcional"
+          />
+        ) : (
+          <>
+            <TextField
+              label="Nome da Instancia (Evolution API)"
+              name="instance_name"
+              placeholder="MinhaInstancia123"
+              required
+            />
+            <TextField
+              label="Token global ou da Instancia (Evolution API)"
+              name="instance_token"
+              placeholder="Opcional se usar API Key global"
+            />
+          </>
+        )}
       </EntityForm>
     </Modal>
   );

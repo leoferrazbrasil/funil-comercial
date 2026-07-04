@@ -81,6 +81,8 @@ type IntegrationChannelPayload = {
   nome: string;
   numero: string;
   phone_number_id?: string;
+  instance_name?: string;
+  instance_token?: string;
   status?: IntegrationChannel["status"];
 };
 
@@ -476,9 +478,17 @@ export async function createIntegrationChannel(
       nome: payload.nome.trim(),
       numero: normalizePhone(payload.numero),
       status: payload.status ?? "ativo",
-      metadata: payload.phone_number_id
-        ? { phone_number_id: normalizePhone(payload.phone_number_id) }
-        : {},
+      metadata: {
+        ...(payload.phone_number_id && {
+          phone_number_id: normalizePhone(payload.phone_number_id),
+        }),
+        ...(payload.instance_name && {
+          instance_name: payload.instance_name.trim(),
+        }),
+        ...(payload.instance_token && {
+          instance_token: payload.instance_token.trim(),
+        }),
+      },
     })
     .select()
     .single();
