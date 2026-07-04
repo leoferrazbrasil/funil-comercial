@@ -115,6 +115,12 @@ Guia tecnico completo:
 docs/whatsapp-cloud-api-integration.md
 ```
 
+Runbook de publicacao das Edge Functions:
+
+```powershell
+.\scripts\deploy-supabase-functions.ps1
+```
+
 ## Status
 
 Esta versao ja possui autenticacao Supabase, sessao persistente, RLS por usuario, CRUD inicial para Inbox, Contatos, Leads e Funil de vendas, e uma Edge Function preparada para captura automatica de mensagens WhatsApp por webhook. A conexao com provedor real exige configurar o canal em `integration_channels` e apontar o webhook do provedor para a funcao publicada.
