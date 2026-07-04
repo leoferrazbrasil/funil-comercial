@@ -166,6 +166,25 @@ export async function createContact(ownerId: string, payload: ContactPayload) {
   return data as Contact;
 }
 
+export async function updateContact(contactId: string, payload: ContactPayload) {
+  const supabase = requireSupabase();
+  const { data, error } = await supabase
+    .from("contacts")
+    .update({
+      nome: payload.nome.trim(),
+      telefone: normalizePhone(payload.telefone),
+      email: payload.email?.trim() || null,
+      origem: payload.origem?.trim() || "Manual",
+      potencial: payload.potencial?.trim() || "Novo",
+    })
+    .eq("id", contactId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data as Contact;
+}
+
 export async function createLead(ownerId: string, payload: LeadPayload) {
   const supabase = requireSupabase();
   const { data, error } = await supabase
@@ -189,6 +208,33 @@ export async function createLead(ownerId: string, payload: LeadPayload) {
   return data as Lead;
 }
 
+export async function updateLead(leadId: string, payload: LeadPayload) {
+  const supabase = requireSupabase();
+  const updatePayload = {
+    nome: payload.nome.trim(),
+    telefone: normalizePhone(payload.telefone),
+    email: payload.email?.trim() || null,
+    interesse: payload.interesse.trim(),
+    status: payload.status ?? "novo",
+    valor_estimado: payload.valor_estimado ?? 0,
+    proxima_acao: payload.proxima_acao?.trim() || "Realizar primeiro contato",
+    origem: payload.origem?.trim() || "Manual",
+    ...(payload.contact_id !== undefined
+      ? { contact_id: payload.contact_id }
+      : {}),
+  };
+
+  const { data, error } = await supabase
+    .from("leads")
+    .update(updatePayload)
+    .eq("id", leadId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data as Lead;
+}
+
 export async function createOpportunity(
   ownerId: string,
   payload: OpportunityPayload,
@@ -205,6 +251,29 @@ export async function createOpportunity(
       responsavel: payload.responsavel?.trim() || "Equipe comercial",
       proxima_acao: payload.proxima_acao?.trim() || "Definir próximo passo",
     })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data as Opportunity;
+}
+
+export async function updateOpportunity(
+  opportunityId: string,
+  payload: OpportunityPayload,
+) {
+  const supabase = requireSupabase();
+  const { data, error } = await supabase
+    .from("opportunities")
+    .update({
+      lead_id: payload.lead_id ?? null,
+      titulo: payload.titulo.trim(),
+      etapa: payload.etapa ?? "Novo",
+      valor: payload.valor ?? 0,
+      responsavel: payload.responsavel?.trim() || "Equipe comercial",
+      proxima_acao: payload.proxima_acao?.trim() || "Definir prÃ³ximo passo",
+    })
+    .eq("id", opportunityId)
     .select()
     .single();
 

@@ -7,6 +7,7 @@ import {
   LogOut,
   MessageCircle,
   MoveRight,
+  Pencil,
   Plus,
   Search,
   ShieldCheck,
@@ -43,6 +44,9 @@ import {
   createInboxMessage,
   createLead,
   createOpportunity,
+  updateContact,
+  updateLead,
+  updateOpportunity,
   updateOpportunityStage,
   ensureDefaultStages,
   getCrmSnapshot,
@@ -65,15 +69,27 @@ import type {
   CrmSnapshot,
   InboxMessage,
   Lead,
+  Opportunity,
   OpportunityStage,
   Route as AppRoute,
 } from "./lib/types";
 
 type ModalType = "contact" | "lead" | "opportunity" | "message";
+type EditingTarget =
+  | { type: "contact"; record: Contact }
+  | { type: "lead"; record: Lead }
+  | { type: "opportunity"; record: Opportunity };
 
 const navItems = navigationItems;
 
 const stages: OpportunityStage[] = pipelineStages;
+const leadStatuses: Array<{ label: string; value: Lead["status"] }> = [
+  { label: "Novo", value: "novo" },
+  { label: "Em atendimento", value: "em_atendimento" },
+  { label: "Qualificado", value: "qualificado" },
+  { label: "Convertido", value: "convertido" },
+  { label: "Perdido", value: "perdido" },
+];
 
 const emptySnapshot: CrmSnapshot = {
   profile: null,
@@ -129,6 +145,7 @@ function AppContent() {
   const [session, setSession] = useState<Session | null>(null);
   const [query, setQuery] = useState("");
   const [modal, setModal] = useState<ModalType | null>(null);
+  const [editing, setEditing] = useState<EditingTarget | null>(null);
   const [isBooting, setIsBooting] = useState(true);
   const queryClient = useQueryClient();
 
@@ -220,6 +237,21 @@ function AppContent() {
     queryClient.invalidateQueries({ queryKey: ["crmSnapshot"] });
   };
 
+  const openModal = (nextModal: ModalType) => {
+    setEditing(null);
+    setModal(nextModal);
+  };
+
+  const closeModal = () => {
+    setModal(null);
+    setEditing(null);
+  };
+
+  const openEditModal = (target: EditingTarget) => {
+    setEditing(target);
+    setModal(target.type);
+  };
+
   const handleAuth = async (
     email: string,
     password: string,
@@ -277,7 +309,7 @@ function AppContent() {
 
     try {
       await mutation();
-      setModal(null);
+      closeModal();
       reloadData();
       toast.success(successMsg);
     } catch (error) {
@@ -293,49 +325,68 @@ function AppContent() {
 
   const createContactFromForm = async (formData: FormData) => {
     if (!ownerId) return;
+    const payload = {
+      nome: getFormValue(formData, "nome"),
+      telefone: getFormValue(formData, "telefone"),
+      email: getFormValue(formData, "email"),
+      origem: getFormValue(formData, "origem"),
+      potencial: getFormValue(formData, "potencial"),
+    };
+
     await runMutation(
       () =>
-        createContact(ownerId, {
-          nome: getFormValue(formData, "nome"),
-          telefone: getFormValue(formData, "telefone"),
-          email: getFormValue(formData, "email"),
-          origem: getFormValue(formData, "origem"),
-          potencial: getFormValue(formData, "potencial"),
-        }),
-      "Contato cadastrado com sucesso!",
+        editing?.type === "contact"
+          ? updateContact(editing.record.id, payload)
+          : createContact(ownerId, payload),
+      editing?.type === "contact"
+        ? "Contato atualizado com sucesso!"
+        : "Contato cadastrado com sucesso!",
     );
   };
 
   const createLeadFromForm = async (formData: FormData) => {
     if (!ownerId) return;
+    const payload = {
+      nome: getFormValue(formData, "nome"),
+      telefone: getFormValue(formData, "telefone"),
+      email: getFormValue(formData, "email"),
+      interesse: getFormValue(formData, "interesse"),
+      status: (getFormValue(formData, "status") || "novo") as Lead["status"],
+      origem: getFormValue(formData, "origem"),
+      valor_estimado: Number(getFormValue(formData, "valor_estimado") || 0),
+      proxima_acao: getFormValue(formData, "proxima_acao"),
+    };
+
     await runMutation(
       () =>
-        createLead(ownerId, {
-          nome: getFormValue(formData, "nome"),
-          telefone: getFormValue(formData, "telefone"),
-          email: getFormValue(formData, "email"),
-          interesse: getFormValue(formData, "interesse"),
-          origem: getFormValue(formData, "origem"),
-          valor_estimado: Number(getFormValue(formData, "valor_estimado") || 0),
-        }),
-      "Lead cadastrado com sucesso!",
+        editing?.type === "lead"
+          ? updateLead(editing.record.id, payload)
+          : createLead(ownerId, payload),
+      editing?.type === "lead"
+        ? "Lead atualizado com sucesso!"
+        : "Lead cadastrado com sucesso!",
     );
   };
 
   const createOpportunityFromForm = async (formData: FormData) => {
     if (!ownerId) return;
+    const payload = {
+      lead_id: getFormValue(formData, "lead_id") || null,
+      titulo: getFormValue(formData, "titulo"),
+      etapa: (getFormValue(formData, "etapa") || "Novo") as OpportunityStage,
+      valor: Number(getFormValue(formData, "valor") || 0),
+      responsavel: getFormValue(formData, "responsavel"),
+      proxima_acao: getFormValue(formData, "proxima_acao"),
+    };
+
     await runMutation(
       () =>
-        createOpportunity(ownerId, {
-          lead_id: getFormValue(formData, "lead_id") || null,
-          titulo: getFormValue(formData, "titulo"),
-          etapa: (getFormValue(formData, "etapa") ||
-            "Novo") as OpportunityStage,
-          valor: Number(getFormValue(formData, "valor") || 0),
-          responsavel: getFormValue(formData, "responsavel"),
-          proxima_acao: getFormValue(formData, "proxima_acao"),
-        }),
-      "Oportunidade criada com sucesso!",
+        editing?.type === "opportunity"
+          ? updateOpportunity(editing.record.id, payload)
+          : createOpportunity(ownerId, payload),
+      editing?.type === "opportunity"
+        ? "Oportunidade atualizada com sucesso!"
+        : "Oportunidade criada com sucesso!",
     );
   };
 
@@ -448,7 +499,7 @@ function AppContent() {
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route
               path="/dashboard"
-              element={<Dashboard snapshot={snapshot} onOpenModal={setModal} />}
+              element={<Dashboard snapshot={snapshot} onOpenModal={openModal} />}
             />
             <Route
               path="/inbox"
@@ -456,7 +507,7 @@ function AppContent() {
                 <InboxPage
                   messages={snapshot.messages}
                   query={query}
-                  onOpenModal={setModal}
+                  onOpenModal={openModal}
                 />
               }
             />
@@ -468,7 +519,10 @@ function AppContent() {
                   query={query}
                   isSaving={isSaving}
                   onConvertContact={handleConvertContact}
-                  onOpenModal={setModal}
+                  onEditContact={(contact) =>
+                    openEditModal({ type: "contact", record: contact })
+                  }
+                  onOpenModal={openModal}
                 />
               }
             />
@@ -480,7 +534,10 @@ function AppContent() {
                   leads={snapshot.leads}
                   query={query}
                   onCreateOpportunity={handleCreateOpportunityFromLead}
-                  onOpenModal={setModal}
+                  onEditLead={(lead) =>
+                    openEditModal({ type: "lead", record: lead })
+                  }
+                  onOpenModal={openModal}
                 />
               }
             />
@@ -490,7 +547,13 @@ function AppContent() {
                 <PipelinePage
                   leads={snapshot.leads}
                   opportunities={snapshot.opportunities}
-                  onOpenModal={setModal}
+                  onEditOpportunity={(opportunity) =>
+                    openEditModal({
+                      type: "opportunity",
+                      record: opportunity,
+                    })
+                  }
+                  onOpenModal={openModal}
                   onDragEnd={handleDragEnd}
                 />
               }
@@ -502,15 +565,17 @@ function AppContent() {
 
       {modal === "contact" && (
         <ContactModal
+          contact={editing?.type === "contact" ? editing.record : undefined}
           isSaving={isSaving}
-          onClose={() => setModal(null)}
+          onClose={closeModal}
           onSubmit={createContactFromForm}
         />
       )}
       {modal === "lead" && (
         <LeadModal
           isSaving={isSaving}
-          onClose={() => setModal(null)}
+          lead={editing?.type === "lead" ? editing.record : undefined}
+          onClose={closeModal}
           onSubmit={createLeadFromForm}
         />
       )}
@@ -518,14 +583,17 @@ function AppContent() {
         <OpportunityModal
           isSaving={isSaving}
           leads={snapshot.leads}
-          onClose={() => setModal(null)}
+          opportunity={
+            editing?.type === "opportunity" ? editing.record : undefined
+          }
+          onClose={closeModal}
           onSubmit={createOpportunityFromForm}
         />
       )}
       {modal === "message" && (
         <MessageModal
           isSaving={isSaving}
-          onClose={() => setModal(null)}
+          onClose={closeModal}
           onSubmit={createMessageFromForm}
         />
       )}
@@ -969,12 +1037,14 @@ function ContactsPage({
   query,
   isSaving,
   onConvertContact,
+  onEditContact,
   onOpenModal,
 }: {
   contacts: Contact[];
   query: string;
   isSaving: boolean;
   onConvertContact: (contact: Contact) => Promise<void>;
+  onEditContact: (contact: Contact) => void;
   onOpenModal: (modal: ModalType) => void;
 }) {
   const filteredContacts = contacts.filter((contact) =>
@@ -1019,13 +1089,24 @@ function ContactsPage({
                 <td>{contact.origem}</td>
                 <td>{contact.potencial}</td>
                 <td>
-                  <button
-                    className="table-action"
-                    disabled={isSaving}
-                    onClick={() => onConvertContact(contact)}
-                  >
-                    Converter em lead
-                  </button>
+                  <div className="table-actions">
+                    <button
+                      className="table-action"
+                      onClick={() => onEditContact(contact)}
+                      type="button"
+                    >
+                      <Pencil size={14} />
+                      Editar
+                    </button>
+                    <button
+                      className="table-action"
+                      disabled={isSaving}
+                      onClick={() => onConvertContact(contact)}
+                      type="button"
+                    >
+                      Converter em lead
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -1041,12 +1122,14 @@ function LeadsPage({
   query,
   isSaving,
   onCreateOpportunity,
+  onEditLead,
   onOpenModal,
 }: {
   leads: Lead[];
   query: string;
   isSaving: boolean;
   onCreateOpportunity: (lead: Lead) => Promise<void>;
+  onEditLead: (lead: Lead) => void;
   onOpenModal: (modal: ModalType) => void;
 }) {
   const filteredLeads = leads.filter((lead) =>
@@ -1092,13 +1175,24 @@ function LeadsPage({
                 <Clock3 size={16} />
                 {lead.proxima_acao}
               </footer>
-              <button
-                className="secondary-button"
-                disabled={isSaving}
-                onClick={() => onCreateOpportunity(lead)}
-              >
-                Criar oportunidade
-              </button>
+              <div className="card-actions">
+                <button
+                  className="secondary-button"
+                  onClick={() => onEditLead(lead)}
+                  type="button"
+                >
+                  <Pencil size={16} />
+                  Editar
+                </button>
+                <button
+                  className="secondary-button"
+                  disabled={isSaving}
+                  onClick={() => onCreateOpportunity(lead)}
+                  type="button"
+                >
+                  Criar oportunidade
+                </button>
+              </div>
             </article>
           ))}
         </div>
@@ -1107,7 +1201,13 @@ function LeadsPage({
   );
 }
 
-function PipelineCard({ item }: { item: any }) {
+function PipelineCard({
+  item,
+  onEdit,
+}: {
+  item: Opportunity;
+  onEdit: (opportunity: Opportunity) => void;
+}) {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: item.id,
     data: { item },
@@ -1132,7 +1232,21 @@ function PipelineCard({ item }: { item: any }) {
       <h3>{item.titulo}</h3>
       <strong>{formatMoney(Number(item.valor))}</strong>
       <p>{item.proxima_acao}</p>
-      <small>{item.responsavel}</small>
+      <footer className="opportunity-card-footer">
+        <small>{item.responsavel}</small>
+        <button
+          className="table-action"
+          onClick={(event) => {
+            event.stopPropagation();
+            onEdit(item);
+          }}
+          onPointerDown={(event) => event.stopPropagation()}
+          type="button"
+        >
+          <Pencil size={14} />
+          Editar
+        </button>
+      </footer>
     </article>
   );
 }
@@ -1154,7 +1268,7 @@ function PipelineColumn({ column }: { column: any }) {
       </header>
       <div className="pipeline-items">
         {column.items.map((item: any) => (
-          <PipelineCard key={item.id} item={item} />
+          <PipelineCard key={item.id} item={item} onEdit={column.onEdit} />
         ))}
         {column.items.length === 0 && (
           <p className="empty-column">Solte aqui.</p>
@@ -1167,11 +1281,13 @@ function PipelineColumn({ column }: { column: any }) {
 function PipelinePage({
   leads,
   opportunities,
+  onEditOpportunity,
   onOpenModal,
   onDragEnd,
 }: {
   leads: Lead[];
   opportunities: CrmSnapshot["opportunities"];
+  onEditOpportunity: (opportunity: Opportunity) => void;
   onOpenModal: (modal: ModalType) => void;
   onDragEnd: (event: any) => void;
 }) {
@@ -1180,8 +1296,9 @@ function PipelinePage({
       stages.map((stage) => ({
         stage,
         items: opportunities.filter((item) => item.etapa === stage),
+        onEdit: onEditOpportunity,
       })),
-    [opportunities],
+    [onEditOpportunity, opportunities],
   );
 
   return (
@@ -1398,36 +1515,51 @@ function Modal({
 }
 
 function ContactModal({
+  contact,
   isSaving,
   onClose,
   onSubmit,
 }: {
+  contact?: Contact;
   isSaving: boolean;
   onClose: () => void;
   onSubmit: (formData: FormData) => Promise<void>;
 }) {
   return (
-    <Modal title="Novo contato" onClose={onClose}>
+    <Modal title={contact ? "Editar contato" : "Novo contato"} onClose={onClose}>
       <EntityForm
         isSaving={isSaving}
-        submitLabel="Salvar contato"
+        submitLabel={contact ? "Salvar alteracoes" : "Salvar contato"}
         onClose={onClose}
         onSubmit={onSubmit}
       >
-        <TextField label="Nome" name="nome" required />
         <TextField
+          defaultValue={contact?.nome}
+          label="Nome"
+          name="nome"
+          required
+        />
+        <TextField
+          defaultValue={contact?.telefone}
           label="Telefone"
           name="telefone"
           placeholder="5511999999999"
           required
         />
-        <TextField label="E-mail" name="email" type="email" />
         <TextField
+          defaultValue={contact?.email}
+          label="E-mail"
+          name="email"
+          type="email"
+        />
+        <TextField
+          defaultValue={contact?.origem}
           label="Origem"
           name="origem"
           placeholder="WhatsApp, indicação, landing page..."
         />
         <TextField
+          defaultValue={contact?.potencial}
           label="Potencial"
           name="potencial"
           placeholder="Novo, alto, médio..."
@@ -1439,41 +1571,69 @@ function ContactModal({
 
 function LeadModal({
   isSaving,
+  lead,
   onClose,
   onSubmit,
 }: {
   isSaving: boolean;
+  lead?: Lead;
   onClose: () => void;
   onSubmit: (formData: FormData) => Promise<void>;
 }) {
   return (
-    <Modal title="Novo lead" onClose={onClose}>
+    <Modal title={lead ? "Editar lead" : "Novo lead"} onClose={onClose}>
       <EntityForm
         isSaving={isSaving}
-        submitLabel="Salvar lead"
+        submitLabel={lead ? "Salvar alteracoes" : "Salvar lead"}
         onClose={onClose}
         onSubmit={onSubmit}
       >
-        <TextField label="Nome" name="nome" required />
+        <TextField defaultValue={lead?.nome} label="Nome" name="nome" required />
         <TextField
+          defaultValue={lead?.telefone}
           label="Telefone"
           name="telefone"
           placeholder="5511999999999"
           required
         />
-        <TextField label="E-mail" name="email" type="email" />
         <TextField
+          defaultValue={lead?.email}
+          label="E-mail"
+          name="email"
+          type="email"
+        />
+        <TextField
+          defaultValue={lead?.interesse}
           label="Interesse"
           name="interesse"
           placeholder="Produto, serviço ou necessidade"
           required
         />
+        <SelectField label="Status" name="status" defaultValue={lead?.status}>
+          {leadStatuses.map((status) => (
+            <option key={status.value} value={status.value}>
+              {status.label}
+            </option>
+          ))}
+        </SelectField>
         <TextField
+          defaultValue={lead?.origem}
           label="Origem"
           name="origem"
           placeholder="WhatsApp, Meta Ads, indicação..."
         />
-        <TextField label="Valor estimado" name="valor_estimado" type="number" />
+        <TextField
+          defaultValue={lead?.valor_estimado}
+          label="Valor estimado"
+          name="valor_estimado"
+          type="number"
+        />
+        <TextField
+          defaultValue={lead?.proxima_acao}
+          label="Proxima acao"
+          name="proxima_acao"
+          placeholder="Realizar primeiro contato"
+        />
       </EntityForm>
     </Modal>
   );
@@ -1482,23 +1642,32 @@ function LeadModal({
 function OpportunityModal({
   isSaving,
   leads,
+  opportunity,
   onClose,
   onSubmit,
 }: {
   isSaving: boolean;
   leads: Lead[];
+  opportunity?: Opportunity;
   onClose: () => void;
   onSubmit: (formData: FormData) => Promise<void>;
 }) {
   return (
-    <Modal title="Nova oportunidade" onClose={onClose}>
+    <Modal
+      title={opportunity ? "Editar oportunidade" : "Nova oportunidade"}
+      onClose={onClose}
+    >
       <EntityForm
         isSaving={isSaving}
-        submitLabel="Salvar oportunidade"
+        submitLabel={opportunity ? "Salvar alteracoes" : "Salvar oportunidade"}
         onClose={onClose}
         onSubmit={onSubmit}
       >
-        <SelectField label="Lead vinculado" name="lead_id">
+        <SelectField
+          defaultValue={opportunity?.lead_id}
+          label="Lead vinculado"
+          name="lead_id"
+        >
           <option value="">Sem vínculo</option>
           {leads.map((lead) => (
             <option key={lead.id} value={lead.id}>
@@ -1506,17 +1675,39 @@ function OpportunityModal({
             </option>
           ))}
         </SelectField>
-        <TextField label="Título" name="titulo" required />
-        <SelectField label="Etapa" name="etapa">
+        <TextField
+          defaultValue={opportunity?.titulo}
+          label="Titulo"
+          name="titulo"
+          required
+        />
+        <SelectField
+          defaultValue={opportunity?.etapa}
+          label="Etapa"
+          name="etapa"
+        >
           {stages.map((stage) => (
             <option key={stage} value={stage}>
               {stage}
             </option>
           ))}
         </SelectField>
-        <TextField label="Valor" name="valor" type="number" />
-        <TextField label="Responsável" name="responsavel" />
-        <TextField label="Próxima ação" name="proxima_acao" />
+        <TextField
+          defaultValue={opportunity?.valor}
+          label="Valor"
+          name="valor"
+          type="number"
+        />
+        <TextField
+          defaultValue={opportunity?.responsavel}
+          label="Responsavel"
+          name="responsavel"
+        />
+        <TextField
+          defaultValue={opportunity?.proxima_acao}
+          label="Proxima acao"
+          name="proxima_acao"
+        />
       </EntityForm>
     </Modal>
   );
@@ -1594,12 +1785,14 @@ function EntityForm({
 }
 
 function TextField({
+  defaultValue,
   label,
   name,
   placeholder,
   required,
   type = "text",
 }: {
+  defaultValue?: string | number | null;
   label: string;
   name: string;
   placeholder?: string;
@@ -1608,12 +1801,17 @@ function TextField({
 }) {
   const isPhone = name === "telefone";
   const isMoney = name === "valor_estimado" || name === "valor";
+  const defaultText =
+    defaultValue === null || defaultValue === undefined
+      ? undefined
+      : String(defaultValue);
 
   return (
     <label>
       {label}
       {isPhone ? (
         <IMaskInput
+          defaultValue={defaultText}
           name={name}
           mask="(00) 00000-0000"
           placeholder={placeholder || "(11) 99999-9999"}
@@ -1621,6 +1819,7 @@ function TextField({
         />
       ) : isMoney ? (
         <IMaskInput
+          defaultValue={defaultText}
           name={name}
           mask={Number}
           scale={0}
@@ -1633,6 +1832,7 @@ function TextField({
         />
       ) : (
         <input
+          defaultValue={defaultText}
           name={name}
           placeholder={placeholder}
           required={required}
@@ -1645,17 +1845,21 @@ function TextField({
 
 function SelectField({
   children,
+  defaultValue,
   label,
   name,
 }: {
   children: ReactNode;
+  defaultValue?: string | null;
   label: string;
   name: string;
 }) {
   return (
     <label>
       {label}
-      <select name={name}>{children}</select>
+      <select name={name} defaultValue={defaultValue ?? ""}>
+        {children}
+      </select>
     </label>
   );
 }
