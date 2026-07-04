@@ -61,6 +61,11 @@ type MessagePayload = {
   direction?: InboxMessage["direction"];
 };
 
+type MessageStatusPayload = {
+  status: string;
+  unread_count: number;
+};
+
 const normalizePhone = (phone: string) => phone.replace(/\D/g, "");
 
 export async function upsertProfile(user: User) {
@@ -300,6 +305,25 @@ export async function createInboxMessage(
       unread_count: payload.unread_count ?? 1,
       direction: payload.direction ?? "inbound",
     })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data as InboxMessage;
+}
+
+export async function updateInboxMessageStatus(
+  messageId: string,
+  payload: MessageStatusPayload,
+) {
+  const supabase = requireSupabase();
+  const { data, error } = await supabase
+    .from("inbox_messages")
+    .update({
+      status: payload.status.trim(),
+      unread_count: payload.unread_count,
+    })
+    .eq("id", messageId)
     .select()
     .single();
 

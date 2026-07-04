@@ -2,6 +2,7 @@ import type { Session } from "@supabase/supabase-js";
 import type { LucideIcon } from "lucide-react";
 import {
   Bell,
+  CheckCircle2,
   CircleDollarSign,
   Clock3,
   LogOut,
@@ -15,6 +16,7 @@ import {
   Target,
   TrendingUp,
   UsersRound,
+  RotateCcw,
   Moon,
   Sun,
   X,
@@ -45,6 +47,7 @@ import {
   createLead,
   createOpportunity,
   updateContact,
+  updateInboxMessageStatus,
   updateLead,
   updateOpportunity,
   updateOpportunityStage,
@@ -135,6 +138,59 @@ const getErrorMessage = (error: unknown) => {
 
 const getFormValue = (formData: FormData, key: string) =>
   String(formData.get(key) ?? "").trim();
+
+const buildInboxRecommendation = (message: InboxMessage) => {
+  const text = normalizeSearch(
+    [message.mensagem, message.status, message.canal].join(" "),
+  );
+  const hasPriceSignal = [
+    "preco",
+    "valor",
+    "orcamento",
+    "investimento",
+    "pagamento",
+  ].some((signal) => text.includes(signal));
+  const hasVisitSignal = ["visita", "conhecer", "agenda", "horario"].some(
+    (signal) => text.includes(signal),
+  );
+  const hasUrgencySignal = ["urgente", "hoje", "agora", "rapido"].some(
+    (signal) => text.includes(signal),
+  );
+
+  if (hasUrgencySignal) {
+    return {
+      priority: "Alta",
+      nextAction: "Responder agora e confirmar qual necessidade precisa ser resolvida primeiro.",
+      suggestedReply:
+        "Vi sua mensagem e ja vou te direcionar. Qual e a prioridade agora: prazo, valor ou detalhes da solucao?",
+    };
+  }
+
+  if (hasVisitSignal) {
+    return {
+      priority: "Alta",
+      nextAction: "Confirmar interesse e propor um horario de conversa ou demonstracao.",
+      suggestedReply:
+        "Perfeito. Para eu organizar o melhor proximo passo, voce prefere conversar hoje ou amanha?",
+    };
+  }
+
+  if (hasPriceSignal) {
+    return {
+      priority: "Media",
+      nextAction: "Entender faixa de investimento e contexto antes de enviar proposta.",
+      suggestedReply:
+        "Consigo te orientar melhor. Qual faixa de investimento ou necessidade voce tem em mente?",
+    };
+  }
+
+  return {
+    priority: message.unread_count > 0 ? "Media" : "Baixa",
+    nextAction: "Qualificar interesse, origem e proximo passo comercial.",
+    suggestedReply:
+      "Entendi. Para eu te direcionar melhor, qual resultado voce quer resolver primeiro?",
+  };
+};
 
 function AppContent() {
   const location = useLocation();
@@ -404,6 +460,23 @@ function AppContent() {
     );
   };
 
+  const handleUpdateInboxStatus = async (
+    message: InboxMessage,
+    status: string,
+    unreadCount: number,
+  ) => {
+    await runMutation(
+      () =>
+        updateInboxMessageStatus(message.id, {
+          status,
+          unread_count: unreadCount,
+        }),
+      status === "Resolvido"
+        ? "Conversa marcada como resolvida."
+        : "Conversa marcada para atendimento.",
+    );
+  };
+
   const handleConvertContact = async (contact: Contact) => {
     if (!ownerId) return;
     await runMutation(
@@ -505,9 +578,11 @@ function AppContent() {
               path="/inbox"
               element={
                 <InboxPage
+                  isSaving={isSaving}
                   messages={snapshot.messages}
                   query={query}
                   onOpenModal={openModal}
+                  onUpdateMessageStatus={handleUpdateInboxStatus}
                 />
               }
             />
@@ -948,13 +1023,21 @@ function Dashboard({
 }
 
 function InboxPage({
+  isSaving,
   messages,
   query,
   onOpenModal,
+  onUpdateMessageStatus,
 }: {
+  isSaving: boolean;
   messages: InboxMessage[];
   query: string;
   onOpenModal: (modal: ModalType) => void;
+  onUpdateMessageStatus: (
+    message: InboxMessage,
+    status: string,
+    unreadCount: number,
+  ) => Promise<void>;
 }) {
   const filteredMessages = messages.filter((message) =>
     matchesQuery(query, [
@@ -968,6 +1051,9 @@ function InboxPage({
   const selected =
     filteredMessages.find((message) => message.id === selectedId) ??
     filteredMessages[0];
+  const recommendation = selected
+    ? buildInboxRecommendation(selected)
+    : undefined;
 
   return (
     <div className="page-stack">
@@ -1004,9 +1090,12 @@ function InboxPage({
                     <small>{conversation.mensagem}</small>
                   </span>
                   <em>
-                    {conversation.unread_count
-                      ? `${conversation.unread_count} nova`
-                      : conversation.canal}
+                    <span>{conversation.status}</span>
+                    <small>
+                      {conversation.unread_count
+                        ? `${conversation.unread_count} nova`
+                        : conversation.canal}
+                    </small>
                   </em>
                 </button>
               ))}
@@ -1014,6 +1103,13 @@ function InboxPage({
           </Panel>
 
           <Panel title={selected.remetente_nome} eyebrow={selected.status}>
+            {recommendation && (
+              <div className="inbox-recommendation">
+                <span>Prioridade {recommendation.priority}</span>
+                <strong>{recommendation.nextAction}</strong>
+                <p>{recommendation.suggestedReply}</p>
+              </div>
+            )}
             <div className="chat-window">
               <p className="message inbound">{selected.mensagem}</p>
               <p className="message outbound">
@@ -1021,9 +1117,33 @@ function InboxPage({
                 comercial.
               </p>
             </div>
+            <div className="inbox-actions">
+              <button
+                className="secondary-button"
+                disabled={isSaving}
+                onClick={() =>
+                  onUpdateMessageStatus(selected, "Em atendimento", 1)
+                }
+                type="button"
+              >
+                <RotateCcw size={16} />
+                Marcar em atendimento
+              </button>
+              <button
+                className="primary-button"
+                disabled={isSaving}
+                onClick={() => onUpdateMessageStatus(selected, "Resolvido", 0)}
+                type="button"
+              >
+                <CheckCircle2 size={16} />
+                Marcar resolvida
+              </button>
+            </div>
             <div className="composer">
               <input placeholder="Escreva uma resposta..." />
-              <button className="primary-button">Enviar</button>
+              <button className="primary-button" type="button">
+                Enviar
+              </button>
             </div>
           </Panel>
         </section>
