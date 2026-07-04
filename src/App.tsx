@@ -48,6 +48,7 @@ import {
   createIntegrationChannel,
   createLead,
   createOpportunity,
+  sendInboxReply,
   updateContact,
   updateIntegrationChannelStatus,
   updateInboxConversationLinks,
@@ -643,6 +644,7 @@ function AppContent() {
           provider: getFormValue(formData, "provider") || "whatsapp",
           nome: getFormValue(formData, "nome"),
           numero: getFormValue(formData, "numero"),
+          phone_number_id: getFormValue(formData, "phone_number_id"),
           status: "ativo",
         }),
       "Canal de entrada configurado.",
@@ -685,24 +687,14 @@ function AppContent() {
     if (!ownerId) return;
 
     await runMutation(
-      async () => {
-        await createInboxMessage(ownerId, {
-          contact_id: message.contact_id,
-          lead_id: message.lead_id,
-          canal: message.canal,
-          remetente_nome: snapshot.profile?.nome ?? "Equipe comercial",
-          telefone: message.telefone,
-          mensagem: reply,
-          status: "Resposta enviada",
-          unread_count: 0,
-          direction: "outbound",
-        });
-        await updateInboxMessageStatus(message.id, {
-          status: "Respondido",
-          unread_count: 0,
-        });
-      },
-      "Resposta registrada no inbox.",
+      () =>
+        sendInboxReply(
+          ownerId,
+          message,
+          reply,
+          snapshot.profile?.nome ?? "Equipe comercial",
+        ),
+      "Resposta processada no inbox.",
     );
   };
 
@@ -2713,6 +2705,11 @@ function ChannelModal({
           name="numero"
           placeholder="5511999999999"
           required
+        />
+        <TextField
+          label="ID do numero na Meta"
+          name="phone_number_id"
+          placeholder="Opcional"
         />
       </EntityForm>
     </Modal>

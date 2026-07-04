@@ -80,6 +80,7 @@ type IntegrationChannelPayload = {
   provider: string;
   nome: string;
   numero: string;
+  phone_number_id?: string;
   status?: IntegrationChannel["status"];
 };
 
@@ -338,6 +339,83 @@ export async function createInboxMessage(
   return data as InboxMessage;
 }
 
+const functionAllowsLocalReplyFallback = (error: unknown) => {
+  if (!error || typeof error !== "object") return false;
+
+  const maybeError = error as {
+    context?: { status?: number };
+    message?: string;
+  };
+  const status = maybeError.context?.status;
+  const message = maybeError.message?.toLowerCase() ?? "";
+
+  return (
+    status === 404 ||
+    status === 501 ||
+    (message.includes("function") && message.includes("not found"))
+  );
+};
+
+async function registerLocalInboxReply(
+  ownerId: string,
+  message: InboxMessage,
+  reply: string,
+  senderName: string,
+) {
+  await createInboxMessage(ownerId, {
+    contact_id: message.contact_id,
+    lead_id: message.lead_id,
+    canal: message.canal,
+    provider: "manual",
+    remetente_nome: senderName,
+    telefone: message.telefone,
+    mensagem: reply,
+    status: "Resposta registrada",
+    unread_count: 0,
+    direction: "outbound",
+  });
+  await updateInboxMessageStatus(message.id, {
+    status: "Respondido",
+    unread_count: 0,
+  });
+
+  return { mode: "local" as const };
+}
+
+export async function sendInboxReply(
+  ownerId: string,
+  message: InboxMessage,
+  reply: string,
+  senderName: string,
+) {
+  const supabase = requireSupabase();
+  const trimmedReply = reply.trim();
+
+  const { data, error } = await supabase.functions.invoke("whatsapp-send", {
+    body: {
+      phone: message.telefone,
+      message: trimmedReply,
+      source_message_id: message.id,
+      contact_id: message.contact_id,
+      lead_id: message.lead_id,
+    },
+  });
+
+  if (!error && data?.sent) {
+    return { mode: "whatsapp" as const };
+  }
+
+  if (!error && data?.fallback_allowed) {
+    return registerLocalInboxReply(ownerId, message, trimmedReply, senderName);
+  }
+
+  if (functionAllowsLocalReplyFallback(error)) {
+    return registerLocalInboxReply(ownerId, message, trimmedReply, senderName);
+  }
+
+  throw error ?? new Error(data?.error ?? "Nao foi possivel enviar a resposta.");
+}
+
 export async function updateInboxMessageStatus(
   messageId: string,
   payload: MessageStatusPayload,
@@ -398,7 +476,9 @@ export async function createIntegrationChannel(
       nome: payload.nome.trim(),
       numero: normalizePhone(payload.numero),
       status: payload.status ?? "ativo",
-      metadata: {},
+      metadata: payload.phone_number_id
+        ? { phone_number_id: normalizePhone(payload.phone_number_id) }
+        : {},
     })
     .select()
     .single();
