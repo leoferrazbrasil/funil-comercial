@@ -27,6 +27,8 @@ body,
 .login-card,
 .metric-card,
 .opportunity-card,
+.pipeline-risk-item,
+.pipeline-signal-card,
 .sidebar,
 .sidebar-nav a,
 .action-item,
@@ -622,6 +624,7 @@ button:disabled {
 .metric-card,
 .table-panel,
 .lead-card,
+.pipeline-signal-card,
 .pipeline-column {
   border: 1px solid var(--line);
   background: var(--fc-panel-bg);
@@ -1110,6 +1113,104 @@ th {
   color: var(--green);
 }
 
+.pipeline-health-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.pipeline-signal-card {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  align-items: start;
+  border-radius: 16px;
+  gap: 12px;
+  padding: 18px;
+}
+
+.pipeline-signal-card svg {
+  border-radius: 12px;
+  background: var(--green-soft);
+  color: var(--green);
+  padding: 9px;
+  box-sizing: content-box;
+}
+
+.pipeline-signal-card.warning svg {
+  background: var(--amber-soft);
+  color: var(--amber);
+}
+
+.pipeline-signal-card span,
+.pipeline-signal-card small {
+  display: block;
+  color: var(--muted);
+}
+
+.pipeline-signal-card span {
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.pipeline-signal-card strong {
+  display: block;
+  margin-top: 8px;
+  color: var(--text);
+  font-size: 22px;
+}
+
+.pipeline-signal-card small {
+  margin-top: 5px;
+  line-height: 1.45;
+}
+
+.pipeline-risk-list {
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+}
+
+.pipeline-risk-item {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) auto auto;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface-2);
+  gap: 12px;
+  padding: 14px;
+}
+
+.pipeline-risk-item > svg {
+  color: var(--amber);
+}
+
+.pipeline-risk-item strong,
+.pipeline-risk-item p,
+.pipeline-risk-item small {
+  display: block;
+  margin: 0;
+}
+
+.pipeline-risk-item p,
+.pipeline-risk-item small {
+  margin-top: 4px;
+  color: var(--muted);
+}
+
+.pipeline-risk-item span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  border-radius: 999px;
+  background: var(--amber-soft);
+  color: var(--amber);
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
 .pipeline-board {
   display: grid;
   grid-template-columns: repeat(6, minmax(240px, 1fr));
@@ -1305,6 +1406,7 @@ th {
   }
 
   .metrics-grid,
+  .pipeline-health-grid,
   .lead-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1379,8 +1481,19 @@ th {
   }
 
   .metrics-grid,
+  .pipeline-health-grid,
   .lead-grid {
     grid-template-columns: 1fr;
+  }
+
+  .pipeline-risk-item {
+    grid-template-columns: 24px minmax(0, 1fr);
+  }
+
+  .pipeline-risk-item span,
+  .pipeline-risk-item button {
+    grid-column: 2;
+    width: fit-content;
   }
 
   .composer {

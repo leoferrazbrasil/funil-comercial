@@ -248,6 +248,54 @@ const buildOpportunityNextActionFromMessage = (message: InboxMessage) => {
 const buildOpportunityTitleFromMessage = (message: InboxMessage, name: string) =>
   `${name || message.remetente_nome} - ${message.canal || "Inbox"}`;
 
+type PipelineRisk = {
+  id: string;
+  opportunity: Opportunity;
+  priority: "Alta" | "Media";
+  reason: string;
+  nextAction: string;
+};
+
+const isOpenOpportunity = (opportunity: Opportunity) =>
+  !["Ganho", "Perdido"].includes(opportunity.etapa);
+
+const isWeakNextAction = (opportunity: Opportunity) => {
+  const nextAction = normalizeSearch(opportunity.proxima_acao ?? "");
+  return !nextAction || nextAction.includes("definir");
+};
+
+const isClosingStage = (opportunity: Opportunity) =>
+  ["Proposta", "NegociaÃ§Ã£o"].includes(opportunity.etapa);
+
+const buildPipelineRisks = (opportunities: Opportunity[]): PipelineRisk[] => {
+  const risks: PipelineRisk[] = [];
+
+  for (const opportunity of opportunities.filter(isOpenOpportunity)) {
+    if (isWeakNextAction(opportunity)) {
+      risks.push({
+        id: `${opportunity.id}-next-action`,
+        opportunity,
+        priority: "Alta",
+        reason: "Sem proxima acao especifica.",
+        nextAction: "Editar e registrar o proximo compromisso comercial.",
+      });
+      continue;
+    }
+
+    if (Number(opportunity.valor) <= 0 && opportunity.etapa !== "Novo") {
+      risks.push({
+        id: `${opportunity.id}-value`,
+        opportunity,
+        priority: "Media",
+        reason: "Valor estimado ainda nao informado.",
+        nextAction: "Atualizar valor para deixar o pipeline mensuravel.",
+      });
+    }
+  }
+
+  return risks.slice(0, 4);
+};
+
 function AppContent() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -1796,6 +1844,59 @@ function PipelineColumn({ column }: { column: any }) {
   );
 }
 
+function PipelineSignalCard({
+  icon: Icon,
+  label,
+  value,
+  hint,
+  tone = "neutral",
+}: {
+  icon: LucideIcon;
+  label: string;
+  value: string;
+  hint: string;
+  tone?: "neutral" | "warning" | "success";
+}) {
+  return (
+    <article className={`pipeline-signal-card ${tone}`}>
+      <Icon size={19} />
+      <div>
+        <span>{label}</span>
+        <strong>{value}</strong>
+        <small>{hint}</small>
+      </div>
+    </article>
+  );
+}
+
+function PipelineRiskItem({
+  risk,
+  onEdit,
+}: {
+  risk: PipelineRisk;
+  onEdit: (opportunity: Opportunity) => void;
+}) {
+  return (
+    <article className="pipeline-risk-item">
+      <Target size={18} />
+      <div>
+        <strong>{risk.opportunity.titulo}</strong>
+        <p>{risk.reason}</p>
+        <small>{risk.nextAction}</small>
+      </div>
+      <span>{risk.priority}</span>
+      <button
+        className="table-action"
+        onClick={() => onEdit(risk.opportunity)}
+        type="button"
+      >
+        <Pencil size={14} />
+        Ajustar
+      </button>
+    </article>
+  );
+}
+
 function PipelinePage({
   leads,
   opportunities,
@@ -1818,6 +1919,17 @@ function PipelinePage({
       })),
     [onEditOpportunity, opportunities],
   );
+  const openOpportunities = opportunities.filter(isOpenOpportunity);
+  const weakActionCount = openOpportunities.filter(isWeakNextAction).length;
+  const noValueCount = openOpportunities.filter(
+    (opportunity) => Number(opportunity.valor) <= 0,
+  ).length;
+  const closingCount = openOpportunities.filter(isClosingStage).length;
+  const openValue = openOpportunities.reduce(
+    (sum, opportunity) => sum + Number(opportunity.valor),
+    0,
+  );
+  const pipelineRisks = buildPipelineRisks(opportunities);
 
   return (
     <div className="page-stack">
@@ -1828,6 +1940,56 @@ function PipelinePage({
         title="Funil de vendas"
         onAction={() => onOpenModal(leads.length ? "opportunity" : "lead")}
       />
+
+      <section className="pipeline-health-grid" aria-label="Saude do funil">
+        <PipelineSignalCard
+          icon={TrendingUp}
+          label="Pipeline aberto"
+          value={formatMoney(openValue)}
+          hint={`${openOpportunities.length} oportunidade(s) em andamento`}
+          tone="success"
+        />
+        <PipelineSignalCard
+          icon={Clock3}
+          label="Sem proxima acao"
+          value={String(weakActionCount)}
+          hint="Precisam de compromisso claro"
+          tone={weakActionCount ? "warning" : "success"}
+        />
+        <PipelineSignalCard
+          icon={CircleDollarSign}
+          label="Sem valor"
+          value={String(noValueCount)}
+          hint="Afetam previsao comercial"
+          tone={noValueCount ? "warning" : "success"}
+        />
+        <PipelineSignalCard
+          icon={Target}
+          label="Etapas finais"
+          value={String(closingCount)}
+          hint="Proposta ou negociacao"
+        />
+      </section>
+
+      <Panel title="Higiene do funil" eyebrow="Riscos operacionais">
+        {pipelineRisks.length ? (
+          <div className="pipeline-risk-list">
+            {pipelineRisks.map((risk) => (
+              <PipelineRiskItem
+                key={risk.id}
+                risk={risk}
+                onEdit={onEditOpportunity}
+              />
+            ))}
+          </div>
+        ) : (
+          <EmptyState
+            action="Nova oportunidade"
+            description="Nenhum risco operacional detectado no funil aberto."
+            onAction={() => onOpenModal(leads.length ? "opportunity" : "lead")}
+          />
+        )}
+      </Panel>
 
       <DndContext onDragEnd={onDragEnd}>
         <section className="pipeline-board" aria-label="Funil de vendas">
