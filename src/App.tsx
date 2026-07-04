@@ -2670,15 +2670,7 @@ function MessageModal({
   );
 }
 
-function ChannelModal({
-  isSaving,
-  onClose,
-  onSubmit,
-}: {
-  isSaving: boolean;
-  onClose: () => void;
-  onSubmit: (formData: FormData) => Promise<void>;
-}) {
+
 function ChannelModal({
   isSaving,
   onClose,
