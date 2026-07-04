@@ -2913,16 +2913,18 @@ function SelectField({
   defaultValue,
   label,
   name,
+  onChange,
 }: {
   children: ReactNode;
   defaultValue?: string | null;
   label: string;
   name: string;
+  onChange?: (event: React.ChangeEvent<HTMLSelectElement>) => void;
 }) {
   return (
     <label>
       {label}
-      <select name={name} defaultValue={defaultValue ?? ""}>
+      <select name={name} defaultValue={defaultValue ?? ""} onChange={onChange}>
         {children}
       </select>
     </label>

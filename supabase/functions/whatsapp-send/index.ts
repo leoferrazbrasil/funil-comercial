@@ -142,16 +142,20 @@ async function sendMetaTextMessage(phoneNumberId: string, toPhone: string, messa
 
   const responseBody = (await response.json().catch(() => ({}))) as JsonRecord;
   if (!response.ok) {
+    const errorCode = isRecord(responseBody.error) ? responseBody.error.code : "unknown";
+    const errorMessage = isRecord(responseBody.error) ? responseBody.error.message : "Desconhecido";
+    
     console.error(
       JSON.stringify({
         event: "whatsapp_send_meta_error",
         status: response.status,
         to_last4: toPhone.slice(-4),
-        error_code: isRecord(responseBody.error) ? responseBody.error.code : null,
+        error_code: errorCode,
+        error_message: errorMessage,
       }),
     );
 
-    throw new Error("Meta WhatsApp API rejected the message.");
+    throw new Error(`Meta API Error [${errorCode}]: ${errorMessage}`);
   }
 
   return {
@@ -279,14 +283,13 @@ Deno.serve(async (request) => {
       provider_message_id: messageId,
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unexpected send error.";
+    const errorMessage = error instanceof Error ? error.message : "Erro desconhecido ao enviar WhatsApp";
     console.error(
       JSON.stringify({
         event: "whatsapp_send_error",
-        message,
+        error: String(error),
       }),
     );
-
-    return jsonResponse({ error: "Erro ao enviar WhatsApp." }, 500);
+    return jsonResponse({ error: errorMessage }, 500);
   }
 });
