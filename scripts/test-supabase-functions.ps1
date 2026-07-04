@@ -37,6 +37,19 @@ function Wait-FunctionPort {
   throw "Timeout aguardando Edge Function na porta $FunctionPort."
 }
 
+function Wait-FunctionPortFree {
+  for ($attempt = 1; $attempt -le 40; $attempt += 1) {
+    $listener = Get-NetTCPConnection -LocalPort $FunctionPort -State Listen -ErrorAction SilentlyContinue
+    if (-not $listener) {
+      return
+    }
+
+    Start-Sleep -Milliseconds 250
+  }
+
+  throw "Porta $FunctionPort permaneceu em uso apos encerrar a Edge Function."
+}
+
 function Start-EdgeFunction {
   param([string]$Path)
 
@@ -60,7 +73,10 @@ function Stop-EdgeFunction {
 
   if ($Process -and -not $Process.HasExited) {
     Stop-Process -Id $Process.Id -Force
+    Wait-Process -Id $Process.Id -Timeout 5 -ErrorAction SilentlyContinue
   }
+
+  Wait-FunctionPortFree
 }
 
 function Invoke-JsonRequest {
