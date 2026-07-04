@@ -256,6 +256,15 @@ type PipelineRisk = {
   nextAction: string;
 };
 
+type LeadQualification = {
+  id: string;
+  lead: Lead;
+  score: number;
+  missingFields: string[];
+  priority: "Alta" | "Media";
+  nextAction: string;
+};
+
 const isOpenOpportunity = (opportunity: Opportunity) =>
   !["Ganho", "Perdido"].includes(opportunity.etapa);
 
@@ -294,6 +303,39 @@ const buildPipelineRisks = (opportunities: Opportunity[]): PipelineRisk[] => {
   }
 
   return risks.slice(0, 4);
+};
+
+const isActiveLead = (lead: Lead) =>
+  !["convertido", "perdido"].includes(lead.status);
+
+const leadHasClearNextAction = (lead: Lead) => {
+  const nextAction = normalizeSearch(lead.proxima_acao ?? "");
+  return Boolean(nextAction) && !nextAction.includes("realizar primeiro contato");
+};
+
+const buildLeadQualification = (lead: Lead): LeadQualification => {
+  const missingFields = [
+    !lead.telefone ? "telefone" : null,
+    !lead.origem ? "origem" : null,
+    !lead.interesse ? "interesse" : null,
+    Number(lead.valor_estimado) <= 0 ? "valor estimado" : null,
+    !leadHasClearNextAction(lead) ? "proxima acao" : null,
+  ].filter(Boolean) as string[];
+  const totalFields = 5;
+  const score = Math.round(
+    ((totalFields - missingFields.length) / totalFields) * 100,
+  );
+
+  return {
+    id: `${lead.id}-qualification`,
+    lead,
+    score,
+    missingFields,
+    priority: missingFields.length >= 3 ? "Alta" : "Media",
+    nextAction: missingFields.length
+      ? `Completar ${missingFields.slice(0, 2).join(" e ")}.`
+      : "Converter em oportunidade ou atualizar etapa comercial.",
+  };
 };
 
 function AppContent() {
@@ -747,6 +789,12 @@ function AppContent() {
 
   const handleCreateOpportunityFromLead = async (lead: Lead) => {
     if (!ownerId) return;
+    const existingOpportunity = findOpportunityByLeadId(lead.id);
+    if (existingOpportunity) {
+      toast.success("Este lead ja tem oportunidade no funil.");
+      return;
+    }
+
     await runMutation(
       () =>
         createOpportunity(ownerId, {
@@ -874,6 +922,7 @@ function AppContent() {
                 <LeadsPage
                   isSaving={isSaving}
                   leads={snapshot.leads}
+                  opportunities={snapshot.opportunities}
                   query={query}
                   onCreateOpportunity={handleCreateOpportunityFromLead}
                   onEditLead={(lead) =>
@@ -1685,6 +1734,7 @@ function ContactsPage({
 
 function LeadsPage({
   leads,
+  opportunities,
   query,
   isSaving,
   onCreateOpportunity,
@@ -1692,6 +1742,7 @@ function LeadsPage({
   onOpenModal,
 }: {
   leads: Lead[];
+  opportunities: Opportunity[];
   query: string;
   isSaving: boolean;
   onCreateOpportunity: (lead: Lead) => Promise<void>;
@@ -1708,6 +1759,27 @@ function LeadsPage({
       lead.origem,
     ]),
   );
+  const activeLeads = filteredLeads.filter(isActiveLead);
+  const opportunityByLeadId = new Map(
+    opportunities
+      .filter((opportunity) => opportunity.lead_id)
+      .map((opportunity) => [opportunity.lead_id, opportunity]),
+  );
+  const leadQualifications = filteredLeads.map(buildLeadQualification);
+  const qualifiedLeads = leadQualifications.filter(
+    (qualification) =>
+      qualification.score >= 80 &&
+      !opportunityByLeadId.has(qualification.lead.id),
+  );
+  const incompleteQualifications = leadQualifications.filter(
+    (qualification) => qualification.missingFields.length > 0,
+  );
+  const leadsWithOpportunity = filteredLeads.filter((lead) =>
+    opportunityByLeadId.has(lead.id),
+  );
+  const qualificationRisks = incompleteQualifications
+    .sort((a, b) => a.score - b.score)
+    .slice(0, 4);
 
   return (
     <div className="page-stack">
@@ -1718,6 +1790,61 @@ function LeadsPage({
         title="Leads"
         onAction={() => onOpenModal("lead")}
       />
+      <section className="lead-health-grid" aria-label="Qualificacao de leads">
+        <PipelineSignalCard
+          icon={UsersRound}
+          label="Leads ativos"
+          value={String(activeLeads.length)}
+          hint="Ainda em atendimento ou qualificacao"
+          tone="success"
+        />
+        <PipelineSignalCard
+          icon={Target}
+          label="Prontos"
+          value={String(qualifiedLeads.length)}
+          hint="Com dados suficientes e sem oportunidade"
+          tone={qualifiedLeads.length ? "success" : "neutral"}
+        />
+        <PipelineSignalCard
+          icon={CircleDollarSign}
+          label="No funil"
+          value={String(leadsWithOpportunity.length)}
+          hint="Ja conectados a oportunidades"
+        />
+        <PipelineSignalCard
+          icon={Clock3}
+          label="Com pendencias"
+          value={String(incompleteQualifications.length)}
+          hint="Precisam de dados antes da conversao"
+          tone={incompleteQualifications.length ? "warning" : "success"}
+        />
+      </section>
+      {qualificationRisks.length > 0 && (
+        <Panel title="Qualificacao pendente" eyebrow="Proximas acoes">
+          <div className="lead-risk-list">
+            {qualificationRisks.map((qualification) => (
+              <article className="lead-risk-item" key={qualification.id}>
+                <div>
+                  <strong>{qualification.lead.nome}</strong>
+                  <p>{qualification.nextAction}</p>
+                  <small>
+                    Faltando: {qualification.missingFields.join(", ")}
+                  </small>
+                </div>
+                <span>{qualification.score}%</span>
+                <button
+                  className="table-action"
+                  onClick={() => onEditLead(qualification.lead)}
+                  type="button"
+                >
+                  <Pencil size={14} />
+                  Completar
+                </button>
+              </article>
+            ))}
+          </div>
+        </Panel>
+      )}
       {filteredLeads.length === 0 ? (
         <EmptyState
           action="Cadastrar lead"
@@ -1728,12 +1855,22 @@ function LeadsPage({
         <div className="lead-grid">
           {filteredLeads.map((lead) => (
             <article className="lead-card" key={lead.id}>
-              <span className={`status-badge ${lead.status}`}>
-                {lead.status.replace("_", " ")}
-              </span>
+              {(() => {
+                const qualification = buildLeadQualification(lead);
+                const opportunity = opportunityByLeadId.get(lead.id);
+                return (
+                  <div className="lead-card-topline">
+                    <span className={`status-badge ${lead.status}`}>
+                      {lead.status.replace("_", " ")}
+                    </span>
+                    <small>{qualification.score}% qualificado</small>
+                    {opportunity && <small>{opportunity.etapa}</small>}
+                  </div>
+                );
+              })()}
               <h3>{lead.nome}</h3>
               <p>{lead.interesse}</p>
-              <div>
+              <div className="lead-card-meta">
                 <strong>{formatMoney(Number(lead.valor_estimado))}</strong>
                 <small>{lead.origem}</small>
               </div>
@@ -1752,11 +1889,13 @@ function LeadsPage({
                 </button>
                 <button
                   className="secondary-button"
-                  disabled={isSaving}
+                  disabled={isSaving || opportunityByLeadId.has(lead.id)}
                   onClick={() => onCreateOpportunity(lead)}
                   type="button"
                 >
-                  Criar oportunidade
+                  {opportunityByLeadId.has(lead.id)
+                    ? "No funil"
+                    : "Criar oportunidade"}
                 </button>
               </div>
             </article>

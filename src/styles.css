@@ -27,6 +27,7 @@ body,
 .login-card,
 .metric-card,
 .opportunity-card,
+.lead-risk-item,
 .pipeline-risk-item,
 .pipeline-signal-card,
 .sidebar,
@@ -1056,6 +1057,54 @@ th {
   gap: 16px;
 }
 
+.lead-health-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.lead-risk-list {
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+}
+
+.lead-risk-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface-2);
+  gap: 12px;
+  padding: 14px;
+}
+
+.lead-risk-item strong,
+.lead-risk-item p,
+.lead-risk-item small {
+  display: block;
+  margin: 0;
+}
+
+.lead-risk-item p,
+.lead-risk-item small {
+  margin-top: 4px;
+  color: var(--muted);
+}
+
+.lead-risk-item span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  border-radius: 999px;
+  background: var(--amber-soft);
+  color: var(--amber);
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
 .lead-card {
   display: grid;
   min-height: 230px;
@@ -1081,10 +1130,24 @@ th {
   color: var(--muted);
 }
 
-.lead-card div {
+.lead-card-meta,
+.lead-card-topline {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 10px;
+}
+
+.lead-card-topline {
+  flex-wrap: wrap;
+}
+
+.lead-card-topline small {
+  border-radius: 999px;
+  background: var(--surface-2);
+  padding: 6px 8px;
+  font-size: 11px;
+  font-weight: 900;
 }
 
 .lead-card footer {
@@ -1406,6 +1469,7 @@ th {
   }
 
   .metrics-grid,
+  .lead-health-grid,
   .pipeline-health-grid,
   .lead-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1481,9 +1545,19 @@ th {
   }
 
   .metrics-grid,
+  .lead-health-grid,
   .pipeline-health-grid,
   .lead-grid {
     grid-template-columns: 1fr;
+  }
+
+  .lead-risk-item {
+    grid-template-columns: 1fr;
+  }
+
+  .lead-risk-item span,
+  .lead-risk-item button {
+    width: fit-content;
   }
 
   .pipeline-risk-item {
