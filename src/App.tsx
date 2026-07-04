@@ -2679,29 +2679,77 @@ function ChannelModal({
   onClose: () => void;
   onSubmit: (formData: FormData) => Promise<void>;
 }) {
+function ChannelModal({
+  isSaving,
+  onClose,
+  onSubmit,
+}: {
+  isSaving: boolean;
+  onClose: () => void;
+  onSubmit: (formData: FormData) => Promise<void>;
+}) {
   const [provider, setProvider] = useState("whatsapp");
+  const [qrCodeStatus, setQrCodeStatus] = useState<"idle" | "generating" | "scanning" | "done">("idle");
+  const [qrCodeBase64, setQrCodeBase64] = useState<string | null>(null);
+  const [generatedInstance, setGeneratedInstance] = useState<string | null>(null);
+
+  const handleGenerateQrCode = async () => {
+    if (!supabase) return;
+    setQrCodeStatus("generating");
+    try {
+      const { data, error } = await supabase.functions.invoke("evolution-proxy", {
+        body: { action: "create_instance" },
+      });
+      if (error || !data?.ok) throw error || new Error(data?.error || "Erro desconhecido");
+      
+      setQrCodeBase64(data.qrcode_base64);
+      setGeneratedInstance(data.instance_name);
+      setQrCodeStatus("scanning");
+    } catch (err) {
+      console.error(err);
+      toast.error("Erro ao gerar QR Code. Verifique se o backend proxy está online e os Secrets configurados.");
+      setQrCodeStatus("idle");
+    }
+  };
+
+  const handleScanDone = () => {
+    setQrCodeStatus("done");
+  };
 
   return (
     <Modal title="Configurar canal de entrada" onClose={onClose}>
       <EntityForm
         isSaving={isSaving}
-        submitLabel="Salvar canal"
+        submitLabel={provider === "evolution_api" && qrCodeStatus !== "done" ? "" : "Salvar canal"}
         onClose={onClose}
-        onSubmit={onSubmit}
+        onSubmit={async (formData) => {
+          if (provider === "evolution_api") {
+            if (qrCodeStatus !== "done" || !generatedInstance) {
+              toast.error("Por favor, conclua o pareamento do QR Code primeiro.");
+              return;
+            }
+            formData.set("instance_name", generatedInstance);
+            formData.set("instance_token", "");
+          }
+          await onSubmit(formData);
+        }}
       >
         <SelectField
           defaultValue="whatsapp"
           label="Tipo de canal"
           name="provider"
-          onChange={(e) => setProvider(e.target.value)}
+          onChange={(e) => {
+            setProvider(e.target.value);
+            setQrCodeStatus("idle");
+          }}
         >
           <option value="whatsapp">WhatsApp Oficial (Cloud API)</option>
           <option value="evolution_api">WhatsApp QR Code (Evolution API)</option>
         </SelectField>
         <TextField
-          label="Nome do canal"
+          label="Nome amigavel"
           name="nome"
-          placeholder="WhatsApp comercial"
+          placeholder="WhatsApp Atendimento"
           required
         />
         <TextField
@@ -2710,26 +2758,66 @@ function ChannelModal({
           placeholder="5511999999999"
           required
         />
-        {provider === "whatsapp" ? (
+        
+        {provider === "whatsapp" && (
           <TextField
             label="ID do numero na Meta"
             name="phone_number_id"
             placeholder="Opcional"
           />
-        ) : (
-          <>
-            <TextField
-              label="Nome da Instancia (Evolution API)"
-              name="instance_name"
-              placeholder="MinhaInstancia123"
-              required
-            />
-            <TextField
-              label="Token global ou da Instancia (Evolution API)"
-              name="instance_token"
-              placeholder="Opcional se usar API Key global"
-            />
-          </>
+        )}
+
+        {provider === "evolution_api" && (
+          <div className="qr-code-section" style={{ display: "flex", flexDirection: "column", gap: "1rem", marginTop: "1rem" }}>
+            {qrCodeStatus === "idle" && (
+              <button 
+                type="button" 
+                className="secondary-button" 
+                onClick={handleGenerateQrCode}
+                style={{ width: "100%", justifyContent: "center" }}
+              >
+                <Sparkles size={16} /> Gerar QR Code de Conexão
+              </button>
+            )}
+
+            {qrCodeStatus === "generating" && (
+              <div style={{ textAlign: "center", padding: "2rem", color: "var(--color-primary)" }}>
+                Conectando ao provedor de QR Code...
+              </div>
+            )}
+
+            {qrCodeStatus === "scanning" && qrCodeBase64 && (
+              <div style={{ textAlign: "center", padding: "1rem", background: "white", borderRadius: "8px" }}>
+                <h4 style={{ marginBottom: "1rem", color: "#333" }}>Escaneie este código</h4>
+                <img 
+                  src={qrCodeBase64.startsWith("data:image") ? qrCodeBase64 : `data:image/png;base64,${qrCodeBase64}`} 
+                  alt="WhatsApp QR Code" 
+                  style={{ width: "250px", height: "250px", objectFit: "contain", margin: "0 auto", display: "block" }} 
+                />
+                <p style={{ fontSize: "14px", marginTop: "1rem", color: "#666" }}>
+                  1. Abra o WhatsApp no seu celular<br />
+                  2. Toque em <strong>Mais opções</strong> (Android) ou <strong>Configurações</strong> (iPhone)<br />
+                  3. Toque em <strong>Aparelhos conectados</strong> {">"} <strong>Conectar um aparelho</strong>
+                </p>
+                <button 
+                  type="button" 
+                  className="primary-button" 
+                  onClick={handleScanDone}
+                  style={{ width: "100%", marginTop: "1.5rem" }}
+                >
+                  Já escaneei e conectei
+                </button>
+              </div>
+            )}
+
+            {qrCodeStatus === "done" && (
+              <div className="alert success" style={{ background: "var(--color-success)", color: "white", padding: "1rem", borderRadius: "6px", textAlign: "center" }}>
+                <CheckCircle2 size={24} style={{ margin: "0 auto 8px" }} />
+                <p><strong>Aparelho Conectado!</strong></p>
+                <small>Clique em "Salvar canal" abaixo para finalizar.</small>
+              </div>
+            )}
+          </div>
         )}
       </EntityForm>
     </Modal>
