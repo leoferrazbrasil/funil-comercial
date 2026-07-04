@@ -4,6 +4,7 @@ import type {
   Contact,
   CrmSnapshot,
   InboxMessage,
+  IntegrationChannel,
   Lead,
   Opportunity,
   OpportunityStage,
@@ -53,6 +54,8 @@ type MessagePayload = {
   contact_id?: string | null;
   lead_id?: string | null;
   canal?: string;
+  provider?: string;
+  provider_message_id?: string | null;
   remetente_nome: string;
   telefone: string;
   mensagem: string;
@@ -71,6 +74,13 @@ type MessageLinkPayload = {
   lead_id?: string | null;
   status?: string;
   unread_count?: number;
+};
+
+type IntegrationChannelPayload = {
+  provider: string;
+  nome: string;
+  numero: string;
+  status?: IntegrationChannel["status"];
 };
 
 const normalizePhone = (phone: string) => phone.replace(/\D/g, "");
@@ -120,6 +130,7 @@ export async function getCrmSnapshot(userId: string): Promise<CrmSnapshot> {
     leadsResult,
     opportunitiesResult,
     messagesResult,
+    channelsResult,
   ] = await Promise.all([
     supabase.from("profiles").select("*").eq("id", userId).maybeSingle(),
     supabase
@@ -138,6 +149,10 @@ export async function getCrmSnapshot(userId: string): Promise<CrmSnapshot> {
       .from("inbox_messages")
       .select("*")
       .order("created_at", { ascending: false }),
+    supabase
+      .from("integration_channels")
+      .select("*")
+      .order("created_at", { ascending: false }),
   ]);
 
   const errors = [
@@ -146,6 +161,7 @@ export async function getCrmSnapshot(userId: string): Promise<CrmSnapshot> {
     leadsResult.error,
     opportunitiesResult.error,
     messagesResult.error,
+    channelsResult.error,
   ].filter(Boolean);
 
   if (errors[0]) throw errors[0];
@@ -156,6 +172,7 @@ export async function getCrmSnapshot(userId: string): Promise<CrmSnapshot> {
     leads: (leadsResult.data as Lead[]) ?? [],
     opportunities: (opportunitiesResult.data as Opportunity[]) ?? [],
     messages: (messagesResult.data as InboxMessage[]) ?? [],
+    channels: (channelsResult.data as IntegrationChannel[]) ?? [],
   };
 }
 
@@ -305,6 +322,8 @@ export async function createInboxMessage(
       contact_id: payload.contact_id ?? null,
       lead_id: payload.lead_id ?? null,
       canal: payload.canal ?? "WhatsApp",
+      provider: payload.provider ?? "manual",
+      provider_message_id: payload.provider_message_id ?? null,
       remetente_nome: payload.remetente_nome.trim(),
       telefone: normalizePhone(payload.telefone),
       mensagem: payload.mensagem.trim(),
@@ -364,6 +383,44 @@ export async function updateInboxConversationLinks(
 
   if (error) throw error;
   return data as InboxMessage[];
+}
+
+export async function createIntegrationChannel(
+  ownerId: string,
+  payload: IntegrationChannelPayload,
+) {
+  const supabase = requireSupabase();
+  const { data, error } = await supabase
+    .from("integration_channels")
+    .insert({
+      owner_id: ownerId,
+      provider: payload.provider.trim().toLowerCase() || "whatsapp",
+      nome: payload.nome.trim(),
+      numero: normalizePhone(payload.numero),
+      status: payload.status ?? "ativo",
+      metadata: {},
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data as IntegrationChannel;
+}
+
+export async function updateIntegrationChannelStatus(
+  channelId: string,
+  status: IntegrationChannel["status"],
+) {
+  const supabase = requireSupabase();
+  const { data, error } = await supabase
+    .from("integration_channels")
+    .update({ status })
+    .eq("id", channelId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data as IntegrationChannel;
 }
 
 export async function convertContactToLead(ownerId: string, contact: Contact) {

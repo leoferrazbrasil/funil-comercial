@@ -45,9 +45,11 @@ import {
   convertContactToLead,
   createContact,
   createInboxMessage,
+  createIntegrationChannel,
   createLead,
   createOpportunity,
   updateContact,
+  updateIntegrationChannelStatus,
   updateInboxConversationLinks,
   updateInboxMessageStatus,
   updateLead,
@@ -73,13 +75,14 @@ import type {
   Contact,
   CrmSnapshot,
   InboxMessage,
+  IntegrationChannel,
   Lead,
   Opportunity,
   OpportunityStage,
   Route as AppRoute,
 } from "./lib/types";
 
-type ModalType = "contact" | "lead" | "opportunity" | "message";
+type ModalType = "contact" | "lead" | "opportunity" | "message" | "channel";
 type EditingTarget =
   | { type: "contact"; record: Contact }
   | { type: "lead"; record: Lead }
@@ -102,6 +105,7 @@ const emptySnapshot: CrmSnapshot = {
   leads: [],
   opportunities: [],
   messages: [],
+  channels: [],
 };
 
 const formatMoney = (value: number) =>
@@ -118,6 +122,13 @@ const normalizeSearch = (value: string) =>
     .toLowerCase();
 
 const normalizePhone = (value: string) => value.replace(/\D/g, "");
+
+const formatProviderName = (provider: string) => {
+  const normalized = provider.trim().toLowerCase();
+  if (normalized === "whatsapp") return "WhatsApp";
+  if (normalized === "twilio") return "Twilio";
+  return provider.trim() || "Canal";
+};
 
 const matchesQuery = (
   query: string,
@@ -624,6 +635,32 @@ function AppContent() {
     );
   };
 
+  const createChannelFromForm = async (formData: FormData) => {
+    if (!ownerId) return;
+    await runMutation(
+      () =>
+        createIntegrationChannel(ownerId, {
+          provider: getFormValue(formData, "provider") || "whatsapp",
+          nome: getFormValue(formData, "nome"),
+          numero: getFormValue(formData, "numero"),
+          status: "ativo",
+        }),
+      "Canal de entrada configurado.",
+    );
+  };
+
+  const handleUpdateChannelStatus = async (
+    channel: IntegrationChannel,
+    status: IntegrationChannel["status"],
+  ) => {
+    await runMutation(
+      () => updateIntegrationChannelStatus(channel.id, status),
+      status === "ativo"
+        ? "Canal ativado para entrada."
+        : "Canal pausado.",
+    );
+  };
+
   const handleUpdateInboxStatus = async (
     message: InboxMessage,
     status: string,
@@ -886,6 +923,7 @@ function AppContent() {
               path="/inbox"
               element={
                 <InboxPage
+                  channels={snapshot.channels}
                   contacts={snapshot.contacts}
                   isSaving={isSaving}
                   leads={snapshot.leads}
@@ -897,6 +935,7 @@ function AppContent() {
                   onCreateOpportunity={handleCreateOpportunityFromInbox}
                   onOpenModal={openModal}
                   onSendReply={handleSendInboxReply}
+                  onUpdateChannelStatus={handleUpdateChannelStatus}
                   onUpdateMessageStatus={handleUpdateInboxStatus}
                 />
               }
@@ -986,6 +1025,13 @@ function AppContent() {
           isSaving={isSaving}
           onClose={closeModal}
           onSubmit={createMessageFromForm}
+        />
+      )}
+      {modal === "channel" && (
+        <ChannelModal
+          isSaving={isSaving}
+          onClose={closeModal}
+          onSubmit={createChannelFromForm}
         />
       )}
     </div>
@@ -1339,6 +1385,7 @@ function Dashboard({
 }
 
 function InboxPage({
+  channels,
   contacts,
   isSaving,
   leads,
@@ -1350,8 +1397,10 @@ function InboxPage({
   onCreateOpportunity,
   onOpenModal,
   onSendReply,
+  onUpdateChannelStatus,
   onUpdateMessageStatus,
 }: {
+  channels: IntegrationChannel[];
   contacts: Contact[];
   isSaving: boolean;
   leads: Lead[];
@@ -1363,6 +1412,10 @@ function InboxPage({
   onCreateOpportunity: (message: InboxMessage) => Promise<void>;
   onOpenModal: (modal: ModalType) => void;
   onSendReply: (message: InboxMessage, reply: string) => Promise<void>;
+  onUpdateChannelStatus: (
+    channel: IntegrationChannel,
+    status: IntegrationChannel["status"],
+  ) => Promise<void>;
   onUpdateMessageStatus: (
     message: InboxMessage,
     status: string,
@@ -1415,6 +1468,7 @@ function InboxPage({
   }, [filteredMessages]);
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
+  const activeChannels = channels.filter((channel) => channel.status === "ativo");
   const selectedConversation =
     conversations.find((conversation) => conversation.key === selectedKey) ??
     conversations[0];
@@ -1500,6 +1554,60 @@ function InboxPage({
         title="Converse, qualifique e transforme mensagens em oportunidades."
         onAction={() => onOpenModal("message")}
       />
+
+      <Panel title="Canais de entrada" eyebrow="Mensagens">
+        {channels.length === 0 ? (
+          <EmptyState
+            action="Configurar canal"
+            description="Cadastre o numero que recebe mensagens para separar cada entrada no CRM."
+            onAction={() => onOpenModal("channel")}
+          />
+        ) : (
+          <div className="channel-list">
+            {channels.map((channel) => (
+              <article className="channel-item" key={channel.id}>
+                <MessageCircle size={18} />
+                <div>
+                  <strong>{channel.nome}</strong>
+                  <p>
+                    {formatProviderName(channel.provider)} · {channel.numero}
+                  </p>
+                </div>
+                <span className={`channel-status ${channel.status}`}>
+                  {channel.status}
+                </span>
+                <button
+                  className="table-action"
+                  disabled={isSaving}
+                  onClick={() =>
+                    onUpdateChannelStatus(
+                      channel,
+                      channel.status === "ativo" ? "pausado" : "ativo",
+                    )
+                  }
+                  type="button"
+                >
+                  {channel.status === "ativo" ? "Pausar" : "Ativar"}
+                </button>
+              </article>
+            ))}
+            <button
+              className="secondary-button channel-add-button"
+              onClick={() => onOpenModal("channel")}
+              type="button"
+            >
+              <Plus size={16} />
+              Adicionar canal
+            </button>
+          </div>
+        )}
+      </Panel>
+
+      {activeChannels.length === 0 && channels.length > 0 && (
+        <div className="alert warning" role="status">
+          Nenhum canal ativo para receber mensagens reais.
+        </div>
+      )}
 
       {conversations.length === 0 ? (
         <EmptyState
@@ -2565,6 +2673,47 @@ function MessageModal({
             required
           />
         </label>
+      </EntityForm>
+    </Modal>
+  );
+}
+
+function ChannelModal({
+  isSaving,
+  onClose,
+  onSubmit,
+}: {
+  isSaving: boolean;
+  onClose: () => void;
+  onSubmit: (formData: FormData) => Promise<void>;
+}) {
+  return (
+    <Modal title="Configurar canal de entrada" onClose={onClose}>
+      <EntityForm
+        isSaving={isSaving}
+        submitLabel="Salvar canal"
+        onClose={onClose}
+        onSubmit={onSubmit}
+      >
+        <TextField
+          defaultValue="whatsapp"
+          label="Tipo de canal"
+          name="provider"
+          placeholder="whatsapp ou twilio"
+          required
+        />
+        <TextField
+          label="Nome do canal"
+          name="nome"
+          placeholder="WhatsApp comercial"
+          required
+        />
+        <TextField
+          label="Numero de entrada"
+          name="numero"
+          placeholder="5511999999999"
+          required
+        />
       </EntityForm>
     </Modal>
   );

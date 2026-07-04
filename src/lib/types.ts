@@ -64,6 +64,8 @@ export type InboxMessage = {
   contact_id: string | null
   lead_id: string | null
   canal: string
+  provider: string
+  provider_message_id: string | null
   remetente_nome: string
   telefone: string
   mensagem: string
@@ -73,10 +75,23 @@ export type InboxMessage = {
   created_at: string
 }
 
+export type IntegrationChannel = {
+  id: string
+  owner_id: string
+  provider: string
+  nome: string
+  numero: string
+  status: 'ativo' | 'pausado' | 'inativo'
+  metadata: Record<string, unknown>
+  created_at: string
+  updated_at: string
+}
+
 export type CrmSnapshot = {
   profile: Profile | null
   contacts: Contact[]
   leads: Lead[]
   opportunities: Opportunity[]
   messages: InboxMessage[]
+  channels: IntegrationChannel[]
 }

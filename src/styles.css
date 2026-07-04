@@ -27,6 +27,7 @@ body,
 .login-card,
 .metric-card,
 .opportunity-card,
+.channel-item,
 .lead-risk-item,
 .pipeline-risk-item,
 .pipeline-signal-card,
@@ -548,6 +549,12 @@ button:disabled {
   color: var(--amber);
 }
 
+.alert.warning {
+  border-color: color-mix(in srgb, var(--amber) 34%, transparent);
+  background: var(--amber-soft);
+  color: var(--amber);
+}
+
 .topbar {
   position: sticky;
   z-index: 5;
@@ -868,6 +875,60 @@ button:disabled {
   margin-top: 6px;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.channel-list {
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+}
+
+.channel-item {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) auto auto;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface-2);
+  gap: 12px;
+  padding: 14px;
+}
+
+.channel-item > svg {
+  color: var(--green);
+}
+
+.channel-item strong,
+.channel-item p {
+  display: block;
+  margin: 0;
+}
+
+.channel-item p {
+  margin-top: 4px;
+  color: var(--muted);
+}
+
+.channel-status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  border-radius: 999px;
+  background: var(--amber-soft);
+  color: var(--amber);
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: capitalize;
+}
+
+.channel-status.ativo {
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.channel-add-button {
+  width: fit-content;
 }
 
 .inbox-recommendation {
@@ -1557,6 +1618,16 @@ th {
 
   .lead-risk-item span,
   .lead-risk-item button {
+    width: fit-content;
+  }
+
+  .channel-item {
+    grid-template-columns: 24px minmax(0, 1fr);
+  }
+
+  .channel-status,
+  .channel-item button {
+    grid-column: 2;
     width: fit-content;
   }
 
