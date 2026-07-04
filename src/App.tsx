@@ -196,6 +196,58 @@ const buildInboxRecommendation = (message: InboxMessage) => {
   };
 };
 
+const inferOpportunityStageFromMessage = (
+  message: InboxMessage,
+): OpportunityStage => {
+  const text = normalizeSearch([message.mensagem, message.status].join(" "));
+  const hasProposalSignal = [
+    "proposta",
+    "orcamento",
+    "valor",
+    "preco",
+    "investimento",
+    "pagamento",
+  ].some((signal) => text.includes(signal));
+  const hasStrongIntent = [
+    "urgente",
+    "hoje",
+    "agora",
+    "conhecer",
+    "demo",
+    "reuniao",
+    "agenda",
+  ].some((signal) => text.includes(signal));
+
+  if (hasProposalSignal) return "Qualificado";
+  if (hasStrongIntent) return "Em atendimento";
+  return "Novo";
+};
+
+const buildOpportunityNextActionFromMessage = (message: InboxMessage) => {
+  const text = normalizeSearch(message.mensagem);
+
+  if (
+    ["proposta", "orcamento", "valor", "preco", "investimento"].some(
+      (signal) => text.includes(signal),
+    )
+  ) {
+    return "Confirmar necessidade, valor esperado e prazo de decisao.";
+  }
+
+  if (
+    ["agenda", "reuniao", "demo", "conhecer"].some((signal) =>
+      text.includes(signal),
+    )
+  ) {
+    return "Agendar conversa e validar criterios de compra.";
+  }
+
+  return "Qualificar necessidade e definir proximo passo comercial.";
+};
+
+const buildOpportunityTitleFromMessage = (message: InboxMessage, name: string) =>
+  `${name || message.remetente_nome} - ${message.canal || "Inbox"}`;
+
 function AppContent() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -394,6 +446,12 @@ function AppContent() {
       (lead) => normalizePhone(lead.telefone) === normalizedPhone,
     );
   };
+  const findOpportunityByLeadId = (leadId?: string | null) =>
+    leadId
+      ? snapshot.opportunities.find(
+          (opportunity) => opportunity.lead_id === leadId,
+        )
+      : undefined;
 
   const createContactFromForm = async (formData: FormData) => {
     if (!ownerId) return;
@@ -582,6 +640,55 @@ function AppContent() {
     );
   };
 
+  const handleCreateOpportunityFromInbox = async (message: InboxMessage) => {
+    if (!ownerId) return;
+
+    await runMutation(
+      async () => {
+        const contact =
+          findContactByPhone(message.telefone) ??
+          (await createContact(ownerId, {
+            nome: message.remetente_nome || "Contato sem nome",
+            telefone: message.telefone,
+            origem: message.canal || "WhatsApp",
+            potencial: "Novo",
+          }));
+        const lead =
+          findLeadByPhone(message.telefone) ??
+          (await createLead(ownerId, {
+            contact_id: contact.id,
+            nome: contact.nome,
+            telefone: contact.telefone,
+            email: contact.email,
+            interesse: message.mensagem.slice(0, 180),
+            status: "em_atendimento",
+            origem: message.canal || "WhatsApp",
+            proxima_acao: "Responder e qualificar necessidade comercial",
+          }));
+        const opportunity = findOpportunityByLeadId(lead.id);
+
+        if (!opportunity) {
+          await createOpportunity(ownerId, {
+            lead_id: lead.id,
+            titulo: buildOpportunityTitleFromMessage(message, lead.nome),
+            etapa: inferOpportunityStageFromMessage(message),
+            valor: lead.valor_estimado,
+            responsavel: snapshot.profile?.nome ?? "Equipe comercial",
+            proxima_acao: buildOpportunityNextActionFromMessage(message),
+          });
+        }
+
+        await updateInboxConversationLinks(ownerId, message.telefone, {
+          contact_id: contact.id,
+          lead_id: lead.id,
+          status: opportunity ? "Oportunidade vinculada" : "Oportunidade aberta",
+          unread_count: 0,
+        });
+      },
+      "Oportunidade preparada no funil.",
+    );
+  };
+
   const handleConvertContact = async (contact: Contact) => {
     if (!ownerId) return;
     await runMutation(
@@ -687,9 +794,11 @@ function AppContent() {
                   isSaving={isSaving}
                   leads={snapshot.leads}
                   messages={snapshot.messages}
+                  opportunities={snapshot.opportunities}
                   query={query}
                   onCreateContact={handleCreateContactFromInbox}
                   onCreateLead={handleCreateLeadFromInbox}
+                  onCreateOpportunity={handleCreateOpportunityFromInbox}
                   onOpenModal={openModal}
                   onSendReply={handleSendInboxReply}
                   onUpdateMessageStatus={handleUpdateInboxStatus}
@@ -1137,9 +1246,11 @@ function InboxPage({
   isSaving,
   leads,
   messages,
+  opportunities,
   query,
   onCreateContact,
   onCreateLead,
+  onCreateOpportunity,
   onOpenModal,
   onSendReply,
   onUpdateMessageStatus,
@@ -1148,9 +1259,11 @@ function InboxPage({
   isSaving: boolean;
   leads: Lead[];
   messages: InboxMessage[];
+  opportunities: Opportunity[];
   query: string;
   onCreateContact: (message: InboxMessage) => Promise<void>;
   onCreateLead: (message: InboxMessage) => Promise<void>;
+  onCreateOpportunity: (message: InboxMessage) => Promise<void>;
   onOpenModal: (modal: ModalType) => void;
   onSendReply: (message: InboxMessage, reply: string) => Promise<void>;
   onUpdateMessageStatus: (
@@ -1231,8 +1344,14 @@ function InboxPage({
     contactByPhone;
   const linkedLead =
     leads.find((lead) => lead.id === conversationLeadId) ?? leadByPhone;
+  const linkedOpportunity = linkedLead
+    ? opportunities.find((opportunity) => opportunity.lead_id === linkedLead.id)
+    : undefined;
   const conversationHasContactLink = Boolean(conversationContactId);
   const conversationHasLeadLink = Boolean(conversationLeadId);
+  const conversationHasOpportunityReady = Boolean(
+    conversationHasLeadLink && linkedOpportunity,
+  );
   const contactActionLabel = conversationHasContactLink
     ? "Contato vinculado"
     : linkedContact
@@ -1243,12 +1362,19 @@ function InboxPage({
     : linkedLead
       ? "Vincular lead"
       : "Criar lead";
+  const opportunityActionLabel = conversationHasOpportunityReady
+    ? "Oportunidade aberta"
+    : linkedOpportunity
+      ? "Vincular oportunidade"
+      : "Criar oportunidade";
   const crmBridgeTitle = linkedLead
     ? `Lead: ${linkedLead.nome}`
     : linkedContact
       ? `Contato: ${linkedContact.nome}`
       : "Ainda sem registro CRM";
-  const crmBridgeDescription = conversationHasLeadLink
+  const crmBridgeDescription = conversationHasOpportunityReady
+    ? `Oportunidade em ${linkedOpportunity?.etapa} no funil.`
+    : conversationHasLeadLink
     ? "Esta conversa ja alimenta um lead do funil."
     : conversationHasContactLink
       ? "Contato vinculado. Crie ou vincule um lead quando houver interesse claro."
@@ -1352,6 +1478,19 @@ function InboxPage({
                 >
                   <Target size={16} />
                   {leadActionLabel}
+                </button>
+                <button
+                  className="primary-button"
+                  disabled={
+                    isSaving || !sourceMessage || conversationHasOpportunityReady
+                  }
+                  onClick={() =>
+                    sourceMessage && onCreateOpportunity(sourceMessage)
+                  }
+                  type="button"
+                >
+                  <CircleDollarSign size={16} />
+                  {opportunityActionLabel}
                 </button>
               </div>
             </div>
