@@ -66,6 +66,13 @@ type MessageStatusPayload = {
   unread_count: number;
 };
 
+type MessageLinkPayload = {
+  contact_id?: string | null;
+  lead_id?: string | null;
+  status?: string;
+  unread_count?: number;
+};
+
 const normalizePhone = (phone: string) => phone.replace(/\D/g, "");
 
 export async function upsertProfile(user: User) {
@@ -329,6 +336,34 @@ export async function updateInboxMessageStatus(
 
   if (error) throw error;
   return data as InboxMessage;
+}
+
+export async function updateInboxConversationLinks(
+  ownerId: string,
+  phone: string,
+  payload: MessageLinkPayload,
+) {
+  const supabase = requireSupabase();
+  const updatePayload = {
+    ...(payload.contact_id !== undefined
+      ? { contact_id: payload.contact_id }
+      : {}),
+    ...(payload.lead_id !== undefined ? { lead_id: payload.lead_id } : {}),
+    ...(payload.status !== undefined ? { status: payload.status.trim() } : {}),
+    ...(payload.unread_count !== undefined
+      ? { unread_count: payload.unread_count }
+      : {}),
+  };
+
+  const { data, error } = await supabase
+    .from("inbox_messages")
+    .update(updatePayload)
+    .eq("owner_id", ownerId)
+    .eq("telefone", normalizePhone(phone))
+    .select();
+
+  if (error) throw error;
+  return data as InboxMessage[];
 }
 
 export async function convertContactToLead(ownerId: string, contact: Contact) {

@@ -48,6 +48,7 @@ import {
   createLead,
   createOpportunity,
   updateContact,
+  updateInboxConversationLinks,
   updateInboxMessageStatus,
   updateLead,
   updateOpportunity,
@@ -115,6 +116,8 @@ const normalizeSearch = (value: string) =>
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase();
+
+const normalizePhone = (value: string) => value.replace(/\D/g, "");
 
 const matchesQuery = (
   query: string,
@@ -379,6 +382,18 @@ function AppContent() {
   };
 
   const ownerId = session?.user.id;
+  const findContactByPhone = (phone: string) => {
+    const normalizedPhone = normalizePhone(phone);
+    return snapshot.contacts.find(
+      (contact) => normalizePhone(contact.telefone) === normalizedPhone,
+    );
+  };
+  const findLeadByPhone = (phone: string) => {
+    const normalizedPhone = normalizePhone(phone);
+    return snapshot.leads.find(
+      (lead) => normalizePhone(lead.telefone) === normalizedPhone,
+    );
+  };
 
   const createContactFromForm = async (formData: FormData) => {
     if (!ownerId) return;
@@ -506,6 +521,67 @@ function AppContent() {
     );
   };
 
+  const handleCreateContactFromInbox = async (message: InboxMessage) => {
+    if (!ownerId) return;
+
+    await runMutation(
+      async () => {
+        const contact =
+          findContactByPhone(message.telefone) ??
+          (await createContact(ownerId, {
+            nome: message.remetente_nome || "Contato sem nome",
+            telefone: message.telefone,
+            origem: message.canal || "WhatsApp",
+            potencial: "Novo",
+          }));
+
+        await updateInboxConversationLinks(ownerId, message.telefone, {
+          contact_id: contact.id,
+          status: "Contato em atendimento",
+          unread_count: 0,
+        });
+      },
+      "Conversa vinculada ao contato.",
+    );
+  };
+
+  const handleCreateLeadFromInbox = async (message: InboxMessage) => {
+    if (!ownerId) return;
+
+    await runMutation(
+      async () => {
+        const contact =
+          findContactByPhone(message.telefone) ??
+          (await createContact(ownerId, {
+            nome: message.remetente_nome || "Contato sem nome",
+            telefone: message.telefone,
+            origem: message.canal || "WhatsApp",
+            potencial: "Novo",
+          }));
+        const lead =
+          findLeadByPhone(message.telefone) ??
+          (await createLead(ownerId, {
+            contact_id: contact.id,
+            nome: contact.nome,
+            telefone: contact.telefone,
+            email: contact.email,
+            interesse: message.mensagem.slice(0, 180),
+            status: "em_atendimento",
+            origem: message.canal || "WhatsApp",
+            proxima_acao: "Responder e qualificar necessidade comercial",
+          }));
+
+        await updateInboxConversationLinks(ownerId, message.telefone, {
+          contact_id: contact.id,
+          lead_id: lead.id,
+          status: "Lead em atendimento",
+          unread_count: 0,
+        });
+      },
+      "Lead criado e vinculado ao inbox.",
+    );
+  };
+
   const handleConvertContact = async (contact: Contact) => {
     if (!ownerId) return;
     await runMutation(
@@ -607,9 +683,13 @@ function AppContent() {
               path="/inbox"
               element={
                 <InboxPage
+                  contacts={snapshot.contacts}
                   isSaving={isSaving}
+                  leads={snapshot.leads}
                   messages={snapshot.messages}
                   query={query}
+                  onCreateContact={handleCreateContactFromInbox}
+                  onCreateLead={handleCreateLeadFromInbox}
                   onOpenModal={openModal}
                   onSendReply={handleSendInboxReply}
                   onUpdateMessageStatus={handleUpdateInboxStatus}
@@ -1053,16 +1133,24 @@ function Dashboard({
 }
 
 function InboxPage({
+  contacts,
   isSaving,
+  leads,
   messages,
   query,
+  onCreateContact,
+  onCreateLead,
   onOpenModal,
   onSendReply,
   onUpdateMessageStatus,
 }: {
+  contacts: Contact[];
   isSaving: boolean;
+  leads: Lead[];
   messages: InboxMessage[];
   query: string;
+  onCreateContact: (message: InboxMessage) => Promise<void>;
+  onCreateLead: (message: InboxMessage) => Promise<void>;
   onOpenModal: (modal: ModalType) => void;
   onSendReply: (message: InboxMessage, reply: string) => Promise<void>;
   onUpdateMessageStatus: (
@@ -1121,9 +1209,52 @@ function InboxPage({
     conversations.find((conversation) => conversation.key === selectedKey) ??
     conversations[0];
   const selected = selectedConversation?.latest;
+  const sourceMessage = selectedConversation?.latestInbound;
   const recommendation = selectedConversation
     ? buildInboxRecommendation(selectedConversation.latestInbound)
     : undefined;
+  const sourcePhone = sourceMessage?.telefone ?? selected?.telefone ?? "";
+  const conversationContactId =
+    selectedConversation?.messages.find((message) => message.contact_id)
+      ?.contact_id ?? null;
+  const conversationLeadId =
+    selectedConversation?.messages.find((message) => message.lead_id)
+      ?.lead_id ?? null;
+  const contactByPhone = contacts.find(
+    (contact) => normalizePhone(contact.telefone) === normalizePhone(sourcePhone),
+  );
+  const leadByPhone = leads.find(
+    (lead) => normalizePhone(lead.telefone) === normalizePhone(sourcePhone),
+  );
+  const linkedContact =
+    contacts.find((contact) => contact.id === conversationContactId) ??
+    contactByPhone;
+  const linkedLead =
+    leads.find((lead) => lead.id === conversationLeadId) ?? leadByPhone;
+  const conversationHasContactLink = Boolean(conversationContactId);
+  const conversationHasLeadLink = Boolean(conversationLeadId);
+  const contactActionLabel = conversationHasContactLink
+    ? "Contato vinculado"
+    : linkedContact
+      ? "Vincular contato"
+      : "Criar contato";
+  const leadActionLabel = conversationHasLeadLink
+    ? "Lead vinculado"
+    : linkedLead
+      ? "Vincular lead"
+      : "Criar lead";
+  const crmBridgeTitle = linkedLead
+    ? `Lead: ${linkedLead.nome}`
+    : linkedContact
+      ? `Contato: ${linkedContact.nome}`
+      : "Ainda sem registro CRM";
+  const crmBridgeDescription = conversationHasLeadLink
+    ? "Esta conversa ja alimenta um lead do funil."
+    : conversationHasContactLink
+      ? "Contato vinculado. Crie ou vincule um lead quando houver interesse claro."
+      : linkedLead || linkedContact
+        ? "Encontramos um registro com este telefone. Vincule para manter o historico unido."
+        : "Crie um contato ou lead com os dados da conversa.";
 
   useEffect(() => {
     setReplyText(recommendation?.suggestedReply ?? "");
@@ -1131,9 +1262,9 @@ function InboxPage({
 
   const handleReplySubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!selected || !replyText.trim()) return;
+    if (!sourceMessage || !replyText.trim()) return;
 
-    await onSendReply(selected, replyText.trim());
+    await onSendReply(sourceMessage, replyText.trim());
     setReplyText("");
   };
 
@@ -1168,7 +1299,7 @@ function InboxPage({
                   onClick={() => setSelectedKey(conversation.key)}
                 >
                   <span>
-                    <strong>{conversation.latest.remetente_nome}</strong>
+                    <strong>{conversation.latestInbound.remetente_nome}</strong>
                     <small>{conversation.latest.mensagem}</small>
                   </span>
                   <em>
@@ -1184,7 +1315,10 @@ function InboxPage({
             </div>
           </Panel>
 
-          <Panel title={selected.remetente_nome} eyebrow={selected.status}>
+          <Panel
+            title={sourceMessage?.remetente_nome ?? selected?.remetente_nome ?? "Conversa"}
+            eyebrow={selected?.status ?? "Atendimento"}
+          >
             {recommendation && (
               <div className="inbox-recommendation">
                 <span>Prioridade {recommendation.priority}</span>
@@ -1192,6 +1326,35 @@ function InboxPage({
                 <p>{recommendation.suggestedReply}</p>
               </div>
             )}
+            <div className="inbox-crm-bridge">
+              <div>
+                <span>Registro CRM</span>
+                <strong>{crmBridgeTitle}</strong>
+                <p>{crmBridgeDescription}</p>
+              </div>
+              <div className="inbox-bridge-actions">
+                <button
+                  className="secondary-button"
+                  disabled={
+                    isSaving || !sourceMessage || conversationHasContactLink
+                  }
+                  onClick={() => sourceMessage && onCreateContact(sourceMessage)}
+                  type="button"
+                >
+                  <UsersRound size={16} />
+                  {contactActionLabel}
+                </button>
+                <button
+                  className="primary-button"
+                  disabled={isSaving || !sourceMessage || conversationHasLeadLink}
+                  onClick={() => sourceMessage && onCreateLead(sourceMessage)}
+                  type="button"
+                >
+                  <Target size={16} />
+                  {leadActionLabel}
+                </button>
+              </div>
+            </div>
             <div className="chat-window">
               {selectedConversation.messages.map((message) => (
                 <p className={`message ${message.direction}`} key={message.id}>
@@ -1205,8 +1368,8 @@ function InboxPage({
                 className="secondary-button"
                 disabled={isSaving}
                 onClick={() =>
-                  selected &&
-                  onUpdateMessageStatus(selected, "Em atendimento", 1)
+                  sourceMessage &&
+                  onUpdateMessageStatus(sourceMessage, "Em atendimento", 1)
                 }
                 type="button"
               >
@@ -1217,7 +1380,7 @@ function InboxPage({
                 className="primary-button"
                 disabled={isSaving}
                 onClick={() =>
-                  selected && onUpdateMessageStatus(selected, "Resolvido", 0)
+                  sourceMessage && onUpdateMessageStatus(sourceMessage, "Resolvido", 0)
                 }
                 type="button"
               >

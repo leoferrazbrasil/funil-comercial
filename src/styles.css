@@ -895,6 +895,46 @@ button:disabled {
   line-height: 1.5;
 }
 
+.inbox-crm-bridge {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+  gap: 14px;
+  padding: 16px 18px;
+}
+
+.inbox-crm-bridge span {
+  display: block;
+  color: var(--quiet);
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.inbox-crm-bridge strong,
+.inbox-crm-bridge p {
+  margin: 0;
+}
+
+.inbox-crm-bridge strong {
+  display: block;
+  margin-top: 5px;
+}
+
+.inbox-crm-bridge p {
+  margin-top: 5px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.inbox-bridge-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
 .chat-window {
   display: grid;
   min-height: 320px;
@@ -1347,9 +1387,19 @@ th {
     grid-template-columns: 1fr;
   }
 
+  .inbox-crm-bridge {
+    grid-template-columns: 1fr;
+  }
+
+  .inbox-bridge-actions,
   .inbox-actions {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .inbox-bridge-actions button,
+  .inbox-actions button {
+    width: 100%;
   }
 
   .form-grid {
