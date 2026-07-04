@@ -1,21 +1,32 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.110.0";
 
-type WebhookPayload = Record<string, unknown>;
+type JsonRecord = Record<string, unknown>;
 
 type NormalizedInboundMessage = {
   provider: string;
   providerMessageId: string | null;
   fromPhone: string;
-  toPhone: string | null;
+  channelIdentifiers: string[];
   senderName: string;
   message: string;
+  messageType: string;
 };
+
+type ProcessedMessage = {
+  ok: true;
+  duplicate: boolean;
+  contact_id: string | null;
+  lead_id: string | null;
+  inbox_message_id: string | null;
+};
+
+type SupabaseClientAny = ReturnType<typeof createClient<any, "public", any>>;
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-funil-webhook-secret",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "authorization, x-client-info, apikey, content-type, x-funil-webhook-secret, x-hub-signature-256",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
 };
 
 const jsonResponse = (body: unknown, status = 200) =>
@@ -27,37 +38,203 @@ const jsonResponse = (body: unknown, status = 200) =>
     },
   });
 
+const textResponse = (body: string, status = 200) =>
+  new Response(body, {
+    status,
+    headers: {
+      ...corsHeaders,
+      "Content-Type": "text/plain",
+    },
+  });
+
+const isRecord = (value: unknown): value is JsonRecord =>
+  Boolean(value) && typeof value === "object" && !Array.isArray(value);
+
+const asString = (value: unknown) =>
+  typeof value === "string" && value.trim() ? value.trim() : null;
+
 const normalizePhone = (value: string | null) =>
   value?.replace("whatsapp:", "").replace(/\D/g, "") ?? "";
 
-const payloadValue = (payload: WebhookPayload, keys: string[]) => {
+const uniqueStrings = (values: Array<string | null | undefined>) =>
+  Array.from(new Set(values.filter((value): value is string => Boolean(value))));
+
+const payloadValue = (payload: JsonRecord, keys: string[]) => {
   for (const key of keys) {
-    const value = payload[key];
-    if (typeof value === "string" && value.trim()) return value.trim();
+    const value = asString(payload[key]);
+    if (value) return value;
   }
 
   return null;
 };
 
-async function readPayload(request: Request): Promise<WebhookPayload> {
+const getNestedRecord = (payload: JsonRecord, key: string) => {
+  const value = payload[key];
+  return isRecord(value) ? value : null;
+};
+
+const getNestedArray = (payload: JsonRecord, key: string) => {
+  const value = payload[key];
+  return Array.isArray(value) ? value : [];
+};
+
+const toHex = (buffer: ArrayBuffer) =>
+  Array.from(new Uint8Array(buffer))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+
+const timingSafeEqual = (first: string, second: string) => {
+  if (first.length !== second.length) return false;
+
+  let diff = 0;
+  for (let index = 0; index < first.length; index += 1) {
+    diff |= first.charCodeAt(index) ^ second.charCodeAt(index);
+  }
+
+  return diff === 0;
+};
+
+const hasMetaSignatureSecret = () =>
+  Boolean(Deno.env.get("META_APP_SECRET") ?? Deno.env.get("WHATSAPP_APP_SECRET"));
+
+async function verifyMetaSignature(rawBody: string, signatureHeader: string | null) {
+  const appSecret = Deno.env.get("META_APP_SECRET") ?? Deno.env.get("WHATSAPP_APP_SECRET");
+  if (!appSecret) return false;
+  if (!signatureHeader?.startsWith("sha256=")) return false;
+
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(appSecret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+  const signature = await crypto.subtle.sign(
+    "HMAC",
+    key,
+    new TextEncoder().encode(rawBody),
+  );
+  const expected = `sha256=${toHex(signature)}`;
+
+  return timingSafeEqual(expected, signatureHeader.toLowerCase());
+}
+
+async function readPayload(request: Request) {
+  const clonedRequest = request.clone();
+  const rawBody = await request.text();
   const contentType = request.headers.get("content-type") ?? "";
 
   if (contentType.includes("application/json")) {
-    return (await request.json()) as WebhookPayload;
+    return {
+      rawBody,
+      payload: rawBody ? (JSON.parse(rawBody) as JsonRecord) : {},
+    };
   }
 
-  if (
-    contentType.includes("application/x-www-form-urlencoded") ||
-    contentType.includes("multipart/form-data")
-  ) {
-    const formData = await request.formData();
-    return Object.fromEntries(formData.entries());
+  if (contentType.includes("application/x-www-form-urlencoded")) {
+    return {
+      rawBody,
+      payload: Object.fromEntries(new URLSearchParams(rawBody).entries()),
+    };
   }
 
-  return { Body: await request.text() };
+  if (contentType.includes("multipart/form-data")) {
+    const formData = await clonedRequest.formData();
+    return {
+      rawBody,
+      payload: Object.fromEntries(formData.entries()) as JsonRecord,
+    };
+  }
+
+  return { rawBody, payload: { Body: rawBody } };
 }
 
-function normalizePayload(payload: WebhookPayload): NormalizedInboundMessage {
+function extractMessageText(message: JsonRecord, messageType: string) {
+  if (messageType === "text") {
+    const text = getNestedRecord(message, "text");
+    return payloadValue(text ?? {}, ["body"]) ?? "";
+  }
+
+  if (messageType === "button") {
+    const button = getNestedRecord(message, "button");
+    return payloadValue(button ?? {}, ["text", "payload"]) ?? "Botao recebido.";
+  }
+
+  if (messageType === "interactive") {
+    const interactive = getNestedRecord(message, "interactive");
+    const buttonReply = getNestedRecord(interactive ?? {}, "button_reply");
+    const listReply = getNestedRecord(interactive ?? {}, "list_reply");
+    return (
+      payloadValue(buttonReply ?? {}, ["title", "id"]) ??
+      payloadValue(listReply ?? {}, ["title", "id"]) ??
+      "Resposta interativa recebida."
+    );
+  }
+
+  const media = getNestedRecord(message, messageType);
+  const caption = payloadValue(media ?? {}, ["caption"]);
+  return caption ?? `Mensagem ${messageType} recebida.`;
+}
+
+function contactNameByPhone(contacts: unknown[], phone: string) {
+  for (const contact of contacts) {
+    if (!isRecord(contact)) continue;
+    const waId = normalizePhone(asString(contact.wa_id));
+    if (waId && waId !== phone) continue;
+
+    const profile = getNestedRecord(contact, "profile");
+    return payloadValue(profile ?? {}, ["name"]) ?? phone;
+  }
+
+  return phone;
+}
+
+function extractWhatsAppCloudMessages(payload: JsonRecord): NormalizedInboundMessage[] {
+  const entries = getNestedArray(payload, "entry");
+  if (payload.object !== "whatsapp_business_account" || entries.length === 0) {
+    return [];
+  }
+
+  const inboundMessages: NormalizedInboundMessage[] = [];
+
+  for (const entry of entries) {
+    if (!isRecord(entry)) continue;
+
+    for (const change of getNestedArray(entry, "changes")) {
+      if (!isRecord(change)) continue;
+
+      const value = getNestedRecord(change, "value");
+      if (!value) continue;
+
+      const metadata = getNestedRecord(value, "metadata") ?? {};
+      const displayPhone = normalizePhone(payloadValue(metadata, ["display_phone_number"]));
+      const phoneNumberId = normalizePhone(payloadValue(metadata, ["phone_number_id"]));
+      const contacts = getNestedArray(value, "contacts");
+
+      for (const rawMessage of getNestedArray(value, "messages")) {
+        if (!isRecord(rawMessage)) continue;
+
+        const fromPhone = normalizePhone(asString(rawMessage.from));
+        const messageType = payloadValue(rawMessage, ["type"]) ?? "unknown";
+        const message = extractMessageText(rawMessage, messageType).trim();
+
+        inboundMessages.push({
+          provider: "whatsapp",
+          providerMessageId: payloadValue(rawMessage, ["id"]),
+          fromPhone,
+          channelIdentifiers: uniqueStrings([displayPhone, phoneNumberId]),
+          senderName: contactNameByPhone(contacts, fromPhone),
+          message,
+          messageType,
+        });
+      }
+    }
+  }
+
+  return inboundMessages;
+}
+
+function normalizeLegacyPayload(payload: JsonRecord): NormalizedInboundMessage {
   const provider =
     payloadValue(payload, ["provider", "Provider"]) ??
     (payloadValue(payload, ["MessageSid", "SmsMessageSid"]) ? "twilio" : "whatsapp");
@@ -73,10 +250,18 @@ function normalizePayload(payload: WebhookPayload): NormalizedInboundMessage {
     provider,
     providerMessageId: payloadValue(payload, ["MessageSid", "SmsMessageSid", "id", "messageId"]),
     fromPhone,
-    toPhone: toPhone || null,
+    channelIdentifiers: uniqueStrings([toPhone]),
     senderName,
     message,
+    messageType: "text",
   };
+}
+
+function getInboundMessages(payload: JsonRecord) {
+  const cloudMessages = extractWhatsAppCloudMessages(payload);
+  if (cloudMessages.length > 0) return cloudMessages;
+  if (payload.object === "whatsapp_business_account") return [];
+  return [normalizeLegacyPayload(payload)];
 }
 
 function getSupabaseClient() {
@@ -84,7 +269,7 @@ function getSupabaseClient() {
   const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
   if (!supabaseUrl || !serviceRoleKey) {
-    throw new Error("SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY precisam estar configurados.");
+    throw new Error("Supabase secrets missing.");
   }
 
   return createClient(supabaseUrl, serviceRoleKey, {
@@ -93,17 +278,18 @@ function getSupabaseClient() {
 }
 
 async function resolveOwnerId(
-  supabase: ReturnType<typeof createClient>,
+  supabase: SupabaseClientAny,
   message: NormalizedInboundMessage,
 ) {
-  if (message.toPhone) {
-    const providers = Array.from(new Set([message.provider, "whatsapp"]));
+  if (message.channelIdentifiers.length > 0) {
+    const providers = uniqueStrings([message.provider, "whatsapp", "whatsapp_cloud"]);
     const { data, error } = await supabase
       .from("integration_channels")
-      .select("owner_id")
-      .eq("numero", message.toPhone)
+      .select("id, owner_id")
+      .in("numero", message.channelIdentifiers)
       .in("provider", providers)
       .eq("status", "ativo")
+      .limit(1)
       .maybeSingle();
 
     if (error) throw error;
@@ -113,9 +299,142 @@ async function resolveOwnerId(
   return Deno.env.get("FUNIL_DEFAULT_OWNER_ID") ?? null;
 }
 
+async function findExistingContact(
+  supabase: SupabaseClientAny,
+  ownerId: string,
+  phone: string,
+) {
+  const { data, error } = await supabase
+    .from("contacts")
+    .select("*")
+    .eq("owner_id", ownerId)
+    .eq("telefone", phone)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data;
+}
+
+async function findExistingLead(
+  supabase: SupabaseClientAny,
+  ownerId: string,
+  phone: string,
+) {
+  const { data, error } = await supabase
+    .from("leads")
+    .select("*")
+    .eq("owner_id", ownerId)
+    .eq("telefone", phone)
+    .in("status", ["novo", "em_atendimento", "qualificado"])
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data;
+}
+
+async function processInboundMessage(
+  supabase: SupabaseClientAny,
+  inboundMessage: NormalizedInboundMessage,
+): Promise<ProcessedMessage> {
+  if (!inboundMessage.fromPhone || !inboundMessage.message) {
+    throw new Error("Inbound message missing phone or body.");
+  }
+
+  const ownerId = await resolveOwnerId(supabase, inboundMessage);
+  if (!ownerId) {
+    throw new Error("No active integration channel found for inbound message.");
+  }
+
+  const contact = await findExistingContact(supabase, ownerId, inboundMessage.fromPhone);
+  const lead = await findExistingLead(supabase, ownerId, inboundMessage.fromPhone);
+  const status = lead ? "Lead vinculado" : contact ? "Contato vinculado" : "Nova conversa";
+
+  const { data: inboxMessage, error: messageError } = await supabase
+    .from("inbox_messages")
+    .insert({
+      owner_id: ownerId,
+      contact_id: contact?.id ?? null,
+      lead_id: lead?.id ?? null,
+      canal: "WhatsApp",
+      provider: inboundMessage.provider,
+      provider_message_id: inboundMessage.providerMessageId,
+      remetente_nome: inboundMessage.senderName,
+      telefone: inboundMessage.fromPhone,
+      mensagem: inboundMessage.message,
+      status,
+      unread_count: 1,
+      direction: "inbound",
+    })
+    .select()
+    .single();
+
+  if (messageError) {
+    if (messageError.code === "23505") {
+      console.log(
+        JSON.stringify({
+          event: "whatsapp_inbound_duplicate",
+          provider: inboundMessage.provider,
+          from_last4: inboundMessage.fromPhone.slice(-4),
+          has_provider_message_id: Boolean(inboundMessage.providerMessageId),
+        }),
+      );
+      return {
+        ok: true,
+        duplicate: true,
+        contact_id: contact?.id ?? null,
+        lead_id: lead?.id ?? null,
+        inbox_message_id: null,
+      };
+    }
+
+    throw messageError;
+  }
+
+  console.log(
+    JSON.stringify({
+      event: "whatsapp_inbound_inserted",
+      provider: inboundMessage.provider,
+      type: inboundMessage.messageType,
+      from_last4: inboundMessage.fromPhone.slice(-4),
+      linked_contact: Boolean(contact),
+      linked_lead: Boolean(lead),
+      has_provider_message_id: Boolean(inboundMessage.providerMessageId),
+    }),
+  );
+
+  return {
+    ok: true,
+    duplicate: false,
+    contact_id: contact?.id ?? null,
+    lead_id: lead?.id ?? null,
+    inbox_message_id: inboxMessage.id,
+  };
+}
+
+function verifyWebhookChallenge(request: Request) {
+  const requestUrl = new URL(request.url);
+  const mode = requestUrl.searchParams.get("hub.mode");
+  const token = requestUrl.searchParams.get("hub.verify_token");
+  const challenge = requestUrl.searchParams.get("hub.challenge");
+  const expectedToken =
+    Deno.env.get("META_WEBHOOK_VERIFY_TOKEN") ?? Deno.env.get("FUNIL_WEBHOOK_SECRET");
+
+  if (mode === "subscribe" && challenge && expectedToken && token === expectedToken) {
+    return textResponse(challenge);
+  }
+
+  return jsonResponse({ error: "Webhook verification failed." }, 403);
+}
+
 Deno.serve(async (request) => {
   if (request.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
+  }
+
+  if (request.method === "GET") {
+    return verifyWebhookChallenge(request);
   }
 
   if (request.method !== "POST") {
@@ -126,132 +445,47 @@ Deno.serve(async (request) => {
   const requestUrl = new URL(request.url);
   const receivedSecret =
     request.headers.get("x-funil-webhook-secret") ?? requestUrl.searchParams.get("token");
-
-  if (configuredSecret && receivedSecret !== configuredSecret) {
-    return jsonResponse({ error: "Webhook nao autorizado." }, 401);
-  }
+  const signatureHeader = request.headers.get("x-hub-signature-256");
 
   try {
-    const payload = await readPayload(request);
-    const inboundMessage = normalizePayload(payload);
+    const { rawBody, payload } = await readPayload(request);
+    const tokenOk = configuredSecret ? receivedSecret === configuredSecret : false;
+    const signatureOk = await verifyMetaSignature(rawBody, signatureHeader);
+    const metaSignatureRequired = hasMetaSignatureSecret();
 
-    if (!inboundMessage.fromPhone || !inboundMessage.message) {
-      return jsonResponse(
-        { error: "Informe telefone de origem e mensagem para registrar o atendimento." },
-        400,
-      );
+    if (signatureHeader && !signatureOk) {
+      return jsonResponse({ error: "Webhook signature invalid." }, 401);
+    }
+
+    if (metaSignatureRequired && !signatureHeader && !tokenOk) {
+      return jsonResponse({ error: "Webhook signature missing." }, 401);
+    }
+
+    if (configuredSecret && !tokenOk && !signatureOk) {
+      return jsonResponse({ error: "Webhook nao autorizado." }, 401);
+    }
+
+    const inboundMessages = getInboundMessages(payload);
+    if (inboundMessages.length === 0) {
+      return jsonResponse({ ok: true, ignored: true, reason: "no_inbound_messages" });
     }
 
     const supabase = getSupabaseClient();
-    const ownerId = await resolveOwnerId(supabase, inboundMessage);
-
-    if (!ownerId) {
-      return jsonResponse(
-        {
-          error:
-            "Nenhum canal ativo encontrado para este numero. Configure integration_channels ou FUNIL_DEFAULT_OWNER_ID.",
-        },
-        422,
-      );
+    const results: ProcessedMessage[] = [];
+    for (const inboundMessage of inboundMessages) {
+      results.push(await processInboundMessage(supabase, inboundMessage));
     }
 
-    const { data: existingContact, error: contactLookupError } = await supabase
-      .from("contacts")
-      .select("*")
-      .eq("owner_id", ownerId)
-      .eq("telefone", inboundMessage.fromPhone)
-      .maybeSingle();
-
-    if (contactLookupError) throw contactLookupError;
-
-    let contact = existingContact;
-    if (!contact) {
-      const { data, error } = await supabase
-        .from("contacts")
-        .insert({
-          owner_id: ownerId,
-          nome: inboundMessage.senderName,
-          telefone: inboundMessage.fromPhone,
-          origem: "WhatsApp",
-          potencial: "Novo",
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-      contact = data;
-    }
-
-    const { data: existingLead, error: leadLookupError } = await supabase
-      .from("leads")
-      .select("*")
-      .eq("owner_id", ownerId)
-      .eq("telefone", inboundMessage.fromPhone)
-      .in("status", ["novo", "em_atendimento", "qualificado"])
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (leadLookupError) throw leadLookupError;
-
-    let lead = existingLead;
-    if (!lead) {
-      const { data, error } = await supabase
-        .from("leads")
-        .insert({
-          owner_id: ownerId,
-          contact_id: contact.id,
-          nome: contact.nome,
-          telefone: inboundMessage.fromPhone,
-          email: contact.email,
-          interesse: "Qualificar demanda comercial",
-          status: "novo",
-          valor_estimado: 0,
-          proxima_acao: "Responder WhatsApp e qualificar necessidade",
-          origem: "WhatsApp",
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-      lead = data;
-    }
-
-    const { data: inboxMessage, error: messageError } = await supabase
-      .from("inbox_messages")
-      .insert({
-        owner_id: ownerId,
-        contact_id: contact.id,
-        lead_id: lead.id,
-        canal: "WhatsApp",
-        provider: inboundMessage.provider,
-        provider_message_id: inboundMessage.providerMessageId,
-        remetente_nome: inboundMessage.senderName,
-        telefone: inboundMessage.fromPhone,
-        mensagem: inboundMessage.message,
-        status: "Novo lead",
-        unread_count: 1,
-        direction: "inbound",
-      })
-      .select()
-      .single();
-
-    if (messageError) {
-      if (messageError.code === "23505") {
-        return jsonResponse({ ok: true, duplicate: true });
-      }
-
-      throw messageError;
-    }
-
-    return jsonResponse({
-      ok: true,
-      contact_id: contact.id,
-      lead_id: lead.id,
-      inbox_message_id: inboxMessage.id,
-    });
+    return jsonResponse({ ok: true, processed: results.length, results });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Erro inesperado.";
-    return jsonResponse({ error: message }, 500);
+    const message = error instanceof Error ? error.message : "Unexpected webhook error.";
+    console.error(
+      JSON.stringify({
+        event: "whatsapp_inbound_error",
+        message,
+      }),
+    );
+
+    return jsonResponse({ error: "Erro ao processar webhook." }, 500);
   }
 });
