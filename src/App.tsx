@@ -414,7 +414,10 @@ function AppContent() {
       setSession(nextSession);
       if (!nextSession) {
         queryClient.removeQueries({ queryKey: ["crmSnapshot"] });
-        navigate("/login");
+        const path = window.location.pathname;
+        if (path !== "/" && path !== "/brandbook" && path !== "/cadastro" && path !== "/login") {
+          navigate("/login");
+        }
       }
     });
 
@@ -422,7 +425,7 @@ function AppContent() {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, []);
+  }, [navigate, queryClient]);
 
   const {
     data: snapshotData,
