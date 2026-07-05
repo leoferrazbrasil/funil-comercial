@@ -1,11 +1,25 @@
+import { useState, useEffect } from "react";
 import { brandConfig } from "../lib/branding";
 import { Link } from "react-router-dom";
-import { MoveRight, Lock, LayoutDashboard, MessageCircle, BarChart3, ChevronDown, CheckCircle2, Building2, Briefcase, Zap } from "lucide-react";
+import { MoveRight, Lock, LayoutDashboard, MessageCircle, BarChart3, ChevronDown, CheckCircle2, Building2, Briefcase, Zap, Menu, X } from "lucide-react";
 import Logo from "../components/Logo";
 
 export default function LandingPage() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isMobileMenuOpen]);
   const handleScroll = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
     e.preventDefault();
+    setIsMobileMenuOpen(false);
     const element = document.getElementById(targetId);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
@@ -14,9 +28,8 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans selection:bg-primary/30">
-      {/* HEADER */}
       <header className="sticky top-0 z-50 w-full border-b border-white/5 bg-background/80 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-6 h-16 md:h-20 flex items-center justify-between">
           <div className="flex items-center gap-8">
             <Link to="/">
               <Logo iconSize={32} />
@@ -30,8 +43,8 @@ export default function LandingPage() {
             <a href="#faq" onClick={(e) => handleScroll(e, 'faq')} className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">FAQ</a>
           </nav>
 
-          <div className="flex items-center gap-4">
-            <Link to="/login" className="text-sm font-semibold hover:text-primary transition-colors hidden sm:block">
+          <div className="hidden md:flex items-center gap-4">
+            <Link to="/login" className="text-sm font-semibold hover:text-primary transition-colors">
               Entrar
             </Link>
             <Link to="/login" className="flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-all active:scale-95 shadow-[0_0_24px_rgba(245,158,11,0.2)] dark:shadow-[0_0_24px_rgba(245,158,11,0.1)]">
@@ -39,28 +52,57 @@ export default function LandingPage() {
               <MoveRight size={16} />
             </Link>
           </div>
+
+          <div className="flex md:hidden items-center gap-4">
+            <Link to="/login" className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors">
+              Entrar
+            </Link>
+            <button 
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
+              className="text-muted-foreground hover:text-foreground transition-colors p-2 -mr-2"
+              aria-label="Abrir menu"
+            >
+              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </div>
+
+        {/* Mobile Menu Overlay */}
+        {isMobileMenuOpen && (
+          <div className="absolute top-[64px] left-0 w-full h-[calc(100vh-64px)] bg-background/95 backdrop-blur-xl flex flex-col px-6 py-8 md:hidden border-t border-white/5 animate-in slide-in-from-top-2 duration-200">
+            <nav className="flex flex-col gap-6 mb-8">
+              <a href="#problema" onClick={(e) => handleScroll(e, 'problema')} className="text-lg font-medium text-foreground">O Problema</a>
+              <a href="#solucao" onClick={(e) => handleScroll(e, 'solucao')} className="text-lg font-medium text-foreground">Como Funciona</a>
+              <a href="#casos" onClick={(e) => handleScroll(e, 'casos')} className="text-lg font-medium text-foreground">Para Quem É</a>
+              <a href="#faq" onClick={(e) => handleScroll(e, 'faq')} className="text-lg font-medium text-foreground">FAQ</a>
+            </nav>
+            <Link to="/login" className="flex justify-center items-center gap-2 rounded-full bg-primary px-6 py-4 text-base font-bold text-primary-foreground mt-auto mb-10 active:scale-95">
+              Começar Agora
+              <MoveRight size={20} />
+            </Link>
+          </div>
+        )}
       </header>
 
       <main className="flex-1">
         {/* HERO SECTION */}
-        <section className="relative overflow-hidden pt-24 pb-32 lg:pt-36 lg:pb-40">
+        <section className="relative overflow-hidden pt-16 pb-20 md:pt-24 md:pb-32 lg:pt-36 lg:pb-40">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-primary/20 blur-[120px] rounded-full pointer-events-none opacity-50 dark:opacity-20" />
           
           <div className="mx-auto max-w-7xl px-6 lg:px-8 relative z-10 text-center">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-semibold uppercase tracking-wider text-primary mb-8">
-              <span className="relative flex h-2 w-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-primary mb-8 text-center leading-tight">
+              <span className="relative flex h-2 w-2 shrink-0">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
               </span>
               O CRM definitivo para gestores
             </div>
             
-            <h1 className="mx-auto max-w-4xl text-5xl font-black tracking-tighter sm:text-7xl mb-8 leading-[1.1]">
+            <h1 className="mx-auto max-w-4xl text-4xl sm:text-5xl md:text-7xl font-black tracking-tighter mb-6 md:mb-8 leading-[1.1] md:leading-[1.1]">
               Venda mais.<br className="hidden sm:block"/> Perca menos.<br/> <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-amber-300">Escale sua operação.</span>
             </h1>
             
-            <p className="mx-auto max-w-2xl text-lg sm:text-xl text-muted-foreground mb-10 leading-relaxed">
+            <p className="mx-auto max-w-2xl text-base sm:text-lg md:text-xl text-muted-foreground mb-10 leading-relaxed px-2 sm:px-0">
               O CRM desenhado para equipes que não têm tempo a perder. Acompanhe cada negociação, do lead ao fechamento, em um fluxo visual impecável.
             </p>
             
@@ -148,15 +190,15 @@ export default function LandingPage() {
         </section>
 
         {/* PROBLEM SECTION */}
-        <section id="problema" className="py-24 bg-card/30 border-y border-white/5 relative">
+        <section id="problema" className="py-16 md:py-24 bg-card/30 border-y border-white/5 relative">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
-            <div className="mb-16 max-w-2xl">
+            <div className="mb-12 md:mb-16 max-w-2xl">
               <span className="text-primary font-bold tracking-wider text-sm uppercase mb-4 block">O Problema</span>
               <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-6 leading-tight">O mercado não perdoa desorganização. Sua equipe perde por falta de processo.</h2>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="bg-background p-8 rounded-3xl border border-white/5 hover:border-primary/30 transition-colors">
+              <div className="bg-background p-6 md:p-8 rounded-3xl border border-white/5 hover:border-primary/30 transition-colors">
                 <div className="w-12 h-12 bg-red-500/10 text-red-500 rounded-2xl flex items-center justify-center mb-6">
                   <Zap size={24} />
                 </div>
@@ -164,7 +206,7 @@ export default function LandingPage() {
                 <p className="text-muted-foreground text-sm leading-relaxed">A demora no primeiro contato reduz drasticamente suas chances de conversão em vendas de alto ticket.</p>
               </div>
               
-              <div className="bg-background p-8 rounded-3xl border border-white/5 hover:border-primary/30 transition-colors">
+              <div className="bg-background p-6 md:p-8 rounded-3xl border border-white/5 hover:border-primary/30 transition-colors">
                 <div className="w-12 h-12 bg-amber-500/10 text-amber-500 rounded-2xl flex items-center justify-center mb-6">
                   <BarChart3 size={24} />
                 </div>
@@ -172,7 +214,7 @@ export default function LandingPage() {
                 <p className="text-muted-foreground text-sm leading-relaxed">Você não sabe exatamente onde o dinheiro está parado nem o motivo das perdas mensais.</p>
               </div>
 
-              <div className="bg-background p-8 rounded-3xl border border-white/5 hover:border-primary/30 transition-colors">
+              <div className="bg-background p-6 md:p-8 rounded-3xl border border-white/5 hover:border-primary/30 transition-colors">
                 <div className="w-12 h-12 bg-blue-500/10 text-blue-500 rounded-2xl flex items-center justify-center mb-6">
                   <CheckCircle2 size={24} />
                 </div>
@@ -180,7 +222,7 @@ export default function LandingPage() {
                 <p className="text-muted-foreground text-sm leading-relaxed">Follow-ups esquecidos porque a equipe depende de planilhas manuais ou lembretes no celular.</p>
               </div>
 
-              <div className="bg-background p-8 rounded-3xl border border-white/5 hover:border-primary/30 transition-colors">
+              <div className="bg-background p-6 md:p-8 rounded-3xl border border-white/5 hover:border-primary/30 transition-colors">
                 <div className="w-12 h-12 bg-purple-500/10 text-purple-500 rounded-2xl flex items-center justify-center mb-6">
                   <LayoutDashboard size={24} />
                 </div>
@@ -192,7 +234,7 @@ export default function LandingPage() {
         </section>
 
         {/* SOLUTION SECTION */}
-        <section id="solucao" className="py-24 relative overflow-hidden">
+        <section id="solucao" className="py-16 md:py-24 relative overflow-hidden">
           <div className="absolute top-1/2 right-0 -translate-y-1/2 w-[600px] h-[600px] bg-primary/10 blur-[120px] rounded-full pointer-events-none" />
           
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
@@ -269,7 +311,7 @@ export default function LandingPage() {
         </section>
 
         {/* USE CASES */}
-        <section id="casos" className="py-24 bg-card/30 border-y border-white/5">
+        <section id="casos" className="py-16 md:py-24 bg-card/30 border-y border-white/5">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-6">Controle total para cada modelo de negócio.</h2>
@@ -302,7 +344,7 @@ export default function LandingPage() {
         </section>
 
         {/* FAQ */}
-        <section id="faq" className="py-24">
+        <section id="faq" className="py-16 md:py-24">
           <div className="mx-auto max-w-3xl px-6 lg:px-8">
             <div className="text-center mb-16">
               <span className="text-primary font-bold tracking-wider text-sm uppercase mb-4 block">Perguntas Frequentes</span>
@@ -317,9 +359,9 @@ export default function LandingPage() {
                 { q: "Meus dados estão seguros?", a: "Utilizamos criptografia de ponta a ponta e a infraestrutura robusta do Supabase, garantindo nível Enterprise de segurança para seus clientes e negociações." }
               ].map((faq, i) => (
                 <details key={i} className="group bg-card border border-white/5 rounded-2xl overflow-hidden">
-                  <summary className="flex items-center justify-between p-6 cursor-pointer list-none font-semibold text-lg hover:text-primary transition-colors">
-                    {faq.q}
-                    <ChevronDown className="transition-transform group-open:rotate-180 text-muted-foreground" size={20} />
+                  <summary className="flex items-start md:items-center justify-between p-6 cursor-pointer list-none font-semibold text-lg hover:text-primary transition-colors gap-4">
+                    <span className="flex-1">{faq.q}</span>
+                    <ChevronDown className="transition-transform group-open:rotate-180 text-muted-foreground shrink-0 mt-1 md:mt-0" size={20} />
                   </summary>
                   <div className="p-6 pt-0 text-muted-foreground leading-relaxed">
                     {faq.a}
@@ -331,15 +373,15 @@ export default function LandingPage() {
         </section>
 
         {/* FINAL CTA */}
-        <section className="py-24 lg:py-32 relative overflow-hidden bg-card border-t border-white/10">
+        <section className="py-16 md:py-24 lg:py-32 relative overflow-hidden bg-card border-t border-white/10">
           <div className="absolute inset-0 bg-primary/5" />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[300px] bg-primary/20 blur-[120px] rounded-full pointer-events-none" />
           
           <div className="relative mx-auto max-w-4xl px-6 lg:px-8 text-center z-10">
-            <h2 className="text-4xl md:text-6xl font-black tracking-tight mb-8">Sua operação está pronta para parar de perder dinheiro?</h2>
-            <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto">Crie sua conta de demonstração em 1 minuto e descubra como gestores de alto nível controlam suas vendas.</p>
+            <h2 className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tight mb-6 md:mb-8">Sua operação está pronta para parar de perder dinheiro?</h2>
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-10 md:mb-12 max-w-2xl mx-auto">Crie sua conta de demonstração em 1 minuto e descubra como gestores de alto nível controlam suas vendas.</p>
             
-            <Link to="/login" className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-10 py-5 text-lg font-bold text-primary-foreground hover:bg-primary/90 transition-all active:scale-95 shadow-[0_0_40px_rgba(245,158,11,0.3)]">
+            <Link to="/login" className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-8 sm:px-10 py-4 sm:py-5 text-base sm:text-lg font-bold text-primary-foreground hover:bg-primary/90 transition-all active:scale-95 shadow-[0_0_40px_rgba(245,158,11,0.3)] w-full sm:w-auto">
               Criar Conta de Teste
               <MoveRight size={24} />
             </Link>
@@ -348,19 +390,20 @@ export default function LandingPage() {
         </section>
       </main>
 
-      {/* FOOTER */}
-      <footer className="border-t border-white/10 bg-background py-12">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-3">
-            <div className="grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all">
-              <Logo iconSize={32} variant="icon-only" />
+      <footer className="border-t border-white/10 bg-background py-10 md:py-12">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-0">
+          <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6 text-center md:text-left">
+            <div className="flex items-center gap-3">
+              <div className="grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all">
+                <Logo iconSize={32} variant="icon-only" />
+              </div>
+              <span className="font-bold text-muted-foreground hidden md:inline">{brandConfig.name}</span>
             </div>
-            <span className="font-bold text-muted-foreground">{brandConfig.name}</span>
+            <p className="text-xs md:text-sm text-muted-foreground">© {new Date().getFullYear()} {brandConfig.name}. Todos os direitos reservados.</p>
           </div>
-          <p className="text-sm text-muted-foreground">© {new Date().getFullYear()} {brandConfig.name}. Todos os direitos reservados.</p>
           <div className="flex gap-6">
-            <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">Termos</a>
-            <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">Privacidade</a>
+            <a href="#" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">Termos</a>
+            <a href="#" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">Privacidade</a>
           </div>
         </div>
       </footer>
