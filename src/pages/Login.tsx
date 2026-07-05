@@ -361,7 +361,7 @@ export default function LoginScreen({
   };
 
   return (
-    <main className="min-h-screen bg-background flex flex-col md:flex-row">
+    <main className="min-h-[100dvh] bg-background flex flex-col md:flex-row">
       <section 
         className="hidden md:flex flex-1 bg-primary/5 flex-col justify-center p-12 border-r border-border relative overflow-hidden" 
         aria-label="Funil Comercial Benefícios"
@@ -413,8 +413,8 @@ export default function LoginScreen({
         </div>
       </section>
 
-      <div className="flex-1 flex flex-col items-center justify-center p-6 md:p-12 relative">
-        <div className="md:hidden w-full max-w-md mb-8">
+      <div className="flex-1 flex flex-col items-center md:justify-center overflow-y-auto py-10 px-4 sm:px-6 md:p-12 relative">
+        <div className="md:hidden w-full max-w-md mb-6 sm:mb-8 mt-4">
           <img 
             className="h-10 w-auto object-contain mx-auto" 
             src={brandConfig.logoPath} 
@@ -423,13 +423,13 @@ export default function LoginScreen({
         </div>
 
         <form 
-          className="w-full max-w-[420px] space-y-6 bg-card p-8 md:p-10 rounded-3xl border border-border shadow-[0_18px_48px_rgba(4,29,87,0.1)] dark:shadow-[0_18px_48px_rgba(0,0,0,0.32)]" 
+          className="w-full max-w-[420px] space-y-6 bg-card p-6 sm:p-8 md:p-10 rounded-3xl border border-border shadow-[0_18px_48px_rgba(4,29,87,0.1)] dark:shadow-[0_18px_48px_rgba(0,0,0,0.32)]" 
           aria-label="Entrar na plataforma" 
           onSubmit={handleSubmit}
         >
-          <div className="mb-8">
+          <div className="mb-6 sm:mb-8">
             <p className="text-xs font-bold tracking-wider text-primary uppercase mb-3">Login</p>
-            <h2 className="text-3xl font-bold tracking-tight text-foreground mb-3">Bem-vindo de volta</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground mb-3">Bem-vindo de volta</h2>
             <p className="text-sm text-muted-foreground">
               Acesse sua conta para continuar gerenciando suas vendas.
             </p>
@@ -463,6 +463,9 @@ export default function LoginScreen({
                 placeholder="gestor@empresa.com.br"
                 required
                 type="email"
+                autoComplete="email"
+                autoCapitalize="none"
+                autoCorrect="off"
                 aria-invalid={!!authError}
               />
             </div>
@@ -485,12 +488,13 @@ export default function LoginScreen({
                   placeholder="••••••••"
                   required
                   type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
                   aria-invalid={!!authError}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-2"
                   aria-label={showPassword ? "Ocultar senha" : "Ver senha"}
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -506,7 +510,7 @@ export default function LoginScreen({
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
               />
-              <label htmlFor="remember" className="text-sm text-muted-foreground cursor-pointer select-none">
+              <label htmlFor="remember" className="text-sm text-muted-foreground cursor-pointer select-none flex-1 py-1">
                 Lembrar de mim
               </label>
             </div>
@@ -534,7 +538,7 @@ export default function LoginScreen({
           </div>
         </form>
         
-        <p className="mt-8 text-xs text-muted-foreground/60">
+        <p className="mt-8 mb-10 md:mb-0 text-xs text-muted-foreground/60">
           Protegido por criptografia de ponta a ponta.
         </p>
       </div>
