@@ -45,6 +45,7 @@ import {
 import LandingPage from "./pages/Landing";
 import BrandbookPage from "./pages/Brandbook";
 import SignUpScreen from "./pages/SignUp";
+import LoginScreen from "./pages/Login";
 import Logo from "./components/Logo";
 import {
   convertContactToLead,
@@ -1050,131 +1051,6 @@ function AppContent() {
   );
 }
 
-function LoginScreen({
-  authError,
-  onAuth,
-}: {
-  authError: string | null;
-  onAuth: (
-    email: string,
-    password: string,
-    mode: "login" | "signup",
-  ) => Promise<void>;
-}) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const submitter = (event.nativeEvent as SubmitEvent)
-      .submitter as HTMLButtonElement | null;
-    const mode = submitter?.value === "signup" ? "signup" : "login";
-    setIsSubmitting(true);
-    await onAuth(
-      getFormValue(formData, "email"),
-      getFormValue(formData, "password"),
-      mode,
-    );
-    setIsSubmitting(false);
-  };
-
-  return (
-    <main className="login-page">
-      <section className="login-visual" aria-label="Funil Comercial">
-        <Logo iconSize={48} variant="stacked" theme="monochrome-white" className="mb-10 text-white" />
-        <p className="eyebrow">{brandConfig.login.eyebrow}</p>
-        <h1>{brandConfig.login.headline}</h1>
-        <p>{brandConfig.login.description}</p>
-        <div className="login-proof-grid" aria-label="Fluxo principal do MVP">
-          <span>
-            <strong>WhatsApp</strong>
-            <small>Conversas centralizadas</small>
-          </span>
-          <span>
-            <strong>CRM</strong>
-            <small>Contatos e leads conectados</small>
-          </span>
-          <span>
-            <strong>Funil</strong>
-            <small>Oportunidades em andamento</small>
-          </span>
-        </div>
-        <div className="flow-line" aria-hidden="true">
-          <i />
-          <i />
-          <i />
-          <i />
-        </div>
-      </section>
-
-      <form
-        className="login-card"
-        aria-label="Entrar na plataforma"
-        onSubmit={handleSubmit}
-      >
-        <div>
-          <p className="eyebrow">Acesso ao MVP</p>
-          <h2>Entrar na plataforma</h2>
-          <p className="muted">
-            Use uma conta cadastrada no Supabase para acessar o CRM.
-          </p>
-        </div>
-
-        {!isSupabaseConfigured && (
-          <p className="config-warning">
-            Configure `VITE_SUPABASE_ANON_KEY` para ativar login, cadastro e
-            dados reais.
-          </p>
-        )}
-
-        {authError && (
-          <p className="alert error" role="alert">
-            {authError}
-          </p>
-        )}
-
-        <label>
-          E-mail corporativo
-          <input
-            name="email"
-            placeholder="gestor@empresa.com.br"
-            required
-            type="email"
-          />
-        </label>
-        <label>
-          Senha
-          <input
-            minLength={6}
-            name="password"
-            placeholder="Mínimo 6 caracteres"
-            required
-            type="password"
-          />
-        </label>
-
-        <button
-          className="primary-button"
-          disabled={!isSupabaseConfigured || isSubmitting}
-          type="submit"
-          value="login"
-        >
-          {isSubmitting ? "Entrando..." : "Entrar na plataforma"}{" "}
-          <MoveRight size={18} />
-        </button>
-
-        <div className="text-center pt-4">
-          <p className="muted" style={{ fontSize: '0.875rem' }}>
-            Ainda não possui conta?{" "}
-            <Link to="/cadastro" style={{ fontWeight: 600, color: 'var(--primary)' }}>
-              Crie agora
-            </Link>
-          </p>
-        </div>
-      </form>
-    </main>
-  );
-}
 
 function Sidebar({
   navItems,
