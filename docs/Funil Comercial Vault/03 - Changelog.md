@@ -5,7 +5,13 @@
 ### Adicionado
 - **Sistema de Design e Componentização**:
   - Novo componente `<Logo />` em SVG nativo (com variante `icon-only` e tamanhos parametrizáveis), substituindo imagens antigas do logo em toda a aplicação (`Landing.tsx`, `Brandbook.tsx`, etc.).
-  
+
+- **Criação da Página de Cadastro (`/cadastro`)**:
+  - Nova tela de criação de conta construída com base no design Master-Detail.
+  - Implementação de feedback visual para Força de Senha e Validação de confirmação de senha em tempo real.
+  - Otimização do fluxo separando as responsabilidades de Login e Cadastro.
+  - Integração aprimorada com a função `signUp` do Supabase para inserir o nome do usuário desde o início.
+
 - **Arquitetura Master-Detail**:
   - Introdução do "Drawer de Perfil 360º" (Slide-over panel) em várias telas para evitar context-switching (não é mais necessário abrir modais centralizadas ou navegar para outras páginas para ver detalhes).
 

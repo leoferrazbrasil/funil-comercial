@@ -34,6 +34,7 @@ import {
   useNavigate,
   useLocation,
   Navigate,
+  Link,
 } from "react-router-dom";
 import {
   QueryClient,
@@ -43,6 +44,7 @@ import {
 } from "@tanstack/react-query";
 import LandingPage from "./pages/Landing";
 import BrandbookPage from "./pages/Brandbook";
+import SignUpScreen from "./pages/SignUp";
 import Logo from "./components/Logo";
 import {
   convertContactToLead,
@@ -472,6 +474,7 @@ function AppContent() {
     email: string,
     password: string,
     mode: "login" | "signup",
+    name?: string
   ) => {
     if (!supabase) {
       setAuthError(
@@ -489,7 +492,7 @@ function AppContent() {
             email,
             password,
             options: {
-              data: { nome: email.split("@")[0] },
+              data: { nome: name || email.split("@")[0] },
             },
           });
 
@@ -879,7 +882,10 @@ function AppContent() {
     );
   }
 
-  if (!session || route === "login") {
+  if (!session || route === "login" || route === "cadastro") {
+    if (route === "cadastro") {
+      return <SignUpScreen authError={authError} onAuth={handleAuth} />;
+    }
     return <LoginScreen authError={authError} onAuth={handleAuth} />;
   }
 
@@ -1154,14 +1160,14 @@ function LoginScreen({
           <MoveRight size={18} />
         </button>
 
-        <button
-          className="secondary-button"
-          disabled={!isSupabaseConfigured || isSubmitting}
-          type="submit"
-          value="signup"
-        >
-          Criar conta de teste
-        </button>
+        <div className="text-center pt-4">
+          <p className="muted" style={{ fontSize: '0.875rem' }}>
+            Ainda não possui conta?{" "}
+            <Link to="/cadastro" style={{ fontWeight: 600, color: 'var(--primary)' }}>
+              Crie agora
+            </Link>
+          </p>
+        </div>
       </form>
     </main>
   );

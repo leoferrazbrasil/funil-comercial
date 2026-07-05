@@ -13,6 +13,7 @@ import {
   useNavigate,
   useLocation,
   Navigate,
+  Link,
 } from "react-router-dom";
 import {
   QueryClient,
@@ -513,7 +514,7 @@ export default function LoginScreen({
 
           <div className="pt-4 space-y-4">
             <button
-              className="flex w-full items-center justify-center gap-2 h-12 px-4 bg-primary text-primary-foreground font-semibold rounded-xl hover:bg-primary/90 transition-all active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
+              className="flex w-full items-center justify-center gap-2 h-12 px-4 bg-primary text-primary-foreground font-semibold rounded-xl hover:bg-primary/90 transition-all active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none shadow-[0_0_24px_rgba(245,158,11,0.2)]"
               disabled={!isSupabaseConfigured || isSubmitting}
               type="submit"
               value="login"
@@ -521,17 +522,15 @@ export default function LoginScreen({
               {isSubmitting ? "Autenticando..." : "Acessar Plataforma"}
               <MoveRight size={18} />
             </button>
-
-            {!isSupabaseConfigured && (
-              <button
-                className="flex w-full items-center justify-center gap-2 h-12 px-4 bg-secondary text-secondary-foreground font-medium rounded-xl hover:bg-secondary/80 transition-all active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
-                disabled={isSubmitting}
-                type="submit"
-                value="signup"
-              >
-                Criar conta de teste local
-              </button>
-            )}
+          </div>
+          
+          <div className="text-center pt-2">
+            <p className="text-sm text-muted-foreground">
+              Ainda não possui conta?{" "}
+              <Link to="/cadastro" className="font-semibold text-foreground hover:text-primary transition-colors">
+                Crie agora
+              </Link>
+            </p>
           </div>
         </form>
         
@@ -542,11 +541,3 @@ export default function LoginScreen({
     </main>
   );
 }
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-      staleTime: 1000 * 60 * 5,
-    },
-  },
-});

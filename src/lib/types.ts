@@ -1,4 +1,4 @@
-export type Route = 'login' | 'dashboard' | 'inbox' | 'contatos' | 'leads' | 'funil'
+export type Route = 'login' | 'cadastro' | 'dashboard' | 'inbox' | 'contatos' | 'leads' | 'funil'
 
 export type LeadStatus = 'novo' | 'em_atendimento' | 'qualificado' | 'convertido' | 'perdido'
 
