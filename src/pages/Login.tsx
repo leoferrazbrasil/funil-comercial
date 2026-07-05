@@ -62,6 +62,7 @@ import type {
   OpportunityStage,
   Route as AppRoute,
 } from "../lib/types";
+import Logo from "../components/Logo";
 
 type ModalType = "contact" | "lead" | "opportunity" | "message" | "channel";
 type EditingTarget =
@@ -367,11 +368,7 @@ export default function LoginScreen({
         aria-label="Funil Comercial Benefícios"
       >
         <div className="max-w-lg mx-auto relative z-10">
-          <img 
-            className="h-10 w-auto object-contain mb-10" 
-            src={brandConfig.logoPath} 
-            alt={brandConfig.name} 
-          />
+          <Logo iconSize={48} className="mb-10" />
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-6 leading-tight">
             Gestão inteligente para sua operação imobiliária.
           </h1>
@@ -414,12 +411,8 @@ export default function LoginScreen({
       </section>
 
       <div className="flex-1 flex flex-col items-center md:justify-center overflow-y-auto py-10 px-4 sm:px-6 md:p-12 relative">
-        <div className="md:hidden w-full max-w-md mb-6 sm:mb-8 mt-4">
-          <img 
-            className="h-10 w-auto object-contain mx-auto" 
-            src={brandConfig.logoPath} 
-            alt={brandConfig.name} 
-          />
+        <div className="md:hidden w-full max-w-md mb-6 sm:mb-8 mt-4 flex justify-center">
+          <Logo iconSize={40} />
         </div>
 
         <form 
