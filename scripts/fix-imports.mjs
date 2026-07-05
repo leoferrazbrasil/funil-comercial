@@ -1,0 +1,1 @@
+const fs = require('fs'); let content = fs.readFileSync('src/pages/Login.tsx', 'utf8'); content = content.replace(/from \"\.\/lib\//g, 'from \"../lib/'); content = content.replace(/from \"\.\/services\//g, 'from \"../services/'); fs.writeFileSync('src/pages/Login.tsx', content);

@@ -524,7 +524,12 @@ button:disabled {
 }
 
 .workspace {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   min-width: 0;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .alert,
@@ -607,9 +612,11 @@ button:disabled {
 }
 
 .content {
-  max-width: 1600px;
-  margin: 0 auto;
-  padding: 28px;
+  width: 100%;
+  padding: 32px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex: 1;
 }
 
 .page-stack {

@@ -41,6 +41,9 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
+import LandingPage from "./pages/Landing";
+import BrandbookPage from "./pages/Brandbook";
+import Logo from "./components/Logo";
 import {
   convertContactToLead,
   createContact,
@@ -353,9 +356,8 @@ const buildLeadQualification = (lead: Lead): LeadQualification => {
 function AppContent() {
   const location = useLocation();
   const navigate = useNavigate();
-  const route = (
-    location.pathname === "/" ? "dashboard" : location.pathname.slice(1)
-  ) as AppRoute;
+  const route = (location.pathname === "/" ? "dashboard" : location.pathname.slice(1)) as AppRoute;
+  const isPublicRoute = location.pathname === "/" || location.pathname === "/brandbook";
   const [session, setSession] = useState<Session | null>(null);
   const [query, setQuery] = useState("");
   const [modal, setModal] = useState<ModalType | null>(null);
@@ -868,6 +870,15 @@ function AppContent() {
     return <LoadingScreen label="Conectando ao Supabase..." />;
   }
 
+  if (isPublicRoute) {
+    return (
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/brandbook" element={<BrandbookPage />} />
+      </Routes>
+    );
+  }
+
   if (!session || route === "login") {
     return <LoginScreen authError={authError} onAuth={handleAuth} />;
   }
@@ -1061,7 +1072,7 @@ function LoginScreen({
   return (
     <main className="login-page">
       <section className="login-visual" aria-label="Funil Comercial">
-        <img className="brand-logo brand-logo-login" src={brandConfig.logoPath} alt={brandConfig.name} />
+        <Logo iconSize={48} variant="stacked" theme="monochrome-white" className="mb-10 text-white" />
         <p className="eyebrow">{brandConfig.login.eyebrow}</p>
         <h1>{brandConfig.login.headline}</h1>
         <p>{brandConfig.login.description}</p>
@@ -1170,11 +1181,9 @@ function Sidebar({
   return (
     <aside className="sidebar">
       <button className="logo-button" onClick={() => onNavigate("dashboard")}>
-        <img className="brand-logo" src={brandConfig.logoPath} alt="Logo" />
-        <span>
-          <strong>{brandConfig.name}</strong>
-          <small>{brandConfig.category}</small>
-        </span>
+        <div className="sidebar-header">
+          <Logo iconSize={32} />
+        </div>
       </button>
 
       <nav aria-label="Menu principal">
