@@ -265,7 +265,7 @@ export default function SignUpScreen({
                 required
                 className="mt-1 h-4 w-4 rounded border-input text-primary focus:ring-ring"
               />
-              <label htmlFor="terms" className="text-sm text-muted-foreground cursor-pointer select-none leading-tight flex-1">
+              <label htmlFor="terms" className="text-sm text-muted-foreground cursor-pointer select-none leading-tight flex-1 block">
                 Li e concordo com os{" "}
                 <a href="#" className="text-primary hover:underline font-medium">
                   Termos de Uso
