@@ -420,7 +420,7 @@ export default function ContactsPage({
 
   const renderDataGrid = () => {
     return (
-      <div className="flex-1 overflow-auto bg-card rounded-2xl border border-white/5 shadow-2xl relative min-h-[500px]">
+      <div className="flex-1 overflow-auto bg-card rounded-2xl border border-white/5 shadow-2xl relative min-h-0 md:min-h-[500px]">
         {filteredContacts.length === 0 ? (
           <EmptyState
             action="Novo Contato"
@@ -497,7 +497,7 @@ export default function ContactsPage({
             </table>
             
             {/* Mobile Cards View */}
-            <div className="flex flex-col md:hidden p-4 gap-3">
+            <div className="flex flex-col md:hidden p-4 pb-28 gap-3">
               {filteredContacts.map((contact) => (
                 <div 
                   key={contact.id}
@@ -547,7 +547,7 @@ export default function ContactsPage({
             <h3 className="font-bold text-sm tracking-widest uppercase text-muted-foreground">Perfil do Contato</h3>
             <button 
               onClick={() => setSelectedContactId(null)} 
-              className="p-2 -mr-2 rounded-xl text-muted-foreground hover:bg-white/10 transition-colors"
+              className="p-3 -mr-3 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-muted-foreground hover:bg-white/10 transition-colors"
             >
               <X size={20} />
             </button>
@@ -679,7 +679,7 @@ export default function ContactsPage({
   };
 
   return (
-    <div className="flex flex-col gap-6 h-[calc(100vh-6rem)] -mb-12">
+    <div className="flex flex-col gap-6 h-[calc(100dvh-5rem)] md:h-[calc(100vh-6rem)] -mb-12">
       <div className="shrink-0 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight mb-1">Base de Contatos</h1>
@@ -693,6 +693,14 @@ export default function ContactsPage({
           className="primary-button hidden sm:flex"
         >
           <Plus size={16} /> Novo Contato
+        </button>
+        
+        {/* Mobile FAB */}
+        <button 
+          onClick={() => onOpenModal("contact")}
+          className="fixed bottom-[80px] right-4 z-[35] w-14 h-14 bg-primary text-primary-foreground rounded-full flex sm:hidden items-center justify-center shadow-lg hover:bg-primary/90 active:scale-95 transition-all"
+        >
+          <Plus size={24} />
         </button>
       </div>
 
