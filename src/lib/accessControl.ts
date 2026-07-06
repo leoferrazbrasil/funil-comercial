@@ -3,8 +3,8 @@ import type { Profile, Route as AppRoute } from "./types";
 export type CommercialRole = Profile["role"];
 
 const roleRoutes: Record<CommercialRole, Array<Exclude<AppRoute, "login">>> = {
-  diretor: ["dashboard", "inbox", "contatos", "leads", "funil"],
-  gestor: ["dashboard", "inbox", "contatos", "leads", "funil"],
+  diretor: ["dashboard", "inbox", "contatos", "leads", "funil", "criativos"],
+  gestor: ["dashboard", "inbox", "contatos", "leads", "funil", "criativos"],
   vendedor: ["dashboard", "inbox", "contatos", "leads", "funil"],
 };
 
