@@ -1019,6 +1019,7 @@ function AppContent() {
                 />
               }
             />
+            <Route path="/criativos" element={<CreativesPage />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
         </section>
