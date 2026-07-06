@@ -452,6 +452,23 @@ function AppContent() {
     enabled: !!session?.user && !!isSupabaseConfigured && !!supabase,
   });
 
+  useEffect(() => {
+    if (!session?.user?.id || !supabase) return;
+
+    const channel = supabase
+      .channel('inbox-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'inbox_messages', filter: `owner_id=eq.${session.user.id}` },
+        () => queryClient.invalidateQueries({ queryKey: ["crmSnapshot"] })
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [session?.user?.id, queryClient]);
+
   const snapshot = snapshotData ?? emptySnapshot;
   const allowedRoutes = getAllowedRoutes(snapshot.profile?.role);
   const visibleNavItems = navItems.filter((item) =>

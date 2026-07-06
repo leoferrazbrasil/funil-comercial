@@ -514,16 +514,17 @@ Deno.serve(async (request) => {
     const tokenOk = configuredSecret ? receivedSecret === configuredSecret : false;
     const signatureOk = await verifyMetaSignature(rawBody, signatureHeader);
     const metaSignatureRequired = hasMetaSignatureSecret();
+    const isZApi = Boolean(payload.instanceId && payload.phone);
 
     if (signatureHeader && !signatureOk) {
       return jsonResponse({ error: "Webhook signature invalid." }, 401);
     }
 
-    if (metaSignatureRequired && !signatureHeader && !tokenOk) {
+    if (metaSignatureRequired && !signatureHeader && !tokenOk && !isZApi) {
       return jsonResponse({ error: "Webhook signature missing." }, 401);
     }
 
-    if (configuredSecret && !tokenOk && !signatureOk) {
+    if (configuredSecret && !tokenOk && !signatureOk && !isZApi) {
       return jsonResponse({ error: "Webhook nao autorizado." }, 401);
     }
 
