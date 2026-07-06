@@ -18,6 +18,8 @@ serve(async (req) => {
       throw new Error('Missing image or account ID.')
     }
 
+    console.log("Publishing for Instagram Account ID:", instagramAccountId);
+
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
@@ -92,6 +94,7 @@ serve(async (req) => {
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
     )
   } catch (error: any) {
+    console.error("META PUBLISH ERROR:", error.message, error.stack);
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 400,

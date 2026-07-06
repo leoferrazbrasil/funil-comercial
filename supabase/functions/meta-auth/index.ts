@@ -67,13 +67,23 @@ serve(async (req) => {
     const pageId = meData.data?.[0]?.id; 
     let instagramId = 'unknown';
     
+    console.log("Meta /me/accounts response:", JSON.stringify(meData));
+
     if (pageId) {
+       console.log("Found Page ID:", pageId);
        const igUrl = `https://graph.facebook.com/v19.0/${pageId}?fields=instagram_business_account&access_token=${accessToken}`
        const igRes = await fetch(igUrl)
        const igData = await igRes.json()
+       console.log("Meta Page response (looking for IG):", JSON.stringify(igData));
+       
        if (igData.instagram_business_account) {
          instagramId = igData.instagram_business_account.id
+         console.log("Successfully found Instagram ID:", instagramId);
+       } else {
+         console.log("Page has no instagram_business_account field!");
        }
+    } else {
+       console.log("No pages found in meData!");
     }
 
     const expiresAt = new Date(Date.now() + expiresIn * 1000).toISOString()
