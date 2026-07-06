@@ -4,6 +4,7 @@ import { Check, Copy, ChevronRight, Menu, X, Download, CheckCircle2, ShieldAlert
 import { Link } from 'react-router-dom';
 import Logo from '../components/Logo';
 import SocialMediaSection from '../components/SocialMediaSection';
+import AvatarGuidelinesSection from '../components/AvatarGuidelinesSection';
 
 function ColorSwatch({ color, name, hex, description }: { color: string, name: string, hex: string, description: string }) {
   const [copied, setCopied] = useState(false);
@@ -48,6 +49,7 @@ const SECTIONS = [
   { id: 'ui', label: 'UI & Componentes' },
   { id: 'tom-de-voz', label: 'Tom de Voz' },
   { id: 'social-media', label: 'Guia Editorial (Social)' },
+  { id: 'avatar-ia', label: 'Avatar & IA' },
 ];
 
 export default function BrandbookPage() {
@@ -423,8 +425,13 @@ export default function BrandbookPage() {
           </section>
 
           {/* SOCIAL MEDIA */}
-          <section id="social-media" className="scroll-mt-24">
+          <section id="social-media" className="scroll-mt-24 space-y-8">
             <SocialMediaSection />
+          </section>
+
+          {/* AVATAR & IA */}
+          <section id="avatar-ia" className="scroll-mt-24 space-y-8">
+            <AvatarGuidelinesSection />
           </section>
           
         </div>
