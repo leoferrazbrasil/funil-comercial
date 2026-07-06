@@ -1,4 +1,4 @@
-export type Route = 'login' | 'cadastro' | 'dashboard' | 'inbox' | 'contatos' | 'leads' | 'funil'
+export type Route = 'login' | 'cadastro' | 'dashboard' | 'inbox' | 'contatos' | 'leads' | 'funil' | 'perfil'
 
 export type LeadStatus = 'novo' | 'em_atendimento' | 'qualificado' | 'convertido' | 'perdido'
 
@@ -17,6 +17,7 @@ export type Profile = {
   email: string | null
   telefone: string | null
   role: 'diretor' | 'gestor' | 'vendedor'
+  avatar_url?: string | null
   created_at: string
 }
 

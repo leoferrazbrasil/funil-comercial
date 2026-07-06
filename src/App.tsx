@@ -46,6 +46,7 @@ import LandingPage from "./pages/Landing";
 import BrandbookPage from "./pages/Brandbook";
 import SignUpScreen from "./pages/SignUp";
 import LoginScreen from "./pages/Login";
+import ProfilePage from "./pages/Profile";
 import Logo from "./components/Logo";
 import {
   convertContactToLead,
@@ -911,11 +912,13 @@ function AppContent() {
           profileName={
             snapshot.profile?.nome ?? session.user.email ?? "Usuário"
           }
+          profileAvatar={snapshot.profile?.avatar_url}
           query={query}
           route={route}
           navItems={visibleNavItems}
           onQueryChange={setQuery}
           onSignOut={handleSignOut}
+          onNavigate={(path) => navigate("/" + path)}
         />
         <section className="content">
           {crmError && (
@@ -928,6 +931,15 @@ function AppContent() {
           )}
           <Routes>
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route
+              path="/perfil"
+              element={
+                <ProfilePage
+                  profile={snapshot.profile}
+                  onProfileUpdated={reloadData}
+                />
+              }
+            />
             <Route
               path="/dashboard"
               element={<Dashboard snapshot={snapshot} onOpenModal={openModal} />}
@@ -1103,21 +1115,25 @@ function Sidebar({
 
 function Header({
   profileName,
+  profileAvatar,
   query,
   route,
   theme,
   navItems,
   onQueryChange,
   onSignOut,
+  onNavigate,
   toggleTheme,
 }: {
   profileName: string;
+  profileAvatar?: string | null;
   query: string;
   route: AppRoute;
   theme?: "light" | "dark";
   navItems: NavigationItem[];
   onQueryChange: (q: string) => void;
   onSignOut: () => void;
+  onNavigate?: (id: AppRoute) => void;
   toggleTheme?: () => void;
 }) {
   const title =
@@ -1158,9 +1174,17 @@ function Header({
         <button className="icon-button" aria-label="Notificações">
           <Bell size={18} />
         </button>
-        <span className="user-chip" title={profileName}>
-          {initials || "FC"}
-        </span>
+        <button 
+          className="user-chip border border-transparent hover:border-primary/50 transition-colors p-0 overflow-hidden" 
+          title={profileName}
+          onClick={() => onNavigate?.("perfil")}
+        >
+          {profileAvatar ? (
+            <img src={profileAvatar} alt="Avatar" className="w-full h-full object-cover" />
+          ) : (
+            initials || "FC"
+          )}
+        </button>
         <button className="icon-button" aria-label="Sair" onClick={onSignOut}>
           <LogOut size={18} />
         </button>
