@@ -95,6 +95,7 @@ import InboxPage from "./pages/Inbox";
 import ContactsPage from "./pages/Contacts";
 import LeadsPage from "./pages/Leads";
 import CreativesPage from "./pages/Creatives";
+import MetaOAuthCallback from "./pages/MetaOAuthCallback";
 
 type ModalType = "contact" | "lead" | "opportunity" | "message" | "channel";
 type EditingTarget =
@@ -1020,6 +1021,7 @@ function AppContent() {
               }
             />
             <Route path="/criativos" element={<CreativesPage />} />
+            <Route path="/oauth/meta" element={<MetaOAuthCallback />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
         </section>
