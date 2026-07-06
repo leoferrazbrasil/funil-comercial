@@ -399,7 +399,10 @@ export default function LandingPage() {
               </div>
               <span className="font-bold text-muted-foreground hidden md:inline">{brandConfig.name}</span>
             </div>
-            <p className="text-xs md:text-sm text-muted-foreground">© {new Date().getFullYear()} {brandConfig.name}. Todos os direitos reservados.</p>
+            <div className="flex flex-col items-center md:items-start gap-1">
+              <p className="text-xs md:text-sm text-muted-foreground">© {new Date().getFullYear()} {brandConfig.name}. Todos os direitos reservados.</p>
+              <p className="text-[10px] md:text-xs text-muted-foreground/60">CNPJ: 65.993.728/0001-07</p>
+            </div>
           </div>
           <div className="flex gap-6">
             <a href="#" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">Termos</a>
