@@ -79,7 +79,7 @@ async function getActiveWhatsAppChannel(supabase: SupabaseClientAny, ownerId: st
     .from("integration_channels")
     .select("*")
     .eq("owner_id", ownerId)
-    .in("provider", ["whatsapp", "whatsapp_cloud"])
+    .in("provider", ["whatsapp", "whatsapp_cloud", "evolution_api"])
     .eq("status", "ativo")
     .order("created_at", { ascending: false })
     .limit(1)
@@ -164,6 +164,54 @@ async function sendMetaTextMessage(phoneNumberId: string, toPhone: string, messa
   };
 }
 
+async function sendEvolutionTextMessage(instanceName: string, toPhone: string, message: string) {
+  const evolutionUrl = Deno.env.get("EVOLUTION_API_URL");
+  const evolutionKey = Deno.env.get("EVOLUTION_GLOBAL_API_KEY");
+
+  if (!evolutionUrl || !evolutionKey || !instanceName) {
+    return {
+      configured: false,
+      response: null as JsonRecord | null,
+    };
+  }
+
+  const response = await fetch(`${evolutionUrl}/message/sendText/${instanceName}`, {
+    method: "POST",
+    headers: {
+      "apikey": evolutionKey,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      number: toPhone,
+      options: {
+        delay: 1200,
+        presence: "composing",
+      },
+      textMessage: {
+        text: message,
+      },
+    }),
+  });
+
+  const responseBody = (await response.json().catch(() => ({}))) as JsonRecord;
+  if (!response.ok) {
+    console.error(
+      JSON.stringify({
+        event: "whatsapp_send_evolution_error",
+        status: response.status,
+        to_last4: toPhone.slice(-4),
+        error_message: responseBody,
+      }),
+    );
+    throw new Error(`Evolution API Error: ${JSON.stringify(responseBody)}`);
+  }
+
+  return {
+    configured: true,
+    response: responseBody,
+  };
+}
+
 function providerMessageId(metaResponse: JsonRecord | null) {
   const messages = Array.isArray(metaResponse?.messages) ? metaResponse.messages : [];
   const firstMessage = messages.find(isRecord);
@@ -204,20 +252,37 @@ Deno.serve(async (request) => {
       });
     }
 
-    const phoneNumberId =
-      metadataString(channel.metadata, ["phone_number_id", "phoneNumberId"]) ??
-      Deno.env.get("META_WHATSAPP_PHONE_NUMBER_ID") ??
-      Deno.env.get("WHATSAPP_PHONE_NUMBER_ID") ??
-      null;
+    let messageId: string | null = null;
+    
+    if (channel.provider === "evolution_api") {
+      const instanceName = metadataString(channel.metadata, ["instance_name", "instanceName"]);
+      const evolutionResult = await sendEvolutionTextMessage(instanceName ?? "", phone, message);
+      if (!evolutionResult.configured) {
+        return jsonResponse({
+          ok: true,
+          sent: false,
+          fallback_allowed: true,
+          reason: "evolution_send_not_configured",
+        });
+      }
+      messageId = asString((evolutionResult.response?.key as JsonRecord)?.id);
+    } else {
+      const phoneNumberId =
+        metadataString(channel.metadata, ["phone_number_id", "phoneNumberId"]) ??
+        Deno.env.get("META_WHATSAPP_PHONE_NUMBER_ID") ??
+        Deno.env.get("WHATSAPP_PHONE_NUMBER_ID") ??
+        null;
 
-    const metaResult = await sendMetaTextMessage(phoneNumberId ?? "", phone, message);
-    if (!metaResult.configured) {
-      return jsonResponse({
-        ok: true,
-        sent: false,
-        fallback_allowed: true,
-        reason: "meta_send_not_configured",
-      });
+      const metaResult = await sendMetaTextMessage(phoneNumberId ?? "", phone, message);
+      if (!metaResult.configured) {
+        return jsonResponse({
+          ok: true,
+          sent: false,
+          fallback_allowed: true,
+          reason: "meta_send_not_configured",
+        });
+      }
+      messageId = providerMessageId(metaResult.response);
     }
 
     const sourceMessage = await getSourceMessage(
@@ -230,7 +295,6 @@ Deno.serve(async (request) => {
       return jsonResponse({ error: "Mensagem de origem nao pertence ao telefone informado." }, 403);
     }
 
-    const messageId = providerMessageId(metaResult.response);
     const { data: inboxMessage, error: insertError } = await supabase
       .from("inbox_messages")
       .insert({
@@ -238,7 +302,7 @@ Deno.serve(async (request) => {
         contact_id: payload.contact_id ?? sourceMessage?.contact_id ?? null,
         lead_id: payload.lead_id ?? sourceMessage?.lead_id ?? null,
         canal: "WhatsApp",
-        provider: "whatsapp",
+        provider: channel.provider,
         provider_message_id: messageId,
         remetente_nome:
           asString(user.user_metadata?.nome) ??
