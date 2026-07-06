@@ -623,7 +623,7 @@ export default function InboxPage({
         <div className="h-16 shrink-0 border-b border-white/5 bg-card/50 flex items-center justify-between px-4 lg:px-6">
           <div className="flex items-center gap-4">
             {/* Mobile back button */}
-            <button onClick={() => setMobileView("list")} className="lg:hidden p-2 -ml-2 rounded-xl text-muted-foreground hover:bg-white/5">
+            <button onClick={() => setMobileView("list")} className="lg:hidden p-3 -ml-3 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-muted-foreground hover:bg-white/5">
               <MoveRight size={20} className="rotate-180" />
             </button>
             
@@ -631,11 +631,11 @@ export default function InboxPage({
               <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center font-bold">
                 {sourceMessage?.remetente_nome.charAt(0).toUpperCase()}
               </div>
-              <div>
-                <h3 className="font-bold text-sm leading-tight">{sourceMessage?.remetente_nome}</h3>
-                <p className="text-[11px] text-muted-foreground flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block" />
-                  {selected?.status ?? "Atendimento"} • {sourceMessage?.canal}
+              <div className="flex-1 min-w-0">
+                <h3 className="font-bold text-sm leading-tight truncate max-w-[160px] sm:max-w-xs">{sourceMessage?.remetente_nome}</h3>
+                <p className="text-[11px] text-muted-foreground flex items-center gap-1 truncate">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block shrink-0" />
+                  <span className="truncate">{selected?.status ?? "Atendimento"} • {sourceMessage?.canal}</span>
                 </p>
               </div>
             </div>
@@ -650,7 +650,7 @@ export default function InboxPage({
             </button>
             <button 
               onClick={() => setMobileView("context")}
-              className="lg:hidden p-2 rounded-xl text-muted-foreground hover:bg-white/5"
+              className="lg:hidden p-3 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-muted-foreground hover:bg-white/5"
             >
               <UsersRound size={20} />
             </button>
@@ -685,7 +685,7 @@ export default function InboxPage({
         </div>
 
         {/* Chat Footer / Composer */}
-        <div className="p-4 bg-card/80 border-t border-white/5 shrink-0">
+        <div className="p-4 pb-8 lg:pb-4 bg-card/80 border-t border-white/5 shrink-0">
           <form onSubmit={handleReplySubmit} className="flex items-end gap-3 max-w-4xl mx-auto">
             <div className="flex-1 bg-black/40 rounded-2xl border border-white/10 overflow-hidden focus-within:border-primary/50 transition-colors">
               <textarea
@@ -724,8 +724,8 @@ export default function InboxPage({
         
         {/* Mobile header for context */}
         <div className="lg:hidden h-16 shrink-0 border-b border-white/5 bg-card flex items-center px-4">
-          <button onClick={() => setMobileView("chat")} className="p-2 -ml-2 rounded-xl text-muted-foreground hover:bg-white/5 flex items-center gap-2">
-            <MoveRight size={20} className="rotate-180" /> <span className="font-semibold text-sm">Voltar ao Chat</span>
+          <button onClick={() => setMobileView("chat")} className="p-3 -ml-3 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-muted-foreground hover:bg-white/5 gap-2">
+            <MoveRight size={20} className="rotate-180 shrink-0" /> <span className="font-semibold text-sm">Voltar ao Chat</span>
           </button>
         </div>
 
@@ -829,8 +829,8 @@ export default function InboxPage({
   };
 
   return (
-    // Fixed height wrapper taking full space below top navbar (assuming standard Layout)
-    <div className="flex -mx-4 sm:-mx-8 -mb-12 h-[calc(100vh-6rem)] min-h-[600px] border-t border-white/5 overflow-hidden relative">
+    // Fixed height wrapper taking full space below top navbar
+    <div className="flex -mx-4 sm:-mx-8 h-[calc(100dvh-5rem)] lg:h-[calc(100vh-6rem)] lg:min-h-[600px] border-t border-white/5 overflow-hidden relative">
       {renderListColumn()}
       {renderChatColumn()}
       {renderContextColumn()}
