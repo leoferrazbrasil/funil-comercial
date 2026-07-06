@@ -47,6 +47,12 @@ export const navigationItems: NavigationItem[] = [
     icon: BriefcaseBusiness,
     description: "Oportunidades por etapa do pipeline.",
   },
+  {
+    id: "criativos",
+    label: "Criativos",
+    icon: Palette,
+    description: "Gerador de artes para Social Media.",
+  },
 ];
 
 export const pipelineStages: OpportunityStage[] = [
