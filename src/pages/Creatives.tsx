@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import * as htmlToImage from "html-to-image";
-import { Download, LayoutTemplate, Type, Wand2, RefreshCw, Share2, Target, PenTool, Lightbulb, ChevronRight, ArrowLeft, Sparkles, Copy, Check, Instagram, BrainCircuit } from "lucide-react";
+import { Download, LayoutTemplate, Type, Wand2, RefreshCw, Share2, Target, PenTool, Lightbulb, ChevronRight, ArrowLeft, Sparkles, Copy, Check, Camera, BrainCircuit } from "lucide-react";
 import Logo from "../components/Logo";
 import PublishModal from "../components/PublishModal";
 import { supabase } from "../lib/supabase";
@@ -203,7 +203,7 @@ export default function CreativesPage() {
             <div className="bg-card border border-white/5 rounded-2xl p-6 flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center text-muted-foreground">
-                  <Instagram size={20} />
+                  <Camera size={20} />
                 </div>
                 <div>
                   <h3 className="font-bold text-white text-lg">Instagram não conectado</h3>

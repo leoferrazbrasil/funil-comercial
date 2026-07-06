@@ -1,5 +1,20 @@
 # Changelog
 
+## [2026-07-06] - Integração Evolution API e AI Strategist
+
+### Adicionado
+- **Integração WhatsApp via Evolution API**:
+  - Nova aba WhatsApp (`/whatsapp`) com painel completo de conversas em tempo real.
+  - Edge Function `whatsapp-send` para envio das mensagens.
+- **Central de Inteligência de Criativos (`/criativos`)**:
+  - Refatoração para um Wizard guiado de 4 etapas (Estratégia, Ideia, IA, Estúdio).
+  - Edge Function `ai-generate-post` com fallbacks OpenAI e Gemini.
+  - **Estrategista IA**: Função `ai-recommend-post` conectada na API oficial do Instagram (Meta Graph API) para ler o histórico e garantir Continuidade Editorial.
+
+### Modificado
+- `App.tsx` e `Whatsapp.tsx`: Correção de importações do `SharedUI` para sanar erros de compilação.
+- `useWhatsApp.ts`: Ajuste de escopo de ID de mensagem temporária para evitar erros no Typescript.
+
 ## [2026-07-04] - Redesign UX/UI Pro Max (Sprint de Conversão)
 
 ### Adicionado
