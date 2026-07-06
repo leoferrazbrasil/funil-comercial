@@ -414,7 +414,7 @@ function PipelineCard({
         // Prevent click if dragging
         if (!transform) onClick(item);
       }}
-      className={`group bg-card p-4 flex flex-col gap-3 rounded-2xl border transition-all cursor-grab active:cursor-grabbing hover:border-primary/50 relative overflow-hidden
+      className={`group w-full min-w-0 bg-card p-4 flex flex-col gap-3 rounded-2xl border transition-all cursor-grab active:cursor-grabbing hover:border-primary/50 relative overflow-hidden
         ${isDragging ? 'shadow-2xl border-primary scale-[1.03] rotate-2' : 'border-white/10 shadow-sm'}
         ${showWarning ? 'border-amber-500/30' : ''}
       `}
@@ -426,9 +426,9 @@ function PipelineCard({
         </div>
       )}
 
-      <div>
-        <h3 className="font-bold text-sm text-foreground leading-tight truncate pr-16">{item.titulo}</h3>
-        <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider mt-1 block">
+      <div className="w-full min-w-0">
+        <h3 className="font-bold text-sm text-foreground leading-tight truncate pr-16 w-full">{item.titulo}</h3>
+        <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider mt-1 block truncate w-full">
           {item.lead_id ? "Lead" : "Contato"}
         </span>
       </div>
@@ -437,10 +437,12 @@ function PipelineCard({
         <strong className="text-xl font-black tracking-tight text-primary">{formatMoney(Number(item.valor))}</strong>
       </div>
       
-      <div className="bg-white/5 p-2 rounded-xl border border-white/5">
+      <div className="bg-white/5 p-2 rounded-xl border border-white/5 w-full min-w-0">
         <p className="text-xs text-muted-foreground font-medium flex items-start gap-1.5 leading-snug">
           <Target size={14} className="shrink-0 mt-0.5" /> 
-          {item.proxima_acao || "Ação não definida"}
+          <span className="min-w-0 flex-1 break-words line-clamp-3">
+            {item.proxima_acao || "Ação não definida"}
+          </span>
         </p>
       </div>
       
