@@ -94,6 +94,7 @@ import Dashboard from "./pages/Dashboard";
 import InboxPage from "./pages/Inbox";
 import ContactsPage from "./pages/Contacts";
 import LeadsPage from "./pages/Leads";
+import CreativesPage from "./pages/Creatives";
 
 type ModalType = "contact" | "lead" | "opportunity" | "message" | "channel";
 type EditingTarget =

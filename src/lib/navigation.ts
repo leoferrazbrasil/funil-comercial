@@ -5,6 +5,7 @@ import {
   Inbox,
   LayoutDashboard,
   UsersRound,
+  Palette,
 } from "lucide-react";
 import type { OpportunityStage, Route as AppRoute } from "./types";
 
