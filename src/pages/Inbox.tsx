@@ -438,19 +438,28 @@ export default function InboxPage({
 
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
+  const [filterTab, setFilterTab] = useState<"abertas" | "nao_lidas" | "todas">("abertas");
   
   // Mobile UI States: "list" | "chat" | "context"
   const [mobileView, setMobileView] = useState<"list" | "chat" | "context">("list");
 
+  const displayedConversations = useMemo(() => {
+    return conversations.filter(conv => {
+      if (filterTab === "nao_lidas") return conv.unreadCount > 0;
+      if (filterTab === "abertas") return conv.latest.status !== "Resolvido";
+      return true;
+    });
+  }, [conversations, filterTab]);
+
   // Selection Logic
   useEffect(() => {
-    if (!selectedKey && conversations.length > 0) {
+    if (!selectedKey && displayedConversations.length > 0) {
       // Don't auto-select on mobile to keep the list view open initially
       if (window.innerWidth >= 1024) {
-        setSelectedKey(conversations[0].key);
+        setSelectedKey(displayedConversations[0].key);
       }
     }
-  }, [conversations, selectedKey]);
+  }, [displayedConversations, selectedKey]);
 
   // View handlers for mobile
   const handleSelectConversation = (key: string) => {
@@ -541,11 +550,26 @@ export default function InboxPage({
           </div>
         </div>
         
-        {/* Fake Search / Filters */}
+        {/* Search / Filters */}
         <div className="flex bg-white/5 rounded-xl p-1">
-          <button className="flex-1 py-1.5 px-3 text-xs font-semibold rounded-lg bg-white/10 text-foreground">Abertas</button>
-          <button className="flex-1 py-1.5 px-3 text-xs font-semibold rounded-lg text-muted-foreground hover:text-foreground">Não Lidas</button>
-          <button className="flex-1 py-1.5 px-3 text-xs font-semibold rounded-lg text-muted-foreground hover:text-foreground">Todas</button>
+          <button 
+            onClick={() => setFilterTab("abertas")}
+            className={`flex-1 py-1.5 px-3 text-xs font-semibold rounded-lg transition-colors ${filterTab === 'abertas' ? 'bg-white/10 text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+          >
+            Abertas
+          </button>
+          <button 
+            onClick={() => setFilterTab("nao_lidas")}
+            className={`flex-1 py-1.5 px-3 text-xs font-semibold rounded-lg transition-colors ${filterTab === 'nao_lidas' ? 'bg-white/10 text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+          >
+            Não Lidas
+          </button>
+          <button 
+            onClick={() => setFilterTab("todas")}
+            className={`flex-1 py-1.5 px-3 text-xs font-semibold rounded-lg transition-colors ${filterTab === 'todas' ? 'bg-white/10 text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+          >
+            Todas
+          </button>
         </div>
       </div>
 
@@ -556,14 +580,14 @@ export default function InboxPage({
           </div>
         )}
         
-        {conversations.length === 0 ? (
+        {displayedConversations.length === 0 ? (
           <div className="p-8 text-center text-muted-foreground">
             <MessageCircle size={32} className="mx-auto mb-3 opacity-20" />
             <p className="text-sm">Nenhuma conversa encontrada.</p>
           </div>
         ) : (
           <div className="flex flex-col">
-            {conversations.map((conv) => {
+            {displayedConversations.map((conv) => {
               const isSelected = selectedKey === conv.key;
               const hasUnread = conv.unreadCount > 0;
               return (

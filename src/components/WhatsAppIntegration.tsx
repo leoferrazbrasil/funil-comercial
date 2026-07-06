@@ -74,6 +74,19 @@ export function WhatsAppIntegration() {
     };
   }, []);
 
+  // Polling para checar status enquanto o QR Code está visível
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval>;
+    if (qrCode && status === 'disconnected') {
+      interval = setInterval(() => {
+        checkStatus();
+      }, 5000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [qrCode, status]);
+
   const handleConnect = async () => {
     setIsGenerating(true);
     try {
@@ -90,7 +103,10 @@ export function WhatsAppIntegration() {
         }
       );
 
-      if (!response.ok) throw new Error("Failed to generate QR Code");
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: response.statusText }));
+        throw new Error(errorData.error || "Failed to generate QR Code");
+      }
 
       const data = await response.json();
       if (data.qrCode) {
@@ -98,9 +114,9 @@ export function WhatsAppIntegration() {
       } else {
         toast.error("Não foi possível gerar o QR Code. Tente novamente.");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error connecting WhatsApp:", error);
-      toast.error("Falha ao comunicar com o servidor.");
+      toast.error(`Falha: ${error.message}`);
     } finally {
       setIsGenerating(false);
     }

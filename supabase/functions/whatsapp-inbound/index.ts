@@ -10,6 +10,7 @@ type NormalizedInboundMessage = {
   senderName: string;
   message: string;
   messageType: string;
+  instanceId?: string;
 };
 
 type ProcessedMessage = {
@@ -275,6 +276,7 @@ function extractZApiMessages(payload: JsonRecord): NormalizedInboundMessage[] {
     senderName,
     message,
     messageType,
+    instanceId: asString(payload.instanceId) || undefined,
   }];
 }
 
@@ -328,6 +330,19 @@ async function resolveOwnerId(
   supabase: SupabaseClientAny,
   message: NormalizedInboundMessage,
 ) {
+  if (message.instanceId) {
+    const { data, error } = await supabase
+      .from("integration_channels")
+      .select("id, owner_id")
+      .eq("provider", "z-api")
+      .eq("status", "ativo")
+      .contains("metadata", { instanceId: message.instanceId })
+      .limit(1)
+      .maybeSingle();
+
+    if (!error && data?.owner_id) return data.owner_id as string;
+  }
+
   if (message.channelIdentifiers.length > 0) {
     const providers = uniqueStrings([message.provider, "whatsapp", "whatsapp_cloud"]);
     const { data, error } = await supabase

@@ -23,7 +23,8 @@ export class ZApiProvider implements IWhatsAppProvider {
     const response = await fetch(`https://api.z-api.io/instances/${instanceId}/token/${token}/qr-code/image`, {
       method: "GET",
       headers: {
-        "Accept": "application/json"
+        "Accept": "application/json",
+        "Client-Token": this.clientToken
       }
     });
 
@@ -41,7 +42,10 @@ export class ZApiProvider implements IWhatsAppProvider {
 
   async getInstanceStatus(instanceId: string, token: string): Promise<{ connected: boolean; phone?: string }> {
     const response = await fetch(`https://api.z-api.io/instances/${instanceId}/token/${token}/status`, {
-      method: "GET"
+      method: "GET",
+      headers: {
+        "Client-Token": this.clientToken
+      }
     });
     
     if (!response.ok) {
@@ -53,9 +57,12 @@ export class ZApiProvider implements IWhatsAppProvider {
     let phone;
 
     if (connected) {
-      // Fetch phone number
-      const phoneResponse = await fetch(`https://api.z-api.io/instances/${instanceId}/token/${token}/phones`, {
-        method: "GET"
+      // Fetch phone number using the correct Z-API device endpoint
+      const phoneResponse = await fetch(`https://api.z-api.io/instances/${instanceId}/token/${token}/device`, {
+        method: "GET",
+        headers: {
+          "Client-Token": this.clientToken
+        }
       });
       if (phoneResponse.ok) {
         const phoneData = await phoneResponse.json();
@@ -68,7 +75,10 @@ export class ZApiProvider implements IWhatsAppProvider {
 
   async disconnectInstance(instanceId: string, token: string): Promise<boolean> {
     const response = await fetch(`https://api.z-api.io/instances/${instanceId}/token/${token}/disconnect`, {
-      method: "GET"
+      method: "GET",
+      headers: {
+        "Client-Token": this.clientToken
+      }
     });
     return response.ok;
   }
