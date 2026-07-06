@@ -5,6 +5,7 @@ import {
   MessageSquare, Compass, ShieldCheck, Zap
 } from 'lucide-react';
 import Logo from './Logo';
+import SocialTemplatesGallery from './SocialTemplatesGallery';
 
 export default function SocialMediaSection() {
   const [activeTab, setActiveTab] = useState('estrategia');
@@ -289,6 +290,14 @@ function TabTemplates() {
   return (
     <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
       
+      <div className="space-y-6">
+        <h3 className="text-2xl font-bold border-b border-white/10 pb-2">Galeria de Templates (20 Modelos)</h3>
+        <p className="text-sm text-muted-foreground mb-6">
+          Explore nossa biblioteca oficial de componentes. Filtre por objetivo ou formato. Todos os templates abaixo são construídos via CSS para documentação viva.
+        </p>
+        <SocialTemplatesGallery />
+      </div>
+
       <div className="space-y-6">
         <h3 className="text-2xl font-bold border-b border-white/10 pb-2">Estrutura de Carrossel (O Padrão Ouro)</h3>
         <p className="text-sm text-muted-foreground max-w-3xl">
