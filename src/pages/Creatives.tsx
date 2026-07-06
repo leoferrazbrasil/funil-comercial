@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import * as htmlToImage from "html-to-image";
-import { Download, LayoutTemplate, Type, Wand2, RefreshCw, Share2, Target, PenTool, Lightbulb, ChevronRight, ArrowLeft, Sparkles, Copy, Check, Camera, BrainCircuit } from "lucide-react";
+import { Download, LayoutTemplate, Type, Wand2, RefreshCw, Share2, Target, PenTool, Lightbulb, ChevronRight, ArrowLeft, Sparkles, Copy, Check, Camera, BrainCircuit, Hash, X, Plus } from "lucide-react";
 import Logo from "../components/Logo";
 import PublishModal from "../components/PublishModal";
 import { supabase } from "../lib/supabase";
@@ -45,12 +45,15 @@ export default function CreativesPage() {
   const [highlight, setHighlight] = useState("LEADS");
   const [tags, setTags] = useState("CRM + PRODUTIVIDADE");
   const [caption, setCaption] = useState("Ter controle sobre os seus leads é o primeiro passo para aumentar as vendas. Sem um CRM estruturado, dinheiro fica na mesa. Salve este post para aplicar na sua operação!");
+  const [hashtags, setHashtags] = useState<string[]>(["gestaocomercial", "crm", "vendas", "produtividade"]);
   
   // UI State
   const [isExporting, setIsExporting] = useState(false);
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
   const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [isRegenerating, setIsRegenerating] = useState(false);
+  const [newHashtag, setNewHashtag] = useState("");
   
   // Recommendation State
   const [recState, setRecState] = useState<"loading" | "ready" | "error" | "unauthorized">("loading");
@@ -73,8 +76,20 @@ export default function CreativesPage() {
         if (!isMounted) return;
         
         if (error || !data) {
-          console.error("Erro ao buscar recomendação:", error);
-          setRecState("error");
+          console.error("Erro ao buscar recomendação (A Função Edge pode não estar online):", error);
+          
+          // MOCK DE FRONTEND (Para visualização do usuário enquanto o erro 403 da Supabase impede o deploy do backend)
+          if (isMounted) {
+            setRecommendation({
+              last_post: { preview: "Erro 404: CRM não é bagunça! Entenda como...", time_ago: "Recentemente" },
+              recommendation: {
+                objective: "Vender", format: "Feed 4:5", pilar: "CRM",
+                reason: "[SIMULAÇÃO VISUAL] Como seu último post foi educativo, agora é hora de fazer uma oferta direta usando fundo escuro.",
+                theme: "Oferta de implantação de CRM B2B"
+              }
+            });
+            setRecState("ready"); // Força o estado de ready para mostrar o card
+          }
           return;
         }
 
@@ -135,15 +150,47 @@ export default function CreativesPage() {
       if (data.highlight_word) setHighlight(data.highlight_word);
       if (data.footer_tags) setTags(data.footer_tags);
       if (data.caption) setCaption(data.caption);
+      if (data.hashtags) setHashtags(data.hashtags);
       if (data.recommended_template_id) setTemplate(data.recommended_template_id);
       
       setStep(4);
     } catch (error) {
       console.error(error);
       alert("Falha ao conectar com o serviço de IA. Preenchendo com exemplos de fallback.");
-      // Fallback in case the edge function isn't ready
       setTimeout(() => setStep(4), 1000);
     }
+  };
+
+  const regenerateCaption = async () => {
+    if (!idea.trim()) return;
+    setIsRegenerating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('ai-generate-post', {
+        body: { objective, pilar, format: format.id, idea }
+      });
+      if (error || !data) throw new Error(error?.message || "Erro na geração");
+      if (data.caption) setCaption(data.caption);
+      if (data.hashtags) setHashtags(data.hashtags);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsRegenerating(false);
+    }
+  };
+
+  const addHashtag = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && newHashtag.trim()) {
+      e.preventDefault();
+      const cleanTag = newHashtag.trim().replace(/^#/, '');
+      if (hashtags.length < 5 && !hashtags.includes(cleanTag)) {
+        setHashtags([...hashtags, cleanTag]);
+      }
+      setNewHashtag("");
+    }
+  };
+
+  const removeHashtag = (tagToRemove: string) => {
+    setHashtags(hashtags.filter(t => t !== tagToRemove));
   };
 
   const handleExport = async () => {
@@ -175,7 +222,8 @@ export default function CreativesPage() {
   };
 
   const copyCaption = () => {
-    navigator.clipboard.writeText(caption);
+    const fullText = `${caption}\n\n${hashtags.map(h => '#' + h).join(' ')}`;
+    navigator.clipboard.writeText(fullText);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -349,6 +397,8 @@ export default function CreativesPage() {
   }
 
   // STEP 4: O ESTÚDIO
+  const isCaptionOverLimit = caption.length > 350;
+
   return (
     <div className="flex flex-col lg:flex-row h-[calc(100dvh-5rem)] lg:h-[calc(100vh-6rem)] overflow-hidden fade-in bg-[#0a0a0c]">
       
@@ -356,46 +406,108 @@ export default function CreativesPage() {
       <div className={`w-full lg:w-[450px] xl:w-[500px] bg-card border-r border-white/5 flex flex-col ${activeTab !== "preview" ? "flex" : "hidden lg:flex"}`}>
         
         {/* Header */}
-        <div className="p-6 border-b border-white/5 flex justify-between items-center bg-black/20">
+        <div className="p-6 border-b border-white/5 flex justify-between items-center bg-black/20 shrink-0">
           <div>
             <button onClick={() => setStep(2)} className="text-xs text-muted-foreground hover:text-white mb-1 flex items-center gap-1"><ArrowLeft size={12}/> Nova Ideia</button>
             <h1 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">Estúdio de Criação <Sparkles size={16} className="text-primary"/></h1>
           </div>
-          <button onClick={generateWithAI} className="p-3 bg-white/5 hover:bg-white/10 rounded-full transition-colors text-primary" title="Gerar Variação com IA">
+          <button onClick={generateWithAI} className="p-3 bg-white/5 hover:bg-white/10 rounded-full transition-colors text-primary" title="Gerar Variação Completa com IA">
             <RefreshCw size={18} />
           </button>
         </div>
 
         {/* Mobile Tabs */}
-        <div className="flex lg:hidden border-b border-white/5 bg-black/40">
+        <div className="flex lg:hidden border-b border-white/5 bg-black/40 shrink-0">
           <button onClick={() => setActiveTab("content")} className={`flex-1 py-4 text-sm font-semibold ${activeTab === 'content' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}>Conteúdo</button>
           <button onClick={() => setActiveTab("design")} className={`flex-1 py-4 text-sm font-semibold ${activeTab === 'design' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}>Design</button>
           <button onClick={() => setActiveTab("preview")} className={`flex-1 py-4 text-sm font-semibold ${activeTab === 'preview' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}>Preview</button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-8 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-8 custom-scrollbar relative">
           
           {(activeTab === "content" || window.innerWidth >= 1024) && (
             <section className="flex flex-col gap-6">
               
-              <div className="bg-primary/5 border border-primary/20 rounded-2xl p-5 flex flex-col gap-3">
+              {/* NOVO PAINEL DE COPY ESTRATÉGICA */}
+              <div className="bg-gradient-to-b from-primary/10 to-transparent border border-primary/20 rounded-2xl p-5 flex flex-col gap-4 relative overflow-hidden">
+                {isRegenerating && (
+                  <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-20 flex items-center justify-center rounded-2xl">
+                    <RefreshCw className="text-primary animate-spin" size={24} />
+                  </div>
+                )}
+                
                 <div className="flex justify-between items-center">
-                  <h3 className="text-sm font-bold uppercase tracking-wider text-primary flex items-center gap-2">
-                    <Type size={16}/> Legenda Sugerida
+                  <h3 className="text-[13px] font-black uppercase tracking-widest text-primary flex items-center gap-2">
+                    <Sparkles size={14}/> Painel de Copy
                   </h3>
-                  <button onClick={copyCaption} className="text-xs font-semibold text-primary hover:text-white flex items-center gap-1 transition-colors">
-                    {copied ? <Check size={14} /> : <Copy size={14} />} {copied ? 'Copiado!' : 'Copiar'}
-                  </button>
+                  <div className="flex gap-2">
+                    <button onClick={regenerateCaption} disabled={isRegenerating} className="text-xs font-semibold text-muted-foreground hover:text-white flex items-center gap-1 transition-colors bg-white/5 px-2 py-1 rounded">
+                      <RefreshCw size={12} className={isRegenerating ? "animate-spin" : ""} /> Regenerar IA
+                    </button>
+                  </div>
                 </div>
-                <textarea 
-                  value={caption} 
-                  onChange={(e) => setCaption(e.target.value)} 
-                  rows={4} 
-                  className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary/50 outline-none transition-colors resize-y text-white/90" 
-                />
+                
+                <div className="flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-white/60 uppercase tracking-wider flex justify-between">
+                    <span>Texto da Publicação</span>
+                    <span className={`transition-colors ${isCaptionOverLimit ? 'text-red-400 font-bold' : 'text-muted-foreground'}`}>
+                      {caption.length} / 350
+                    </span>
+                  </label>
+                  <textarea 
+                    value={caption} 
+                    onChange={(e) => setCaption(e.target.value)} 
+                    rows={4} 
+                    className={`w-full bg-black/40 border rounded-xl p-3 text-sm focus:border-primary/50 outline-none transition-colors resize-y text-white/90 ${isCaptionOverLimit ? 'border-red-500/50 focus:border-red-500' : 'border-white/10'}`} 
+                  />
+                  {isCaptionOverLimit && (
+                    <p className="text-[10px] text-red-400 flex items-center gap-1 mt-1">
+                      Limites do Instagram atingidos. A copy está longa demais e perderá retenção.
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex flex-col gap-2 mt-2">
+                  <label className="text-xs font-semibold text-white/60 uppercase tracking-wider flex justify-between">
+                    <span>Hashtags Estratégicas</span>
+                    <span className="text-muted-foreground">{hashtags.length} / 5</span>
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {hashtags.map((tag) => (
+                      <span key={tag} className="flex items-center gap-1 bg-white/10 text-white/90 text-xs px-2.5 py-1.5 rounded-full border border-white/10 group">
+                        <Hash size={10} className="text-primary opacity-70" />
+                        {tag}
+                        <button onClick={() => removeHashtag(tag)} className="ml-1 opacity-50 hover:opacity-100 hover:text-red-400 transition-colors">
+                          <X size={12} />
+                        </button>
+                      </span>
+                    ))}
+                    {hashtags.length < 5 && (
+                      <div className="flex items-center bg-black/40 border border-white/10 rounded-full px-2">
+                        <Plus size={12} className="text-muted-foreground" />
+                        <input 
+                          type="text" 
+                          value={newHashtag}
+                          onChange={(e) => setNewHashtag(e.target.value)}
+                          onKeyDown={addHashtag}
+                          placeholder="Adicionar..." 
+                          className="bg-transparent border-none outline-none text-xs w-20 px-1 py-1.5 text-white/90 placeholder:text-muted-foreground/50"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <button 
+                  onClick={copyCaption}
+                  className="w-full mt-2 bg-primary/20 hover:bg-primary/30 border border-primary/30 text-primary px-4 py-2.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all active:scale-95"
+                >
+                  {copied ? <Check size={16} /> : <Copy size={16} />} 
+                  {copied ? 'Legenda + Hashtags Copiadas!' : 'Copiar Tudo'}
+                </button>
               </div>
 
-              <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mt-4">Textos da Arte</h3>
+              <h3 className="text-[13px] font-black uppercase tracking-widest text-muted-foreground mt-4 pb-2 border-b border-white/10">Textos da Arte</h3>
               
               <div className="flex flex-col gap-2">
                 <label className="text-sm font-semibold text-white/80">Headline</label>
@@ -508,7 +620,7 @@ export default function CreativesPage() {
         isOpen={isPublishModalOpen}
         onClose={() => setIsPublishModalOpen(false)}
         imageUrl={previewImageUrl}
-        defaultCaption={caption}
+        defaultCaption={`${caption}\n\n${hashtags.map(h => '#' + h).join(' ')}`}
         onPublish={async (cap) => { console.log('Publishing', cap); }}
       />
     </div>

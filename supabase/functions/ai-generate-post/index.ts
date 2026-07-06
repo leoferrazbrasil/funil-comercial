@@ -77,7 +77,8 @@ serve(async (req) => {
           subheadline: `[MOCK] O pilar é ${pilar} e o objetivo é ${objective}.`,
           highlight_word: `LEADS`,
           footer_tags: `${pilar.toUpperCase()} + INTELIGÊNCIA`,
-          caption: `Atenção: Esta é uma copy de teste porque as API Keys (OpenAI e Gemini) não estão configuradas no backend. Para que a IA funcione de verdade, você precisa rodar:\n\nnpx supabase secrets set OPENAI_API_KEY=sua_chave\n\nMas a sua ideia era: ${idea}`,
+          caption: `Atenção: Esta é uma copy de teste porque as API Keys não estão configuradas no backend. Para que a IA funcione de verdade, configure as secrets. A sua ideia era: ${idea}`,
+          hashtags: ["gestaocomercial", "crm", "vendas", "produtividade", "funildevendas"],
           recommended_template_id: 't1'
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
@@ -85,19 +86,30 @@ serve(async (req) => {
     }
 
     const systemPrompt = `
-      Você é um especialista em Social Media e Copywriting do "Funil Comercial", uma ferramenta B2B.
-      O seu tom de voz é: direto, profissional, estratégico, didático e orientado a resultado.
-      Nunca faça promessas irreais ou use jargões comerciais exagerados.
+      Você é um Especialista em Social Media Sênior, Product Owner e Copywriter do "Funil Comercial", uma ferramenta B2B.
+      Sua missão é gerar o conteúdo da arte E uma legenda altamente estratégica.
+      
+      Regras da Legenda (Caption):
+      1. DEVE ter no máximo 350 caracteres.
+      2. Deve ser clara, objetiva e estratégica, reforçando a mensagem principal da arte.
+      3. Deve conter uma chamada para ação (CTA) sutil quando fizer sentido.
+      4. Evite excesso de emojis, promessas exageradas ou linguagem genérica.
+      5. Nunca inclua hashtags dentro do texto da legenda.
+      
+      Regras das Hashtags:
+      1. Gere EXATAMENTE um array com até 5 hashtags estratégicas (sem o símbolo #).
+      2. Priorize termos relacionados a: gestão comercial, CRM, vendas, funil de vendas, automação comercial, inteligência artificial, produtividade comercial, atendimento pelo WhatsApp, geração de leads, previsibilidade de vendas.
       
       Você vai receber os parâmetros de um post de Instagram.
-      Retorne APENAS um JSON válido seguindo esta estrutura (sem formatação markdown como \`\`\`json):
+      Retorne APENAS um JSON válido seguindo estritamente esta estrutura:
       {
         "headline": "Título principal curto (use \\n para quebrar linha se tiver mais de 4 palavras)",
         "subheadline": "Frase de apoio ou subtítulo explicando a headline (1 a 2 linhas curtas)",
-        "highlight_word": "A palavra mais importante da headline (exata) para destacarmos com a cor primária da marca",
+        "highlight_word": "A palavra mais importante da headline (exata) para destacarmos com a cor primária",
         "footer_tags": "2 ou 3 palavras curtas separadas por +, ex: VENDAS + CRM + IA",
-        "caption": "A legenda completa do post, contendo gancho, desenvolvimento, chamada pra ação (CTA) e hashtags (sempre incluindo #funilcomercial)",
-        "recommended_template_id": "t1" // Escolha entre: "t1" (Posicionamento/Impacto), "t4" (Lista/Passo a Passo), "t12" (Prova Social / Frase aspas)
+        "caption": "A legenda estratégica (MÁXIMO 350 CARACTERES), contendo gancho, desenvolvimento e CTA (SEM HASHTAGS AQUI).",
+        "hashtags": ["gestaocomercial", "crm", "vendas"],
+        "recommended_template_id": "t1" // Escolha entre: "t1" (Impacto), "t4" (Passo a Passo), "t12" (Prova Social)
       }
     `;
 
