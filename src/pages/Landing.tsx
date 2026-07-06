@@ -401,7 +401,13 @@ export default function LandingPage() {
             </div>
             <div className="flex flex-col items-center md:items-start gap-1">
               <p className="text-xs md:text-sm text-muted-foreground">© {new Date().getFullYear()} {brandConfig.name}. Todos os direitos reservados.</p>
-              <p className="text-[10px] md:text-xs text-muted-foreground/60">CNPJ: 65.993.728/0001-07</p>
+              <div className="text-[10px] md:text-xs text-muted-foreground/80 mt-2 text-center md:text-left space-y-1">
+                <p>Funil Comercial é uma marca operada por LEONARDO FERRAZ DA SILVA BRASIL.</p>
+                <p>Razão social: LEONARDO FERRAZ DA SILVA BRASIL</p>
+                <p>CNPJ: 65.993.728/0001-07</p>
+                <p>E-mail: <a href="mailto:funil@funilcomercial.com" className="hover:text-primary transition-colors">funil@funilcomercial.com</a></p>
+                <p>Site: <a href="https://funilcomercial.com" className="hover:text-primary transition-colors">https://funilcomercial.com</a></p>
+              </div>
             </div>
           </div>
           <div className="flex gap-6">
