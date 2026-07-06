@@ -1,3 +1,12 @@
+-- Função genérica para atualizar a coluna updated_at
+CREATE OR REPLACE FUNCTION update_modified_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
 -- Tabela para armazenar as integrações com redes sociais
 CREATE TABLE public.social_integrations (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
