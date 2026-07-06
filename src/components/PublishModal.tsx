@@ -65,7 +65,8 @@ export default function PublishModal({ isOpen, onClose, imageUrl, defaultCaption
   const handleLogin = () => {
     const appId = import.meta.env.VITE_META_APP_ID;
     if (!appId) {
-      setErrorMessage("O ID do Aplicativo Meta (VITE_META_APP_ID) não está configurado. Verifique as configurações de ambiente.");
+      setErrorMessage("O ID do Aplicativo Meta (VITE_META_APP_ID) não está configurado. Verifique as configurações de ambiente (.env).");
+      setStatus("error");
       return;
     }
     
