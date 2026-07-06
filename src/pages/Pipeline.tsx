@@ -414,7 +414,7 @@ function PipelineCard({
         // Prevent click if dragging
         if (!transform) onClick(item);
       }}
-      className={`group w-full min-w-0 bg-card p-4 flex flex-col gap-3 rounded-2xl border transition-all cursor-grab active:cursor-grabbing hover:border-primary/50 relative overflow-hidden
+      className={`group w-full min-w-0 max-w-full bg-card p-4 flex flex-col gap-3 rounded-2xl border transition-all cursor-grab active:cursor-grabbing hover:border-primary/50 relative overflow-hidden
         ${isDragging ? 'shadow-2xl border-primary scale-[1.03] rotate-2' : 'border-white/10 shadow-sm'}
         ${showWarning ? 'border-amber-500/30' : ''}
       `}
@@ -426,9 +426,9 @@ function PipelineCard({
         </div>
       )}
 
-      <div className="w-full min-w-0">
-        <h3 className="font-bold text-sm text-foreground leading-tight truncate pr-16 w-full">{item.titulo}</h3>
-        <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider mt-1 block truncate w-full">
+      <div className="w-full min-w-0 max-w-full overflow-hidden">
+        <h3 className="font-bold text-sm text-foreground leading-tight truncate pr-16 w-full break-all">{item.titulo}</h3>
+        <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider mt-1 block truncate w-full break-all">
           {item.lead_id ? "Lead" : "Contato"}
         </span>
       </div>
@@ -437,7 +437,7 @@ function PipelineCard({
         <strong className="text-xl font-black tracking-tight text-primary">{formatMoney(Number(item.valor))}</strong>
       </div>
       
-      <div className="bg-white/5 p-2 rounded-xl border border-white/5 w-full min-w-0">
+      <div className="bg-white/5 p-2 rounded-xl border border-white/5 w-full min-w-0 max-w-full overflow-hidden">
         <p className="text-xs text-muted-foreground font-medium flex items-start gap-1.5 leading-snug">
           <Target size={14} className="shrink-0 mt-0.5" /> 
           <span className="min-w-0 flex-1 break-words line-clamp-3">
@@ -476,7 +476,7 @@ function PipelineColumn({ column, onCardClick }: { column: any, onCardClick: (it
   return (
     <div
       ref={setNodeRef}
-      className={`flex flex-col min-w-[85vw] w-[85vw] md:min-w-[340px] md:w-[340px] rounded-[1.5rem] bg-card/40 border border-white/5 overflow-hidden transition-colors ${isOver ? "bg-primary/5 border-primary/30 ring-1 ring-primary/30" : ""}`}
+      className={`flex flex-col min-w-[85vw] w-[85vw] max-w-[85vw] md:min-w-[340px] md:w-[340px] md:max-w-[340px] rounded-[1.5rem] bg-card/40 border border-white/5 overflow-hidden transition-colors ${isOver ? "bg-primary/5 border-primary/30 ring-1 ring-primary/30" : ""}`}
     >
       <header className="flex items-center justify-between p-5 border-b border-white/5 bg-background/50 backdrop-blur-md sticky top-0 z-10">
         <div className="flex flex-col">
@@ -484,7 +484,7 @@ function PipelineColumn({ column, onCardClick }: { column: any, onCardClick: (it
         </div>
         <strong className="text-xs font-black bg-white/10 text-muted-foreground px-2.5 py-1 rounded-full shadow-inner">{column.items.length}</strong>
       </header>
-      <div className="flex-1 p-3 space-y-3 overflow-y-auto min-h-[150px] relative">
+      <div className="flex-1 p-3 space-y-3 overflow-y-auto overflow-x-hidden min-h-[150px] relative w-full max-w-full">
         {isOver && (
           <div className="absolute inset-0 bg-primary/5 z-0 pointer-events-none rounded-b-[1.5rem]" />
         )}
