@@ -46,6 +46,7 @@ import LandingPage from "./pages/Landing";
 import BrandbookPage from "./pages/Brandbook";
 import SignUpScreen from "./pages/SignUp";
 import LoginScreen from "./pages/Login";
+import PipelinePage from "./pages/Pipeline";
 import ProfilePage from "./pages/Profile";
 import Logo from "./components/Logo";
 import {
@@ -2051,111 +2052,6 @@ function PipelineRiskItem({
         Ajustar
       </button>
     </article>
-  );
-}
-
-function PipelinePage({
-  leads,
-  opportunities,
-  onEditOpportunity,
-  onOpenModal,
-  onDragEnd,
-}: {
-  leads: Lead[];
-  opportunities: CrmSnapshot["opportunities"];
-  onEditOpportunity: (opportunity: Opportunity) => void;
-  onOpenModal: (modal: ModalType) => void;
-  onDragEnd: (event: any) => void;
-}) {
-  const grouped = useMemo(
-    () =>
-      stages.map((stage) => ({
-        stage,
-        items: opportunities.filter((item) => item.etapa === stage),
-        onEdit: onEditOpportunity,
-      })),
-    [onEditOpportunity, opportunities],
-  );
-  const openOpportunities = opportunities.filter(isOpenOpportunity);
-  const weakActionCount = openOpportunities.filter(isWeakNextAction).length;
-  const noValueCount = openOpportunities.filter(
-    (opportunity) => Number(opportunity.valor) <= 0,
-  ).length;
-  const closingCount = openOpportunities.filter(isClosingStage).length;
-  const openValue = openOpportunities.reduce(
-    (sum, opportunity) => sum + Number(opportunity.valor),
-    0,
-  );
-  const pipelineRisks = buildPipelineRisks(opportunities);
-
-  return (
-    <div className="page-stack">
-      <PageIntro
-        action="Nova oportunidade"
-        description="Visualize oportunidades por etapa e mantenha sempre uma próxima ação definida. Arraste os cards para mover."
-        eyebrow="Pipeline"
-        title="Funil de vendas"
-        onAction={() => onOpenModal(leads.length ? "opportunity" : "lead")}
-      />
-
-      <section className="pipeline-health-grid" aria-label="Saude do funil">
-        <PipelineSignalCard
-          icon={TrendingUp}
-          label="Pipeline aberto"
-          value={formatMoney(openValue)}
-          hint={`${openOpportunities.length} oportunidade(s) em andamento`}
-          tone="success"
-        />
-        <PipelineSignalCard
-          icon={Clock3}
-          label="Sem proxima acao"
-          value={String(weakActionCount)}
-          hint="Precisam de compromisso claro"
-          tone={weakActionCount ? "warning" : "success"}
-        />
-        <PipelineSignalCard
-          icon={CircleDollarSign}
-          label="Sem valor"
-          value={String(noValueCount)}
-          hint="Afetam previsao comercial"
-          tone={noValueCount ? "warning" : "success"}
-        />
-        <PipelineSignalCard
-          icon={Target}
-          label="Etapas finais"
-          value={String(closingCount)}
-          hint="Proposta ou negociacao"
-        />
-      </section>
-
-      <Panel title="Higiene do funil" eyebrow="Riscos operacionais">
-        {pipelineRisks.length ? (
-          <div className="pipeline-risk-list">
-            {pipelineRisks.map((risk) => (
-              <PipelineRiskItem
-                key={risk.id}
-                risk={risk}
-                onEdit={onEditOpportunity}
-              />
-            ))}
-          </div>
-        ) : (
-          <EmptyState
-            action="Nova oportunidade"
-            description="Nenhum risco operacional detectado no funil aberto."
-            onAction={() => onOpenModal(leads.length ? "opportunity" : "lead")}
-          />
-        )}
-      </Panel>
-
-      <DndContext onDragEnd={onDragEnd}>
-        <section className="pipeline-board" aria-label="Funil de vendas">
-          {grouped.map((column) => (
-            <PipelineColumn key={column.stage} column={column} />
-          ))}
-        </section>
-      </DndContext>
-    </div>
   );
 }
 

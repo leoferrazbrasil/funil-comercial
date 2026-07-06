@@ -1,12 +1,22 @@
 const fs = require('fs');
-let content = fs.readFileSync('src/pages/Dashboard.tsx', 'utf8');
-const lines = content.split('\n');
+const lines = fs.readFileSync('src/App.tsx', 'utf8').split('\n');
 
-const newImports = `import { HeroPanel, PageIntro, MetricCard, Panel, ActionItem, TablePanel, EmptyState, Modal, ContactModal, LeadModal, OpportunityModal, MessageModal, ChannelModal, EntityForm, TextField, SelectField, LoadingScreen } from "../components/SharedUI";
-import type { Session } from "@supabase/supabase-js";
-import type { LucideIcon } from "lucide-react";
-import { Calendar, Bell, CheckCircle2, CircleDollarSign, Clock3, LogOut, MessageCircle, MoveRight, Pencil, Plus, Send, Search, ShieldCheck, Sparkles, Target, TrendingUp, UsersRound, RotateCcw, Moon, Sun, X } from "lucide-react";`;
+const startIndex = lines.findIndex(l => l.startsWith('function PipelinePage({'));
+if (startIndex === -1) throw new Error("Could not find PipelinePage");
+let endIndex = startIndex;
+while (!lines[endIndex].startsWith('}')) {
+  endIndex++;
+}
+while (!lines[endIndex].startsWith('function HeroPanel')) {
+  endIndex++;
+}
 
-lines.splice(0, 16, newImports);
+const newLines = [
+  ...lines.slice(0, 48),
+  'import PipelinePage from "./pages/Pipeline";',
+  ...lines.slice(48, startIndex),
+  ...lines.slice(endIndex)
+];
 
-fs.writeFileSync('src/pages/Dashboard.tsx', lines.join('\n'));
+fs.writeFileSync('src/App.tsx', newLines.join('\n'));
+console.log("Replaced PipelinePage in App.tsx!");
