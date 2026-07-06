@@ -685,7 +685,7 @@ export default function InboxPage({
         </div>
 
         {/* Chat Footer / Composer */}
-        <div className="p-4 pb-8 lg:pb-4 bg-card/80 border-t border-white/5 shrink-0">
+        <div className="p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] lg:pb-4 bg-card/80 border-t border-white/5 shrink-0">
           <form onSubmit={handleReplySubmit} className="flex items-end gap-3 max-w-4xl mx-auto">
             <div className="flex-1 bg-black/40 rounded-2xl border border-white/10 overflow-hidden focus-within:border-primary/50 transition-colors">
               <textarea

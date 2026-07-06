@@ -524,10 +524,15 @@ export function Modal({
   onClose: () => void;
 }) {
   return (
-    <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4" role="presentation">
-      <section aria-modal="true" className="bg-card border border-white/10 shadow-lg rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto flex flex-col" role="dialog">
-        <header className="flex justify-between items-center p-6 border-b border-white/5"><h2 className="text-lg font-semibold text-foreground">{title}</h2><button aria-label="Fechar" className="p-2 rounded-md hover:bg-white/5 transition-colors text-muted-foreground hover:text-foreground" onClick={onClose}><X size={18} /></button></header>
-        {children}
+    <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4" role="presentation">
+      <section aria-modal="true" className="bg-card border border-white/10 shadow-2xl rounded-t-2xl sm:rounded-xl w-full max-w-lg max-h-[90dvh] flex flex-col animate-in slide-in-from-bottom-1/2 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200" role="dialog">
+        <header className="flex justify-between items-center p-5 sm:p-6 border-b border-white/5 shrink-0">
+          <h2 className="text-lg font-semibold text-foreground">{title}</h2>
+          <button aria-label="Fechar" className="p-2 -mr-2 rounded-md hover:bg-white/5 transition-colors text-muted-foreground hover:text-foreground" onClick={onClose}><X size={18} /></button>
+        </header>
+        <div className="overflow-y-auto flex-1 custom-scrollbar">
+          {children}
+        </div>
       </section>
     </div>
   );

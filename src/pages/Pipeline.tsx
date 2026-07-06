@@ -742,7 +742,7 @@ export default function PipelinePage({
       <div className="flex-1 overflow-hidden relative">
         <DndContext onDragEnd={onDragEnd}>
           {/* Scrollable Container just for the Board */}
-          <section className="absolute inset-0 flex gap-4 overflow-x-auto pb-28 md:pb-4 custom-scrollbar" aria-label="Funil de vendas">
+          <section className="absolute inset-0 flex gap-4 overflow-x-auto pb-[calc(7rem+env(safe-area-inset-bottom))] md:pb-4 custom-scrollbar" aria-label="Funil de vendas">
             {grouped.map((column) => (
               <PipelineColumn key={column.stage} column={column} onCardClick={(o) => setSelectedOppId(o.id)} />
             ))}
