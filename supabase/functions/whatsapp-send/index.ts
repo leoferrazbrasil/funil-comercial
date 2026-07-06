@@ -79,7 +79,7 @@ async function getActiveWhatsAppChannel(supabase: SupabaseClientAny, ownerId: st
     .from("integration_channels")
     .select("*")
     .eq("owner_id", ownerId)
-    .in("provider", ["whatsapp", "whatsapp_cloud", "evolution_api"])
+    .in("provider", ["whatsapp", "whatsapp_cloud", "evolution_api", "z-api"])
     .eq("status", "ativo")
     .order("created_at", { ascending: false })
     .limit(1)
@@ -212,6 +212,47 @@ async function sendEvolutionTextMessage(instanceName: string, toPhone: string, m
   };
 }
 
+async function sendZApiTextMessage(instanceId: string, token: string, toPhone: string, message: string) {
+  const clientToken = Deno.env.get("ZAPI_CLIENT_TOKEN");
+
+  if (!instanceId || !token) {
+    return {
+      configured: false,
+      response: null as JsonRecord | null,
+    };
+  }
+
+  const response = await fetch(`https://api.z-api.io/instances/${instanceId}/token/${token}/send-text`, {
+    method: "POST",
+    headers: {
+      "Client-Token": clientToken || "",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      phone: toPhone,
+      message: message,
+    }),
+  });
+
+  const responseBody = (await response.json().catch(() => ({}))) as JsonRecord;
+  if (!response.ok) {
+    console.error(
+      JSON.stringify({
+        event: "whatsapp_send_zapi_error",
+        status: response.status,
+        to_last4: toPhone.slice(-4),
+        error_message: responseBody,
+      }),
+    );
+    throw new Error(`Z-API Error: ${JSON.stringify(responseBody)}`);
+  }
+
+  return {
+    configured: true,
+    response: responseBody,
+  };
+}
+
 function providerMessageId(metaResponse: JsonRecord | null) {
   const messages = Array.isArray(metaResponse?.messages) ? metaResponse.messages : [];
   const firstMessage = messages.find(isRecord);
@@ -266,6 +307,20 @@ Deno.serve(async (request) => {
         });
       }
       messageId = asString((evolutionResult.response?.key as JsonRecord)?.id);
+    } else if (channel.provider === "z-api") {
+      const instanceId = metadataString(channel.metadata, ["instance_id", "instanceId"]);
+      const token = metadataString(channel.metadata, ["token"]);
+      
+      const zapiResult = await sendZApiTextMessage(instanceId ?? "", token ?? "", phone, message);
+      if (!zapiResult.configured) {
+        return jsonResponse({
+          ok: true,
+          sent: false,
+          fallback_allowed: true,
+          reason: "zapi_send_not_configured",
+        });
+      }
+      messageId = asString(zapiResult.response?.messageId);
     } else {
       const phoneNumberId =
         metadataString(channel.metadata, ["phone_number_id", "phoneNumberId"]) ??

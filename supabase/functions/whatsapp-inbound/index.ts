@@ -234,6 +234,50 @@ function extractWhatsAppCloudMessages(payload: JsonRecord): NormalizedInboundMes
   return inboundMessages;
 }
 
+function extractZApiMessages(payload: JsonRecord): NormalizedInboundMessage[] {
+  // Z-API usually sends individual messages or arrays depending on the webhook configuration.
+  // For standard "on-message-received" webhook:
+  if (!payload.instanceId || !payload.phone) return [];
+  if (payload.fromMe === true) return []; // Ignore outgoing messages
+
+  const fromPhone = normalizePhone(asString(payload.phone));
+  const senderName = payloadValue(payload, ["senderName", "contactName"]) ?? fromPhone;
+  const providerMessageId = payloadValue(payload, ["messageId"]);
+  
+  // Actually ZAPI sends connected phone in "connectedPhone" or similar?
+  // Since we don't know the exact toPhone from the webhook payload easily unless it's in connectedPhone
+  // we will try to extract it if available, otherwise just use fromPhone for now and the routing query will match by owner_id and provider anyway?
+  // Wait, the routing matches by channelIdentifiers. ZAPI sends `connectedPhone` in some webhooks.
+  const toPhone = normalizePhone(asString(payload.connectedPhone));
+  const channelIdentifiers = toPhone ? [toPhone] : [];
+
+  let message = "";
+  let messageType = "text";
+
+  if (isRecord(payload.text)) {
+    message = asString(payload.text.message) || "";
+  } else if (isRecord(payload.audio)) {
+    messageType = "audio";
+    message = "Áudio recebido.";
+  } else if (isRecord(payload.image)) {
+    messageType = "image";
+    message = asString(payload.image.caption) || "Imagem recebida.";
+  } else if (isRecord(payload.document)) {
+    messageType = "document";
+    message = asString(payload.document.fileName) || "Documento recebido.";
+  }
+
+  return [{
+    provider: "z-api",
+    providerMessageId,
+    fromPhone,
+    channelIdentifiers,
+    senderName,
+    message,
+    messageType,
+  }];
+}
+
 function normalizeLegacyPayload(payload: JsonRecord): NormalizedInboundMessage {
   const provider =
     payloadValue(payload, ["provider", "Provider"]) ??
@@ -258,6 +302,9 @@ function normalizeLegacyPayload(payload: JsonRecord): NormalizedInboundMessage {
 }
 
 function getInboundMessages(payload: JsonRecord) {
+  const zApiMessages = extractZApiMessages(payload);
+  if (zApiMessages.length > 0) return zApiMessages;
+
   const cloudMessages = extractWhatsAppCloudMessages(payload);
   if (cloudMessages.length > 0) return cloudMessages;
   if (payload.object === "whatsapp_business_account") return [];

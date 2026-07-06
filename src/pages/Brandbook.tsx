@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { brandConfig } from '../lib/branding';
-import { Check, Copy, ChevronRight, Menu, X, Download, CheckCircle2, ShieldAlert } from 'lucide-react';
+import { Check, Copy, ChevronRight, Menu, X, Download, CheckCircle2, ShieldAlert, Target, Users, Briefcase, LayoutGrid, Activity, Building2, Workflow } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Logo from '../components/Logo';
 import SocialMediaSection from '../components/SocialMediaSection';
@@ -43,6 +43,7 @@ function ColorSwatch({ color, name, hex, description }: { color: string, name: s
 
 const SECTIONS = [
   { id: 'visao-geral', label: 'Visão Geral' },
+  { id: 'atuacao-mercado', label: 'Atuação de Mercado' },
   { id: 'logo', label: 'Sistema de Logo' },
   { id: 'cores', label: 'Paleta de Cores' },
   { id: 'tipografia', label: 'Tipografia' },
@@ -170,6 +171,170 @@ export default function BrandbookPage() {
                 <p className="text-sm leading-relaxed text-muted-foreground">
                   Direta, profissional e focada em resultados. Não usamos jargões desnecessários. Nós falamos a língua do fechamento e da eficiência operacional.
                 </p>
+              </div>
+            </div>
+          </section>
+
+          {/* ATUAÇÃO DE MERCADO */}
+          <section id="atuacao-mercado" className="scroll-mt-24 space-y-12">
+            <div>
+              <h2 className="text-3xl font-bold mb-2">Clareza Estratégica de Atuação</h2>
+              <p className="text-muted-foreground">O posicionamento comercial, clientes atendidos e as necessidades que resolvemos.</p>
+            </div>
+            
+            <div className="space-y-6">
+              {/* Grid 1: Segmento e Objetivo */}
+              <div className="grid gap-6 sm:grid-cols-2">
+                <div className="rounded-2xl border border-white/5 bg-card/30 p-8 flex flex-col h-full">
+                  <div className="mb-4 h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                    <Building2 size={24} />
+                  </div>
+                  <h3 className="text-xl font-bold text-foreground mb-3">Segmento de Atuação</h3>
+                  <p className="text-sm leading-relaxed text-muted-foreground flex-1">
+                    Tecnologia para Gestão Comercial B2B e Vendas. O Funil Comercial atua no mercado de SaaS (Software as a Service) voltado para CRM, automação de vendas, gestão centralizada de leads e atendimento digital de alta performance.
+                  </p>
+                </div>
+                
+                <div className="rounded-2xl border border-white/5 bg-card/30 p-8 flex flex-col h-full">
+                  <div className="mb-4 h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                    <Target size={24} />
+                  </div>
+                  <h3 className="text-xl font-bold text-foreground mb-3">Objetivo de Uso</h3>
+                  <p className="text-sm leading-relaxed text-muted-foreground flex-1">
+                    Centralização, Controle e Escala. O Funil Comercial existe para centralizar toda a jornada de vendas, desde o primeiro contato do lead até o fechamento da oportunidade, substituindo planilhas soltas e conversas dispersas por um fluxo de trabalho rastreável e previsível.
+                  </p>
+                </div>
+              </div>
+
+              {/* Grid 2: Clientes e Segmentos */}
+              <div className="grid gap-6 sm:grid-cols-2">
+                <div className="rounded-2xl border border-white/5 bg-card/30 p-8">
+                  <div className="mb-4 h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                    <Users size={24} />
+                  </div>
+                  <h3 className="text-xl font-bold text-foreground mb-4">Principais Clientes Atendidos</h3>
+                  <ul className="space-y-3 text-sm text-muted-foreground">
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 size={16} className="text-primary shrink-0 mt-0.5" />
+                      Empresas com operação comercial ativa e times de vendas.
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 size={16} className="text-primary shrink-0 mt-0.5" />
+                      Negócios que recebem leads e vendem pelo WhatsApp.
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 size={16} className="text-primary shrink-0 mt-0.5" />
+                      Gestores comerciais e prestadores de serviço.
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 size={16} className="text-primary shrink-0 mt-0.5" />
+                      PMEs em processo de estruturação comercial que desejam previsibilidade.
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="rounded-2xl border border-white/5 bg-card/30 p-8">
+                  <div className="mb-4 h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                    <Briefcase size={24} />
+                  </div>
+                  <h3 className="text-xl font-bold text-foreground mb-4">Segmentos de Clientes</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {['Consultorias', 'Agências', 'Prestadores de Serviço', 'Imobiliárias', 'Clínicas', 'Escolas e Cursos', 'Negócios Locais', 'Empresas B2B', 'Operações Digitais'].map((badge) => (
+                      <span key={badge} className="px-3 py-1.5 rounded-lg border border-white/5 bg-white/5 text-xs font-medium text-foreground">
+                        {badge}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Grid 3: Funcionalidades e Atividades */}
+              <div className="grid gap-6 sm:grid-cols-2">
+                <div className="rounded-2xl border border-white/5 bg-card/30 p-8">
+                  <div className="mb-4 h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                    <LayoutGrid size={24} />
+                  </div>
+                  <h3 className="text-xl font-bold text-foreground mb-4">Funcionalidades mais Utilizadas</h3>
+                  <ul className="space-y-3 text-sm text-muted-foreground">
+                    <li className="flex items-start gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary shrink-0 mt-1.5" />
+                      <span><strong>Inbox Omnichannel:</strong> Gestão de WhatsApp e acompanhamento de conversas.</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary shrink-0 mt-1.5" />
+                      <span><strong>Funil de Vendas:</strong> Movimentação de oportunidades no kanban.</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary shrink-0 mt-1.5" />
+                      <span><strong>Leads e Contatos:</strong> Organização de histórico comercial completo.</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary shrink-0 mt-1.5" />
+                      <span><strong>Dashboard:</strong> Visualização de indicadores em tempo real.</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary shrink-0 mt-1.5" />
+                      <span><strong>Criativos e Brandbook:</strong> Apoio visual e estratégico.</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="rounded-2xl border border-white/5 bg-card/30 p-8">
+                  <div className="mb-4 h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                    <Activity size={24} />
+                  </div>
+                  <h3 className="text-xl font-bold text-foreground mb-4">Principais Atividades Executadas</h3>
+                  <ul className="space-y-3 text-sm text-muted-foreground">
+                    <li className="flex items-start gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary shrink-0 mt-1.5" />
+                      <span>Registrar novos contatos e qualificar leads.</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary shrink-0 mt-1.5" />
+                      <span>Atender clientes via conversas do WhatsApp.</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary shrink-0 mt-1.5" />
+                      <span>Criar, movimentar e acompanhar oportunidades no funil.</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary shrink-0 mt-1.5" />
+                      <span>Organizar e executar follow-ups diários.</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary shrink-0 mt-1.5" />
+                      <span>Visualizar indicadores de performance da operação.</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* Bloco 4: Necessidades */}
+              <div className="rounded-2xl border border-white/5 bg-card/30 p-8">
+                <div className="mb-4 h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                  <Workflow size={24} />
+                </div>
+                <h3 className="text-xl font-bold text-foreground mb-4">Necessidades Resolvidas (Dores)</h3>
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground text-sm">Organização e Histórico</h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Resolve a perda de leads, o atendimento disperso no WhatsApp e a ausência de um histórico centralizado de conversas.
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground text-sm">Processos e Previsibilidade</h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Cura a dificuldade de acompanhar oportunidades ativas, a falta de processo comercial e a falta de previsibilidade em vendas.
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground text-sm">Produtividade e Métricas</h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Elimina follow-ups esquecidos, a baixa produtividade da equipe e a dificuldade de medir resultados com a ausência de visão do funil.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </section>

@@ -4,6 +4,7 @@ import { IMaskInput } from "react-imask";
 import { toast } from "react-hot-toast";
 import { updateProfile, updateUserSecurity, uploadAvatar } from "../lib/crmService";
 import type { Profile } from "../lib/types";
+import { WhatsAppIntegration } from "../components/WhatsAppIntegration";
 
 type ProfilePageProps = {
   profile: Profile | null;
@@ -254,6 +255,10 @@ export default function ProfilePage({ profile, onProfileUpdated }: ProfilePagePr
               </label>
             </div>
           </div>
+        </div>
+
+        <div className="panel p-6">
+          <WhatsAppIntegration />
         </div>
 
         <div className={`fixed bottom-0 left-0 right-0 p-4 md:p-6 flex justify-center z-50 transition-transform duration-300 ${hasChanges ? 'translate-y-0' : 'translate-y-full'}`}>
