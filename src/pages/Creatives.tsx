@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import * as htmlToImage from "html-to-image";
-import { Download, LayoutTemplate, Type, Image as ImageIcon, Wand2, RefreshCw, Instagram } from "lucide-react";
+import { Download, LayoutTemplate, Type, Image as ImageIcon, Wand2, RefreshCw, Share2 } from "lucide-react";
 import Logo from "../components/Logo";
 import PublishModal from "../components/PublishModal";
 
@@ -187,7 +187,7 @@ export default function CreativesPage() {
             onClick={handleOpenPublishModal} 
             className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white px-6 py-3 rounded-xl font-bold shadow-xl transition-all active:scale-95"
           >
-            <Instagram size={18} />
+            <Share2 size={18} />
             <span>Publicar</span>
           </button>
         </div>

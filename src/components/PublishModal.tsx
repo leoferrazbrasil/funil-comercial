@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { X, Instagram, Send, Info, CheckCircle2, AlertTriangle, RefreshCw } from "lucide-react";
+import { X, Send, Info, CheckCircle2, AlertTriangle, RefreshCw, Share2 } from "lucide-react";
 
 type PublishModalProps = {
   isOpen: boolean;
@@ -39,7 +39,7 @@ export default function PublishModal({ isOpen, onClose, imageUrl, defaultCaption
         {/* Left Side: Preview */}
         <div className="w-full md:w-1/2 bg-[#09090B] p-6 flex flex-col justify-center items-center relative border-b md:border-b-0 md:border-r border-white/5">
           <div className="absolute top-4 left-4 flex items-center gap-2 text-white/50 text-xs font-bold uppercase tracking-wider">
-            <Instagram size={14} /> Prévia do Post
+            <Share2 size={14} /> Prévia do Post
           </div>
           
           {imageUrl ? (
