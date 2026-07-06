@@ -1,7 +1,8 @@
 import React, { useState, useRef } from "react";
 import * as htmlToImage from "html-to-image";
-import { Download, LayoutTemplate, Type, Image as ImageIcon, Wand2, RefreshCw } from "lucide-react";
+import { Download, LayoutTemplate, Type, Image as ImageIcon, Wand2, RefreshCw, Instagram } from "lucide-react";
 import Logo from "../components/Logo";
+import PublishModal from "../components/PublishModal";
 
 // 1. Definition of Templates and Formats
 const FORMATS = [
@@ -29,6 +30,8 @@ export default function CreativesPage() {
   const [tags, setTags] = useState("AQUISIÇÃO + CRM + IA");
   
   const [isExporting, setIsExporting] = useState(false);
+  const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
+  const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
 
   const handleExport = async () => {
@@ -48,6 +51,31 @@ export default function CreativesPage() {
     } finally {
       setIsExporting(false);
     }
+  };
+
+  const handleOpenPublishModal = async () => {
+    if (!canvasRef.current) return;
+    setIsPublishModalOpen(true);
+    setPreviewImageUrl(null);
+    try {
+      const dataUrl = await htmlToImage.toJpeg(canvasRef.current, {
+        quality: 0.9,
+        pixelRatio: 1, // For JPEG, API recommends good quality.
+      });
+      setPreviewImageUrl(dataUrl);
+    } catch (err) {
+      console.error("Erro ao gerar preview", err);
+    }
+  };
+
+  const handlePublishToInstagram = async (caption: string) => {
+    // 🚧 MOCK: Aqui a Edge Function do Supabase entraria em cena para fazer o upload e enviar para a Meta
+    console.log("Publishing to Instagram with caption:", caption);
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        resolve();
+      }, 3000);
+    });
   };
 
   return (
@@ -145,14 +173,22 @@ export default function CreativesPage() {
            <button onClick={() => setActiveTab("content")} className="px-4 py-2 bg-card rounded-lg text-sm font-semibold shadow-xl border border-white/10">Voltar para Edição</button>
         </div>
 
-        <div className="absolute top-4 right-4 z-50">
+        <div className="absolute top-4 right-4 z-40 flex items-center gap-3">
           <button 
             onClick={handleExport} 
             disabled={isExporting}
-            className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-xl font-bold shadow-xl transition-transform active:scale-95 disabled:opacity-50"
+            className="flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white px-4 py-3 rounded-xl font-bold transition-colors active:scale-95 disabled:opacity-50"
           >
             {isExporting ? <RefreshCw className="animate-spin" size={18} /> : <Download size={18} />}
-            {isExporting ? "Gerando..." : "Exportar Arte"}
+            <span className="hidden md:inline">Baixar</span>
+          </button>
+          
+          <button 
+            onClick={handleOpenPublishModal} 
+            className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white px-6 py-3 rounded-xl font-bold shadow-xl transition-all active:scale-95"
+          >
+            <Instagram size={18} />
+            <span>Publicar</span>
           </button>
         </div>
 
@@ -179,6 +215,14 @@ export default function CreativesPage() {
            </div>
         </div>
       </div>
+      
+      <PublishModal 
+        isOpen={isPublishModalOpen}
+        onClose={() => setIsPublishModalOpen(false)}
+        imageUrl={previewImageUrl}
+        defaultCaption={`Transforme sua operação comercial com o Funil Comercial.\n\n${tags.split('+').map(t => `#${t.trim().replace(/\s+/g, '')}`).join(' ')}`}
+        onPublish={handlePublishToInstagram}
+      />
     </div>
   );
 }
