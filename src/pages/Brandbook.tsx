@@ -3,6 +3,7 @@ import { brandConfig } from '../lib/branding';
 import { Check, Copy, ChevronRight, Menu, X, Download, CheckCircle2, ShieldAlert } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Logo from '../components/Logo';
+import SocialMediaSection from '../components/SocialMediaSection';
 
 function ColorSwatch({ color, name, hex, description }: { color: string, name: string, hex: string, description: string }) {
   const [copied, setCopied] = useState(false);
@@ -46,6 +47,7 @@ const SECTIONS = [
   { id: 'tipografia', label: 'Tipografia' },
   { id: 'ui', label: 'UI & Componentes' },
   { id: 'tom-de-voz', label: 'Tom de Voz' },
+  { id: 'social-media', label: 'Guia Editorial (Social)' },
 ];
 
 export default function BrandbookPage() {
@@ -418,6 +420,11 @@ export default function BrandbookPage() {
                 </ul>
               </div>
             </div>
+          </section>
+
+          {/* SOCIAL MEDIA */}
+          <section id="social-media" className="scroll-mt-24">
+            <SocialMediaSection />
           </section>
           
         </div>
