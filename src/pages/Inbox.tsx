@@ -804,10 +804,10 @@ export default function InboxPage({
     if (!selectedConversation) return null;
 
     return (
-      <div className={`flex-col bg-background lg:bg-card border-l border-border h-full overflow-y-auto ${mobileView === "context" ? "flex animate-in slide-in-from-right duration-200 absolute inset-0 z-50 lg:static" : "hidden lg:flex"} w-full lg:w-[320px] xl:w-[380px] shrink-0`}>
+      <div className={`flex-col bg-background border-l border-border h-full overflow-y-auto ${mobileView === "context" ? "flex animate-in slide-in-from-right duration-200 absolute inset-0 z-50 lg:static" : "hidden lg:flex"} w-full lg:w-[320px] xl:w-[380px] shrink-0`}>
         
         {/* Mobile header for context */}
-        <div className="lg:hidden h-16 shrink-0 border-b border-border bg-card/80 backdrop-blur-md flex items-center px-4 shadow-sm z-10 sticky top-0">
+        <div className="lg:hidden h-16 shrink-0 border-b border-border bg-background/80 backdrop-blur-md flex items-center px-4 shadow-sm z-10 sticky top-0">
           <button onClick={() => setMobileView("chat")} className="p-2.5 -ml-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-foreground hover:bg-white/10 transition-colors gap-2">
             <MoveRight size={22} className="rotate-180 shrink-0" /> <span className="font-bold text-sm">Voltar ao Chat</span>
           </button>
@@ -857,7 +857,7 @@ export default function InboxPage({
 
                 <button
                   type="button"
-                  className={`w-full py-2.5 px-3 rounded-xl text-[13px] font-bold transition-all ${conversationHasContactLink ? 'bg-muted text-muted-foreground cursor-not-allowed border border-border' : 'bg-secondary hover:bg-secondary/80 text-secondary-foreground border border-border hover:border-border/80 shadow-sm'}`}
+                  className={`w-full py-2.5 px-3 rounded-xl text-[13px] font-bold transition-all ${conversationHasContactLink ? 'bg-muted text-muted-foreground cursor-not-allowed border border-border' : 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_4px_14px_0_rgba(37,99,235,0.25)] hover:shadow-[0_6px_20px_rgba(37,99,235,0.3)]'}`}
                   disabled={isSaving || !sourceMessage || conversationHasContactLink}
                   onClick={() => sourceMessage && onCreateContact(sourceMessage)}
                 >
@@ -866,10 +866,10 @@ export default function InboxPage({
               </div>
 
               {/* Lead Link */}
-              <div className={`p-4.5 rounded-2xl border flex flex-col gap-3.5 shadow-sm transition-all ${linkedLead ? 'bg-card border-green-500/20' : 'bg-card border-primary/20'}`}>
+              <div className={`p-4.5 rounded-2xl border flex flex-col gap-3.5 shadow-sm transition-all ${linkedLead ? 'bg-card border-green-500/20' : 'bg-card border-border'}`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-sm font-bold text-foreground">
-                    <Target size={18} className={linkedLead ? 'text-green-500' : 'text-primary'} />
+                    <Target size={18} className={linkedLead ? 'text-green-500' : 'text-muted-foreground'} />
                     <span>Lead</span>
                   </div>
                   {linkedLead && <CheckCircle2 size={16} className="text-green-500" />}
@@ -890,10 +890,10 @@ export default function InboxPage({
               </div>
 
               {/* Oportunidade Link */}
-              <div className={`p-4.5 rounded-2xl border flex flex-col gap-3.5 shadow-sm transition-all ${linkedOpportunity ? 'bg-card border-green-500/20' : 'bg-card border-primary/20'}`}>
+              <div className={`p-4.5 rounded-2xl border flex flex-col gap-3.5 shadow-sm transition-all ${linkedOpportunity ? 'bg-card border-green-500/20' : 'bg-card border-border'}`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-sm font-bold text-foreground">
-                    <CircleDollarSign size={18} className={linkedOpportunity ? 'text-green-500' : 'text-primary'} />
+                    <CircleDollarSign size={18} className={linkedOpportunity ? 'text-green-500' : 'text-muted-foreground'} />
                     <span>Oportunidade</span>
                   </div>
                   {linkedOpportunity && <CheckCircle2 size={16} className="text-green-500" />}
