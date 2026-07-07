@@ -10,6 +10,7 @@ type NormalizedInboundMessage = {
   senderName: string;
   message: string;
   messageType: string;
+  direction?: "inbound" | "outbound";
   instanceId?: string;
 };
 
@@ -239,7 +240,6 @@ function extractZApiMessages(payload: JsonRecord): NormalizedInboundMessage[] {
   // Z-API usually sends individual messages or arrays depending on the webhook configuration.
   // For standard "on-message-received" webhook:
   if (!payload.instanceId || !payload.phone) return [];
-  if (payload.fromMe === true) return []; // Ignore outgoing messages
 
   const fromPhone = normalizePhone(asString(payload.phone));
   const senderName = payloadValue(payload, ["senderName", "contactName"]) ?? fromPhone;
@@ -276,6 +276,7 @@ function extractZApiMessages(payload: JsonRecord): NormalizedInboundMessage[] {
     senderName,
     message,
     messageType,
+    direction: payload.fromMe ? "outbound" : "inbound",
     instanceId: asString(payload.instanceId) || undefined,
   }];
 }
@@ -425,9 +426,9 @@ async function processInboundMessage(
       remetente_nome: inboundMessage.senderName,
       telefone: inboundMessage.fromPhone,
       mensagem: inboundMessage.message,
-      status,
-      unread_count: 1,
-      direction: "inbound",
+      status: inboundMessage.direction === "outbound" ? "nova" : status,
+      unread_count: inboundMessage.direction === "outbound" ? 0 : 1,
+      direction: inboundMessage.direction ?? "inbound",
     })
     .select()
     .single();
