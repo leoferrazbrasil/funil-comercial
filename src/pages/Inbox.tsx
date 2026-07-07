@@ -789,7 +789,7 @@ export default function InboxPage({
             <button
               type="submit"
               disabled={isSaving || !replyText.trim()}
-              className="shrink-0 h-[52px] w-[52px] rounded-2xl bg-primary flex items-center justify-center text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:hover:bg-primary transition-all shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] disabled:shadow-none hover:shadow-[0_6px_20px_rgba(37,99,235,0.23)] hover:-translate-y-0.5 active:translate-y-0"
+              className="shrink-0 h-[52px] w-[52px] rounded-2xl bg-primary flex items-center justify-center text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:hover:bg-primary transition-all shadow-md disabled:shadow-none hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
             >
               {isSaving ? <RotateCcw size={20} className="animate-spin" /> : <Send size={20} className="ml-1" />}
             </button>
@@ -842,7 +842,7 @@ export default function InboxPage({
             
             <div className="flex flex-col gap-4">
               {/* Contato Link */}
-              <div className={`p-4.5 rounded-2xl border flex flex-col gap-3.5 shadow-sm transition-all ${linkedContact ? 'bg-card border-green-500/20' : 'bg-card border-border'}`}>
+              <div className={`p-5 rounded-2xl border flex flex-col gap-3.5 shadow-sm transition-all ${linkedContact ? 'bg-card border-green-500/20' : 'bg-card border-border'}`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-sm font-bold text-foreground">
                     <UsersRound size={18} className={linkedContact ? 'text-green-500' : 'text-muted-foreground'} />
@@ -857,7 +857,7 @@ export default function InboxPage({
 
                 <button
                   type="button"
-                  className={`w-full py-2.5 px-3 rounded-xl text-[13px] font-bold transition-all ${conversationHasContactLink ? 'bg-muted text-muted-foreground cursor-not-allowed border border-border' : 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_4px_14px_0_rgba(37,99,235,0.25)] hover:shadow-[0_6px_20px_rgba(37,99,235,0.3)]'}`}
+                  className={`w-full py-2.5 px-3 rounded-xl text-[13px] font-bold transition-all ${conversationHasContactLink ? 'bg-muted text-muted-foreground cursor-not-allowed border border-border' : 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm hover:shadow-md'}`}
                   disabled={isSaving || !sourceMessage || conversationHasContactLink}
                   onClick={() => sourceMessage && onCreateContact(sourceMessage)}
                 >
@@ -866,7 +866,7 @@ export default function InboxPage({
               </div>
 
               {/* Lead Link */}
-              <div className={`p-4.5 rounded-2xl border flex flex-col gap-3.5 shadow-sm transition-all ${linkedLead ? 'bg-card border-green-500/20' : 'bg-card border-border'}`}>
+              <div className={`p-5 rounded-2xl border flex flex-col gap-3.5 shadow-sm transition-all ${linkedLead ? 'bg-card border-green-500/20' : 'bg-card border-border'}`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-sm font-bold text-foreground">
                     <Target size={18} className={linkedLead ? 'text-green-500' : 'text-muted-foreground'} />
@@ -881,7 +881,7 @@ export default function InboxPage({
 
                 <button
                   type="button"
-                  className={`w-full py-2.5 px-3 rounded-xl text-[13px] font-bold transition-all ${conversationHasLeadLink ? 'bg-muted text-muted-foreground cursor-not-allowed border border-border' : 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_4px_14px_0_rgba(37,99,235,0.25)] hover:shadow-[0_6px_20px_rgba(37,99,235,0.3)]'}`}
+                  className={`w-full py-2.5 px-3 rounded-xl text-[13px] font-bold transition-all ${conversationHasLeadLink ? 'bg-muted text-muted-foreground cursor-not-allowed border border-border' : 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm hover:shadow-md'}`}
                   disabled={isSaving || !sourceMessage || conversationHasLeadLink}
                   onClick={() => sourceMessage && onCreateLead(sourceMessage)}
                 >
@@ -890,7 +890,7 @@ export default function InboxPage({
               </div>
 
               {/* Oportunidade Link */}
-              <div className={`p-4.5 rounded-2xl border flex flex-col gap-3.5 shadow-sm transition-all ${linkedOpportunity ? 'bg-card border-green-500/20' : 'bg-card border-border'}`}>
+              <div className={`p-5 rounded-2xl border flex flex-col gap-3.5 shadow-sm transition-all ${linkedOpportunity ? 'bg-card border-green-500/20' : 'bg-card border-border'}`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-sm font-bold text-foreground">
                     <CircleDollarSign size={18} className={linkedOpportunity ? 'text-green-500' : 'text-muted-foreground'} />
@@ -905,7 +905,7 @@ export default function InboxPage({
 
                 <button
                   type="button"
-                  className={`w-full py-2.5 px-3 rounded-xl text-[13px] font-bold transition-all ${conversationHasOpportunityReady ? 'bg-muted text-muted-foreground cursor-not-allowed border border-border' : 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_4px_14px_0_rgba(37,99,235,0.25)] hover:shadow-[0_6px_20px_rgba(37,99,235,0.3)]'}`}
+                  className={`w-full py-2.5 px-3 rounded-xl text-[13px] font-bold transition-all ${conversationHasOpportunityReady ? 'bg-muted text-muted-foreground cursor-not-allowed border border-border' : 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm hover:shadow-md'}`}
                   disabled={isSaving || !sourceMessage || conversationHasOpportunityReady}
                   onClick={() => sourceMessage && onCreateOpportunity(sourceMessage)}
                 >
