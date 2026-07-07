@@ -147,6 +147,17 @@ const normalizeSearch = (value: string) =>
 
 const normalizePhone = (value: string) => value.replace(/\D/g, "");
 
+// Helper to unify Brazilian numbers (with or without 9th digit) for grouping
+const unifyPhone = (phone: string | null | undefined) => {
+  if (!phone) return "";
+  const p = normalizePhone(phone);
+  if (p.startsWith("55") && p.length === 13 && p[4] === "9") {
+    // Return the 12-digit version (removing the 9th digit)
+    return p.slice(0, 4) + p.slice(5);
+  }
+  return p;
+};
+
 const formatProviderName = (provider: string) => {
   const normalized = provider.trim().toLowerCase();
   if (normalized === "whatsapp") return "WhatsApp";
@@ -424,10 +435,12 @@ export default function InboxPage({
   const conversations = useMemo(() => {
     const grouped = new Map<string, InboxMessage[]>();
 
-    for (const message of filteredMessages) {
-      const key = message.telefone || message.id;
-      grouped.set(key, [...(grouped.get(key) ?? []), message]);
-    }
+      for (const message of filteredMessages) {
+        // We prioritize grouping by phone to merge inbound/outbound from same person.
+        // If phone is missing, fallback to contact_id or message_id.
+        const key = unifyPhone(message.telefone) || message.contact_id || message.id;
+        grouped.set(key, [...(grouped.get(key) ?? []), message]);
+      }
 
     return Array.from(grouped.entries())
       .map(([key, conversationMessages]) => {

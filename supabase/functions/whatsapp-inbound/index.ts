@@ -362,16 +362,36 @@ async function resolveOwnerId(
   return Deno.env.get("FUNIL_DEFAULT_OWNER_ID") ?? null;
 }
 
+// Helper to generate phone variations for robust searching
+function getPhoneVariations(phone: string) {
+  if (!phone) return [];
+  const variations = new Set<string>();
+  variations.add(phone);
+  
+  if (phone.startsWith("55")) {
+    if (phone.length === 13 && phone[4] === "9") {
+      // Create 12-digit version
+      variations.add(phone.slice(0, 4) + phone.slice(5));
+    } else if (phone.length === 12) {
+      // Create 13-digit version
+      variations.add(phone.slice(0, 4) + "9" + phone.slice(4));
+    }
+  }
+  
+  return Array.from(variations);
+}
+
 async function findExistingContact(
   supabase: SupabaseClientAny,
   ownerId: string,
   phone: string,
 ) {
+  const variations = getPhoneVariations(phone);
   const { data, error } = await supabase
     .from("contacts")
     .select("*")
     .eq("owner_id", ownerId)
-    .eq("telefone", phone)
+    .in("telefone", variations)
     .maybeSingle();
 
   if (error) throw error;
@@ -383,11 +403,12 @@ async function findExistingLead(
   ownerId: string,
   phone: string,
 ) {
+  const variations = getPhoneVariations(phone);
   const { data, error } = await supabase
     .from("leads")
     .select("*")
     .eq("owner_id", ownerId)
-    .eq("telefone", phone)
+    .in("telefone", variations)
     .in("status", ["novo", "em_atendimento", "qualificado"])
     .order("created_at", { ascending: false })
     .limit(1)
