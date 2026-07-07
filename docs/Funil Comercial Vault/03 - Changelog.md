@@ -1,5 +1,12 @@
 # Changelog
 
+## [2026-07-07] - Correção Definitiva de Duplicidade de Chats (Z-API WhatsApp LID)
+
+### Corrigido
+- **Mapeamento de Identificadores Ocultos da Z-API**:
+  - Descobrimos que mensagens enviadas diretamente pelo aplicativo físico do WhatsApp estavam gerando um chat duplicado porque as políticas de privacidade da Meta ocultam o número de telefone de destino nesses eventos, enviando apenas um `@lid` (WhatsApp Private Identifier) de 15 dígitos na propriedade `phone` do webhook.
+  - `whatsapp-inbound` (Edge Function): O webhook foi refatorado para identificar quando o payload da Z-API contém um `@lid`. Quando detectado, o sistema agora faz uma query retrospectiva no banco de dados (`inbox_messages -> metadata -> chat_lid`) para encontrar e associar o número de telefone real correspondente àquele `@lid`.
+  - Essa correção encerra o problema onde o "mesmo contato" ficava fragmentado em duas conversas no painel (uma com o número real e outra com o LID de 15 dígitos).
 ## [2026-07-07] - Correção de Duplicidade de Chats no Inbox
 
 ### Modificado

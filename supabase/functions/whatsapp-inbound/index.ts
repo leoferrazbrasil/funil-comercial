@@ -12,8 +12,8 @@ type NormalizedInboundMessage = {
   messageType: string;
   direction?: "inbound" | "outbound";
   instanceId?: string;
-  rawPhone?: string;
-  chatLid?: string;
+  rawPhone?: string | null;
+  chatLid?: string | null;
 };
 
 type ProcessedMessage = {
