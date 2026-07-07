@@ -1,3 +1,16 @@
 const { createClient } = require('@supabase/supabase-js');
-const supabase = createClient('https://dtdtewojmyhiegwmgmte.supabase.co', 'sb_publishable_DR9s-yTjB16plrnQamQPXg_MYiO5gDr');
-supabase.from('inbox_messages').select('*').order('created_at', { ascending: false }).limit(5).then(res => console.log(JSON.stringify(res.data, null, 2))).catch(console.error);
+require('dotenv').config();
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+
+async function check() {
+  const { data, error } = await supabase
+    .from('inbox_messages')
+    .select('id, telefone, remetente_nome, direction, mensagem, created_at, contact_id')
+    .order('created_at', { ascending: false })
+    .limit(30);
+  
+  if (error) console.error(error);
+  console.log(JSON.stringify(data, null, 2));
+}
+
+check();

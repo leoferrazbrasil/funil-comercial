@@ -153,6 +153,11 @@ const unifyPhone = (phone: string | null | undefined) => {
   let p = normalizePhone(phone);
   if (!p) return "";
   
+  // Strip any leading zeros that might come from raw input
+  while (p.startsWith("0")) {
+    p = p.substring(1);
+  }
+  
   if (p.length === 10 || p.length === 11) {
     p = "55" + p;
   }

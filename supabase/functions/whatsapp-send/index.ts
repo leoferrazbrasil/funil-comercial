@@ -33,6 +33,7 @@ const normalizePhone = (value: string | null | undefined) => {
   const p = value?.replace("whatsapp:", "").replace(/\D/g, "") ?? "";
   if (!p) return "";
   let unified = p;
+  while (unified.startsWith("0")) unified = unified.substring(1);
   if (unified.length === 10 || unified.length === 11) {
     unified = "55" + unified;
   }

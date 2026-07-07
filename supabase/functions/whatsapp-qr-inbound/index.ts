@@ -44,8 +44,19 @@ const isRecord = (value: unknown): value is JsonRecord =>
 const asString = (value: unknown) =>
   typeof value === "string" && value.trim() ? value.trim() : null;
 
-const normalizePhone = (value: string | null) =>
-  value?.replace("whatsapp:", "").replace(/\D/g, "") ?? "";
+const normalizePhone = (value: string | null | undefined) => {
+  const p = value?.replace("whatsapp:", "").replace(/\D/g, "") ?? "";
+  if (!p) return "";
+  let unified = p;
+  while (unified.startsWith("0")) unified = unified.substring(1);
+  if (unified.length === 10 || unified.length === 11) {
+    unified = "55" + unified;
+  }
+  if (unified.startsWith("55") && unified.length === 13 && unified[4] === "9") {
+    return unified.slice(0, 4) + unified.slice(5);
+  }
+  return unified;
+};
 
 const uniqueStrings = (values: Array<string | null | undefined>) =>
   Array.from(new Set(values.filter((value): value is string => Boolean(value))));
