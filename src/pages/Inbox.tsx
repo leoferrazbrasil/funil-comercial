@@ -572,12 +572,12 @@ export default function InboxPage({
 
   // Renders the list column
   const renderListColumn = () => (
-    <div className={`flex-col bg-[#0B0F19] lg:bg-card border-r border-white/5 h-full overflow-hidden ${mobileView === "list" ? "flex animate-in slide-in-from-left duration-200" : "hidden lg:flex"} w-full lg:w-[320px] xl:w-[380px] shrink-0 z-10`}>
-      <div className="p-4 border-b border-white/5 bg-black/20 flex flex-col gap-4 shrink-0">
+    <div className={`flex-col bg-background lg:bg-card border-r border-border h-full overflow-hidden ${mobileView === "list" ? "flex animate-in slide-in-from-left duration-200" : "hidden lg:flex"} w-full lg:w-[320px] xl:w-[380px] shrink-0 z-10`}>
+      <div className="p-4 border-b border-border bg-black/20 flex flex-col gap-4 shrink-0">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold tracking-tight text-white">Inbox</h2>
+          <h2 className="text-xl font-bold tracking-tight text-foreground">Inbox</h2>
           <div className="flex items-center gap-2">
-            <button onClick={() => onOpenModal("channel")} className="p-2 rounded-xl bg-white/5 hover:bg-white/10 transition-colors text-white" title="Canais">
+            <button onClick={() => onOpenModal("channel")} className="p-2 rounded-xl bg-white/5 hover:bg-white/10 transition-colors text-foreground" title="Canais">
               <Plus size={18} />
             </button>
           </div>
@@ -599,25 +599,25 @@ export default function InboxPage({
         <div className="flex bg-white/5 rounded-xl p-1 relative">
           <button 
             onClick={() => setFilterTab("abertas")}
-            className={`flex-1 py-1.5 px-3 text-xs font-semibold rounded-lg transition-all relative z-10 ${filterTab === 'abertas' ? 'text-white' : 'text-muted-foreground hover:text-white/80'}`}
+            className={`flex-1 py-1.5 px-3 text-xs font-semibold rounded-lg transition-all relative z-10 ${filterTab === 'abertas' ? 'text-foreground' : 'text-muted-foreground hover:text-foreground/80'}`}
           >
             Abertas
           </button>
           <button 
             onClick={() => setFilterTab("nao_lidas")}
-            className={`flex-1 py-1.5 px-3 text-xs font-semibold rounded-lg transition-all relative z-10 ${filterTab === 'nao_lidas' ? 'text-white' : 'text-muted-foreground hover:text-white/80'}`}
+            className={`flex-1 py-1.5 px-3 text-xs font-semibold rounded-lg transition-all relative z-10 ${filterTab === 'nao_lidas' ? 'text-foreground' : 'text-muted-foreground hover:text-foreground/80'}`}
           >
             Não Lidas
           </button>
           <button 
             onClick={() => setFilterTab("todas")}
-            className={`flex-1 py-1.5 px-3 text-xs font-semibold rounded-lg transition-all relative z-10 ${filterTab === 'todas' ? 'text-white' : 'text-muted-foreground hover:text-white/80'}`}
+            className={`flex-1 py-1.5 px-3 text-xs font-semibold rounded-lg transition-all relative z-10 ${filterTab === 'todas' ? 'text-foreground' : 'text-muted-foreground hover:text-foreground/80'}`}
           >
             Todas
           </button>
           {/* Active pill background */}
           <div 
-            className="absolute top-1 bottom-1 bg-[#1E293B] shadow-sm rounded-lg transition-all duration-300 ease-in-out border border-white/5"
+            className="absolute top-1 bottom-1 bg-white/10 shadow-sm rounded-lg transition-all duration-300 ease-in-out border border-white/5"
             style={{
               width: 'calc(33.333% - 2.6px)',
               left: filterTab === 'abertas' ? '4px' : filterTab === 'nao_lidas' ? 'calc(33.333% + 2px)' : 'calc(66.666%)'
@@ -650,27 +650,27 @@ export default function InboxPage({
                 <button
                   key={conv.key}
                   onClick={() => handleSelectConversation(conv.key)}
-                  className={`flex items-start gap-3 p-4 border-b border-white/5 text-left transition-all ${isSelected ? 'bg-[#1E293B]/80 lg:border-l-2 lg:border-l-primary' : 'hover:bg-white/[0.03] lg:border-l-2 lg:border-l-transparent'}`}
+                  className={`flex items-start gap-3 p-4 border-b border-border text-left transition-all ${isSelected ? 'bg-primary/10 lg:border-l-2 lg:border-l-primary' : 'hover:bg-white/[0.03] lg:border-l-2 lg:border-l-transparent'}`}
                 >
                   <div className="relative shrink-0 mt-1">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-white/10 to-white/5 flex items-center justify-center font-bold text-lg text-white shadow-sm border border-white/10">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-white/10 to-white/5 flex items-center justify-center font-bold text-lg text-foreground shadow-sm border border-white/10">
                       {conv.latestInbound.remetente_nome.charAt(0).toUpperCase()}
                     </div>
                     {hasUnread && (
-                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-[#0B0F19] lg:border-[#1E293B] shadow-sm animate-pulse" />
+                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-destructive rounded-full border-2 border-background shadow-sm animate-pulse" />
                     )}
                   </div>
                   
                   <div className="flex-1 min-w-0 mt-0.5">
                     <div className="flex items-center justify-between mb-1.5">
-                      <strong className={`text-sm truncate ${hasUnread ? 'text-white font-bold' : 'text-white/90 font-medium'}`}>
+                      <strong className={`text-sm truncate ${hasUnread ? 'text-foreground font-bold' : 'text-foreground/90 font-medium'}`}>
                         {conv.latestInbound.remetente_nome}
                       </strong>
                       <span className={`text-[11px] shrink-0 ml-2 font-medium ${hasUnread ? 'text-primary' : 'text-muted-foreground'}`}>
                         {formatRelativeDate(conv.latest.created_at)}
                       </span>
                     </div>
-                    <p className={`text-xs line-clamp-1 ${hasUnread ? 'text-white/80 font-medium' : 'text-muted-foreground'}`}>
+                    <p className={`text-xs line-clamp-1 ${hasUnread ? 'text-foreground/80 font-medium' : 'text-muted-foreground'}`}>
                       {conv.latest.mensagem}
                     </p>
                   </div>
@@ -687,33 +687,33 @@ export default function InboxPage({
   const renderChatColumn = () => {
     if (!selectedConversation) {
       return (
-        <div className={`flex-1 bg-[#050A14] lg:bg-black/20 hidden lg:flex flex-col items-center justify-center text-center p-8 z-0`}>
+        <div className={`flex-1 bg-background lg:bg-card/50 hidden lg:flex flex-col items-center justify-center text-center p-8 z-0`}>
           <div className="w-24 h-24 rounded-3xl bg-white/5 flex items-center justify-center mb-6 shadow-xl border border-white/10 relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent opacity-50" />
-            <MessageCircle size={40} className="text-white/60 relative z-10" />
+            <MessageCircle size={40} className="text-foreground/60 relative z-10" />
           </div>
-          <h2 className="text-2xl font-bold mb-3 text-white tracking-tight">Inbox do Funil Comercial</h2>
+          <h2 className="text-2xl font-bold mb-3 text-foreground tracking-tight">Inbox do Funil Comercial</h2>
           <p className="text-muted-foreground max-w-md text-sm leading-relaxed">Selecione uma conversa na lista para começar o atendimento. Responda rapidamente e acompanhe o contexto de CRM do seu contato em tempo real.</p>
         </div>
       );
     }
 
     return (
-      <div className={`flex-1 bg-[#0B0F19] lg:bg-black/20 flex-col h-full ${mobileView === "chat" ? "flex animate-in slide-in-from-right duration-200 absolute inset-0 z-20 lg:static" : "hidden lg:flex"}`}>
+      <div className={`flex-1 bg-background lg:bg-card/30 flex-col h-full ${mobileView === "chat" ? "flex animate-in slide-in-from-right duration-200 absolute inset-0 z-20 lg:static" : "hidden lg:flex"}`}>
         {/* Chat Header */}
-        <div className="h-16 shrink-0 border-b border-white/5 bg-[#1E293B]/50 backdrop-blur-md flex items-center justify-between px-4 lg:px-6 shadow-sm z-10">
+        <div className="h-16 shrink-0 border-b border-border bg-card/80 backdrop-blur-md flex items-center justify-between px-4 lg:px-6 shadow-sm z-10">
           <div className="flex items-center gap-3">
             {/* Mobile back button */}
-            <button onClick={() => setMobileView("list")} className="lg:hidden p-2.5 -ml-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-white hover:bg-white/10 transition-colors">
+            <button onClick={() => setMobileView("list")} className="lg:hidden p-2.5 -ml-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-foreground hover:bg-white/10 transition-colors">
               <MoveRight size={22} className="rotate-180" />
             </button>
             
             <div className="flex items-center gap-3 cursor-pointer" onClick={() => setMobileView("context")}>
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-white/10 to-white/5 flex items-center justify-center font-bold text-white shadow-sm border border-white/10">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-white/10 to-white/5 flex items-center justify-center font-bold text-foreground shadow-sm border border-white/10">
                 {sourceMessage?.remetente_nome.charAt(0).toUpperCase()}
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-bold text-sm leading-tight truncate max-w-[160px] sm:max-w-xs text-white">{sourceMessage?.remetente_nome}</h3>
+                <h3 className="font-bold text-sm leading-tight truncate max-w-[160px] sm:max-w-xs text-foreground">{sourceMessage?.remetente_nome}</h3>
                 <p className="text-[11px] text-muted-foreground flex items-center gap-1.5 truncate mt-0.5">
                   <span className="w-2 h-2 rounded-full bg-green-500 inline-block shrink-0 shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
                   <span className="truncate font-medium">{selected?.status ?? "Atendimento"} • {sourceMessage?.canal}</span>
@@ -731,7 +731,7 @@ export default function InboxPage({
             </button>
             <button 
               onClick={() => setMobileView("context")}
-              className="lg:hidden p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-white bg-white/5 hover:bg-white/10 transition-colors"
+              className="lg:hidden p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-foreground bg-white/5 hover:bg-white/10 transition-colors"
             >
               <UsersRound size={20} />
             </button>
@@ -741,7 +741,7 @@ export default function InboxPage({
         {/* Chat Body */}
         <div className="flex-1 overflow-y-auto p-4 lg:p-6 flex flex-col gap-4 scroll-smooth">
           <div className="text-center my-6 sticky top-0 z-0">
-            <span className="px-4 py-1.5 text-[10px] font-bold tracking-widest uppercase bg-[#1E293B] shadow-md border border-white/5 rounded-full text-muted-foreground backdrop-blur-md">
+            <span className="px-4 py-1.5 text-[10px] font-bold tracking-widest uppercase bg-card shadow-md border border-border rounded-full text-muted-foreground backdrop-blur-md">
               Início da conversa
             </span>
           </div>
@@ -754,7 +754,7 @@ export default function InboxPage({
                 <div 
                   className={`px-4 py-3 text-[15px] leading-relaxed shadow-sm ${
                     isInbound 
-                      ? 'bg-[#1E293B] text-white rounded-2xl rounded-tl-sm border border-white/5' 
+                      ? 'bg-card text-card-foreground rounded-2xl rounded-tl-sm border border-border' 
                       : 'bg-primary text-primary-foreground rounded-2xl rounded-tr-sm'
                   }`}
                 >
@@ -769,11 +769,11 @@ export default function InboxPage({
         </div>
 
         {/* Chat Footer / Composer */}
-        <div className="p-3 lg:p-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] bg-[#0B0F19] lg:bg-card/90 border-t border-white/5 shrink-0 backdrop-blur-lg">
+        <div className="p-3 lg:p-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] bg-background lg:bg-card/90 border-t border-border shrink-0 backdrop-blur-lg">
           <form onSubmit={handleReplySubmit} className="flex items-end gap-2 lg:gap-3 max-w-4xl mx-auto">
-            <div className="flex-1 bg-[#1E293B] rounded-2xl border border-white/10 overflow-hidden focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/50 transition-all shadow-inner">
+            <div className="flex-1 bg-card rounded-2xl border border-border overflow-hidden focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/50 transition-all shadow-inner">
               <textarea
-                className="w-full bg-transparent px-4 py-3.5 text-sm resize-none outline-none min-h-[52px] max-h-[150px] text-white placeholder:text-muted-foreground/70"
+                className="w-full bg-transparent px-4 py-3.5 text-sm resize-none outline-none min-h-[52px] max-h-[150px] text-foreground placeholder:text-muted-foreground/70"
                 rows={1}
                 placeholder="Escreva sua resposta..."
                 value={replyText}
@@ -804,11 +804,11 @@ export default function InboxPage({
     if (!selectedConversation) return null;
 
     return (
-      <div className={`flex-col bg-[#050A14] lg:bg-card border-l border-white/5 h-full overflow-y-auto ${mobileView === "context" ? "flex animate-in slide-in-from-right duration-200 absolute inset-0 z-50 lg:static" : "hidden lg:flex"} w-full lg:w-[320px] xl:w-[380px] shrink-0`}>
+      <div className={`flex-col bg-background lg:bg-card border-l border-border h-full overflow-y-auto ${mobileView === "context" ? "flex animate-in slide-in-from-right duration-200 absolute inset-0 z-50 lg:static" : "hidden lg:flex"} w-full lg:w-[320px] xl:w-[380px] shrink-0`}>
         
         {/* Mobile header for context */}
-        <div className="lg:hidden h-16 shrink-0 border-b border-white/5 bg-[#1E293B]/50 backdrop-blur-md flex items-center px-4 shadow-sm z-10 sticky top-0">
-          <button onClick={() => setMobileView("chat")} className="p-2.5 -ml-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-white hover:bg-white/10 transition-colors gap-2">
+        <div className="lg:hidden h-16 shrink-0 border-b border-border bg-card/80 backdrop-blur-md flex items-center px-4 shadow-sm z-10 sticky top-0">
+          <button onClick={() => setMobileView("chat")} className="p-2.5 -ml-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-foreground hover:bg-white/10 transition-colors gap-2">
             <MoveRight size={22} className="rotate-180 shrink-0" /> <span className="font-bold text-sm">Voltar ao Chat</span>
           </button>
         </div>
@@ -821,12 +821,12 @@ export default function InboxPage({
               <div className={`absolute top-0 right-0 w-32 h-32 blur-3xl rounded-full opacity-20 pointer-events-none ${recommendation.priority === 'Alta' ? 'bg-amber-500' : 'bg-primary'}`} />
               <div className="flex items-center gap-2 mb-3 relative z-10">
                 <Sparkles size={18} className={recommendation.priority === 'Alta' ? 'text-amber-500' : 'text-primary'} />
-                <h3 className="font-bold text-sm text-white">Inteligência Comercial</h3>
+                <h3 className="font-bold text-sm text-foreground">Inteligência Comercial</h3>
               </div>
-              <p className="text-[13px] font-medium text-white/90 mb-4 relative z-10 leading-relaxed">{recommendation.nextAction}</p>
+              <p className="text-[13px] font-medium text-foreground/90 mb-4 relative z-10 leading-relaxed">{recommendation.nextAction}</p>
               <button 
                 type="button"
-                className={`w-full p-3.5 rounded-xl text-left text-[13px] border transition-all relative z-10 shadow-sm flex flex-col gap-1.5 ${recommendation.priority === 'Alta' ? 'bg-amber-500/10 border-amber-500/20 hover:bg-amber-500/20 text-amber-100 hover:border-amber-500/40' : 'bg-primary/10 border-primary/20 hover:bg-primary/20 text-primary-100 hover:border-primary/40'}`}
+                className={`w-full p-3.5 rounded-xl text-left text-[13px] border transition-all relative z-10 shadow-sm flex flex-col gap-1.5 ${recommendation.priority === 'Alta' ? 'bg-amber-500/10 border-amber-500/20 hover:bg-amber-500/20 text-amber-600 dark:text-amber-100 hover:border-amber-500/40' : 'bg-primary/10 border-primary/20 hover:bg-primary/20 text-primary-600 dark:text-primary-100 hover:border-primary/40'}`}
                 onClick={() => setReplyText(recommendation.suggestedReply)}
                 title="Clique para preencher a resposta"
               >
@@ -842,9 +842,9 @@ export default function InboxPage({
             
             <div className="flex flex-col gap-4">
               {/* Contato Link */}
-              <div className={`p-4.5 rounded-2xl border flex flex-col gap-3.5 shadow-sm transition-all ${linkedContact ? 'bg-[#1E293B]/40 border-green-500/20' : 'bg-[#1E293B]/40 border-white/10'}`}>
+              <div className={`p-4.5 rounded-2xl border flex flex-col gap-3.5 shadow-sm transition-all ${linkedContact ? 'bg-card border-green-500/20' : 'bg-card border-border'}`}>
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-sm font-bold text-white">
+                  <div className="flex items-center gap-2 text-sm font-bold text-foreground">
                     <UsersRound size={18} className={linkedContact ? 'text-green-500' : 'text-muted-foreground'} />
                     <span>Contato</span>
                   </div>
@@ -852,12 +852,12 @@ export default function InboxPage({
                 </div>
                 
                 <p className="text-[13px] text-muted-foreground leading-relaxed">
-                  {linkedContact ? <span className="text-white/80">{linkedContact.nome} <br/><span className="opacity-70 text-[11px] font-medium">{linkedContact.telefone}</span></span> : "Nenhum contato encontrado. Deseja registrar no banco de dados?"}
+                  {linkedContact ? <span className="text-foreground/80">{linkedContact.nome} <br/><span className="opacity-70 text-[11px] font-medium">{linkedContact.telefone}</span></span> : "Nenhum contato encontrado. Deseja registrar no banco de dados?"}
                 </p>
 
                 <button
                   type="button"
-                  className={`w-full py-2.5 px-3 rounded-xl text-[13px] font-bold transition-all ${conversationHasContactLink ? 'bg-white/5 text-muted-foreground cursor-not-allowed border border-white/5' : 'bg-white/10 hover:bg-white/20 text-white border border-white/10 hover:border-white/20 shadow-sm'}`}
+                  className={`w-full py-2.5 px-3 rounded-xl text-[13px] font-bold transition-all ${conversationHasContactLink ? 'bg-muted text-muted-foreground cursor-not-allowed border border-border' : 'bg-secondary hover:bg-secondary/80 text-secondary-foreground border border-border hover:border-border/80 shadow-sm'}`}
                   disabled={isSaving || !sourceMessage || conversationHasContactLink}
                   onClick={() => sourceMessage && onCreateContact(sourceMessage)}
                 >
@@ -866,9 +866,9 @@ export default function InboxPage({
               </div>
 
               {/* Lead Link */}
-              <div className={`p-4.5 rounded-2xl border flex flex-col gap-3.5 shadow-sm transition-all ${linkedLead ? 'bg-[#1E293B]/40 border-green-500/20' : 'bg-[#1E293B]/40 border-primary/20'}`}>
+              <div className={`p-4.5 rounded-2xl border flex flex-col gap-3.5 shadow-sm transition-all ${linkedLead ? 'bg-card border-green-500/20' : 'bg-card border-primary/20'}`}>
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-sm font-bold text-white">
+                  <div className="flex items-center gap-2 text-sm font-bold text-foreground">
                     <Target size={18} className={linkedLead ? 'text-green-500' : 'text-primary'} />
                     <span>Lead</span>
                   </div>
@@ -876,12 +876,12 @@ export default function InboxPage({
                 </div>
                 
                 <p className="text-[13px] text-muted-foreground leading-relaxed">
-                  {linkedLead ? <span className="text-white/80">Lead ativo com interesse em <strong>{linkedLead.interesse || 'indefinido'}</strong>.</span> : "O contato demonstrou interesse comercial? Transforme-o em Lead."}
+                  {linkedLead ? <span className="text-foreground/80">Lead ativo com interesse em <strong>{linkedLead.interesse || 'indefinido'}</strong>.</span> : "O contato demonstrou interesse comercial? Transforme-o em Lead."}
                 </p>
 
                 <button
                   type="button"
-                  className={`w-full py-2.5 px-3 rounded-xl text-[13px] font-bold transition-all ${conversationHasLeadLink ? 'bg-white/5 text-muted-foreground cursor-not-allowed border border-white/5' : 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_4px_14px_0_rgba(37,99,235,0.25)] hover:shadow-[0_6px_20px_rgba(37,99,235,0.3)]'}`}
+                  className={`w-full py-2.5 px-3 rounded-xl text-[13px] font-bold transition-all ${conversationHasLeadLink ? 'bg-muted text-muted-foreground cursor-not-allowed border border-border' : 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_4px_14px_0_rgba(37,99,235,0.25)] hover:shadow-[0_6px_20px_rgba(37,99,235,0.3)]'}`}
                   disabled={isSaving || !sourceMessage || conversationHasLeadLink}
                   onClick={() => sourceMessage && onCreateLead(sourceMessage)}
                 >
@@ -890,9 +890,9 @@ export default function InboxPage({
               </div>
 
               {/* Oportunidade Link */}
-              <div className={`p-4.5 rounded-2xl border flex flex-col gap-3.5 shadow-sm transition-all ${linkedOpportunity ? 'bg-[#1E293B]/40 border-green-500/20' : 'bg-[#1E293B]/40 border-primary/20'}`}>
+              <div className={`p-4.5 rounded-2xl border flex flex-col gap-3.5 shadow-sm transition-all ${linkedOpportunity ? 'bg-card border-green-500/20' : 'bg-card border-primary/20'}`}>
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-sm font-bold text-white">
+                  <div className="flex items-center gap-2 text-sm font-bold text-foreground">
                     <CircleDollarSign size={18} className={linkedOpportunity ? 'text-green-500' : 'text-primary'} />
                     <span>Oportunidade</span>
                   </div>
@@ -900,12 +900,12 @@ export default function InboxPage({
                 </div>
                 
                 <p className="text-[13px] text-muted-foreground leading-relaxed">
-                  {linkedOpportunity ? <span className="text-white/80">Oportunidade aberta na etapa: <strong>{linkedOpportunity.etapa}</strong>.</span> : "Negociação iniciada? Abra uma oportunidade no Funil."}
+                  {linkedOpportunity ? <span className="text-foreground/80">Oportunidade aberta na etapa: <strong>{linkedOpportunity.etapa}</strong>.</span> : "Negociação iniciada? Abra uma oportunidade no Funil."}
                 </p>
 
                 <button
                   type="button"
-                  className={`w-full py-2.5 px-3 rounded-xl text-[13px] font-bold transition-all ${conversationHasOpportunityReady ? 'bg-white/5 text-muted-foreground cursor-not-allowed border border-white/5' : 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_4px_14px_0_rgba(37,99,235,0.25)] hover:shadow-[0_6px_20px_rgba(37,99,235,0.3)]'}`}
+                  className={`w-full py-2.5 px-3 rounded-xl text-[13px] font-bold transition-all ${conversationHasOpportunityReady ? 'bg-muted text-muted-foreground cursor-not-allowed border border-border' : 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_4px_14px_0_rgba(37,99,235,0.25)] hover:shadow-[0_6px_20px_rgba(37,99,235,0.3)]'}`}
                   disabled={isSaving || !sourceMessage || conversationHasOpportunityReady}
                   onClick={() => sourceMessage && onCreateOpportunity(sourceMessage)}
                 >
@@ -923,7 +923,8 @@ export default function InboxPage({
 
   return (
     // Fixed height wrapper taking full space below top navbar
-    <div className="flex -mx-4 sm:-mx-8 h-[calc(100dvh-5rem)] lg:h-[calc(100vh-6rem)] lg:min-h-[600px] border-t border-white/5 overflow-hidden relative">
+    // Added negative top margin to counteract `.content` padding (18px mobile, 32px desktop)
+    <div className="flex -mx-4 sm:-mx-8 -mt-[18px] lg:-mt-8 h-[calc(100dvh-5rem+18px)] lg:h-[calc(100vh-6rem+32px)] lg:min-h-[600px] border-t border-border overflow-hidden relative">
       {renderListColumn()}
       {renderChatColumn()}
       {renderContextColumn()}
