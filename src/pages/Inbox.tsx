@@ -27,7 +27,7 @@ import type { FormEvent, ReactNode } from "react";
 import { Toaster, toast } from "react-hot-toast";
 import { DndContext, useDraggable, useDroppable } from "@dnd-kit/core";
 import { IMaskInput } from "react-imask";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import {
   BrowserRouter,
   Routes,
@@ -462,9 +462,15 @@ export default function InboxPage({
   const [replyText, setReplyText] = useState("");
   const [filterTab, setFilterTab] = useState<"abertas" | "nao_lidas" | "todas">("abertas");
   const [localSearch, setLocalSearch] = useState("");
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   
   // Mobile UI States: "list" | "chat" | "context"
   const [mobileView, setMobileView] = useState<"list" | "chat" | "context">("list");
+
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [conversations, selectedKey]);
 
   const displayedConversations = useMemo(() => {
     return conversations.filter(conv => {
@@ -766,6 +772,7 @@ export default function InboxPage({
               </div>
             );
           })}
+          <div ref={messagesEndRef} />
         </div>
 
         {/* Chat Footer / Composer */}
