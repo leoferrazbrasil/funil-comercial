@@ -1,5 +1,20 @@
 # Changelog
 
+## [2026-07-06] - Correções Z-API, Abas do Inbox e Tempo Real
+
+### Adicionado
+- **Filtros Funcionais no Inbox (`/inbox`)**:
+  - Lógica real de abas para "Abertas", "Não Lidas" e "Todas".
+- **Sistema Realtime no Inbox**:
+  - Assinatura no Supabase (`App.tsx`) para atualizar a listagem e leitura de conversas instantaneamente (sem recarregar página) sempre que um webhook inserir mensagens novas em `inbox_messages`.
+
+### Modificado
+- **Integração Z-API (Webhook de Recebimento)**:
+  - `whatsapp-inbound` (Edge Function): Agora consulta o banco de dados via `instanceId` presente no payload, ao invés do `connectedPhone` (que a Z-API omite em alguns casos).
+  - Assinatura Meta (JWT/HMAC): Adicionada uma regra de *bypass* (salto) para ignorar assinaturas criptografadas caso o payload seja legitimamente da Z-API, corrigindo o erro 401 de acesso negado.
+- **Conexão Z-API (Polling de Status)**:
+  - `whatsapp-manager/ZApiProvider.ts`: Correção do endpoint da Z-API de `/phones` para `/device` na hora de buscar qual número escaneou o QR Code. Isso permite que a conexão de fato mude o status do banco de dados para "Ativo".
+
 ## [2026-07-06] - Integração Evolution API e AI Strategist
 
 ### Adicionado
