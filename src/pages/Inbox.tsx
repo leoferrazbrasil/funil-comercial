@@ -117,6 +117,28 @@ const formatMoney = (value: number) =>
     maximumFractionDigits: 0,
   }).format(value);
 
+const formatRelativeDate = (dateString: string) => {
+  const date = new Date(dateString);
+  const now = new Date();
+  
+  const diffInTime = now.getTime() - date.getTime();
+  const diffInDays = Math.floor(diffInTime / (1000 * 3600 * 24));
+  
+  if (diffInDays === 0) {
+    if (date.getDate() === now.getDate()) {
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } else {
+      return "Ontem";
+    }
+  } else if (diffInDays === 1) {
+    return "Ontem";
+  } else if (diffInDays < 7) {
+    return date.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '');
+  } else {
+    return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+  }
+};
+
 const normalizeSearch = (value: string) =>
   value
     .normalize("NFD")
@@ -439,17 +461,29 @@ export default function InboxPage({
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
   const [filterTab, setFilterTab] = useState<"abertas" | "nao_lidas" | "todas">("abertas");
+  const [localSearch, setLocalSearch] = useState("");
   
   // Mobile UI States: "list" | "chat" | "context"
   const [mobileView, setMobileView] = useState<"list" | "chat" | "context">("list");
 
   const displayedConversations = useMemo(() => {
     return conversations.filter(conv => {
-      if (filterTab === "nao_lidas") return conv.unreadCount > 0;
-      if (filterTab === "abertas") return conv.latest.status !== "Resolvido";
+      if (filterTab === "nao_lidas" && conv.unreadCount === 0) return false;
+      if (filterTab === "abertas" && conv.latest.status === "Resolvido") return false;
+      
+      if (localSearch) {
+        const searchTerms = [
+          conv.latestInbound.remetente_nome,
+          conv.latest.mensagem,
+          conv.key
+        ];
+        if (!matchesQuery(localSearch, searchTerms)) {
+          return false;
+        }
+      }
       return true;
     });
-  }, [conversations, filterTab]);
+  }, [conversations, filterTab, localSearch]);
 
   // Selection Logic
   useEffect(() => {
@@ -538,37 +572,57 @@ export default function InboxPage({
 
   // Renders the list column
   const renderListColumn = () => (
-    <div className={`flex-col bg-card border-r border-white/5 h-full overflow-hidden ${mobileView === "list" ? "flex" : "hidden lg:flex"} lg:w-[320px] xl:w-[380px] shrink-0`}>
+    <div className={`flex-col bg-[#0B0F19] lg:bg-card border-r border-white/5 h-full overflow-hidden ${mobileView === "list" ? "flex animate-in slide-in-from-left duration-200" : "hidden lg:flex"} w-full lg:w-[320px] xl:w-[380px] shrink-0 z-10`}>
       <div className="p-4 border-b border-white/5 bg-black/20 flex flex-col gap-4 shrink-0">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold tracking-tight">Inbox</h2>
+          <h2 className="text-xl font-bold tracking-tight text-white">Inbox</h2>
           <div className="flex items-center gap-2">
-            <button onClick={() => onOpenModal("channel")} className="p-2 rounded-xl bg-white/5 hover:bg-white/10 transition-colors" title="Canais">
+            <button onClick={() => onOpenModal("channel")} className="p-2 rounded-xl bg-white/5 hover:bg-white/10 transition-colors text-white" title="Canais">
               <Plus size={18} />
             </button>
           </div>
         </div>
         
-        {/* Search / Filters */}
-        <div className="flex bg-white/5 rounded-xl p-1">
+        {/* Search Input */}
+        <div className="relative">
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <input
+            type="text"
+            placeholder="Buscar mensagens..."
+            className="w-full bg-white/5 border border-white/10 rounded-xl py-2 pl-9 pr-4 text-sm outline-none focus:border-primary/50 focus:bg-white/10 transition-colors text-foreground placeholder:text-muted-foreground"
+            value={localSearch}
+            onChange={(e) => setLocalSearch(e.target.value)}
+          />
+        </div>
+        
+        {/* Search / Filters (Segmented Control) */}
+        <div className="flex bg-white/5 rounded-xl p-1 relative">
           <button 
             onClick={() => setFilterTab("abertas")}
-            className={`flex-1 py-1.5 px-3 text-xs font-semibold rounded-lg transition-colors ${filterTab === 'abertas' ? 'bg-white/10 text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+            className={`flex-1 py-1.5 px-3 text-xs font-semibold rounded-lg transition-all relative z-10 ${filterTab === 'abertas' ? 'text-white' : 'text-muted-foreground hover:text-white/80'}`}
           >
             Abertas
           </button>
           <button 
             onClick={() => setFilterTab("nao_lidas")}
-            className={`flex-1 py-1.5 px-3 text-xs font-semibold rounded-lg transition-colors ${filterTab === 'nao_lidas' ? 'bg-white/10 text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+            className={`flex-1 py-1.5 px-3 text-xs font-semibold rounded-lg transition-all relative z-10 ${filterTab === 'nao_lidas' ? 'text-white' : 'text-muted-foreground hover:text-white/80'}`}
           >
             Não Lidas
           </button>
           <button 
             onClick={() => setFilterTab("todas")}
-            className={`flex-1 py-1.5 px-3 text-xs font-semibold rounded-lg transition-colors ${filterTab === 'todas' ? 'bg-white/10 text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+            className={`flex-1 py-1.5 px-3 text-xs font-semibold rounded-lg transition-all relative z-10 ${filterTab === 'todas' ? 'text-white' : 'text-muted-foreground hover:text-white/80'}`}
           >
             Todas
           </button>
+          {/* Active pill background */}
+          <div 
+            className="absolute top-1 bottom-1 bg-[#1E293B] shadow-sm rounded-lg transition-all duration-300 ease-in-out border border-white/5"
+            style={{
+              width: 'calc(33.333% - 2.6px)',
+              left: filterTab === 'abertas' ? '4px' : filterTab === 'nao_lidas' ? 'calc(33.333% + 2px)' : 'calc(66.666%)'
+            }}
+          />
         </div>
       </div>
 
@@ -580,9 +634,12 @@ export default function InboxPage({
         )}
         
         {displayedConversations.length === 0 ? (
-          <div className="p-8 text-center text-muted-foreground">
-            <MessageCircle size={32} className="mx-auto mb-3 opacity-20" />
-            <p className="text-sm">Nenhuma conversa encontrada.</p>
+          <div className="p-8 flex flex-col items-center justify-center text-center text-muted-foreground h-full">
+            <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
+              <MessageCircle size={28} className="opacity-40" />
+            </div>
+            <p className="text-sm font-medium">Nenhuma conversa por aqui.</p>
+            <p className="text-xs opacity-70 mt-1 max-w-[200px]">Ajuste seus filtros ou aguarde novas mensagens.</p>
           </div>
         ) : (
           <div className="flex flex-col">
@@ -593,27 +650,27 @@ export default function InboxPage({
                 <button
                   key={conv.key}
                   onClick={() => handleSelectConversation(conv.key)}
-                  className={`flex items-start gap-3 p-4 border-b border-white/5 text-left transition-all hover:bg-white/[0.02] ${isSelected ? 'bg-primary/5 border-l-2 border-l-primary' : 'border-l-2 border-l-transparent'}`}
+                  className={`flex items-start gap-3 p-4 border-b border-white/5 text-left transition-all ${isSelected ? 'bg-[#1E293B]/80 lg:border-l-2 lg:border-l-primary' : 'hover:bg-white/[0.03] lg:border-l-2 lg:border-l-transparent'}`}
                 >
                   <div className="relative shrink-0 mt-1">
-                    <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center font-bold text-muted-foreground">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-white/10 to-white/5 flex items-center justify-center font-bold text-lg text-white shadow-sm border border-white/10">
                       {conv.latestInbound.remetente_nome.charAt(0).toUpperCase()}
                     </div>
                     {hasUnread && (
-                      <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-primary rounded-full border-2 border-[#121212]" />
+                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-[#0B0F19] lg:border-[#1E293B] shadow-sm animate-pulse" />
                     )}
                   </div>
                   
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-1">
-                      <strong className={`text-sm truncate ${hasUnread ? 'text-foreground' : 'text-foreground/80'}`}>
+                  <div className="flex-1 min-w-0 mt-0.5">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <strong className={`text-sm truncate ${hasUnread ? 'text-white font-bold' : 'text-white/90 font-medium'}`}>
                         {conv.latestInbound.remetente_nome}
                       </strong>
-                      <span className="text-[10px] text-muted-foreground shrink-0 ml-2">
-                        {new Date(conv.latest.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      <span className={`text-[11px] shrink-0 ml-2 font-medium ${hasUnread ? 'text-primary' : 'text-muted-foreground'}`}>
+                        {formatRelativeDate(conv.latest.created_at)}
                       </span>
                     </div>
-                    <p className={`text-xs line-clamp-1 ${hasUnread ? 'text-foreground/80 font-medium' : 'text-muted-foreground'}`}>
+                    <p className={`text-xs line-clamp-1 ${hasUnread ? 'text-white/80 font-medium' : 'text-muted-foreground'}`}>
                       {conv.latest.mensagem}
                     </p>
                   </div>
@@ -630,35 +687,36 @@ export default function InboxPage({
   const renderChatColumn = () => {
     if (!selectedConversation) {
       return (
-        <div className={`flex-1 bg-black/20 hidden lg:flex flex-col items-center justify-center text-center p-8`}>
-          <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mb-6">
-            <MessageCircle size={32} className="text-muted-foreground/30" />
+        <div className={`flex-1 bg-[#050A14] lg:bg-black/20 hidden lg:flex flex-col items-center justify-center text-center p-8 z-0`}>
+          <div className="w-24 h-24 rounded-3xl bg-white/5 flex items-center justify-center mb-6 shadow-xl border border-white/10 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent opacity-50" />
+            <MessageCircle size={40} className="text-white/60 relative z-10" />
           </div>
-          <h2 className="text-xl font-bold mb-2">Central de Atendimento</h2>
-          <p className="text-muted-foreground max-w-sm">Selecione uma conversa na barra lateral para começar a responder e qualificar seus leads.</p>
+          <h2 className="text-2xl font-bold mb-3 text-white tracking-tight">Inbox do Funil Comercial</h2>
+          <p className="text-muted-foreground max-w-md text-sm leading-relaxed">Selecione uma conversa na lista para começar o atendimento. Responda rapidamente e acompanhe o contexto de CRM do seu contato em tempo real.</p>
         </div>
       );
     }
 
     return (
-      <div className={`flex-1 bg-black/20 flex-col h-full ${mobileView === "chat" ? "flex" : "hidden lg:flex"}`}>
+      <div className={`flex-1 bg-[#0B0F19] lg:bg-black/20 flex-col h-full ${mobileView === "chat" ? "flex animate-in slide-in-from-right duration-200 absolute inset-0 z-20 lg:static" : "hidden lg:flex"}`}>
         {/* Chat Header */}
-        <div className="h-16 shrink-0 border-b border-white/5 bg-card/50 flex items-center justify-between px-4 lg:px-6">
-          <div className="flex items-center gap-4">
+        <div className="h-16 shrink-0 border-b border-white/5 bg-[#1E293B]/50 backdrop-blur-md flex items-center justify-between px-4 lg:px-6 shadow-sm z-10">
+          <div className="flex items-center gap-3">
             {/* Mobile back button */}
-            <button onClick={() => setMobileView("list")} className="lg:hidden p-3 -ml-3 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-muted-foreground hover:bg-white/5">
-              <MoveRight size={20} className="rotate-180" />
+            <button onClick={() => setMobileView("list")} className="lg:hidden p-2.5 -ml-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-white hover:bg-white/10 transition-colors">
+              <MoveRight size={22} className="rotate-180" />
             </button>
             
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center font-bold">
+            <div className="flex items-center gap-3 cursor-pointer" onClick={() => setMobileView("context")}>
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-white/10 to-white/5 flex items-center justify-center font-bold text-white shadow-sm border border-white/10">
                 {sourceMessage?.remetente_nome.charAt(0).toUpperCase()}
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-bold text-sm leading-tight truncate max-w-[160px] sm:max-w-xs">{sourceMessage?.remetente_nome}</h3>
-                <p className="text-[11px] text-muted-foreground flex items-center gap-1 truncate">
-                  <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block shrink-0" />
-                  <span className="truncate">{selected?.status ?? "Atendimento"} • {sourceMessage?.canal}</span>
+                <h3 className="font-bold text-sm leading-tight truncate max-w-[160px] sm:max-w-xs text-white">{sourceMessage?.remetente_nome}</h3>
+                <p className="text-[11px] text-muted-foreground flex items-center gap-1.5 truncate mt-0.5">
+                  <span className="w-2 h-2 rounded-full bg-green-500 inline-block shrink-0 shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
+                  <span className="truncate font-medium">{selected?.status ?? "Atendimento"} • {sourceMessage?.canal}</span>
                 </p>
               </div>
             </div>
@@ -667,13 +725,13 @@ export default function InboxPage({
           <div className="flex items-center gap-2">
             <button 
               onClick={() => sourceMessage && onUpdateMessageStatus(sourceMessage, "Resolvido", 0)}
-              className="px-3 py-1.5 rounded-lg bg-green-500/10 text-green-500 font-semibold text-xs hover:bg-green-500/20 transition-colors hidden sm:flex items-center gap-1"
+              className="px-4 py-2 rounded-xl bg-green-500/10 text-green-500 font-bold text-xs hover:bg-green-500/20 transition-all hidden sm:flex items-center gap-1.5 border border-green-500/20"
             >
-              <CheckCircle2 size={14} /> Resolver
+              <CheckCircle2 size={16} /> Resolver
             </button>
             <button 
               onClick={() => setMobileView("context")}
-              className="lg:hidden p-3 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-muted-foreground hover:bg-white/5"
+              className="lg:hidden p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-white bg-white/5 hover:bg-white/10 transition-colors"
             >
               <UsersRound size={20} />
             </button>
@@ -681,26 +739,29 @@ export default function InboxPage({
         </div>
 
         {/* Chat Body */}
-        <div className="flex-1 overflow-y-auto p-4 lg:p-6 flex flex-col gap-4">
-          <div className="text-center my-4">
-            <span className="px-3 py-1 text-[10px] font-bold tracking-wider uppercase bg-white/5 rounded-full text-muted-foreground">Início da conversa</span>
+        <div className="flex-1 overflow-y-auto p-4 lg:p-6 flex flex-col gap-4 scroll-smooth">
+          <div className="text-center my-6 sticky top-0 z-0">
+            <span className="px-4 py-1.5 text-[10px] font-bold tracking-widest uppercase bg-[#1E293B] shadow-md border border-white/5 rounded-full text-muted-foreground backdrop-blur-md">
+              Início da conversa
+            </span>
           </div>
           
-          {selectedConversation.messages.map((message) => {
+          {selectedConversation.messages.map((message, index) => {
             const isInbound = message.direction === "inbound";
+            // Check if previous message is from same sender to group them (optional enhancement, skipping complex logic for now)
             return (
-              <div key={message.id} className={`flex flex-col max-w-[85%] ${isInbound ? 'self-start' : 'self-end'}`}>
+              <div key={message.id} className={`flex flex-col max-w-[85%] lg:max-w-[75%] ${isInbound ? 'self-start' : 'self-end'} group`}>
                 <div 
-                  className={`p-3.5 rounded-2xl text-sm ${
+                  className={`px-4 py-3 text-[15px] leading-relaxed shadow-sm ${
                     isInbound 
-                      ? 'bg-white/10 text-foreground rounded-tl-sm' 
-                      : 'bg-primary text-primary-foreground rounded-tr-sm'
+                      ? 'bg-[#1E293B] text-white rounded-2xl rounded-tl-sm border border-white/5' 
+                      : 'bg-primary text-primary-foreground rounded-2xl rounded-tr-sm'
                   }`}
                 >
                   {message.mensagem}
                 </div>
-                <div className={`text-[10px] text-muted-foreground mt-1 ${isInbound ? 'text-left' : 'text-right'}`}>
-                  {new Date(message.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                <div className={`text-[10px] font-medium text-muted-foreground mt-1.5 opacity-70 group-hover:opacity-100 transition-opacity ${isInbound ? 'text-left ml-1' : 'text-right mr-1'}`}>
+                  {formatRelativeDate(message.created_at)}
                 </div>
               </div>
             );
@@ -708,11 +769,11 @@ export default function InboxPage({
         </div>
 
         {/* Chat Footer / Composer */}
-        <div className="p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] lg:pb-4 bg-card/80 border-t border-white/5 shrink-0">
-          <form onSubmit={handleReplySubmit} className="flex items-end gap-3 max-w-4xl mx-auto">
-            <div className="flex-1 bg-black/40 rounded-2xl border border-white/10 overflow-hidden focus-within:border-primary/50 transition-colors">
+        <div className="p-3 lg:p-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] bg-[#0B0F19] lg:bg-card/90 border-t border-white/5 shrink-0 backdrop-blur-lg">
+          <form onSubmit={handleReplySubmit} className="flex items-end gap-2 lg:gap-3 max-w-4xl mx-auto">
+            <div className="flex-1 bg-[#1E293B] rounded-2xl border border-white/10 overflow-hidden focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/50 transition-all shadow-inner">
               <textarea
-                className="w-full bg-transparent p-4 text-sm resize-none outline-none min-h-[50px] max-h-[150px]"
+                className="w-full bg-transparent px-4 py-3.5 text-sm resize-none outline-none min-h-[52px] max-h-[150px] text-white placeholder:text-muted-foreground/70"
                 rows={1}
                 placeholder="Escreva sua resposta..."
                 value={replyText}
@@ -728,9 +789,9 @@ export default function InboxPage({
             <button
               type="submit"
               disabled={isSaving || !replyText.trim()}
-              className="shrink-0 h-[50px] w-[50px] rounded-full bg-primary flex items-center justify-center text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:hover:bg-primary transition-all shadow-lg"
+              className="shrink-0 h-[52px] w-[52px] rounded-2xl bg-primary flex items-center justify-center text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:hover:bg-primary transition-all shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] disabled:shadow-none hover:shadow-[0_6px_20px_rgba(37,99,235,0.23)] hover:-translate-y-0.5 active:translate-y-0"
             >
-              <Send size={18} className="ml-1" />
+              {isSaving ? <RotateCcw size={20} className="animate-spin" /> : <Send size={20} className="ml-1" />}
             </button>
           </form>
         </div>
@@ -743,57 +804,60 @@ export default function InboxPage({
     if (!selectedConversation) return null;
 
     return (
-      <div className={`flex-col bg-card border-l border-white/5 h-full overflow-y-auto ${mobileView === "context" ? "flex absolute inset-0 z-50" : "hidden lg:flex"} lg:w-[320px] xl:w-[380px] shrink-0`}>
+      <div className={`flex-col bg-[#050A14] lg:bg-card border-l border-white/5 h-full overflow-y-auto ${mobileView === "context" ? "flex animate-in slide-in-from-right duration-200 absolute inset-0 z-50 lg:static" : "hidden lg:flex"} w-full lg:w-[320px] xl:w-[380px] shrink-0`}>
         
         {/* Mobile header for context */}
-        <div className="lg:hidden h-16 shrink-0 border-b border-white/5 bg-card flex items-center px-4">
-          <button onClick={() => setMobileView("chat")} className="p-3 -ml-3 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-muted-foreground hover:bg-white/5 gap-2">
-            <MoveRight size={20} className="rotate-180 shrink-0" /> <span className="font-semibold text-sm">Voltar ao Chat</span>
+        <div className="lg:hidden h-16 shrink-0 border-b border-white/5 bg-[#1E293B]/50 backdrop-blur-md flex items-center px-4 shadow-sm z-10 sticky top-0">
+          <button onClick={() => setMobileView("chat")} className="p-2.5 -ml-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-white hover:bg-white/10 transition-colors gap-2">
+            <MoveRight size={22} className="rotate-180 shrink-0" /> <span className="font-bold text-sm">Voltar ao Chat</span>
           </button>
         </div>
 
-        <div className="p-6 flex flex-col gap-8">
+        <div className="p-6 flex flex-col gap-8 scroll-smooth">
           
           {/* AI Recommendation Panel */}
           {recommendation && (
-            <div className={`p-5 rounded-3xl border ${recommendation.priority === 'Alta' ? 'bg-amber-500/5 border-amber-500/20' : 'bg-primary/5 border-primary/20'}`}>
-              <div className="flex items-center gap-2 mb-3">
-                <Sparkles size={16} className={recommendation.priority === 'Alta' ? 'text-amber-500' : 'text-primary'} />
-                <h3 className="font-bold text-sm">Inteligência Comercial</h3>
+            <div className={`p-5 rounded-3xl border shadow-lg relative overflow-hidden ${recommendation.priority === 'Alta' ? 'bg-gradient-to-br from-amber-500/10 to-amber-500/5 border-amber-500/30' : 'bg-gradient-to-br from-primary/10 to-primary/5 border-primary/30'}`}>
+              <div className={`absolute top-0 right-0 w-32 h-32 blur-3xl rounded-full opacity-20 pointer-events-none ${recommendation.priority === 'Alta' ? 'bg-amber-500' : 'bg-primary'}`} />
+              <div className="flex items-center gap-2 mb-3 relative z-10">
+                <Sparkles size={18} className={recommendation.priority === 'Alta' ? 'text-amber-500' : 'text-primary'} />
+                <h3 className="font-bold text-sm text-white">Inteligência Comercial</h3>
               </div>
-              <p className="text-sm font-medium text-foreground mb-2">{recommendation.nextAction}</p>
-              <div 
-                className="p-3 rounded-xl bg-black/20 text-xs text-muted-foreground border border-white/5 cursor-pointer hover:bg-white/5 transition-colors group"
+              <p className="text-[13px] font-medium text-white/90 mb-4 relative z-10 leading-relaxed">{recommendation.nextAction}</p>
+              <button 
+                type="button"
+                className={`w-full p-3.5 rounded-xl text-left text-[13px] border transition-all relative z-10 shadow-sm flex flex-col gap-1.5 ${recommendation.priority === 'Alta' ? 'bg-amber-500/10 border-amber-500/20 hover:bg-amber-500/20 text-amber-100 hover:border-amber-500/40' : 'bg-primary/10 border-primary/20 hover:bg-primary/20 text-primary-100 hover:border-primary/40'}`}
                 onClick={() => setReplyText(recommendation.suggestedReply)}
-                title="Clique para usar esta sugestão"
+                title="Clique para preencher a resposta"
               >
-                <span className="block mb-1 text-[10px] uppercase font-bold tracking-wider opacity-50 group-hover:text-primary transition-colors">Sugestão de resposta (Clique para usar)</span>
-                "{recommendation.suggestedReply}"
-              </div>
+                <span className="text-[10px] uppercase font-bold tracking-widest opacity-60">Usar Sugestão</span>
+                <span className="font-medium">"{recommendation.suggestedReply}"</span>
+              </button>
             </div>
           )}
 
           {/* CRM Context Panel */}
           <div className="flex flex-col gap-4">
-            <h3 className="font-bold text-sm tracking-widest uppercase text-muted-foreground">Contexto de CRM</h3>
+            <h3 className="font-bold text-xs tracking-widest uppercase text-muted-foreground ml-1">Contexto de CRM</h3>
             
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-4">
               {/* Contato Link */}
-              <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 flex flex-col gap-3">
+              <div className={`p-4.5 rounded-2xl border flex flex-col gap-3.5 shadow-sm transition-all ${linkedContact ? 'bg-[#1E293B]/40 border-green-500/20' : 'bg-[#1E293B]/40 border-white/10'}`}>
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-sm font-semibold">
-                    <UsersRound size={16} className="text-muted-foreground" />
+                  <div className="flex items-center gap-2 text-sm font-bold text-white">
+                    <UsersRound size={18} className={linkedContact ? 'text-green-500' : 'text-muted-foreground'} />
                     <span>Contato</span>
                   </div>
-                  {linkedContact && <CheckCircle2 size={14} className="text-green-500" />}
+                  {linkedContact && <CheckCircle2 size={16} className="text-green-500" />}
                 </div>
                 
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  {linkedContact ? `${linkedContact.nome} (${linkedContact.telefone})` : "Nenhum contato encontrado. Deseja registrar no banco de dados?"}
+                <p className="text-[13px] text-muted-foreground leading-relaxed">
+                  {linkedContact ? <span className="text-white/80">{linkedContact.nome} <br/><span className="opacity-70 text-[11px] font-medium">{linkedContact.telefone}</span></span> : "Nenhum contato encontrado. Deseja registrar no banco de dados?"}
                 </p>
 
                 <button
-                  className={`w-full py-2 px-3 rounded-lg text-xs font-semibold transition-colors ${conversationHasContactLink ? 'bg-white/5 text-muted-foreground cursor-not-allowed' : 'bg-white/10 hover:bg-white/20 text-foreground'}`}
+                  type="button"
+                  className={`w-full py-2.5 px-3 rounded-xl text-[13px] font-bold transition-all ${conversationHasContactLink ? 'bg-white/5 text-muted-foreground cursor-not-allowed border border-white/5' : 'bg-white/10 hover:bg-white/20 text-white border border-white/10 hover:border-white/20 shadow-sm'}`}
                   disabled={isSaving || !sourceMessage || conversationHasContactLink}
                   onClick={() => sourceMessage && onCreateContact(sourceMessage)}
                 >
@@ -802,21 +866,22 @@ export default function InboxPage({
               </div>
 
               {/* Lead Link */}
-              <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 flex flex-col gap-3">
+              <div className={`p-4.5 rounded-2xl border flex flex-col gap-3.5 shadow-sm transition-all ${linkedLead ? 'bg-[#1E293B]/40 border-green-500/20' : 'bg-[#1E293B]/40 border-primary/20'}`}>
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-sm font-semibold">
-                    <Target size={16} className="text-muted-foreground" />
+                  <div className="flex items-center gap-2 text-sm font-bold text-white">
+                    <Target size={18} className={linkedLead ? 'text-green-500' : 'text-primary'} />
                     <span>Lead</span>
                   </div>
-                  {linkedLead && <CheckCircle2 size={14} className="text-green-500" />}
+                  {linkedLead && <CheckCircle2 size={16} className="text-green-500" />}
                 </div>
                 
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  {linkedLead ? `Lead ativo com interesse em ${linkedLead.interesse || 'indefinido'}.` : "O contato demonstrou interesse comercial? Transforme-o em Lead."}
+                <p className="text-[13px] text-muted-foreground leading-relaxed">
+                  {linkedLead ? <span className="text-white/80">Lead ativo com interesse em <strong>{linkedLead.interesse || 'indefinido'}</strong>.</span> : "O contato demonstrou interesse comercial? Transforme-o em Lead."}
                 </p>
 
                 <button
-                  className={`w-full py-2 px-3 rounded-lg text-xs font-semibold transition-colors ${conversationHasLeadLink ? 'bg-white/5 text-muted-foreground cursor-not-allowed' : 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg'}`}
+                  type="button"
+                  className={`w-full py-2.5 px-3 rounded-xl text-[13px] font-bold transition-all ${conversationHasLeadLink ? 'bg-white/5 text-muted-foreground cursor-not-allowed border border-white/5' : 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_4px_14px_0_rgba(37,99,235,0.25)] hover:shadow-[0_6px_20px_rgba(37,99,235,0.3)]'}`}
                   disabled={isSaving || !sourceMessage || conversationHasLeadLink}
                   onClick={() => sourceMessage && onCreateLead(sourceMessage)}
                 >
@@ -825,21 +890,22 @@ export default function InboxPage({
               </div>
 
               {/* Oportunidade Link */}
-              <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 flex flex-col gap-3">
+              <div className={`p-4.5 rounded-2xl border flex flex-col gap-3.5 shadow-sm transition-all ${linkedOpportunity ? 'bg-[#1E293B]/40 border-green-500/20' : 'bg-[#1E293B]/40 border-primary/20'}`}>
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-sm font-semibold">
-                    <CircleDollarSign size={16} className="text-muted-foreground" />
+                  <div className="flex items-center gap-2 text-sm font-bold text-white">
+                    <CircleDollarSign size={18} className={linkedOpportunity ? 'text-green-500' : 'text-primary'} />
                     <span>Oportunidade</span>
                   </div>
-                  {linkedOpportunity && <CheckCircle2 size={14} className="text-green-500" />}
+                  {linkedOpportunity && <CheckCircle2 size={16} className="text-green-500" />}
                 </div>
                 
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  {linkedOpportunity ? `Oportunidade aberta na etapa: ${linkedOpportunity.etapa}.` : "Negociação iniciada? Abra uma oportunidade no Funil."}
+                <p className="text-[13px] text-muted-foreground leading-relaxed">
+                  {linkedOpportunity ? <span className="text-white/80">Oportunidade aberta na etapa: <strong>{linkedOpportunity.etapa}</strong>.</span> : "Negociação iniciada? Abra uma oportunidade no Funil."}
                 </p>
 
                 <button
-                  className={`w-full py-2 px-3 rounded-lg text-xs font-semibold transition-colors ${conversationHasOpportunityReady ? 'bg-white/5 text-muted-foreground cursor-not-allowed' : 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg'}`}
+                  type="button"
+                  className={`w-full py-2.5 px-3 rounded-xl text-[13px] font-bold transition-all ${conversationHasOpportunityReady ? 'bg-white/5 text-muted-foreground cursor-not-allowed border border-white/5' : 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_4px_14px_0_rgba(37,99,235,0.25)] hover:shadow-[0_6px_20px_rgba(37,99,235,0.3)]'}`}
                   disabled={isSaving || !sourceMessage || conversationHasOpportunityReady}
                   onClick={() => sourceMessage && onCreateOpportunity(sourceMessage)}
                 >
