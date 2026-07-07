@@ -10,6 +10,7 @@ type NormalizedInboundMessage = {
   senderName: string;
   message: string;
   messageType: string;
+  direction: "inbound" | "outbound";
 };
 
 type ProcessedMessage = {
@@ -80,7 +81,7 @@ function extractEvolutionMessages(payload: JsonRecord): NormalizedInboundMessage
   if (!data) return [];
 
   const key = getNestedRecord(data, "key");
-  if (!key || key.fromMe) return []; // Ignore outgoing messages
+  if (!key) return [];
 
   const remoteJid = asString(key.remoteJid) ?? "";
   if (remoteJid.includes("@g.us")) return []; // Ignore group messages
@@ -122,6 +123,7 @@ function extractEvolutionMessages(payload: JsonRecord): NormalizedInboundMessage
     senderName,
     message: messageText.trim(),
     messageType,
+    direction: key.fromMe ? "outbound" : "inbound",
   }];
 }
 
@@ -241,7 +243,7 @@ async function processInboundMessage(
       remetente_nome: contact?.nome ?? inboundMessage.senderName,
       telefone: inboundMessage.fromPhone,
       mensagem: inboundMessage.message,
-      direction: "inbound",
+      direction: inboundMessage.direction,
       status: "nova",
       metadata: {
         message_type: inboundMessage.messageType,

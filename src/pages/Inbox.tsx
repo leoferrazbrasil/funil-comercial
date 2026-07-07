@@ -525,10 +525,9 @@ export default function InboxPage({
     : linkedContact
       ? `Contato: ${linkedContact.nome}`
       : "Sem registro comercial";
-
   useEffect(() => {
-    setReplyText(recommendation?.suggestedReply ?? "");
-  }, [selectedConversation?.key, recommendation?.suggestedReply]);
+    setReplyText("");
+  }, [selectedConversation?.key]);
 
   const handleReplySubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -763,8 +762,12 @@ export default function InboxPage({
                 <h3 className="font-bold text-sm">Inteligência Comercial</h3>
               </div>
               <p className="text-sm font-medium text-foreground mb-2">{recommendation.nextAction}</p>
-              <div className="p-3 rounded-xl bg-black/20 text-xs text-muted-foreground border border-white/5">
-                <span className="block mb-1 text-[10px] uppercase font-bold tracking-wider opacity-50">Sugestão de resposta</span>
+              <div 
+                className="p-3 rounded-xl bg-black/20 text-xs text-muted-foreground border border-white/5 cursor-pointer hover:bg-white/5 transition-colors group"
+                onClick={() => setReplyText(recommendation.suggestedReply)}
+                title="Clique para usar esta sugestão"
+              >
+                <span className="block mb-1 text-[10px] uppercase font-bold tracking-wider opacity-50 group-hover:text-primary transition-colors">Sugestão de resposta (Clique para usar)</span>
                 "{recommendation.suggestedReply}"
               </div>
             </div>
