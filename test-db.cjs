@@ -1,16 +1,16 @@
-const { createClient } = require('@supabase/supabase-js');
-require('dotenv').config();
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+const url = "https://juvwfxnlusrnvcarkrmc.supabase.co/rest/v1/inbox_messages?select=*&order=created_at.desc&limit=20";
+const key = "sb_publishable_yHgMqSz5KFAAPpWUht81vA_Rrjy36VF";
 
-async function check() {
-  const { data, error } = await supabase
-    .from('inbox_messages')
-    .select('id, telefone, remetente_nome, direction, mensagem, created_at, contact_id')
-    .order('created_at', { ascending: false })
-    .limit(30);
-  
-  if (error) console.error(error);
-  console.log(JSON.stringify(data, null, 2));
-}
-
-check();
+fetch(url, {
+  headers: {
+    "apikey": key,
+    "Authorization": `Bearer ${key}`
+  }
+})
+.then(res => res.json())
+.then(data => {
+  data.forEach(m => {
+    console.log(`[${m.created_at}] ${m.remetente_nome} | tel: '${m.telefone}' | dir: ${m.direction} | msg: ${m.mensagem.substring(0,20)}... | id: ${m.id}`);
+  });
+})
+.catch(console.error);

@@ -158,6 +158,11 @@ const unifyPhone = (phone: string | null | undefined) => {
     p = p.substring(1);
   }
   
+  // If it starts with 550, strip the 0
+  while (p.startsWith("550")) {
+    p = "55" + p.substring(3);
+  }
+  
   if (p.length === 10 || p.length === 11) {
     p = "55" + p;
   }
@@ -694,7 +699,7 @@ export default function InboxPage({
                   <div className="flex-1 min-w-0 mt-0.5">
                     <div className="flex items-center justify-between mb-1.5">
                       <strong className={`text-sm truncate ${hasUnread ? 'text-foreground font-bold' : 'text-foreground/90 font-medium'}`}>
-                        {conv.latestInbound.remetente_nome}
+                        {conv.latestInbound.remetente_nome} ({conv.latest.telefone}) [{conv.key}]
                       </strong>
                       <span className={`text-[11px] shrink-0 ml-2 font-medium ${hasUnread ? 'text-primary' : 'text-muted-foreground'}`}>
                         {formatRelativeDate(conv.latest.created_at)}
