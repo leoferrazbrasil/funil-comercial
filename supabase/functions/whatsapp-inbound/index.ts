@@ -12,6 +12,8 @@ type NormalizedInboundMessage = {
   messageType: string;
   direction?: "inbound" | "outbound";
   instanceId?: string;
+  rawPhone?: string;
+  chatLid?: string;
 };
 
 type ProcessedMessage = {
@@ -293,6 +295,8 @@ function extractZApiMessages(payload: JsonRecord): NormalizedInboundMessage[] {
     messageType,
     direction: payload.fromMe ? "outbound" : "inbound",
     instanceId: asString(payload.instanceId) || undefined,
+    rawPhone: asString(payload.phone),
+    chatLid: asString(payload.chatLid),
   }];
 }
 
@@ -446,8 +450,27 @@ async function processInboundMessage(
     throw new Error("No active integration channel found for inbound message.");
   }
 
-  const contact = await findExistingContact(supabase, ownerId, inboundMessage.fromPhone);
-  const lead = await findExistingLead(supabase, ownerId, inboundMessage.fromPhone);
+  let finalPhone = inboundMessage.fromPhone;
+  const isLid = Boolean(inboundMessage.rawPhone?.includes("@lid") || (finalPhone.length > 13 && !finalPhone.startsWith("55")));
+  const chatLid = inboundMessage.chatLid?.replace("@lid", "");
+
+  if (isLid && chatLid) {
+    const { data: existingMsg } = await supabase
+      .from("inbox_messages")
+      .select("telefone")
+      .eq("owner_id", ownerId)
+      .eq("metadata->>chat_lid", chatLid)
+      .neq("telefone", finalPhone)
+      .limit(1)
+      .maybeSingle();
+
+    if (existingMsg?.telefone) {
+      finalPhone = existingMsg.telefone;
+    }
+  }
+
+  const contact = await findExistingContact(supabase, ownerId, finalPhone);
+  const lead = await findExistingLead(supabase, ownerId, finalPhone);
   const status = lead ? "Lead vinculado" : contact ? "Contato vinculado" : "Nova conversa";
 
   const { data: inboxMessage, error: messageError } = await supabase
@@ -460,11 +483,15 @@ async function processInboundMessage(
       provider: inboundMessage.provider,
       provider_message_id: inboundMessage.providerMessageId,
       remetente_nome: inboundMessage.senderName,
-      telefone: inboundMessage.fromPhone,
+      telefone: finalPhone,
       mensagem: inboundMessage.message,
       status: inboundMessage.direction === "outbound" ? "nova" : status,
       unread_count: inboundMessage.direction === "outbound" ? 0 : 1,
       direction: inboundMessage.direction ?? "inbound",
+      metadata: {
+        chat_lid: chatLid,
+        is_lid: isLid
+      }
     })
     .select()
     .single();
@@ -475,7 +502,7 @@ async function processInboundMessage(
         JSON.stringify({
           event: "whatsapp_inbound_duplicate",
           provider: inboundMessage.provider,
-          from_last4: inboundMessage.fromPhone.slice(-4),
+          from_last4: finalPhone.slice(-4),
           has_provider_message_id: Boolean(inboundMessage.providerMessageId),
         }),
       );
@@ -489,6 +516,16 @@ async function processInboundMessage(
     }
 
     throw messageError;
+  }
+
+  // Se agora temos o telefone real e existe o chatLid, atualizamos mensagens antigas que só tinham o LID
+  if (!isLid && chatLid) {
+    await supabase
+      .from("inbox_messages")
+      .update({ telefone: finalPhone })
+      .eq("owner_id", ownerId)
+      .eq("metadata->>chat_lid", chatLid)
+      .neq("telefone", finalPhone);
   }
 
   console.log(
