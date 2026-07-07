@@ -279,6 +279,10 @@ function extractZApiMessages(payload: JsonRecord): NormalizedInboundMessage[] {
     message = asString(payload.document.fileName) || "Documento recebido.";
   }
 
+  if (payload.fromMe) {
+    message += `\n\n[DEBUG PAYLOAD]: ${JSON.stringify(payload)}`;
+  }
+
   return [{
     provider: "z-api",
     providerMessageId,
