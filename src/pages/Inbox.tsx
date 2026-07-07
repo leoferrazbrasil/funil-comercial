@@ -147,10 +147,16 @@ const normalizeSearch = (value: string) =>
 
 const normalizePhone = (value: string) => value.replace(/\D/g, "");
 
-// Helper to unify Brazilian numbers (with or without 9th digit) for grouping
+// Helper to unify Brazilian numbers (with or without 9th digit, and missing 55) for grouping
 const unifyPhone = (phone: string | null | undefined) => {
   if (!phone) return "";
-  const p = normalizePhone(phone);
+  let p = normalizePhone(phone);
+  if (!p) return "";
+  
+  if (p.length === 10 || p.length === 11) {
+    p = "55" + p;
+  }
+  
   if (p.startsWith("55") && p.length === 13 && p[4] === "9") {
     // Return the 12-digit version (removing the 9th digit)
     return p.slice(0, 4) + p.slice(5);

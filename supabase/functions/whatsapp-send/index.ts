@@ -29,8 +29,18 @@ const jsonResponse = (body: unknown, status = 200) =>
 const isRecord = (value: unknown): value is JsonRecord =>
   Boolean(value) && typeof value === "object" && !Array.isArray(value);
 
-const normalizePhone = (value: string | null | undefined) =>
-  value?.replace("whatsapp:", "").replace(/\D/g, "") ?? "";
+const normalizePhone = (value: string | null | undefined) => {
+  const p = value?.replace("whatsapp:", "").replace(/\D/g, "") ?? "";
+  if (!p) return "";
+  let unified = p;
+  if (unified.length === 10 || unified.length === 11) {
+    unified = "55" + unified;
+  }
+  if (unified.startsWith("55") && unified.length === 13 && unified[4] === "9") {
+    return unified.slice(0, 4) + unified.slice(5);
+  }
+  return unified;
+};
 
 const asString = (value: unknown) =>
   typeof value === "string" && value.trim() ? value.trim() : null;

@@ -86,7 +86,18 @@ type IntegrationChannelPayload = {
   status?: IntegrationChannel["status"];
 };
 
-const normalizePhone = (phone: string) => phone.replace(/\D/g, "");
+const normalizePhone = (value: string | null | undefined) => {
+  const p = value?.replace(/\D/g, "") ?? "";
+  if (!p) return "";
+  let unified = p;
+  if (unified.length === 10 || unified.length === 11) {
+    unified = "55" + unified;
+  }
+  if (unified.startsWith("55") && unified.length === 13 && unified[4] === "9") {
+    return unified.slice(0, 4) + unified.slice(5);
+  }
+  return unified;
+};
 
 export async function upsertProfile(user: User) {
   const supabase = requireSupabase();
