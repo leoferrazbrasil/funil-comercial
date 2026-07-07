@@ -72,7 +72,8 @@ async function readPayload(request: Request) {
 }
 
 function extractEvolutionMessages(payload: JsonRecord): NormalizedInboundMessage[] {
-  if (payload.event !== "messages.upsert") return [];
+  const allowedEvents = ["messages.upsert", "MESSAGES_UPSERT", "send.message", "SEND_MESSAGE", "send_message"];
+  if (!allowedEvents.includes(asString(payload.event) ?? "")) return [];
   
   const instance = asString(payload.instance);
   if (!instance) return [];

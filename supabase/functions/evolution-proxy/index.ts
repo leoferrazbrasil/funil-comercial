@@ -107,7 +107,7 @@ Deno.serve(async (request) => {
             url: functionUrl,
             webhook_by_events: false,
             webhook_base64: false,
-            events: ["MESSAGES_UPSERT", "messages.upsert", "messages-upsert"] // Send common formats
+            events: ["MESSAGES_UPSERT", "messages.upsert", "messages-upsert", "SEND_MESSAGE", "send.message"] // Send common formats
           })
         });
 
