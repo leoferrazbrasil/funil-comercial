@@ -1,12 +1,12 @@
 param(
-  [string]$ProjectRef = "dtdtewojmyhiegwmgmte",
+  [string]$ProjectRef = "juvwfxnlusrnvcarkrmc",
   [switch]$UseApi,
   [switch]$SkipDenoCheck
 )
 
 $ErrorActionPreference = "Stop"
 
-$ExpectedProjectRef = "dtdtewojmyhiegwmgmte"
+$ExpectedProjectRef = "juvwfxnlusrnvcarkrmc"
 if ($ProjectRef -ne $ExpectedProjectRef) {
   throw "ProjectRef recusado. Esperado: $ExpectedProjectRef"
 }
