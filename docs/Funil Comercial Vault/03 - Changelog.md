@@ -1,5 +1,13 @@
 # Changelog
 
+## [2026-07-07] - Correção de Duplicidade de Chats no Inbox
+
+### Modificado
+- **Lógica de Normalização de Telefones**:
+  - `unifyPhone` (Front-end): Atualizado para adicionar o DDI `55` em números brasileiros que chegam com 10 ou 11 dígitos, garantindo o agrupamento correto na interface de usuário.
+  - `whatsapp-inbound` e `whatsapp-send` (Edge Functions): A normalização de telefones foi atualizada para aplicar a mesma regra, registrando todas as interações no banco de dados (`inbox_messages`) com o formato unificado de 12 dígitos, eliminando a criação de chats duplicados e garantindo a vinculação correta ao CRM.
+  - `crmService.ts`: Atualizado para aplicar a normalização consistente na criação e atualização de contatos e leads.
+
 ## [2026-07-06] - Correções Z-API, Abas do Inbox e Tempo Real
 
 ### Adicionado
