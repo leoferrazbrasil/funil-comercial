@@ -48,6 +48,15 @@ $project = $projects | Where-Object { $_.ref -eq $ProjectRef } | Select-Object -
 if (-not $project) {
   throw "Token Supabase atual nao tem acesso ao projeto $ProjectRef."
 }
+if ($LASTEXITCODE -ne 0) {
+  throw "Nao foi possivel listar projetos Supabase com o token atual."
+}
+
+$projects = $projectsJson | ConvertFrom-Json
+$project = $projects | Where-Object { $_.ref -eq $ProjectRef } | Select-Object -First 1
+if (-not $project) {
+  throw "Token Supabase atual nao tem acesso ao projeto $ProjectRef."
+}
 
 if (-not $SkipDenoCheck) {
   Invoke-Checked @(
@@ -55,6 +64,7 @@ if (-not $SkipDenoCheck) {
     "check",
     "--no-lock",
     "supabase/functions/whatsapp-inbound/index.ts",
+    "supabase/functions/whatsapp-qr-inbound/index.ts",
     "supabase/functions/whatsapp-send/index.ts"
   )
 }
@@ -84,5 +94,16 @@ $deploySend = @(
   "whatsapp-send"
 ) + $deploySharedFlags
 Invoke-Checked $deploySend
+
+$deployQrInbound = @(
+  "npx",
+  "--yes",
+  "supabase",
+  "functions",
+  "deploy",
+  "whatsapp-qr-inbound",
+  "--no-verify-jwt"
+) + $deploySharedFlags
+Invoke-Checked $deployQrInbound
 
 Write-Host "Edge Functions publicadas no projeto $ProjectRef."
