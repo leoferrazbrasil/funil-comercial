@@ -113,3 +113,9 @@
 
 ### Removido
 - Imagens PNG antigas e inconsistentes do logo ("sÃ­mbolo esquisito") sendo totalmente depreciadas no front-end atualizado.
+### 2026-07-08 - Correção Conexão QR Code WhatsApp
+- Backend: Corrigido bug no whatsapp-manager que impedia atualização do status por atraso na resposta do campo phone da Z-API.
+- Backend: Adicionado tratamento de webhook de conexão Z-API no whatsapp-qr-inbound.
+- Frontend: Polling acelerado para 3s durante exibição do QR Code.
+- Frontend: Implementada expiração do QR Code em 60s.
+- Frontend: Novos feedbacks de interface ('QR Code lido', etc).
