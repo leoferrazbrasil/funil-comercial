@@ -289,13 +289,37 @@ function extractZApiMessages(payload: JsonRecord): NormalizedInboundMessage[] {
   const callbackType = asString(payload.type) ?? "";
   if (ZAPI_NON_MESSAGE_TYPES.has(callbackType)) return [];
 
-  const fromPhone = normalizePhone(asString(payload.phone));
-  if (!fromPhone) return [];
+  const rawPhoneStr = asString(payload.phone) ?? "";
+  const isNewsletter = payload.isNewsletter === true || rawPhoneStr.includes("@newsletter");
+  const isGroup = payload.isGroup === true || rawPhoneStr.includes("@g.us");
 
-  const senderName = payloadValue(payload, ["senderName", "chatName", "contactName"]) ?? fromPhone;
+  // Newsletters/communities are one-way broadcast channels (ex.: comunicados de
+  // marketing) — não são conversas de atendimento. Ignorados para não poluir o Inbox.
+  if (isNewsletter) return [];
+
   const providerMessageId = payloadValue(payload, ["messageId", "id"]);
   const toPhone = normalizePhone(asString(payload.connectedPhone));
   const channelIdentifiers = toPhone ? [toPhone] : [];
+
+  // Attribute the message to the REAL sender. In a group, `phone` is the group id;
+  // the actual person is the participant. This groups conversations by pessoa, não
+  // pelo id do grupo, e rotula com o nome do grupo para dar contexto.
+  let fromPhone: string;
+  let senderName: string;
+  if (isGroup) {
+    const participant =
+      asString(payload.participantPhone) ??
+      asString(payload.participantLid) ??
+      asString(payload.participant);
+    fromPhone = normalizePhone(participant) || normalizePhone(rawPhoneStr);
+    const groupName = payloadValue(payload, ["chatName", "groupName"]) ?? "Grupo";
+    const person = payloadValue(payload, ["senderName", "participantName", "pushName"]) ?? fromPhone;
+    senderName = `${person} · ${groupName}`;
+  } else {
+    fromPhone = normalizePhone(rawPhoneStr);
+    senderName = payloadValue(payload, ["senderName", "chatName", "contactName"]) ?? fromPhone;
+  }
+  if (!fromPhone) return [];
 
   let message = "";
   let messageType = "text";
