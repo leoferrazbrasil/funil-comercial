@@ -57,6 +57,26 @@ const isRecord = (value: unknown): value is JsonRecord =>
 const asString = (value: unknown) =>
   typeof value === "string" && value.trim() ? value.trim() : null;
 
+// Supabase/Postgres errors are plain objects (NOT Error instances), so the old
+// `error instanceof Error ? error.message : "Unexpected webhook error."` swallowed
+// the real cause. This surfaces code/message/details/hint for real diagnosis.
+const describeError = (error: unknown): string => {
+  if (error instanceof Error) return error.message;
+  if (error && typeof error === "object") {
+    const e = error as Record<string, unknown>;
+    const parts = [e.message, e.code, e.details, e.hint].filter(
+      (v): v is string => typeof v === "string" && v.length > 0,
+    );
+    if (parts.length) return parts.join(" | ");
+    try {
+      return JSON.stringify(error);
+    } catch {
+      return String(error);
+    }
+  }
+  return String(error);
+};
+
 const normalizePhone = (value: string | null | undefined) => {
   const p = value?.replace("whatsapp:", "").replace(/\D/g, "") ?? "";
   if (!p) return "";
@@ -249,19 +269,31 @@ function extractWhatsAppCloudMessages(payload: JsonRecord): NormalizedInboundMes
   return inboundMessages;
 }
 
+// Z-API callback types that are NOT chat messages (delivery/read receipts,
+// presence, connection). They carry no body and must be ignored gracefully —
+// NOT treated as "missing body" errors (which caused 500s + webhook retries).
+const ZAPI_NON_MESSAGE_TYPES = new Set([
+  "DeliveryCallback",
+  "ReadCallback",
+  "MessageStatusCallback",
+  "PresenceChatCallback",
+  "ChatPresence",
+  "ConnectedCallback",
+  "DisconnectedCallback",
+]);
+
 function extractZApiMessages(payload: JsonRecord): NormalizedInboundMessage[] {
-  // Z-API usually sends individual messages or arrays depending on the webhook configuration.
-  // For standard "on-message-received" webhook:
+  // Standard Z-API "on-message-received" (and "notify sent by me") webhook.
   if (!payload.instanceId || !payload.phone) return [];
 
+  const callbackType = asString(payload.type) ?? "";
+  if (ZAPI_NON_MESSAGE_TYPES.has(callbackType)) return [];
+
   const fromPhone = normalizePhone(asString(payload.phone));
-  const senderName = payloadValue(payload, ["senderName", "contactName"]) ?? fromPhone;
-  const providerMessageId = payloadValue(payload, ["messageId"]);
-  
-  // Actually ZAPI sends connected phone in "connectedPhone" or similar?
-  // Since we don't know the exact toPhone from the webhook payload easily unless it's in connectedPhone
-  // we will try to extract it if available, otherwise just use fromPhone for now and the routing query will match by owner_id and provider anyway?
-  // Wait, the routing matches by channelIdentifiers. ZAPI sends `connectedPhone` in some webhooks.
+  if (!fromPhone) return [];
+
+  const senderName = payloadValue(payload, ["senderName", "chatName", "contactName"]) ?? fromPhone;
+  const providerMessageId = payloadValue(payload, ["messageId", "id"]);
   const toPhone = normalizePhone(asString(payload.connectedPhone));
   const channelIdentifiers = toPhone ? [toPhone] : [];
 
@@ -270,16 +302,47 @@ function extractZApiMessages(payload: JsonRecord): NormalizedInboundMessage[] {
 
   if (isRecord(payload.text)) {
     message = asString(payload.text.message) || "";
-  } else if (isRecord(payload.audio)) {
-    messageType = "audio";
-    message = "Áudio recebido.";
   } else if (isRecord(payload.image)) {
     messageType = "image";
-    message = asString(payload.image.caption) || "Imagem recebida.";
+    message = asString(payload.image.caption) || "📷 Imagem recebida.";
+  } else if (isRecord(payload.audio)) {
+    messageType = "audio";
+    message = "🎤 Áudio recebido.";
+  } else if (isRecord(payload.video)) {
+    messageType = "video";
+    message = asString(payload.video.caption) || "🎬 Vídeo recebido.";
   } else if (isRecord(payload.document)) {
     messageType = "document";
-    message = asString(payload.document.fileName) || "Documento recebido.";
+    message = asString(payload.document.fileName) || asString(payload.document.caption) || "📄 Documento recebido.";
+  } else if (isRecord(payload.sticker)) {
+    messageType = "sticker";
+    message = "Figurinha recebida.";
+  } else if (isRecord(payload.location)) {
+    messageType = "location";
+    message = "📍 Localização recebida.";
+  } else if (isRecord(payload.contact) || isRecord(payload.contacts)) {
+    messageType = "contact";
+    message = "👤 Contato recebido.";
+  } else if (isRecord(payload.reaction)) {
+    messageType = "reaction";
+    message = asString(payload.reaction.value) || "Reação recebida.";
+  } else if (isRecord(payload.buttonsResponseMessage)) {
+    message = asString(payload.buttonsResponseMessage.message) || "Resposta recebida.";
+  } else if (isRecord(payload.listResponseMessage)) {
+    const list = payload.listResponseMessage as JsonRecord;
+    message = asString(list.message) || asString(list.title) || "Resposta recebida.";
+  } else if (isRecord(payload.poll)) {
+    messageType = "poll";
+    message = asString((payload.poll as JsonRecord).name) || "Enquete recebida.";
   }
+
+  // A real message whose specific type we don't parse — keep it visible.
+  if (!message && providerMessageId) {
+    message = "Mensagem recebida.";
+  }
+
+  // No body and no message id → not a chat message; ignore instead of erroring.
+  if (!message) return [];
 
   return [{
     provider: "z-api",
@@ -407,6 +470,8 @@ async function findExistingContact(
     .select("*")
     .eq("owner_id", ownerId)
     .in("telefone", variations)
+    .order("created_at", { ascending: false })
+    .limit(1)
     .maybeSingle();
 
   if (error) throw error;
@@ -598,6 +663,19 @@ Deno.serve(async (request) => {
       return jsonResponse({ error: "Webhook nao autorizado." }, 401);
     }
 
+    // Diagnostic: log the raw Z-API payload so the exact event shape is visible
+    // in the function logs (keys + a truncated body — no secrets are involved).
+    if (isZApi) {
+      const rawPreview = rawBody.length > 2000 ? rawBody.slice(0, 2000) + "…(truncado)" : rawBody;
+      console.log(JSON.stringify({
+        event: "whatsapp_inbound_received",
+        type: payload.type ?? null,
+        fromMe: payload.fromMe ?? null,
+        keys: Object.keys(payload),
+        raw: rawPreview,
+      }));
+    }
+
     const inboundMessages = getInboundMessages(payload);
     if (inboundMessages.length === 0) {
       return jsonResponse({ ok: true, ignored: true, reason: "no_inbound_messages" });
@@ -605,17 +683,31 @@ Deno.serve(async (request) => {
 
     const supabase = getSupabaseClient();
     const results: ProcessedMessage[] = [];
+    let failed = 0;
+    // Process each message in isolation: one bad event must not fail the whole
+    // batch nor trigger a 500 (which makes Z-API retry the same event forever).
     for (const inboundMessage of inboundMessages) {
-      results.push(await processInboundMessage(supabase, inboundMessage));
+      try {
+        results.push(await processInboundMessage(supabase, inboundMessage));
+      } catch (error) {
+        failed += 1;
+        console.error(JSON.stringify({
+          event: "whatsapp_inbound_message_error",
+          reason: describeError(error),
+          from_last4: inboundMessage.fromPhone?.slice(-4) ?? null,
+          type: inboundMessage.messageType,
+        }));
+      }
     }
 
-    return jsonResponse({ ok: true, processed: results.length, results });
+    // Return 200 even on partial failures: the errors are logged for diagnosis,
+    // and a 500 here only causes Z-API to re-deliver the same failing event.
+    return jsonResponse({ ok: true, processed: results.length, failed });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unexpected webhook error.";
     console.error(
       JSON.stringify({
         event: "whatsapp_inbound_error",
-        message,
+        message: describeError(error),
       }),
     );
 
