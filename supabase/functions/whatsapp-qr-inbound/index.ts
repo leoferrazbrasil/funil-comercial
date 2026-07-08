@@ -154,27 +154,34 @@ async function handleZApiConnectionEvent(
   // Z-API connection payloads might come as `connected: boolean` or `status: "CONNECTED"`
   const isConnectedBool = typeof payload.connected === "boolean" && payload.connected === true;
   const isConnectedStatus = typeof payload.status === "string" && payload.status.toUpperCase() === "CONNECTED";
-  
+
   const hasConnectionInfo = typeof payload.connected === "boolean" || typeof payload.status === "string";
-  if (!hasConnectionInfo) return false;
+  if (!hasConnectionInfo) {
+    console.log("[whatsapp-qr-inbound] Payload is not a Z-API connection event");
+    return false;
+  }
 
   const isConnected = isConnectedBool || isConnectedStatus;
   const phone = asString(payload.phone) ?? asString(payload.connectedPhone);
   const instanceId = asString(payload.instanceId) ?? Deno.env.get("ZAPI_INSTANCE_ID");
 
-  console.log(`[whatsapp-qr-inbound] Z-API connection event: connected=${isConnected}, phone=${phone}, instanceId=${instanceId}`);
+  console.log(`[whatsapp-qr-inbound] ✅ Z-API connection event received: connected=${isConnected}, phone=${phone}, instanceId=${instanceId}`);
 
-  if (!instanceId) return false;
+  if (!instanceId) {
+    console.warn("[whatsapp-qr-inbound] No instanceId found in payload or env");
+    return false;
+  }
 
   // Find the channel by instanceId in metadata
   const { data: channel } = await supabase
     .from("integration_channels")
-    .select("id, status, numero")
+    .select("id, status, numero, owner_id")
     .eq("provider", "z-api")
     .contains("metadata", { instanceId })
     .maybeSingle();
 
   if (!channel) {
+    console.warn(`[whatsapp-qr-inbound] No channel found with instanceId=${instanceId}. Trying fallback...`);
     // Fallback: find any z-api channel (single-instance MVP)
     const { data: anyChannel } = await supabase
       .from("integration_channels")
@@ -183,29 +190,39 @@ async function handleZApiConnectionEvent(
       .maybeSingle();
 
     if (!anyChannel) {
-      console.warn("[whatsapp-qr-inbound] No z-api channel found to update.");
+      console.error("[whatsapp-qr-inbound] ❌ No z-api channel found in entire database to update.");
       return false;
     }
 
     const newStatus = isConnected ? "ativo" : "pausado";
     const newNumero = phone ?? (isConnected ? anyChannel.numero : "disconnected");
-    await supabase
+    const { error } = await supabase
       .from("integration_channels")
       .update({ status: newStatus, numero: newNumero })
       .eq("id", anyChannel.id);
 
-    console.log(`[whatsapp-qr-inbound] Updated channel ${anyChannel.id} to status=${newStatus}, numero=${newNumero}`);
+    if (error) {
+      console.error(`[whatsapp-qr-inbound] ❌ Error updating channel ${anyChannel.id}:`, error);
+      return false;
+    }
+
+    console.log(`[whatsapp-qr-inbound] ✅ Updated channel ${anyChannel.id} to status=${newStatus}, numero=${newNumero}`);
     return true;
   }
 
   const newStatus = isConnected ? "ativo" : "pausado";
   const newNumero = phone ?? (isConnected ? channel.numero : "disconnected");
-  await supabase
+  const { error } = await supabase
     .from("integration_channels")
     .update({ status: newStatus, numero: newNumero })
     .eq("id", channel.id);
 
-  console.log(`[whatsapp-qr-inbound] Updated channel ${channel.id} to status=${newStatus}, numero=${newNumero}`);
+  if (error) {
+    console.error(`[whatsapp-qr-inbound] ❌ Error updating channel ${channel.id}:`, error);
+    return false;
+  }
+
+  console.log(`[whatsapp-qr-inbound] ✅ Updated channel ${channel.id} (owner=${channel.owner_id}) to status=${newStatus}, numero=${newNumero}`);
   return true;
 }
 

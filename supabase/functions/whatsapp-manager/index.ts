@@ -60,8 +60,10 @@ Deno.serve(async (request) => {
     const action = requestUrl.searchParams.get("action");
 
     if (action === "create") {
+      console.log(`[whatsapp-manager] Creating instance for user ${user.id}...`);
       const { instanceId, qrCode, token } = await provider.createInstance(user.id);
-      
+      console.log(`[whatsapp-manager] QR Code generated successfully for instanceId=${instanceId}`);
+
       // Find existing channel for this user/provider
       const { data: existing } = await supabase
         .from('integration_channels')
@@ -72,6 +74,7 @@ Deno.serve(async (request) => {
 
       if (existing) {
         // Update the existing record
+        console.log(`[whatsapp-manager] Updating existing channel ${existing.id}`);
         await supabase
           .from('integration_channels')
           .update({
@@ -82,6 +85,7 @@ Deno.serve(async (request) => {
           .eq('id', existing.id);
       } else {
         // Create a new record
+        console.log(`[whatsapp-manager] Creating new channel for user ${user.id}`);
         await supabase
           .from('integration_channels')
           .insert({
@@ -94,12 +98,13 @@ Deno.serve(async (request) => {
           });
       }
 
+      console.log(`[whatsapp-manager] Channel created/updated. Waiting for QR Code scan...`);
       return jsonResponse({ ok: true, qrCode, instanceId });
     }
 
     if (action === "status") {
       // Find the channel
-      const { data: channel, error } = await supabase
+      const { data: channel } = await supabase
         .from('integration_channels')
         .select('*')
         .eq('owner_id', user.id)
@@ -107,19 +112,22 @@ Deno.serve(async (request) => {
         .maybeSingle();
 
       if (!channel || !channel.metadata?.instanceId) {
+        console.log(`[whatsapp-manager] No z-api channel found for user ${user.id}`);
         return jsonResponse({ connected: false });
       }
 
       const { instanceId, token } = channel.metadata;
+      console.log(`[whatsapp-manager] Checking status for channel ${channel.id} (instanceId=${instanceId})`);
       const status = await provider.getInstanceStatus(instanceId, token);
 
-      console.log(`[whatsapp-manager] Status for channel ${channel.id}: connected=${status.connected}, phone=${status.phone}`);
+      console.log(`[whatsapp-manager] Status for channel ${channel.id}: connected=${status.connected}, phone=${status.phone}, currentDBStatus=${channel.status}`);
 
       if (status.connected) {
         // Always update to 'ativo' when connected, even if phone is not yet available.
         // This fixes the bug where phone=undefined caused the condition to be false,
         // leaving the DB stuck as 'inativo' despite the instance being connected.
         const updatedNumero = status.phone ?? (channel.numero !== 'disconnected' && channel.numero !== 'pending' ? channel.numero : 'connected');
+        console.log(`[whatsapp-manager] Instance connected! Updating channel status to ativo, numero=${updatedNumero}`);
         await supabase
           .from('integration_channels')
           .update({
@@ -128,7 +136,8 @@ Deno.serve(async (request) => {
           })
           .eq('id', channel.id);
       } else if (!status.connected && (channel.status === 'ativo' || channel.status === 'pausado')) {
-         await supabase
+        console.log(`[whatsapp-manager] Instance disconnected. Updating channel status to pausado`);
+        await supabase
           .from('integration_channels')
           .update({
             status: 'pausado'

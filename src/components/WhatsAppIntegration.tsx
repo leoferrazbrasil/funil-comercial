@@ -4,9 +4,15 @@ import { Loader2, Smartphone, QrCode, CheckCircle2, AlertCircle, RefreshCw } fro
 import { toast } from "react-hot-toast";
 
 type ConnectionStatus = "loading" | "connected" | "disconnected" | "error";
-type ScanStatus = "waiting" | "scanned" | "connecting";
+type ScanStatus = "waiting" | "scanned" | "connecting" | "finalizing";
 
-const QR_EXPIRY_MS = 120_000; // Increased to 120s to allow Z-API sufficient time to complete the handshake and sync messages after a successful scan.
+// Increased to 300s (5 minutes) to allow Z-API sufficient time to:
+// 1. Finalize the QR code handshake with WhatsApp
+// 2. Establish the WebSocket connection
+// 3. Sync historical messages
+// 4. Return connected=true status
+// Z-API typically needs 90-180s+ depending on network and message volume
+const QR_EXPIRY_MS = 300_000;
 
 export function WhatsAppIntegration() {
   const [status, setStatus] = useState<ConnectionStatus>("loading");
@@ -35,26 +41,40 @@ export function WhatsAppIntegration() {
           headers: {
             Authorization: `Bearer ${session.access_token}`,
           },
+          // 30 second timeout for status check
+          signal: AbortSignal.timeout(30000),
         }
       );
 
-      if (!response.ok) throw new Error("Failed to check status");
+      if (!response.ok) {
+        console.warn("[WhatsAppIntegration] Status check failed:", response.status);
+        throw new Error("Failed to check status");
+      }
 
       const data = await response.json();
       console.log("[WhatsAppIntegration] Status check:", data);
 
       if (data.connected) {
+        console.log("[WhatsAppIntegration] ✅ Connection successful!");
         setStatus("connected");
         setPhone(data.phone ?? null);
         setQrCode(null);
         setScanStatus("waiting");
         clearQrExpiry();
+        toast.success("WhatsApp conectado com sucesso!");
       } else {
         // Safe update: don't override if real-time listener just set it to connected
-        setStatus((prev) => (prev === "connected" ? "connected" : "disconnected"));
+        setStatus((prev) => {
+          if (prev === "connected") return "connected";
+          if (qrCode && prev === "disconnected") {
+            // Still waiting for connection while QR is visible
+            setScanStatus("connecting");
+          }
+          return "disconnected";
+        });
       }
     } catch (error) {
-      console.error("Error checking WhatsApp status:", error);
+      console.error("[WhatsAppIntegration] Error checking WhatsApp status:", error);
       if (status === "loading") setStatus("error");
     }
   };
@@ -144,12 +164,16 @@ export function WhatsAppIntegration() {
         setQrCode(data.qrCode);
         setStatus("disconnected");
 
-        // Start QR expiry countdown
+        // Start QR expiry countdown (300 seconds = 5 minutes)
         qrExpiryTimer.current = setTimeout(() => {
           setQrExpired(true);
           setQrCode(null);
           setScanStatus("waiting");
-          toast("QR Code expirado. Gere um novo código.", { icon: "⏱️" });
+          setStatus("disconnected");
+          toast.error("QR Code expirado após 5 minutos. Gere um novo código e tente novamente.", {
+            icon: "⏱️",
+            duration: 5000
+          });
         }, QR_EXPIRY_MS);
       } else {
         toast.error("Estamos preparando a conexão. Aguarde alguns segundos e tente novamente.");
@@ -192,9 +216,10 @@ export function WhatsAppIntegration() {
   // Scan status label and icon
   const scanLabel = () => {
     if (qrExpired) return null;
-    if (scanStatus === "scanned") return "QR Code lido. Finalizando conexão...";
-    if (scanStatus === "connecting") return "Conectando ao WhatsApp...";
-    return "Aguardando leitura...";
+    if (scanStatus === "finalizing") return "QR Code lido! Finalizando conexão...";
+    if (scanStatus === "connecting") return "Conectando seu WhatsApp...";
+    if (scanStatus === "scanned") return "Sincronizando mensagens...";
+    return "Aguardando leitura do QR Code...";
   };
 
   return (
@@ -261,9 +286,14 @@ export function WhatsAppIntegration() {
               Nenhum número conectado no momento.
             </p>
             {qrExpired && (
-              <p className="text-xs text-amber-500 text-center">
-                O QR Code anterior expirou. Gere um novo para continuar.
-              </p>
+              <div className="w-full p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+                <p className="text-xs text-amber-600 text-center font-medium">
+                  QR Code expirou após 5 minutos
+                </p>
+                <p className="text-xs text-amber-600/70 text-center mt-1">
+                  Isso pode acontecer se o WhatsApp demorar muito para processar a leitura. Gere um novo código e tente novamente.
+                </p>
+              </div>
             )}
             <button
               type="button"
@@ -296,9 +326,17 @@ export function WhatsAppIntegration() {
             <div className="p-2 bg-white rounded-xl shadow-sm">
               <img src={qrCode} alt="WhatsApp QR Code" className="w-48 h-48 object-contain" />
             </div>
+            <div className="w-full px-4 py-2 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+              <p className="text-xs text-blue-600 text-center font-medium">
+                💡 Escaneie com a câmera do seu celular
+              </p>
+              <p className="text-xs text-blue-600/70 text-center mt-1">
+                Se usar o WhatsApp web, toque em Menu → Vincular um dispositivo
+              </p>
+            </div>
             <div className={`flex items-center text-sm gap-2 ${scanStatus !== "waiting" ? "text-emerald-500" : "text-muted-foreground"}`}>
               <Loader2 className="w-3 h-3 animate-spin shrink-0" />
-              <span>{scanLabel()}</span>
+              <span className="font-medium">{scanLabel()}</span>
             </div>
             <button
               type="button"

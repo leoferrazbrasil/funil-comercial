@@ -22,7 +22,7 @@ export class ZApiProvider implements IWhatsAppProvider {
 
     try {
       console.log("[ZApiProvider] Disconnecting and restoring session for a completely fresh state...");
-      
+
       // Force disconnect first to be safe
       await fetch(`${base}/disconnect`, { headers: this.headers() });
       await sleep(2000);
@@ -32,10 +32,14 @@ export class ZApiProvider implements IWhatsAppProvider {
         method: "POST",
         headers: this.headers(),
       });
-      
-      // Wait 10 seconds to ensure the browser is fully booted before we ask for the QR code.
-      // This is necessary because if we ask too soon, Z-API might give us a phantom/broken QR code.
-      await sleep(10000);
+
+      // Wait 15 seconds to ensure the browser is fully booted and ready.
+      // Increased from 10s to 15s because Z-API needs time to:
+      // 1. Spin up a new browser instance
+      // 2. Load WhatsApp Web
+      // 3. Establish initial connection
+      // If we ask for QR code too soon, Z-API returns a phantom/broken QR code.
+      await sleep(15000);
     } catch (e) {
       console.warn("[ZApiProvider] Error during ensureCleanState:", e);
     }
@@ -94,32 +98,40 @@ export class ZApiProvider implements IWhatsAppProvider {
   async getInstanceStatus(instanceId: string, token: string): Promise<{ connected: boolean; phone?: string }> {
     const base = this.baseUrl(instanceId, token);
 
-    const response = await fetch(`${base}/status`, {
-      method: "GET",
-      headers: this.headers(),
-    });
-    
-    if (!response.ok) {
-      return { connected: false };
-    }
-
-    const data = await response.json();
-    const connected = data.connected === true;
-    let phone;
-
-    if (connected) {
-      // Fetch phone number using the correct Z-API device endpoint
-      const phoneResponse = await fetch(`${base}/device`, {
+    try {
+      const response = await fetch(`${base}/status`, {
         method: "GET",
         headers: this.headers(),
+        signal: AbortSignal.timeout(15000), // 15 second timeout per API call
       });
-      if (phoneResponse.ok) {
-        const phoneData = await phoneResponse.json();
-        phone = phoneData.phone || phoneData.connectedPhone;
-      }
-    }
 
-    return { connected, phone };
+      if (!response.ok) {
+        console.warn(`[ZApiProvider] Status check failed: HTTP ${response.status}`);
+        return { connected: false };
+      }
+
+      const data = await response.json();
+      const connected = data.connected === true;
+      let phone;
+
+      if (connected) {
+        // Fetch phone number using the correct Z-API device endpoint
+        const phoneResponse = await fetch(`${base}/device`, {
+          method: "GET",
+          headers: this.headers(),
+          signal: AbortSignal.timeout(10000), // 10 second timeout for device info
+        });
+        if (phoneResponse.ok) {
+          const phoneData = await phoneResponse.json();
+          phone = phoneData.phone || phoneData.connectedPhone;
+        }
+      }
+
+      return { connected, phone };
+    } catch (error) {
+      console.error(`[ZApiProvider] Error checking instance status:`, error);
+      return { connected: false };
+    }
   }
 
   async disconnectInstance(instanceId: string, token: string): Promise<boolean> {
