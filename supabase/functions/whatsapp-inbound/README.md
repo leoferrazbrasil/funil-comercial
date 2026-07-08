@@ -7,14 +7,14 @@ e preservar o vinculo com contatos/leads existentes por telefone.
 ## URL
 
 ```text
-https://dtdtewojmyhiegwmgmte.supabase.co/functions/v1/whatsapp-inbound
+https://juvwfxnlusrnvcarkrmc.supabase.co/functions/v1/whatsapp-inbound
 ```
 
 Para provedores genericos ou testes sem assinatura da Meta, use o token
 compartilhado por header ou query string:
 
 ```text
-https://dtdtewojmyhiegwmgmte.supabase.co/functions/v1/whatsapp-inbound?token=SEU_TOKEN
+https://juvwfxnlusrnvcarkrmc.supabase.co/functions/v1/whatsapp-inbound?token=SEU_TOKEN
 ```
 
 ## Verificacao da Meta

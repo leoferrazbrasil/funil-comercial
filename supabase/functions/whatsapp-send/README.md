@@ -6,7 +6,7 @@ Platform Cloud API e registrar o outbound no Inbox.
 ## URL
 
 ```text
-https://dtdtewojmyhiegwmgmte.supabase.co/functions/v1/whatsapp-send
+https://juvwfxnlusrnvcarkrmc.supabase.co/functions/v1/whatsapp-send
 ```
 
 ## Autenticacao

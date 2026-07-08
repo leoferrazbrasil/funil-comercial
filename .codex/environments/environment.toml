@@ -3,4 +3,4 @@ version = 1
 name = "funil-comercial"
 
 [setup]
-script = "SUPABASE_DB_URL=postgresql://postgres:Funil808182@db.dtdtewojmyhiegwmgmte.supabase.co:5432/postgres"
+script = "SUPABASE_DB_URL=postgresql://postgres:${SUPABASE_DB_PASSWORD}@db.juvwfxnlusrnvcarkrmc.supabase.co:5432/postgres"

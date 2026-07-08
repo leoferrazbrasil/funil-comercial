@@ -23,13 +23,13 @@ npm run dev
 Projeto configurado para a fundacao P0:
 
 ```text
-https://dtdtewojmyhiegwmgmte.supabase.co
+https://juvwfxnlusrnvcarkrmc.supabase.co
 ```
 
 Crie um arquivo `.env.local` a partir de `.env.example`:
 
 ```bash
-VITE_SUPABASE_URL=https://dtdtewojmyhiegwmgmte.supabase.co
+VITE_SUPABASE_URL=https://juvwfxnlusrnvcarkrmc.supabase.co
 VITE_SUPABASE_ANON_KEY=sua_chave_anon_public
 ```
 
@@ -39,7 +39,7 @@ Execute a migration abaixo no SQL Editor do Supabase ou aplique via connection s
 npm run db:apply
 ```
 
-O comando `db:apply` so executa se `SUPABASE_DB_URL` pertencer ao project ref `dtdtewojmyhiegwmgmte`, evitando aplicacao acidental em outro banco.
+O comando `db:apply` so executa se `SUPABASE_DB_URL` pertencer ao project ref `juvwfxnlusrnvcarkrmc`, evitando aplicacao acidental em outro banco.
 
 ## Build
 

@@ -7,15 +7,15 @@ Data: 2026-07-04
 Tentativa de deploy realizada para o projeto esperado:
 
 ```text
-dtdtewojmyhiegwmgmte
+juvwfxnlusrnvcarkrmc
 ```
 
 Resultado seguro:
 
 - `SUPABASE_ACCESS_TOKEN`: presente no processo.
 - Token atual lista outros projetos Supabase, mas nao lista
-  `dtdtewojmyhiegwmgmte`.
-- `supabase functions deploy whatsapp-inbound --project-ref dtdtewojmyhiegwmgmte`
+  `juvwfxnlusrnvcarkrmc`.
+- `supabase functions deploy whatsapp-inbound --project-ref juvwfxnlusrnvcarkrmc`
   retornou `403`.
 - Nenhum secret foi impresso.
 - Nenhuma Edge Function foi publicada nesta tentativa.
@@ -70,7 +70,7 @@ Configure o secret do repositorio:
 SUPABASE_ACCESS_TOKEN
 ```
 
-O token precisa ter acesso ao projeto `dtdtewojmyhiegwmgmte`. O workflow usa o
+O token precisa ter acesso ao projeto `juvwfxnlusrnvcarkrmc`. O workflow usa o
 mesmo script seguro do repositorio, portanto tambem recusa qualquer project ref
 diferente do esperado.
 
@@ -118,11 +118,11 @@ Nao salvar esses valores no repositorio.
 
 ```powershell
 npx supabase functions deploy whatsapp-inbound `
-  --project-ref dtdtewojmyhiegwmgmte `
+  --project-ref juvwfxnlusrnvcarkrmc `
   --no-verify-jwt
 
 npx supabase functions deploy whatsapp-send `
-  --project-ref dtdtewojmyhiegwmgmte
+  --project-ref juvwfxnlusrnvcarkrmc
 ```
 
 ## Validacao apos deploy

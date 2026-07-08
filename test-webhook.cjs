@@ -24,7 +24,7 @@ const payload = {
 const body = JSON.stringify(payload);
 const signature = crypto.createHmac('sha256', secret).update(body).digest('hex');
 
-fetch('https://dtdtewojmyhiegwmgmte.supabase.co/functions/v1/whatsapp-inbound', {
+fetch('https://juvwfxnlusrnvcarkrmc.supabase.co/functions/v1/whatsapp-inbound', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
