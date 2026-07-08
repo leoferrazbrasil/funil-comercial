@@ -17,11 +17,6 @@ export class ZApiProvider implements IWhatsAppProvider {
     };
   }
 
-  /**
-   * Ensures the instance is in a clean "disconnected" state before requesting QR Code.
-   * This prevents the scenario where a recently-disconnected instance is still
-   * processing internally and refuses to generate a new QR Code.
-   */
   private async ensureCleanState(instanceId: string, token: string): Promise<void> {
     const base = this.baseUrl(instanceId, token);
 
@@ -36,23 +31,13 @@ export class ZApiProvider implements IWhatsAppProvider {
         if (statusData.connected === true) {
           console.log("[ZApiProvider] Instance still connected, forcing disconnect...");
           await fetch(`${base}/disconnect`, { headers: this.headers() });
-          await sleep(3000); // Give Z-API time to process
+          await sleep(5000); // Give Z-API time to process disconnect
+        } else {
+          console.log("[ZApiProvider] Instance already disconnected. Proceeding without restore.");
         }
       }
     } catch (e) {
       console.warn("[ZApiProvider] Could not check status before QR generation:", e);
-    }
-
-    // 2. Restart the instance to ensure it's ready for a new QR scan
-    try {
-      console.log("[ZApiProvider] Restarting instance to prepare for QR Code...");
-      await fetch(`${base}/restore-session`, {
-        method: "POST",
-        headers: this.headers(),
-      });
-      await sleep(2000); // Give Z-API time to restart
-    } catch (e) {
-      console.warn("[ZApiProvider] Could not restart instance:", e);
     }
   }
 
