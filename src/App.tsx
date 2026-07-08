@@ -900,7 +900,7 @@ function AppContent() {
   };
 
   if (isBooting) {
-    return <LoadingScreen label="Conectando ao Supabase..." />;
+    return <LoadingScreen label="Preparando sua experiência..." />;
   }
 
   if (isPublicRoute) {

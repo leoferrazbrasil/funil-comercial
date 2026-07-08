@@ -21,6 +21,7 @@ import {
   Moon,
   Sun,
   X,
+  Loader2,
 } from "lucide-react";
 import type { FormEvent, ReactNode } from "react";
 import { Toaster, toast } from "react-hot-toast";
@@ -1034,12 +1035,15 @@ export function SelectField({
 
 export function LoadingScreen({ label }: { label: string }) {
   return (
-    <main className="loading-state">
-      <div className="brand-mark">
+    <main className="loading-state animate-in fade-in duration-500">
+      <div className="brand-mark animate-pulse shadow-[0_0_40px_rgba(35,196,131,0.2)]">
         <span />
         <strong>FC</strong>
       </div>
-      <p>{label}</p>
+      <p className="flex items-center gap-3 text-sm font-medium text-muted-foreground mt-4">
+        <Loader2 className="animate-spin text-primary" size={16} />
+        {label}
+      </p>
     </main>
   );
 }

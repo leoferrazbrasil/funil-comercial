@@ -22,6 +22,7 @@ import {
   Moon,
   Sun,
   X,
+  Smartphone,
 } from "lucide-react";
 import type { FormEvent, ReactNode } from "react";
 import { Toaster, toast } from "react-hot-toast";
@@ -439,6 +440,8 @@ export default function InboxPage({
     unreadCount: number,
   ) => Promise<void>;
 }) {
+  const navigate = useNavigate();
+
   const filteredMessages = messages.filter((message) =>
     matchesQuery(query, [
       message.remetente_nome,
@@ -664,7 +667,8 @@ export default function InboxPage({
       <div className="flex-1 overflow-y-auto overflow-x-hidden">
         {activeChannels.length === 0 && channels.length > 0 && (
           <div className="p-4 m-4 text-xs bg-amber-500/10 border border-amber-500/30 text-amber-500 rounded-xl">
-            Nenhum canal ativo para receber mensagens.
+            <strong>WhatsApp Desconectado</strong>
+            <p className="mt-1">Seu histórico de conversas está preservado.</p>
           </div>
         )}
         
@@ -806,30 +810,51 @@ export default function InboxPage({
 
         {/* Chat Footer / Composer */}
         <div className="p-3 lg:p-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] bg-background lg:bg-card/90 border-t border-border shrink-0 backdrop-blur-lg">
-          <form onSubmit={handleReplySubmit} className="flex items-end gap-2 lg:gap-3 max-w-4xl mx-auto">
-            <div className="flex-1 bg-card rounded-2xl border border-border overflow-hidden focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/50 transition-all shadow-inner">
-              <textarea
-                className="w-full bg-transparent px-4 py-3.5 text-sm resize-none outline-none min-h-[52px] max-h-[150px] text-foreground placeholder:text-muted-foreground/70"
-                rows={1}
-                placeholder="Escreva sua resposta..."
-                value={replyText}
-                onChange={(e) => setReplyText(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    handleReplySubmit(e as any);
-                  }
-                }}
-              />
+          {activeChannels.length === 0 ? (
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-500 max-w-4xl mx-auto">
+              <div className="flex items-center gap-3 text-sm">
+                <span className="shrink-0 w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center">
+                  <Smartphone size={16} />
+                </span>
+                <div>
+                  <strong className="block">WhatsApp Desconectado</strong>
+                  <span className="opacity-80">Conecte uma instância para continuar atendendo seus contatos.</span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => navigate("/perfil")}
+                className="shrink-0 whitespace-nowrap px-4 py-2 bg-amber-500 text-amber-950 font-bold text-xs rounded-xl hover:bg-amber-400 transition-colors w-full sm:w-auto"
+              >
+                Reconectar WhatsApp
+              </button>
             </div>
-            <button
-              type="submit"
-              disabled={isSaving || !replyText.trim()}
-              className="shrink-0 h-[52px] w-[52px] rounded-2xl bg-primary flex items-center justify-center text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:hover:bg-primary transition-all shadow-md disabled:shadow-none hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
-            >
-              {isSaving ? <RotateCcw size={20} className="animate-spin" /> : <Send size={20} className="ml-1" />}
-            </button>
-          </form>
+          ) : (
+            <form onSubmit={handleReplySubmit} className="flex items-end gap-2 lg:gap-3 max-w-4xl mx-auto">
+              <div className="flex-1 bg-card rounded-2xl border border-border overflow-hidden focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/50 transition-all shadow-inner">
+                <textarea
+                  className="w-full bg-transparent px-4 py-3.5 text-sm resize-none outline-none min-h-[52px] max-h-[150px] text-foreground placeholder:text-muted-foreground/70"
+                  rows={1}
+                  placeholder="Escreva sua resposta..."
+                  value={replyText}
+                  onChange={(e) => setReplyText(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleReplySubmit(e as any);
+                    }
+                  }}
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={isSaving || !replyText.trim()}
+                className="shrink-0 h-[52px] w-[52px] rounded-2xl bg-primary flex items-center justify-center text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:hover:bg-primary transition-all shadow-md disabled:shadow-none hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
+              >
+                {isSaving ? <RotateCcw size={20} className="animate-spin" /> : <Send size={20} className="ml-1" />}
+              </button>
+            </form>
+          )}
         </div>
       </div>
     );
