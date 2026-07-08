@@ -134,8 +134,6 @@ function extractEvolutionMessages(payload: JsonRecord): NormalizedInboundMessage
 
   if (!messageText) return [];
 
-  messageText += `\n\n[DEBUG EVOLUTION PAYLOAD]: ${JSON.stringify(payload)}`;
-
   return [{
     provider: "evolution_api",
     providerMessageId,
