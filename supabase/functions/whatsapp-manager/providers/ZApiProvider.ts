@@ -20,24 +20,24 @@ export class ZApiProvider implements IWhatsAppProvider {
   private async ensureCleanState(instanceId: string, token: string): Promise<void> {
     const base = this.baseUrl(instanceId, token);
 
-    // 1. Check current status
     try {
-      const statusRes = await fetch(`${base}/status`, { headers: this.headers() });
-      if (statusRes.ok) {
-        const statusData = await statusRes.json();
-        console.log("[ZApiProvider] Current instance status:", JSON.stringify(statusData));
+      console.log("[ZApiProvider] Disconnecting and restoring session for a completely fresh state...");
+      
+      // Force disconnect first to be safe
+      await fetch(`${base}/disconnect`, { headers: this.headers() });
+      await sleep(2000);
 
-        // If still connected, force disconnect first
-        if (statusData.connected === true) {
-          console.log("[ZApiProvider] Instance still connected, forcing disconnect...");
-          await fetch(`${base}/disconnect`, { headers: this.headers() });
-          await sleep(5000); // Give Z-API time to process disconnect
-        } else {
-          console.log("[ZApiProvider] Instance already disconnected. Proceeding without restore.");
-        }
-      }
+      // Restore session forces a hard restart of the WhatsApp Web browser process
+      await fetch(`${base}/restore-session`, {
+        method: "POST",
+        headers: this.headers(),
+      });
+      
+      // Wait 10 seconds to ensure the browser is fully booted before we ask for the QR code.
+      // This is necessary because if we ask too soon, Z-API might give us a phantom/broken QR code.
+      await sleep(10000);
     } catch (e) {
-      console.warn("[ZApiProvider] Could not check status before QR generation:", e);
+      console.warn("[ZApiProvider] Error during ensureCleanState:", e);
     }
   }
 
