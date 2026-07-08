@@ -44,6 +44,13 @@ const isRecord = (value: unknown): value is JsonRecord =>
 const asString = (value: unknown) =>
   typeof value === "string" && value.trim() ? value.trim() : null;
 
+// A "real" phone number: digits only, 10-15 long. Placeholder markers
+// (pending-*, disconnected-*, "connected") are never real phones and must not
+// be written into `numero` (they can collide with the unique(provider,numero)
+// constraint and abort the update).
+const isRealPhone = (value: unknown): value is string =>
+  typeof value === "string" && /^\d{10,15}$/.test(value.trim());
+
 const normalizePhone = (value: string | null | undefined) => {
   const p = value?.replace("whatsapp:", "").replace(/\D/g, "") ?? "";
   if (!p) return "";
@@ -180,49 +187,45 @@ async function handleZApiConnectionEvent(
     .contains("metadata", { instanceId })
     .maybeSingle();
 
-  if (!channel) {
-    console.warn(`[whatsapp-qr-inbound] No channel found with instanceId=${instanceId}. Trying fallback...`);
-    // Fallback: find any z-api channel (single-instance MVP)
-    const { data: anyChannel } = await supabase
-      .from("integration_channels")
-      .select("id, status, numero")
-      .eq("provider", "z-api")
-      .maybeSingle();
+  // Build a collision-free patch: flip status, and only write `numero` when we
+  // have a REAL phone number. On disconnect we keep the existing numero (preserves
+  // the line identity for a future reconnect) and only change status.
+  const buildPatch = (): Record<string, unknown> => {
+    const patch: Record<string, unknown> = { status: isConnected ? "ativo" : "pausado" };
+    if (isConnected && isRealPhone(phone)) patch.numero = phone;
+    return patch;
+  };
 
-    if (!anyChannel) {
+  let target = channel;
+  if (!target) {
+    console.warn(`[whatsapp-qr-inbound] No channel found with instanceId=${instanceId}. Trying fallback...`);
+    // Fallback: most recently updated z-api channel (single-instance MVP)
+    const { data: fallbackRows } = await supabase
+      .from("integration_channels")
+      .select("id, status, numero, owner_id")
+      .eq("provider", "z-api")
+      .order("updated_at", { ascending: false })
+      .limit(1);
+
+    target = Array.isArray(fallbackRows) && fallbackRows.length > 0 ? fallbackRows[0] : null;
+    if (!target) {
       console.error("[whatsapp-qr-inbound] ❌ No z-api channel found in entire database to update.");
       return false;
     }
-
-    const newStatus = isConnected ? "ativo" : "pausado";
-    const newNumero = phone ?? (isConnected ? anyChannel.numero : "disconnected");
-    const { error } = await supabase
-      .from("integration_channels")
-      .update({ status: newStatus, numero: newNumero })
-      .eq("id", anyChannel.id);
-
-    if (error) {
-      console.error(`[whatsapp-qr-inbound] ❌ Error updating channel ${anyChannel.id}:`, error);
-      return false;
-    }
-
-    console.log(`[whatsapp-qr-inbound] ✅ Updated channel ${anyChannel.id} to status=${newStatus}, numero=${newNumero}`);
-    return true;
   }
 
-  const newStatus = isConnected ? "ativo" : "pausado";
-  const newNumero = phone ?? (isConnected ? channel.numero : "disconnected");
+  const patch = buildPatch();
   const { error } = await supabase
     .from("integration_channels")
-    .update({ status: newStatus, numero: newNumero })
-    .eq("id", channel.id);
+    .update(patch)
+    .eq("id", target.id);
 
   if (error) {
-    console.error(`[whatsapp-qr-inbound] ❌ Error updating channel ${channel.id}:`, error);
+    console.error(`[whatsapp-qr-inbound] ❌ Error updating channel ${target.id}:`, error.message);
     return false;
   }
 
-  console.log(`[whatsapp-qr-inbound] ✅ Updated channel ${channel.id} (owner=${channel.owner_id}) to status=${newStatus}, numero=${newNumero}`);
+  console.log(`[whatsapp-qr-inbound] ✅ Updated channel ${target.id} (owner=${target.owner_id}) → ${JSON.stringify(patch)}`);
   return true;
 }
 

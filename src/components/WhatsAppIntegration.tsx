@@ -4,15 +4,22 @@ import { Loader2, Smartphone, QrCode, CheckCircle2, AlertCircle, RefreshCw } fro
 import { toast } from "react-hot-toast";
 
 type ConnectionStatus = "loading" | "connected" | "disconnected" | "error";
-type ScanStatus = "waiting" | "scanned" | "connecting" | "finalizing";
+type ScanStatus = "waiting" | "finalizing";
 
-// Increased to 300s (5 minutes) to allow Z-API sufficient time to:
-// 1. Finalize the QR code handshake with WhatsApp
-// 2. Establish the WebSocket connection
-// 3. Sync historical messages
-// 4. Return connected=true status
-// Z-API typically needs 90-180s+ depending on network and message volume
-const QR_EXPIRY_MS = 300_000;
+// QR Code validity window on our side. While it is visible we poll the live
+// Z-API status every few seconds; the connection is ALSO pushed to us in real
+// time via the integration_channels realtime channel (fed by the Z-API
+// on-connect webhook). Either path flips the UI to "Conectado".
+const QR_EXPIRY_MS = 300_000; // 5 minutes
+const POLL_INTERVAL_MS = 3_000;
+// After this many consecutive failed status checks we stop hiding the problem
+// and surface an actionable hint (instead of an eternal silent spinner).
+const POLL_FAILURE_HINT_THRESHOLD = 3;
+
+// The backend stores placeholder markers in `numero` (pending-*, disconnected-*,
+// "connected") until a real phone is known. Only ever render a real phone.
+const isRealPhone = (value: unknown): value is string =>
+  typeof value === "string" && /^\d{10,15}$/.test(value.trim());
 
 export function WhatsAppIntegration() {
   const [status, setStatus] = useState<ConnectionStatus>("loading");
@@ -21,7 +28,16 @@ export function WhatsAppIntegration() {
   const [scanStatus, setScanStatus] = useState<ScanStatus>("waiting");
   const [qrExpired, setQrExpired] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [pollWarning, setPollWarning] = useState(false);
   const qrExpiryTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pollFailuresRef = useRef(0);
+  // Kept in refs so the realtime handler and interval callback always read the
+  // latest values without needing to re-subscribe.
+  const qrVisibleRef = useRef(false);
+  qrVisibleRef.current = Boolean(qrCode) && !qrExpired;
+  const statusRef = useRef<ConnectionStatus>(status);
+  statusRef.current = status;
 
   const clearQrExpiry = () => {
     if (qrExpiryTimer.current) {
@@ -30,81 +46,91 @@ export function WhatsAppIntegration() {
     }
   };
 
-  const checkStatus = async () => {
+  const applyConnected = (rawPhone: unknown) => {
+    setStatus("connected");
+    setPhone(isRealPhone(rawPhone) ? rawPhone.trim() : null);
+    setQrCode(null);
+    setQrExpired(false);
+    setScanStatus("waiting");
+    setPollWarning(false);
+    pollFailuresRef.current = 0;
+    clearQrExpiry();
+  };
+
+  // Returns true if the check confirmed a connection (used by the manual button).
+  const checkStatus = async (): Promise<boolean> => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
+      if (!session) return false;
 
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/whatsapp-manager?action=status`,
         {
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-          },
-          // 30 second timeout for status check
+          headers: { Authorization: `Bearer ${session.access_token}` },
           signal: AbortSignal.timeout(30000),
         }
       );
 
       if (!response.ok) {
-        console.warn("[WhatsAppIntegration] Status check failed:", response.status);
-        throw new Error("Failed to check status");
+        throw new Error(`status HTTP ${response.status}`);
       }
 
       const data = await response.json();
       console.log("[WhatsAppIntegration] Status check:", data);
+      pollFailuresRef.current = 0;
+      setPollWarning(false);
 
       if (data.connected) {
-        console.log("[WhatsAppIntegration] ✅ Connection successful!");
-        setStatus("connected");
-        setPhone(data.phone ?? null);
-        setQrCode(null);
-        setScanStatus("waiting");
-        clearQrExpiry();
-        toast.success("WhatsApp conectado com sucesso!");
-      } else {
-        // Safe update: don't override if real-time listener just set it to connected
-        setStatus((prev) => {
-          if (prev === "connected") return "connected";
-          if (qrCode && prev === "disconnected") {
-            // Still waiting for connection while QR is visible
-            setScanStatus("connecting");
-          }
-          return "disconnected";
-        });
+        const alreadyConnected = statusRef.current === "connected";
+        applyConnected(data.phone);
+        if (!alreadyConnected) toast.success("WhatsApp conectado com sucesso!");
+        return true;
       }
+
+      // Not connected yet. Never override a connection that a realtime event may
+      // have just applied; otherwise settle on "disconnected".
+      setStatus((prev) => (prev === "connected" ? "connected" : "disconnected"));
+      return false;
     } catch (error) {
+      // IMPORTANT: during polling `status` is "disconnected", so we must NOT stay
+      // silent here (the old code only surfaced errors while "loading", which let
+      // a timed-out status check leave the spinner hanging forever).
       console.error("[WhatsAppIntegration] Error checking WhatsApp status:", error);
-      if (status === "loading") setStatus("error");
+      pollFailuresRef.current += 1;
+      if (status === "loading") {
+        setStatus("error");
+      } else if (qrVisibleRef.current && pollFailuresRef.current >= POLL_FAILURE_HINT_THRESHOLD) {
+        setPollWarning(true);
+      }
+      return false;
     }
   };
 
   useEffect(() => {
     checkStatus();
 
-    // Listen for real-time updates on integration_channels
+    // Realtime push: the Z-API on-connect webhook (whatsapp-qr-inbound) writes
+    // integration_channels.status='ativo', which is streamed here. This is the
+    // authoritative, instant path — independent of polling.
     const channel = supabase
       .channel("whatsapp-integration-changes")
       .on(
         "postgres_changes",
-        {
-          event: "UPDATE",
-          schema: "public",
-          table: "integration_channels",
-        },
+        { event: "UPDATE", schema: "public", table: "integration_channels" },
         (payload: any) => {
-          console.log("[WhatsAppIntegration] Realtime update:", payload.new);
-          if (payload.new.provider !== "z-api") return;
+          const row = payload?.new;
+          if (!row || row.provider !== "z-api") return;
+          console.log("[WhatsAppIntegration] Realtime update:", row.status, row.numero);
 
-          if (payload.new.status === "ativo") {
-            setStatus("connected");
-            setPhone(payload.new.numero !== "connected" ? payload.new.numero : null);
-            setQrCode(null);
-            setScanStatus("waiting");
-            clearQrExpiry();
-            toast.success("WhatsApp conectado com sucesso!");
-          } else if (payload.new.status === "inativo" || payload.new.status === "pausado") {
-            setStatus("disconnected");
+          if (row.status === "ativo") {
+            const wasConnected = statusRef.current === "connected";
+            applyConnected(row.numero);
+            if (!wasConnected) toast.success("WhatsApp conectado com sucesso!");
+          } else if (row.status === "inativo" || row.status === "pausado") {
+            // Ignore downgrade events while a QR is on screen (mid-connect churn
+            // from create/regenerate) to avoid flicker; the poll/expiry govern that view.
+            if (qrVisibleRef.current) return;
+            setStatus((prev) => (prev === "connected" ? "disconnected" : prev === "loading" ? "disconnected" : prev));
             setPhone(null);
           }
         }
@@ -115,25 +141,23 @@ export function WhatsAppIntegration() {
       supabase.removeChannel(channel);
       clearQrExpiry();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Polling while QR Code is visible — faster polling (3s) for responsiveness
+  // Poll live status every 3s while the QR Code is visible.
   useEffect(() => {
-    let interval: ReturnType<typeof setInterval>;
-    if (qrCode && !qrExpired) {
-      interval = setInterval(() => {
-        checkStatus();
-      }, 3000);
-    }
-    return () => {
-      if (interval) clearInterval(interval);
-    };
+    if (!qrCode || qrExpired) return;
+    const interval = setInterval(() => { checkStatus(); }, POLL_INTERVAL_MS);
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [qrCode, qrExpired]);
 
   const handleConnect = async () => {
     setIsGenerating(true);
     setQrExpired(false);
     setScanStatus("waiting");
+    setPollWarning(false);
+    pollFailuresRef.current = 0;
     clearQrExpiry();
 
     try {
@@ -144,9 +168,7 @@ export function WhatsAppIntegration() {
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/whatsapp-manager?action=create`,
         {
           method: "POST",
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-          },
+          headers: { Authorization: `Bearer ${session.access_token}` },
         }
       );
 
@@ -164,15 +186,19 @@ export function WhatsAppIntegration() {
         setQrCode(data.qrCode);
         setStatus("disconnected");
 
-        // Start QR expiry countdown (300 seconds = 5 minutes)
         qrExpiryTimer.current = setTimeout(() => {
-          setQrExpired(true);
-          setQrCode(null);
-          setScanStatus("waiting");
-          setStatus("disconnected");
-          toast.error("QR Code expirado após 5 minutos. Gere um novo código e tente novamente.", {
-            icon: "⏱️",
-            duration: 5000
+          // Do a final check before declaring the QR expired — the connection may
+          // have landed right at the edge of the window.
+          checkStatus().then((connected) => {
+            if (connected) return;
+            setQrExpired(true);
+            setQrCode(null);
+            setScanStatus("waiting");
+            setStatus("disconnected");
+            toast.error("Não foi possível confirmar a conexão. Gere um novo QR Code e tente novamente.", {
+              icon: "⏱️",
+              duration: 6000,
+            });
           });
         }, QR_EXPIRY_MS);
       } else {
@@ -186,6 +212,21 @@ export function WhatsAppIntegration() {
     }
   };
 
+  // Manual "I already scanned — confirm now" escape hatch: the user is never
+  // trapped waiting on the automatic detection.
+  const handleVerifyNow = async () => {
+    setIsVerifying(true);
+    setScanStatus("finalizing");
+    try {
+      const connected = await checkStatus();
+      if (!connected) {
+        toast("Ainda não detectamos a conexão. Aguarde alguns segundos após escanear.", { icon: "⏳" });
+      }
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
   const handleDisconnect = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -195,15 +236,14 @@ export function WhatsAppIntegration() {
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/whatsapp-manager?action=disconnect`,
         {
           method: "POST",
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-          },
+          headers: { Authorization: `Bearer ${session.access_token}` },
         }
       );
 
       setStatus("disconnected");
       setPhone(null);
       setQrCode(null);
+      setQrExpired(false);
       setScanStatus("waiting");
       clearQrExpiry();
       toast.success("Instância desconectada com sucesso.");
@@ -213,14 +253,10 @@ export function WhatsAppIntegration() {
     }
   };
 
-  // Scan status label and icon
-  const scanLabel = () => {
-    if (qrExpired) return null;
-    if (scanStatus === "finalizing") return "QR Code lido! Finalizando conexão...";
-    if (scanStatus === "connecting") return "Conectando seu WhatsApp...";
-    if (scanStatus === "scanned") return "Sincronizando mensagens...";
-    return "Aguardando leitura do QR Code...";
-  };
+  const scanLabel = () =>
+    scanStatus === "finalizing"
+      ? "QR Code lido! Finalizando conexão..."
+      : "Aguardando leitura do QR Code...";
 
   return (
     <div className="w-full max-w-md bg-card border border-white/5 rounded-2xl overflow-hidden shadow-sm">
@@ -249,7 +285,7 @@ export function WhatsAppIntegration() {
             <button
               type="button"
               className="px-4 py-2 border border-white/10 rounded-lg hover:bg-white/5 transition-colors text-sm"
-              onClick={checkStatus}
+              onClick={() => checkStatus()}
             >
               Tentar Novamente
             </button>
@@ -263,7 +299,7 @@ export function WhatsAppIntegration() {
             </div>
             <div className="text-center">
               <p className="font-semibold text-emerald-500">WhatsApp Conectado</p>
-              {phone && phone !== "connected" && (
+              {phone && (
                 <p className="text-sm text-emerald-500/80 mt-0.5">{phone}</p>
               )}
             </div>
@@ -288,10 +324,10 @@ export function WhatsAppIntegration() {
             {qrExpired && (
               <div className="w-full p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
                 <p className="text-xs text-amber-600 text-center font-medium">
-                  QR Code expirou após 5 minutos
+                  Não foi possível confirmar a conexão
                 </p>
                 <p className="text-xs text-amber-600/70 text-center mt-1">
-                  Isso pode acontecer se o WhatsApp demorar muito para processar a leitura. Gere um novo código e tente novamente.
+                  Se você já escaneou, toque em “Verificar conexão”. Caso contrário, gere um novo QR Code e tente novamente.
                 </p>
               </div>
             )}
@@ -315,6 +351,17 @@ export function WhatsAppIntegration() {
                 "Conectar Número"
               )}
             </button>
+            {qrExpired && (
+              <button
+                type="button"
+                className="w-full px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                onClick={handleVerifyNow}
+                disabled={isVerifying}
+              >
+                {isVerifying ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                Já escaneei — Verificar conexão
+              </button>
+            )}
           </div>
         )}
 
@@ -338,10 +385,27 @@ export function WhatsAppIntegration() {
               <Loader2 className="w-3 h-3 animate-spin shrink-0" />
               <span className="font-medium">{scanLabel()}</span>
             </div>
+
+            {pollWarning && (
+              <p className="text-xs text-amber-500 text-center">
+                Estamos com dificuldade para confirmar automaticamente. Se já escaneou, use o botão abaixo.
+              </p>
+            )}
+
+            <button
+              type="button"
+              className="w-full px-4 py-2 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded-lg hover:bg-emerald-500/20 transition-colors text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-50"
+              onClick={handleVerifyNow}
+              disabled={isVerifying}
+            >
+              {isVerifying ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
+              Já escaneei — Verificar conexão
+            </button>
+
             <button
               type="button"
               className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-              onClick={() => { setQrCode(null); clearQrExpiry(); }}
+              onClick={() => { setQrCode(null); setScanStatus("waiting"); clearQrExpiry(); }}
             >
               Cancelar
             </button>

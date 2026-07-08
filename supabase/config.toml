@@ -1,0 +1,23 @@
+# Supabase project configuration.
+#
+# The two WhatsApp webhook endpoints are called by Z-API's servers, which send
+# their own "Client-Token" header and CANNOT present a Supabase JWT. With the
+# platform default (verify_jwt = true) the Edge runtime rejects those POSTs with
+# 401 *before* our handler runs — so the Z-API "on connect" / "on message"
+# webhooks silently never reach us. Disabling JWT verification for exactly these
+# two functions makes them publicly reachable; each still authenticates the
+# caller internally (FUNIL_WEBHOOK_SECRET / Z-API instanceId checks).
+#
+# Every other function is intentionally OMITTED here, so it keeps the secure
+# default (verify_jwt = true). whatsapp-manager and whatsapp-send are always
+# invoked from the browser WITH the signed-in user's JWT and must stay protected.
+
+project_id = "juvwfxnlusrnvcarkrmc"
+
+# Z-API connection-status webhook (ConnectedCallback / on-disconnect) + Evolution.
+[functions.whatsapp-qr-inbound]
+verify_jwt = false
+
+# Inbound message webhook (Z-API on-message-received / Meta Cloud API).
+[functions.whatsapp-inbound]
+verify_jwt = false

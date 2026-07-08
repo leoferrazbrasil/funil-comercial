@@ -98,40 +98,59 @@ export class ZApiProvider implements IWhatsAppProvider {
   async getInstanceStatus(instanceId: string, token: string): Promise<{ connected: boolean; phone?: string }> {
     const base = this.baseUrl(instanceId, token);
 
+    // STEP 1 — Determine connection state from /status ONLY. This value is
+    // authoritative and must NEVER be flipped by the (optional) phone lookup.
+    let connected = false;
     try {
       const response = await fetch(`${base}/status`, {
         method: "GET",
         headers: this.headers(),
-        signal: AbortSignal.timeout(15000), // 15 second timeout per API call
+        signal: AbortSignal.timeout(15000),
       });
 
       if (!response.ok) {
-        console.warn(`[ZApiProvider] Status check failed: HTTP ${response.status}`);
+        const body = await response.text().catch(() => "");
+        console.warn(`[ZApiProvider] /status HTTP ${response.status} body=${body.slice(0, 300)}`);
         return { connected: false };
       }
 
       const data = await response.json();
-      const connected = data.connected === true;
-      let phone;
-
-      if (connected) {
-        // Fetch phone number using the correct Z-API device endpoint
-        const phoneResponse = await fetch(`${base}/device`, {
-          method: "GET",
-          headers: this.headers(),
-          signal: AbortSignal.timeout(10000), // 10 second timeout for device info
-        });
-        if (phoneResponse.ok) {
-          const phoneData = await phoneResponse.json();
-          phone = phoneData.phone || phoneData.connectedPhone;
-        }
-      }
-
-      return { connected, phone };
+      // Z-API /status returns: { connected: boolean, error, smartphoneConnected }.
+      // Log the RAW payload so a live scan can be diagnosed from the function logs.
+      console.log(`[ZApiProvider] RAW /status response: ${JSON.stringify(data)}`);
+      // Accept boolean true or the string "true" (defensive against serialization quirks).
+      connected = data.connected === true || data.connected === "true";
     } catch (error) {
-      console.error(`[ZApiProvider] Error checking instance status:`, error);
+      console.error(`[ZApiProvider] Error calling /status:`, error instanceof Error ? error.message : error);
       return { connected: false };
     }
+
+    if (!connected) {
+      return { connected: false };
+    }
+
+    // STEP 2 — Best-effort phone lookup. FULLY ISOLATED: any failure here
+    // (timeout, network, non-ok, bad JSON) must not affect `connected`.
+    let phone: string | undefined;
+    try {
+      const phoneResponse = await fetch(`${base}/device`, {
+        method: "GET",
+        headers: this.headers(),
+        signal: AbortSignal.timeout(8000),
+      });
+      if (phoneResponse.ok) {
+        const phoneData = await phoneResponse.json();
+        const raw = phoneData.phone || phoneData.connectedPhone;
+        phone = typeof raw === "string" && raw.trim() ? raw.trim() : undefined;
+        console.log(`[ZApiProvider] /device phone resolved: ${phone ?? "(none)"}`);
+      } else {
+        console.warn(`[ZApiProvider] /device HTTP ${phoneResponse.status} (phone lookup skipped, connection still valid)`);
+      }
+    } catch (error) {
+      console.warn(`[ZApiProvider] /device lookup failed (connection still valid):`, error instanceof Error ? error.message : error);
+    }
+
+    return { connected: true, phone };
   }
 
   async disconnectInstance(instanceId: string, token: string): Promise<boolean> {
