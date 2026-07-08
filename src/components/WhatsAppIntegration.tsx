@@ -6,7 +6,7 @@ import { toast } from "react-hot-toast";
 type ConnectionStatus = "loading" | "connected" | "disconnected" | "error";
 type ScanStatus = "waiting" | "scanned" | "connecting";
 
-const QR_EXPIRY_MS = 60_000; // Z-API QR Codes expire in ~60s
+const QR_EXPIRY_MS = 120_000; // Increased to 120s to allow Z-API sufficient time to complete the handshake and sync messages after a successful scan.
 
 export function WhatsAppIntegration() {
   const [status, setStatus] = useState<ConnectionStatus>("loading");

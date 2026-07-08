@@ -151,12 +151,14 @@ async function handleZApiConnectionEvent(
   supabase: SupabaseClientAny,
   payload: JsonRecord,
 ): Promise<boolean> {
-  // Z-API connection payloads have a `connected` boolean at the root level
-  // and do NOT have the Evolution API `event` field.
-  const hasConnectedField = typeof payload.connected === "boolean";
-  if (!hasConnectedField) return false;
+  // Z-API connection payloads might come as `connected: boolean` or `status: "CONNECTED"`
+  const isConnectedBool = typeof payload.connected === "boolean" && payload.connected === true;
+  const isConnectedStatus = typeof payload.status === "string" && payload.status.toUpperCase() === "CONNECTED";
+  
+  const hasConnectionInfo = typeof payload.connected === "boolean" || typeof payload.status === "string";
+  if (!hasConnectionInfo) return false;
 
-  const isConnected = payload.connected === true;
+  const isConnected = isConnectedBool || isConnectedStatus;
   const phone = asString(payload.phone) ?? asString(payload.connectedPhone);
   const instanceId = asString(payload.instanceId) ?? Deno.env.get("ZAPI_INSTANCE_ID");
 
