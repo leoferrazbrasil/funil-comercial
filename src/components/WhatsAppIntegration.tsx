@@ -105,18 +105,24 @@ export function WhatsAppIntegration() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: response.statusText }));
-        throw new Error(errorData.error || "Failed to generate QR Code");
+        const serverMessage = errorData.error || "";
+        
+        // Map technical errors to user-friendly messages
+        if (serverMessage.includes("ainda está sendo preparada")) {
+          throw new Error("Estamos preparando uma nova conexão. Aguarde alguns segundos e tente novamente.");
+        }
+        throw new Error("Não conseguimos iniciar a conexão agora. Tente novamente em instantes.");
       }
 
       const data = await response.json();
       if (data.qrCode) {
         setQrCode(data.qrCode);
       } else {
-        toast.error("Não foi possível gerar o QR Code. Tente novamente.");
+        toast.error("Estamos preparando a conexão. Aguarde alguns segundos e tente novamente.");
       }
     } catch (error: any) {
       console.error("Error connecting WhatsApp:", error);
-      toast.error(`Falha: ${error.message}`);
+      toast.error(error.message || "Não foi possível iniciar a conexão. Tente novamente.");
     } finally {
       setIsGenerating(false);
     }

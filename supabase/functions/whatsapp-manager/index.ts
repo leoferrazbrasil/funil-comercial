@@ -62,31 +62,36 @@ Deno.serve(async (request) => {
     if (action === "create") {
       const { instanceId, qrCode, token } = await provider.createInstance(user.id);
       
-      // Upsert the channel as 'pausado' or 'inativo' initially (until webhook confirms connection)
-      // Actually, we'll store the metadata so the frontend can check status
-      const { data, error } = await supabase
+      // Find existing channel for this user/provider
+      const { data: existing } = await supabase
         .from('integration_channels')
-        .upsert({
-          owner_id: user.id,
-          provider: 'z-api',
-          nome: 'WhatsApp (Z-API)',
-          numero: 'pending', // placeholder until connected
-          status: 'inativo',
-          metadata: { instanceId, token }
-        }, { onConflict: 'provider, numero' })
-        .select()
-        .single();
-        
-      if (error && error.code !== '23505') {
-        // If conflict on pending number, try to update existing
+        .select('id')
+        .eq('owner_id', user.id)
+        .eq('provider', 'z-api')
+        .maybeSingle();
+
+      if (existing) {
+        // Update the existing record
         await supabase
           .from('integration_channels')
           .update({
             metadata: { instanceId, token },
-            status: 'inativo'
+            status: 'inativo',
+            numero: 'pending',
           })
-          .eq('owner_id', user.id)
-          .eq('provider', 'z-api');
+          .eq('id', existing.id);
+      } else {
+        // Create a new record
+        await supabase
+          .from('integration_channels')
+          .insert({
+            owner_id: user.id,
+            provider: 'z-api',
+            nome: 'WhatsApp (Z-API)',
+            numero: 'pending',
+            status: 'inativo',
+            metadata: { instanceId, token },
+          });
       }
 
       return jsonResponse({ ok: true, qrCode, instanceId });
@@ -141,7 +146,7 @@ Deno.serve(async (request) => {
         await provider.disconnectInstance(channel.metadata.instanceId, channel.metadata.token);
         await supabase
           .from('integration_channels')
-          .update({ status: 'inativo' })
+          .update({ status: 'inativo', numero: 'disconnected' })
           .eq('id', channel.id);
       }
 
