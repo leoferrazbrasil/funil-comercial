@@ -113,16 +113,21 @@ Deno.serve(async (request) => {
       const { instanceId, token } = channel.metadata;
       const status = await provider.getInstanceStatus(instanceId, token);
 
-      if (status.connected && status.phone && channel.numero !== status.phone) {
-        // Update number and status if connected
+      console.log(`[whatsapp-manager] Status for channel ${channel.id}: connected=${status.connected}, phone=${status.phone}`);
+
+      if (status.connected) {
+        // Always update to 'ativo' when connected, even if phone is not yet available.
+        // This fixes the bug where phone=undefined caused the condition to be false,
+        // leaving the DB stuck as 'inativo' despite the instance being connected.
+        const updatedNumero = status.phone ?? (channel.numero !== 'disconnected' && channel.numero !== 'pending' ? channel.numero : 'connected');
         await supabase
           .from('integration_channels')
           .update({
-            numero: status.phone,
+            numero: updatedNumero,
             status: 'ativo'
           })
           .eq('id', channel.id);
-      } else if (!status.connected && channel.status === 'ativo') {
+      } else if (!status.connected && (channel.status === 'ativo' || channel.status === 'pausado')) {
          await supabase
           .from('integration_channels')
           .update({

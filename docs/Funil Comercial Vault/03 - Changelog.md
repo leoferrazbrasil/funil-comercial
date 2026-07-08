@@ -1,5 +1,25 @@
 # Changelog
 
+## [2026-07-08] - Correção: Reconexão de WhatsApp (QR Code)
+
+### Corrigido
+- **Geração de QR Code após desconexão**:
+  - A Z-API levava alguns segundos para processar a desconexão internamente, e ao clicar em "Conectar Número" logo em seguida, a instância ainda estava no estado "connected", impedindo a geração de um novo QR Code.
+  - `ZApiProvider.ts`: Refatorado para garantir um estado limpo antes de solicitar o QR Code — agora verifica o status, força `/disconnect` se necessário, reinicia a sessão com `/restore-session`, e tenta gerar o QR Code até 3 vezes com intervalo entre tentativas.
+  - `whatsapp-manager/index.ts`: A action `create` agora busca e atualiza o registro existente no banco ao invés de tentar `upsert` com conflito de constraint. A action `disconnect` agora limpa o campo `numero` do registro.
+  - `WhatsAppIntegration.tsx`: Mensagens de erro genéricas substituídas por mensagens amigáveis e orientadoras (ex: "Estamos preparando uma nova conexão. Aguarde alguns segundos e tente novamente.").
+
+## [2026-07-08] - Melhorias de UX: Loading Inicial e Bloqueio de Inbox
+
+### Modificado
+- **Experiência de Carregamento Inicial (Boot)**:
+  - Substituída a mensagem técnica "Conectando ao Supabase..." por uma comunicação institucional mais amigável ("Preparando sua experiência...").
+  - Adicionado efeito de fade-in, pulso na logomarca e um spinner minimalista (`lucide-react`) para transmitir mais confiança e profissionalismo ao usuário.
+- **Segurança Operacional no Inbox (`/inbox`)**:
+  - Implementada a "Alternativa 4": O Inbox agora preserva todo o histórico de mensagens mesmo quando o WhatsApp está desconectado.
+  - Bloqueio do Composer (campo de texto e botão de envio) caso não haja nenhuma instância ativa.
+  - Exibição de um painel claro de alerta ("WhatsApp Desconectado") no local do Composer, com um botão rápido ("Reconectar WhatsApp") direcionando o usuário para o painel de configurações.
+
 ## [2026-07-07] - Correção Definitiva de Duplicidade de Chats (Z-API WhatsApp LID)
 
 ### Corrigido

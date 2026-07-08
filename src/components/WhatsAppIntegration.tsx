@@ -1,15 +1,28 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "../lib/supabase";
-import { Loader2, Smartphone, QrCode, CheckCircle2, AlertCircle } from "lucide-react";
+import { Loader2, Smartphone, QrCode, CheckCircle2, AlertCircle, RefreshCw } from "lucide-react";
 import { toast } from "react-hot-toast";
 
 type ConnectionStatus = "loading" | "connected" | "disconnected" | "error";
+type ScanStatus = "waiting" | "scanned" | "connecting";
+
+const QR_EXPIRY_MS = 60_000; // Z-API QR Codes expire in ~60s
 
 export function WhatsAppIntegration() {
   const [status, setStatus] = useState<ConnectionStatus>("loading");
   const [phone, setPhone] = useState<string | null>(null);
   const [qrCode, setQrCode] = useState<string | null>(null);
+  const [scanStatus, setScanStatus] = useState<ScanStatus>("waiting");
+  const [qrExpired, setQrExpired] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const qrExpiryTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearQrExpiry = () => {
+    if (qrExpiryTimer.current) {
+      clearTimeout(qrExpiryTimer.current);
+      qrExpiryTimer.current = null;
+    }
+  };
 
   const checkStatus = async () => {
     try {
@@ -28,16 +41,24 @@ export function WhatsAppIntegration() {
       if (!response.ok) throw new Error("Failed to check status");
 
       const data = await response.json();
+      console.log("[WhatsAppIntegration] Status check:", data);
+
       if (data.connected) {
         setStatus("connected");
-        setPhone(data.phone);
+        setPhone(data.phone ?? null);
         setQrCode(null);
-      } else {
-        setStatus("disconnected");
+        setScanStatus("waiting");
+        clearQrExpiry();
+      } else if (status !== "loading") {
+        // Only update to disconnected if we're not in initial load
+        // (avoid overriding a just-set connected state)
+        if (status !== "connected") {
+          setStatus("disconnected");
+        }
       }
     } catch (error) {
       console.error("Error checking WhatsApp status:", error);
-      setStatus("error");
+      if (status === "loading") setStatus("error");
     }
   };
 
@@ -46,22 +67,26 @@ export function WhatsAppIntegration() {
 
     // Listen for real-time updates on integration_channels
     const channel = supabase
-      .channel('schema-db-changes')
+      .channel("whatsapp-integration-changes")
       .on(
-        'postgres_changes',
+        "postgres_changes",
         {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'integration_channels',
-          filter: `provider=eq.z-api`
+          event: "UPDATE",
+          schema: "public",
+          table: "integration_channels",
         },
         (payload: any) => {
-          if (payload.new.status === 'ativo') {
+          console.log("[WhatsAppIntegration] Realtime update:", payload.new);
+          if (payload.new.provider !== "z-api") return;
+
+          if (payload.new.status === "ativo") {
             setStatus("connected");
-            setPhone(payload.new.numero);
+            setPhone(payload.new.numero !== "connected" ? payload.new.numero : null);
             setQrCode(null);
-            toast.success("WhatsApp Conectado! Sua instância foi conectada com sucesso.");
-          } else if (payload.new.status === 'inativo' || payload.new.status === 'pausado') {
+            setScanStatus("waiting");
+            clearQrExpiry();
+            toast.success("WhatsApp conectado com sucesso!");
+          } else if (payload.new.status === "inativo" || payload.new.status === "pausado") {
             setStatus("disconnected");
             setPhone(null);
           }
@@ -71,24 +96,29 @@ export function WhatsAppIntegration() {
 
     return () => {
       supabase.removeChannel(channel);
+      clearQrExpiry();
     };
   }, []);
 
-  // Polling para checar status enquanto o QR Code está visível
+  // Polling while QR Code is visible — faster polling (3s) for responsiveness
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
-    if (qrCode && status === 'disconnected') {
+    if (qrCode && !qrExpired) {
       interval = setInterval(() => {
         checkStatus();
-      }, 5000);
+      }, 3000);
     }
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [qrCode, status]);
+  }, [qrCode, qrExpired]);
 
   const handleConnect = async () => {
     setIsGenerating(true);
+    setQrExpired(false);
+    setScanStatus("waiting");
+    clearQrExpiry();
+
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
@@ -106,9 +136,7 @@ export function WhatsAppIntegration() {
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: response.statusText }));
         const serverMessage = errorData.error || "";
-        
-        // Map technical errors to user-friendly messages
-        if (serverMessage.includes("ainda está sendo preparada")) {
+        if (serverMessage.includes("ainda está sendo preparada") || serverMessage.includes("instancia")) {
           throw new Error("Estamos preparando uma nova conexão. Aguarde alguns segundos e tente novamente.");
         }
         throw new Error("Não conseguimos iniciar a conexão agora. Tente novamente em instantes.");
@@ -117,6 +145,15 @@ export function WhatsAppIntegration() {
       const data = await response.json();
       if (data.qrCode) {
         setQrCode(data.qrCode);
+        setStatus("disconnected");
+
+        // Start QR expiry countdown
+        qrExpiryTimer.current = setTimeout(() => {
+          setQrExpired(true);
+          setQrCode(null);
+          setScanStatus("waiting");
+          toast("QR Code expirado. Gere um novo código.", { icon: "⏱️" });
+        }, QR_EXPIRY_MS);
       } else {
         toast.error("Estamos preparando a conexão. Aguarde alguns segundos e tente novamente.");
       }
@@ -142,13 +179,25 @@ export function WhatsAppIntegration() {
           },
         }
       );
-      
+
       setStatus("disconnected");
       setPhone(null);
-      toast.success("A instância foi desconectada.");
+      setQrCode(null);
+      setScanStatus("waiting");
+      clearQrExpiry();
+      toast.success("Instância desconectada com sucesso.");
     } catch (error) {
       console.error("Error disconnecting WhatsApp:", error);
+      toast.error("Não foi possível desconectar. Tente novamente.");
     }
+  };
+
+  // Scan status label and icon
+  const scanLabel = () => {
+    if (qrExpired) return null;
+    if (scanStatus === "scanned") return "QR Code lido. Finalizando conexão...";
+    if (scanStatus === "connecting") return "Conectando ao WhatsApp...";
+    return "Aguardando leitura...";
   };
 
   return (
@@ -162,7 +211,7 @@ export function WhatsAppIntegration() {
           Gerencie a conexão do seu número de WhatsApp com o Funil Comercial.
         </p>
       </div>
-      
+
       <div className="p-6 space-y-4">
         {status === "loading" && (
           <div className="flex flex-col items-center justify-center p-6 space-y-4">
@@ -174,10 +223,10 @@ export function WhatsAppIntegration() {
         {status === "error" && (
           <div className="flex flex-col items-center justify-center p-6 space-y-4 text-red-500">
             <AlertCircle className="w-8 h-8" />
-            <p className="text-sm font-medium">Erro ao verificar status.</p>
-            <button 
-              type="button" 
-              className="px-4 py-2 border border-white/10 rounded-lg hover:bg-white/5 transition-colors"
+            <p className="text-sm font-medium text-center">Não foi possível verificar o status da conexão.</p>
+            <button
+              type="button"
+              className="px-4 py-2 border border-white/10 rounded-lg hover:bg-white/5 transition-colors text-sm"
               onClick={checkStatus}
             >
               Tentar Novamente
@@ -191,12 +240,14 @@ export function WhatsAppIntegration() {
               <CheckCircle2 className="w-6 h-6 text-emerald-500" />
             </div>
             <div className="text-center">
-              <p className="font-semibold text-emerald-500">Conectado</p>
-              <p className="text-sm text-emerald-500/80">{phone}</p>
+              <p className="font-semibold text-emerald-500">WhatsApp Conectado</p>
+              {phone && phone !== "connected" && (
+                <p className="text-sm text-emerald-500/80 mt-0.5">{phone}</p>
+              )}
             </div>
-            <button 
+            <button
               type="button"
-              className="w-full px-4 py-2 border border-white/10 rounded-lg hover:bg-white/5 transition-colors mt-2" 
+              className="w-full px-4 py-2 border border-white/10 rounded-lg hover:bg-white/5 transition-colors mt-2 text-sm"
               onClick={handleDisconnect}
             >
               Desconectar
@@ -212,16 +263,26 @@ export function WhatsAppIntegration() {
             <p className="text-sm text-center text-muted-foreground">
               Nenhum número conectado no momento.
             </p>
-            <button 
+            {qrExpired && (
+              <p className="text-xs text-amber-500 text-center">
+                O QR Code anterior expirou. Gere um novo para continuar.
+              </p>
+            )}
+            <button
               type="button"
-              className="w-full px-4 py-2 bg-primary text-primary-foreground font-medium rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center disabled:opacity-50"
-              onClick={handleConnect} 
+              className="w-full px-4 py-2 bg-primary text-primary-foreground font-medium rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center disabled:opacity-50 gap-2"
+              onClick={handleConnect}
               disabled={isGenerating}
             >
               {isGenerating ? (
                 <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  <Loader2 className="w-4 h-4 animate-spin" />
                   Gerando QR Code...
+                </>
+              ) : qrExpired ? (
+                <>
+                  <RefreshCw className="w-4 h-4" />
+                  Gerar Novo QR Code
                 </>
               ) : (
                 "Conectar Número"
@@ -230,7 +291,7 @@ export function WhatsAppIntegration() {
           </div>
         )}
 
-        {qrCode && (
+        {qrCode && !qrExpired && (
           <div className="flex flex-col items-center justify-center p-4 space-y-4 bg-white/5 rounded-xl animate-in fade-in zoom-in duration-300">
             <p className="text-sm font-medium text-center">
               Escaneie o QR Code com seu WhatsApp
@@ -238,14 +299,14 @@ export function WhatsAppIntegration() {
             <div className="p-2 bg-white rounded-xl shadow-sm">
               <img src={qrCode} alt="WhatsApp QR Code" className="w-48 h-48 object-contain" />
             </div>
-            <div className="flex items-center text-sm text-muted-foreground">
-              <Loader2 className="w-3 h-3 mr-2 animate-spin" />
-              Aguardando leitura...
+            <div className={`flex items-center text-sm gap-2 ${scanStatus !== "waiting" ? "text-emerald-500" : "text-muted-foreground"}`}>
+              <Loader2 className="w-3 h-3 animate-spin shrink-0" />
+              <span>{scanLabel()}</span>
             </div>
-            <button 
+            <button
               type="button"
               className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-              onClick={() => setQrCode(null)}
+              onClick={() => { setQrCode(null); clearQrExpiry(); }}
             >
               Cancelar
             </button>

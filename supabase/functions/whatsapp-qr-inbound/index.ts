@@ -141,6 +141,72 @@ function extractEvolutionMessages(payload: JsonRecord): NormalizedInboundMessage
   }];
 }
 
+/**
+ * Handles Z-API connection status webhooks.
+ * Z-API fires these when the instance connects or disconnects after QR Code scan.
+ * Payload format: { "connected": true, "phone": "5519...", "instanceId": "..." }
+ * or: { "type": "ReceivedCallback", "connected": false }
+ */
+async function handleZApiConnectionEvent(
+  supabase: SupabaseClientAny,
+  payload: JsonRecord,
+): Promise<boolean> {
+  // Z-API connection payloads have a `connected` boolean at the root level
+  // and do NOT have the Evolution API `event` field.
+  const hasConnectedField = typeof payload.connected === "boolean";
+  if (!hasConnectedField) return false;
+
+  const isConnected = payload.connected === true;
+  const phone = asString(payload.phone) ?? asString(payload.connectedPhone);
+  const instanceId = asString(payload.instanceId) ?? Deno.env.get("ZAPI_INSTANCE_ID");
+
+  console.log(`[whatsapp-qr-inbound] Z-API connection event: connected=${isConnected}, phone=${phone}, instanceId=${instanceId}`);
+
+  if (!instanceId) return false;
+
+  // Find the channel by instanceId in metadata
+  const { data: channel } = await supabase
+    .from("integration_channels")
+    .select("id, status, numero")
+    .eq("provider", "z-api")
+    .contains("metadata", { instanceId })
+    .maybeSingle();
+
+  if (!channel) {
+    // Fallback: find any z-api channel (single-instance MVP)
+    const { data: anyChannel } = await supabase
+      .from("integration_channels")
+      .select("id, status, numero")
+      .eq("provider", "z-api")
+      .maybeSingle();
+
+    if (!anyChannel) {
+      console.warn("[whatsapp-qr-inbound] No z-api channel found to update.");
+      return false;
+    }
+
+    const newStatus = isConnected ? "ativo" : "pausado";
+    const newNumero = phone ?? (isConnected ? anyChannel.numero : "disconnected");
+    await supabase
+      .from("integration_channels")
+      .update({ status: newStatus, numero: newNumero })
+      .eq("id", anyChannel.id);
+
+    console.log(`[whatsapp-qr-inbound] Updated channel ${anyChannel.id} to status=${newStatus}, numero=${newNumero}`);
+    return true;
+  }
+
+  const newStatus = isConnected ? "ativo" : "pausado";
+  const newNumero = phone ?? (isConnected ? channel.numero : "disconnected");
+  await supabase
+    .from("integration_channels")
+    .update({ status: newStatus, numero: newNumero })
+    .eq("id", channel.id);
+
+  console.log(`[whatsapp-qr-inbound] Updated channel ${channel.id} to status=${newStatus}, numero=${newNumero}`);
+  return true;
+}
+
 function getSupabaseClient() {
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
@@ -292,17 +358,20 @@ Deno.serve(async (request) => {
 
   try {
     const { payload } = await readPayload(request);
-    
-    // Auth could be done via global apikey or instance api key headers, 
-    // but typically the URL path includes a secret or we use Evolution API global key.
-    // For now, we trust the inbound webhook if the instance name matches an active channel.
-    
+    const supabase = getSupabaseClient();
+
+    // 1. Try to handle Z-API connection/disconnection event first
+    const wasZApiEvent = await handleZApiConnectionEvent(supabase, payload);
+    if (wasZApiEvent) {
+      return jsonResponse({ ok: true, handled: "z-api-connection" });
+    }
+
+    // 2. Try to extract and process Evolution API inbound messages
     const inboundMessages = extractEvolutionMessages(payload);
     if (inboundMessages.length === 0) {
       return jsonResponse({ ok: true, ignored: true, reason: "no_inbound_messages" });
     }
 
-    const supabase = getSupabaseClient();
     const results: ProcessedMessage[] = [];
     for (const inboundMessage of inboundMessages) {
       results.push(await processInboundMessage(supabase, inboundMessage));
