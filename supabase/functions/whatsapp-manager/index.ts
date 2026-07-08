@@ -161,23 +161,33 @@ Deno.serve(async (request) => {
 
       console.log(`[whatsapp-manager] Resolved: connected=${connected} (live=${live.connected}, dbAtivo=${dbAtivo}), phone=${realPhone ?? "(pending)"}`);
 
-      // Persist connection, but NEVER let a DB write failure hide the connected
-      // signal from the client. Only write a real phone into numero; otherwise
-      // leave the existing placeholder untouched (avoids the unique(provider,numero)
-      // collision that previously 500'd this endpoint and stranded the UI).
-      if (live.connected) {
-        try {
-          const patch: Record<string, unknown> = { status: 'ativo' };
-          if (realPhone && channel.numero !== realPhone) patch.numero = realPhone;
-          const { error: updErr } = await supabase
-            .from('integration_channels')
-            .update(patch)
-            .eq('id', channel.id);
-          if (updErr) {
-            console.error(`[whatsapp-manager] status DB update failed (non-fatal): ${updErr.message}`);
-          }
-        } catch (dbError) {
-          console.error(`[whatsapp-manager] status DB update threw (non-fatal):`, dbError instanceof Error ? dbError.message : dbError);
+      // Persist connection. CRITICAL: write `status='ativo'` on its OWN, never
+      // bundled with `numero`. The global unique(provider, numero) constraint can
+      // reject a numero write (e.g. a stale row already holds this phone), and if
+      // status were in the same UPDATE it would be rolled back too — leaving the
+      // channel not 'ativo', which breaks the Inbox banner AND inbound message
+      // routing (whatsapp-inbound requires status='ativo' to resolve the owner).
+      if (live.connected && !dbAtivo) {
+        const { error: statusErr } = await supabase
+          .from('integration_channels')
+          .update({ status: 'ativo' })
+          .eq('id', channel.id);
+        if (statusErr) {
+          console.error(`[whatsapp-manager] FAILED to set status=ativo (channel ${channel.id}): ${statusErr.message}`);
+        } else {
+          console.log(`[whatsapp-manager] channel ${channel.id} → status=ativo`);
+        }
+      }
+
+      // Best-effort: store the real phone separately. A unique-constraint collision
+      // here is non-fatal — the connection is already marked active above.
+      if (live.connected && realPhone && channel.numero !== realPhone) {
+        const { error: numErr } = await supabase
+          .from('integration_channels')
+          .update({ numero: realPhone })
+          .eq('id', channel.id);
+        if (numErr) {
+          console.warn(`[whatsapp-manager] could not store phone in numero (non-fatal): ${numErr.message}`);
         }
       }
 

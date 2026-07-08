@@ -187,15 +187,6 @@ async function handleZApiConnectionEvent(
     .contains("metadata", { instanceId })
     .maybeSingle();
 
-  // Build a collision-free patch: flip status, and only write `numero` when we
-  // have a REAL phone number. On disconnect we keep the existing numero (preserves
-  // the line identity for a future reconnect) and only change status.
-  const buildPatch = (): Record<string, unknown> => {
-    const patch: Record<string, unknown> = { status: isConnected ? "ativo" : "pausado" };
-    if (isConnected && isRealPhone(phone)) patch.numero = phone;
-    return patch;
-  };
-
   let target = channel;
   if (!target) {
     console.warn(`[whatsapp-qr-inbound] No channel found with instanceId=${instanceId}. Trying fallback...`);
@@ -214,18 +205,33 @@ async function handleZApiConnectionEvent(
     }
   }
 
-  const patch = buildPatch();
-  const { error } = await supabase
+  // CRITICAL: write `status` on its OWN — never bundled with `numero`. The global
+  // unique(provider, numero) constraint can reject a numero write (a stale row may
+  // already hold this phone); bundling would roll back the status too, leaving the
+  // channel not 'ativo' and breaking the Inbox + inbound message routing.
+  const newStatus = isConnected ? "ativo" : "pausado";
+  const { error: statusErr } = await supabase
     .from("integration_channels")
-    .update(patch)
+    .update({ status: newStatus })
     .eq("id", target.id);
 
-  if (error) {
-    console.error(`[whatsapp-qr-inbound] ❌ Error updating channel ${target.id}:`, error.message);
+  if (statusErr) {
+    console.error(`[whatsapp-qr-inbound] ❌ FAILED to set status=${newStatus} (channel ${target.id}):`, statusErr.message);
     return false;
   }
+  console.log(`[whatsapp-qr-inbound] ✅ channel ${target.id} (owner=${target.owner_id}) → status=${newStatus}`);
 
-  console.log(`[whatsapp-qr-inbound] ✅ Updated channel ${target.id} (owner=${target.owner_id}) → ${JSON.stringify(patch)}`);
+  // Best-effort: store the real phone separately (collision is non-fatal).
+  if (isConnected && isRealPhone(phone) && target.numero !== phone) {
+    const { error: numErr } = await supabase
+      .from("integration_channels")
+      .update({ numero: phone })
+      .eq("id", target.id);
+    if (numErr) {
+      console.warn(`[whatsapp-qr-inbound] could not store phone in numero (non-fatal): ${numErr.message}`);
+    }
+  }
+
   return true;
 }
 

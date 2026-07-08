@@ -462,6 +462,14 @@ function AppContent() {
         { event: '*', schema: 'public', table: 'inbox_messages', filter: `owner_id=eq.${session.user.id}` },
         () => queryClient.invalidateQueries({ queryKey: ["crmSnapshot"] })
       )
+      .on(
+        // Refresh the snapshot when the WhatsApp channel connects/disconnects so
+        // the Inbox "WhatsApp Desconectado" banner and the composer reflect the
+        // live connection state without a manual reload.
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'integration_channels', filter: `owner_id=eq.${session.user.id}` },
+        () => queryClient.invalidateQueries({ queryKey: ["crmSnapshot"] })
+      )
       .subscribe();
 
     return () => {
