@@ -49,12 +49,9 @@ export function WhatsAppIntegration() {
         setQrCode(null);
         setScanStatus("waiting");
         clearQrExpiry();
-      } else if (status !== "loading") {
-        // Only update to disconnected if we're not in initial load
-        // (avoid overriding a just-set connected state)
-        if (status !== "connected") {
-          setStatus("disconnected");
-        }
+      } else {
+        // Safe update: don't override if real-time listener just set it to connected
+        setStatus((prev) => (prev === "connected" ? "connected" : "disconnected"));
       }
     } catch (error) {
       console.error("Error checking WhatsApp status:", error);
