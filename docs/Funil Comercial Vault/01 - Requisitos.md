@@ -1,1 +1,70 @@
 # Requisitos
+
+> Documentação do que o **Funil Comercial** faz hoje (atualizado em 2026-07-09).
+> Foca no estado **implementado** (não em planos futuros).
+
+## 1. Visão geral
+CRM comercial focado em **prospecção ativa** e atendimento por **WhatsApp**, cobrindo o ciclo: encontrar/receber contatos → qualificar em leads → negociar no funil → fechar (Ganho/Perdido), com métricas de operação e receita (única e recorrente/MRR).
+
+- **Multiusuário / multi-tenant:** cada usuário (dono) enxerga apenas seus próprios dados (RLS por `owner_id`).
+- **Papéis:** `diretor`, `gestor`, `vendedor` (controle de rotas por papel em `accessControl`).
+
+## 2. Autenticação e Perfil
+- Cadastro (`/cadastro`) com nome, e-mail e senha (força de senha + confirmação em tempo real).
+- Login (`/login`) via Supabase Auth.
+- Perfil (`/perfil`): editar nome, telefone, avatar (upload), e-mail e senha.
+- **Conexão WhatsApp** no perfil: gerar QR Code, acompanhar status, conectar/desconectar a instância (Z-API).
+
+## 3. Dashboard (`/dashboard`)
+- **KPIs:** Atenção Necessária (Inbox pendente), Leads Ativos, Pipeline Aberto (R$), **Win Rate** (Ganhos ÷ Ganhos+Perdidos).
+- **Rotina de Hoje:** contatos criados hoje, quantos viraram lead, taxa contato→lead.
+- Recomendações comerciais, gráfico de funil e oportunidades recentes.
+
+## 4. Inbox (`/inbox`)
+- Lista de conversas de WhatsApp agrupadas por telefone (sem duplicidade).
+- **Abas:** Abertas, Não Lidas, Todas + busca.
+- **Tempo real:** novas mensagens aparecem sem recarregar (realtime em `inbox_messages`).
+- **Responder** pela instância conectada (Z-API); histórico preservado mesmo desconectado.
+- **Bloqueio de envio** quando não há instância ativa (painel "WhatsApp Desconectado" + atalho para reconectar).
+- **Contexto CRM** na conversa: criar/vincular Contato, Lead e Oportunidade a partir da mensagem.
+- **Grupos:** mensagens atribuídas ao participante real (rótulo "Pessoa · Grupo"). **Newsletters/comunidades** (broadcast) são ignoradas.
+
+## 5. Contatos (`/contatos`)
+- Lista + Perfil 360º (drawer lateral). Criar, editar e **excluir** (com confirmação).
+- Campos: nome, telefone, e-mail, **Origem** (Meta Ads, Google Ads, Site, WhatsApp, Indicação, Prospecção Ativa) e **Potencial** (Frio, Morno, Quente) — via listas suspensas.
+- Botão **WhatsApp**: abre a conversa **dentro do painel** (`/inbox`) com aquele contato (existente ou rascunho).
+
+## 6. Leads (`/leads`)
+- Fila de qualificação com **Score Ring** (saúde do preenchimento). Criar, editar e **excluir** (com confirmação).
+- Converter **Contato → Lead**; criar **Oportunidade** a partir do lead.
+- Status: novo, em atendimento, qualificado, convertido, perdido.
+
+## 7. Funil de Vendas (`/funil`)
+- **Kanban** com drag & drop entre etapas (Novo, Em atendimento, Qualificado, Proposta, Negociação, Ganho, Perdido).
+- Oportunidade com **Produto/Serviço**, valor (pagamento único) e mensalidade (recorrente). Criar, editar e **excluir** (no card).
+- **Produto auto-detectado** ao criar pelo Inbox (varre a conversa) e **preço pré-definido** preenche o valor (Site R$497 + R$37,90/mês; Google Meu Negócio R$800; Tráfego Pago R$1.497/mês).
+- **Métricas:** Pipeline Aberto, Etapas Finais, Sem Ação, Sem Valor, e comparativo **Fechado (Ganho) × Projeção (pipeline aberto)** separando único (setup) de recorrente (MRR). Mover para "Ganho" soma no Fechado automaticamente.
+- Ações rápidas de Ganho/Perdido no drawer da oportunidade.
+
+## 8. Criativos (`/criativos`)
+- Wizard de 4 etapas (Estratégia, Ideia, IA, Estúdio).
+- Geração de post com IA (`ai-generate-post`, fallback OpenAI/Gemini) e **Estrategista IA** (`ai-recommend-post`) conectado ao Instagram (Meta Graph) para continuidade editorial.
+- Copy com limite de caracteres e gestão de hashtags (até 5, foco vendas/B2B).
+
+## 9. Regras de negócio principais
+- **Vínculos:** lead→contato, oportunidade→lead, mensagens→contato/lead (por `contact_id`/`lead_id`).
+- **Exclusão preserva histórico:** FKs `ON DELETE SET NULL` — excluir contato/lead só desvincula; a Inbox e os relacionados permanecem.
+- **Normalização de telefone:** DDI 55 e unificação (12 dígitos) para evitar chats duplicados e vincular ao CRM.
+- **Receita:** valor único (setup) + recorrente (MRR) por produto; win rate por negócios fechados.
+
+## 10. Integrações
+- **Z-API** (WhatsApp): QR/conexão, recebimento (webhook), envio.
+- **Meta Graph API**: Instagram (criativos), Cloud API (WhatsApp Business, quando configurado).
+- **OpenAI / Gemini**: geração e recomendação de conteúdo.
+
+## 11. Requisitos não-funcionais
+- **Segurança:** Supabase Auth + RLS por dono; webhooks públicos autenticam internamente (secret/instanceId).
+- **Tempo real:** Supabase Realtime (inbox_messages, contacts, leads, opportunities, integration_channels).
+- **Deploy:** front automático via push no GitHub (Hostinger); migrações aplicadas no Supabase; Edge Functions via `supabase functions deploy` (webhooks com JWT off).
+- **Responsividade:** desktop, tablet e mobile (layouts Master-Detail, Kanban mobile).
+- **Identidade visual:** paleta e componentes padronizados (`SharedUI`), dropdowns customizados na paleta.
