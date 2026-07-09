@@ -71,7 +71,7 @@ import {
   getCrmSnapshot,
   upsertProfile,
 } from "./lib/crmService";
-import { PRODUCTS, inferProductFromMessage } from "./lib/products";
+import { PRODUCTS, inferProductFromMessage, priceForProduct } from "./lib/products";
 import { getAllowedRoutes } from "./lib/accessControl";
 import { brandConfig } from "./lib/branding";
 import {
@@ -860,11 +860,14 @@ function AppContent() {
           const produto = inferProductFromMessage(
             `${conversationText} ${message.mensagem} ${lead.interesse ?? ""}`,
           );
+          // Preço pré-definido do produto detectado; se não houver, mantém o
+          // valor estimado do lead.
+          const precoProduto = priceForProduct(produto);
           await createOpportunity(ownerId, {
             lead_id: lead.id,
             titulo: buildOpportunityTitleFromMessage(message, lead.nome, produto),
             etapa: inferOpportunityStageFromMessage(message),
-            valor: lead.valor_estimado,
+            valor: precoProduto ?? lead.valor_estimado,
             responsavel: snapshot.profile?.nome ?? "Equipe comercial",
             proxima_acao: buildOpportunityNextActionFromMessage(message),
             produto,
@@ -1425,6 +1428,10 @@ function OpportunityModal({
   onClose: () => void;
   onSubmit: (formData: FormData) => Promise<void>;
 }) {
+  // `valor` controlado só para permitir auto-preenchimento ao escolher o produto.
+  // O usuário ainda pode digitar por cima; o FormData lê o valor final do campo.
+  const [valor, setValor] = useState(String(opportunity?.valor ?? 0));
+
   return (
     <Modal
       title={opportunity ? "Editar oportunidade" : "Nova oportunidade"}
@@ -1469,6 +1476,10 @@ function OpportunityModal({
           defaultValue={opportunity?.produto ?? ""}
           label="Produto / Serviço"
           name="produto"
+          onChange={(event) => {
+            const preco = priceForProduct(event.target.value);
+            if (preco != null) setValor(String(preco));
+          }}
         >
           <option value="">Não definido</option>
           {PRODUCTS.map((produto) => (
@@ -1478,7 +1489,8 @@ function OpportunityModal({
           ))}
         </SelectField>
         <TextField
-          defaultValue={opportunity?.valor}
+          key={valor}
+          defaultValue={valor}
           label="Valor"
           name="valor"
           type="number"

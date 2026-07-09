@@ -11,6 +11,32 @@ export const PRODUCTS = [
 
 export type Product = (typeof PRODUCTS)[number];
 
+// Preço de entrada ("a partir de") de cada produto. Vira o `valor` da
+// oportunidade (que já soma no card e na métrica "Pipeline Aberto").
+export const PRODUCT_PRICES: Partial<Record<Product, number>> = {
+  "Site / Landing Page": 497,
+  "Google Meu Negócio": 800,
+  "Tráfego Pago": 1497,
+  // Social Media / Criativos: preço sob consulta (sem default).
+};
+
+// Mensalidade recorrente, quando houver (apenas informativo no card).
+export const PRODUCT_MONTHLY: Partial<Record<Product, number>> = {
+  "Site / Landing Page": 37.9,
+};
+
+export const priceForProduct = (produto: string | null | undefined): number | null => {
+  if (!produto) return null;
+  const price = (PRODUCT_PRICES as Record<string, number>)[produto];
+  return typeof price === "number" ? price : null;
+};
+
+export const monthlyForProduct = (produto: string | null | undefined): number | null => {
+  if (!produto) return null;
+  const monthly = (PRODUCT_MONTHLY as Record<string, number>)[produto];
+  return typeof monthly === "number" ? monthly : null;
+};
+
 const stripDiacritics = (value: string) =>
   value.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 

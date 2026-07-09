@@ -1,5 +1,6 @@
 import { HeroPanel, PageIntro, MetricCard, Panel, ActionItem, TablePanel, EmptyState, Modal, ContactModal, LeadModal, OpportunityModal, MessageModal, ChannelModal, EntityForm, TextField, SelectField, LoadingScreen } from "../components/SharedUI";
 import { ConfirmDialog } from "../components/ConfirmDialog";
+import { monthlyForProduct } from "../lib/products";
 import type { Session } from "@supabase/supabase-js";
 import type { LucideIcon } from "lucide-react";
 import {
@@ -442,8 +443,13 @@ function PipelineCard({
         )}
       </div>
       
-      <div className="flex items-center gap-2">
+      <div className="flex items-baseline gap-2 flex-wrap">
         <strong className="text-xl font-black tracking-tight text-primary">{formatMoney(Number(item.valor))}</strong>
+        {monthlyForProduct(item.produto) != null && (
+          <span className="text-[11px] font-semibold text-muted-foreground">
+            + {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(monthlyForProduct(item.produto)!)}/mês
+          </span>
+        )}
       </div>
       
       <div className="bg-white/5 p-2 rounded-xl border border-white/5 w-full min-w-0 max-w-full overflow-hidden">
