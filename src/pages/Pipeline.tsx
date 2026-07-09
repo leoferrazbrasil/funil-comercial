@@ -435,6 +435,11 @@ function PipelineCard({
         <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider mt-1 block truncate w-full break-all">
           {item.lead_id ? "Lead" : "Contato"}
         </span>
+        {item.produto && (
+          <span className="inline-block mt-1.5 max-w-full truncate text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/15 text-primary border border-primary/20">
+            {item.produto}
+          </span>
+        )}
       </div>
       
       <div className="flex items-center gap-2">

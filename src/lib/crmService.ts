@@ -48,6 +48,7 @@ type OpportunityPayload = {
   valor?: number;
   responsavel?: string;
   proxima_acao?: string;
+  produto?: string | null;
 };
 
 type MessagePayload = {
@@ -294,6 +295,7 @@ export async function createOpportunity(
       valor: payload.valor ?? 0,
       responsavel: payload.responsavel?.trim() || "Equipe comercial",
       proxima_acao: payload.proxima_acao?.trim() || "Definir próximo passo",
+      produto: payload.produto?.trim() || null,
     })
     .select()
     .single();
@@ -316,6 +318,7 @@ export async function updateOpportunity(
       valor: payload.valor ?? 0,
       responsavel: payload.responsavel?.trim() || "Equipe comercial",
       proxima_acao: payload.proxima_acao?.trim() || "Definir prÃ³ximo passo",
+      produto: payload.produto?.trim() || null,
     })
     .eq("id", opportunityId)
     .select()

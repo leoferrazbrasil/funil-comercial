@@ -56,6 +56,7 @@ export type Opportunity = {
   valor: number
   responsavel: string
   proxima_acao: string
+  produto: string | null
   created_at: string
 }
 

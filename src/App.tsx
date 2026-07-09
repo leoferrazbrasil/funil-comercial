@@ -71,6 +71,7 @@ import {
   getCrmSnapshot,
   upsertProfile,
 } from "./lib/crmService";
+import { inferProductFromMessage } from "./lib/products";
 import { getAllowedRoutes } from "./lib/accessControl";
 import { brandConfig } from "./lib/branding";
 import {
@@ -275,8 +276,14 @@ const buildOpportunityNextActionFromMessage = (message: InboxMessage) => {
   return "Qualificar necessidade e definir proximo passo comercial.";
 };
 
-const buildOpportunityTitleFromMessage = (message: InboxMessage, name: string) =>
-  `${name || message.remetente_nome} - ${message.canal || "Inbox"}`;
+const buildOpportunityTitleFromMessage = (
+  message: InboxMessage,
+  name: string,
+  produto?: string | null,
+) => {
+  const base = name || message.remetente_nome;
+  return produto ? `${base} · ${produto}` : `${base} - ${message.canal || "Inbox"}`;
+};
 
 type PipelineRisk = {
   id: string;
@@ -662,6 +669,7 @@ function AppContent() {
       valor: Number(getFormValue(formData, "valor") || 0),
       responsavel: getFormValue(formData, "responsavel"),
       proxima_acao: getFormValue(formData, "proxima_acao"),
+      produto: getFormValue(formData, "produto") || null,
     };
 
     await runMutation(
@@ -840,13 +848,19 @@ function AppContent() {
         const opportunity = findOpportunityByLeadId(lead.id);
 
         if (!opportunity) {
+          // Auto-detecta o produto/serviço tratado pela conversa (site, tráfego,
+          // GMN, social...). Fica editável no card/modal se a detecção falhar.
+          const produto = inferProductFromMessage(
+            `${message.mensagem} ${lead.interesse ?? ""}`,
+          );
           await createOpportunity(ownerId, {
             lead_id: lead.id,
-            titulo: buildOpportunityTitleFromMessage(message, lead.nome),
+            titulo: buildOpportunityTitleFromMessage(message, lead.nome, produto),
             etapa: inferOpportunityStageFromMessage(message),
             valor: lead.valor_estimado,
             responsavel: snapshot.profile?.nome ?? "Equipe comercial",
             proxima_acao: buildOpportunityNextActionFromMessage(message),
+            produto,
           });
         }
 
