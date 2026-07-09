@@ -848,10 +848,17 @@ function AppContent() {
         const opportunity = findOpportunityByLeadId(lead.id);
 
         if (!opportunity) {
-          // Auto-detecta o produto/serviço tratado pela conversa (site, tráfego,
-          // GMN, social...). Fica editável no card/modal se a detecção falhar.
+          // Auto-detecta o produto/serviço tratado (site, tráfego, GMN, social...)
+          // varrendo TODA a conversa daquele telefone (não só a última mensagem),
+          // mais a mensagem atual e o interesse do lead. Editável se falhar.
+          const conversationText = snapshot.messages
+            .filter(
+              (m) => normalizePhone(m.telefone) === normalizePhone(message.telefone),
+            )
+            .map((m) => m.mensagem)
+            .join(" ");
           const produto = inferProductFromMessage(
-            `${message.mensagem} ${lead.interesse ?? ""}`,
+            `${conversationText} ${message.mensagem} ${lead.interesse ?? ""}`,
           );
           await createOpportunity(ownerId, {
             lead_id: lead.id,
