@@ -7,6 +7,7 @@ import { Toaster, toast } from "react-hot-toast";
 import { DndContext, useDraggable, useDroppable } from "@dnd-kit/core";
 import { IMaskInput } from "react-imask";
 import { useEffect, useMemo, useState } from "react";
+import { effectiveValue } from "../lib/products";
 import {
   BrowserRouter,
   Routes,
@@ -456,14 +457,15 @@ export default function Dashboard({
   );
   const openPipeline = periodOpps
     .filter((item) => !["Ganho", "Perdido"].includes(item.etapa))
-    .reduce((sum, item) => sum + Number(item.valor), 0);
+    .reduce((sum, item) => sum + effectiveValue(item.valor, item.produto), 0);
 
   // Taxa de Conversão (por VALOR): quanto do valor total das oportunidades do
   // período já foi convertido em venda (etapa "Ganho"). Sobe conforme os ganhos.
-  const totalValue = periodOpps.reduce((sum, o) => sum + (Number(o.valor) || 0), 0);
+  // Usa o valor efetivo (1º pagamento) — inclui serviços só-mensais (ex.: Tráfego).
+  const totalValue = periodOpps.reduce((sum, o) => sum + effectiveValue(o.valor, o.produto), 0);
   const wonValue = periodOpps
     .filter((o) => o.etapa === "Ganho")
-    .reduce((sum, o) => sum + (Number(o.valor) || 0), 0);
+    .reduce((sum, o) => sum + effectiveValue(o.valor, o.produto), 0);
   const conversionRate = totalValue ? Math.round((wonValue / totalValue) * 100) : 0;
 
   // Rotina comercial do DIA (sempre hoje, independente do filtro).

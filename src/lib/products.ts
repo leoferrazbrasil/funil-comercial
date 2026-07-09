@@ -17,7 +17,9 @@ export type Product = (typeof PRODUCTS)[number];
 export const PRODUCT_PRICING: Record<Product, { setup: number; monthly: number }> = {
   "Site / Landing Page": { setup: 497, monthly: 37.9 },
   "Google Meu Negócio": { setup: 800, monthly: 0 },
-  "Tráfego Pago": { setup: 0, monthly: 1497 },
+  // Serviço só-mensal: o 1º pagamento (no ato da contratação) é a própria
+  // mensalidade — por isso setup = monthly. O serviço só inicia após o pagamento.
+  "Tráfego Pago": { setup: 1497, monthly: 1497 },
   "Social Media / Criativos": { setup: 0, monthly: 0 }, // sob consulta
 };
 
@@ -36,6 +38,19 @@ export const priceForProduct = (produto: string | null | undefined): number | nu
 // Mensalidade recorrente (MRR) do produto. 0 quando não há recorrência.
 export const monthlyForProduct = (produto: string | null | undefined): number => {
   return pricingFor(produto)?.monthly ?? 0;
+};
+
+// Valor ÚNICO/imediato efetivo da oportunidade (pago no ato da contratação).
+// Usa o `valor` gravado quando > 0 (respeita edição manual); senão cai no preço
+// do produto (setup) — assim oportunidades antigas com valor 0 (ex.: Tráfego Pago
+// criado antes do ajuste) já refletem o 1º pagamento sem precisar reeditar.
+export const effectiveValue = (
+  valor: number | null | undefined,
+  produto: string | null | undefined,
+): number => {
+  const v = Number(valor) || 0;
+  if (v > 0) return v;
+  return priceForProduct(produto) ?? 0;
 };
 
 const stripDiacritics = (value: string) =>

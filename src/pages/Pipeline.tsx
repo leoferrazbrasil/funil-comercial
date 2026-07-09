@@ -1,6 +1,6 @@
 import { HeroPanel, PageIntro, MetricCard, Panel, ActionItem, TablePanel, EmptyState, Modal, ContactModal, LeadModal, OpportunityModal, MessageModal, ChannelModal, EntityForm, TextField, SelectField, LoadingScreen } from "../components/SharedUI";
 import { ConfirmDialog } from "../components/ConfirmDialog";
-import { monthlyForProduct } from "../lib/products";
+import { monthlyForProduct, effectiveValue } from "../lib/products";
 import type { Session } from "@supabase/supabase-js";
 import type { LucideIcon } from "lucide-react";
 import {
@@ -444,7 +444,7 @@ function PipelineCard({
       </div>
       
       <div className="flex items-baseline gap-2 flex-wrap">
-        <strong className="text-xl font-black tracking-tight text-primary">{formatMoney(Number(item.valor))}</strong>
+        <strong className="text-xl font-black tracking-tight text-primary">{formatMoney(effectiveValue(item.valor, item.produto))}</strong>
         {monthlyForProduct(item.produto) > 0 && (
           <span className="text-[11px] font-semibold text-muted-foreground">
             + {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(monthlyForProduct(item.produto))}/mês
@@ -615,20 +615,20 @@ export default function PipelinePage({
   const openOpportunities = opportunities.filter(isOpenOpportunity);
   const weakActionCount = openOpportunities.filter(isWeakNextAction).length;
   const noValueCount = openOpportunities.filter(
-    (opportunity) => Number(opportunity.valor) <= 0,
+    (opportunity) => effectiveValue(opportunity.valor, opportunity.produto) <= 0,
   ).length;
   const closingCount = openOpportunities.filter(isClosingStage).length;
   const openValue = openOpportunities.reduce(
-    (sum, opportunity) => sum + Number(opportunity.valor),
+    (sum, opportunity) => sum + effectiveValue(opportunity.valor, opportunity.produto),
     0,
   );
 
-  // Receita separada em único (setup) e recorrente (MRR), derivando a
-  // mensalidade do produto. `valor` = pagamento único (respeita edição manual).
+  // Receita separada em único (imediato) e recorrente (MRR). O único usa o valor
+  // efetivo (1º pagamento) — em serviços só-mensais equivale à mensalidade.
   const sumRevenue = (opps: Opportunity[]) =>
     opps.reduce(
       (acc, o) => {
-        acc.unico += Number(o.valor) || 0;
+        acc.unico += effectiveValue(o.valor, o.produto);
         acc.mensal += monthlyForProduct(o.produto);
         return acc;
       },
