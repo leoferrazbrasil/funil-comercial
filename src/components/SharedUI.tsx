@@ -1039,7 +1039,7 @@ export function SelectField({
   return (
     <label>
       {label}
-      <select className="flex min-h-10 w-full rounded-md border border-white/10 bg-black/20 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" name={name} defaultValue={defaultValue ?? ""} onChange={onChange}>
+      <select className="flex min-h-10 w-full cursor-pointer rounded-md border border-white/10 bg-black/20 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all [&>option]:bg-card [&>option]:text-foreground" name={name} defaultValue={defaultValue ?? ""} onChange={onChange}>
         {children}
       </select>
     </label>

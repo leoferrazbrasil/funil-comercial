@@ -1290,6 +1290,17 @@ function Modal({
   );
 }
 
+// Opções padronizadas de origem e potencial do contato.
+const CONTACT_ORIGINS = [
+  "Meta Ads",
+  "Google Ads",
+  "Site",
+  "WhatsApp",
+  "Indicação",
+  "Prospecção Ativa",
+];
+const CONTACT_POTENTIALS = ["Frio", "Morno", "Quente"];
+
 function ContactModal({
   contact,
   isSaving,
@@ -1328,18 +1339,36 @@ function ContactModal({
           name="email"
           type="email"
         />
-        <TextField
+        <SelectField
           defaultValue={contact?.origem}
           label="Origem"
           name="origem"
-          placeholder="WhatsApp, indicação, landing page..."
-        />
-        <TextField
+        >
+          <option value="">Selecione a origem</option>
+          {contact?.origem && !CONTACT_ORIGINS.includes(contact.origem) && (
+            <option value={contact.origem}>{contact.origem}</option>
+          )}
+          {CONTACT_ORIGINS.map((origem) => (
+            <option key={origem} value={origem}>
+              {origem}
+            </option>
+          ))}
+        </SelectField>
+        <SelectField
           defaultValue={contact?.potencial}
           label="Potencial"
           name="potencial"
-          placeholder="Novo, alto, médio..."
-        />
+        >
+          <option value="">Selecione o potencial</option>
+          {contact?.potencial && !CONTACT_POTENTIALS.includes(contact.potencial) && (
+            <option value={contact.potencial}>{contact.potencial}</option>
+          )}
+          {CONTACT_POTENTIALS.map((potencial) => (
+            <option key={potencial} value={potencial}>
+              {potencial}
+            </option>
+          ))}
+        </SelectField>
       </EntityForm>
     </Modal>
   );
