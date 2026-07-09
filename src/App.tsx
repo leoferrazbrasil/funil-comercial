@@ -71,7 +71,7 @@ import {
   getCrmSnapshot,
   upsertProfile,
 } from "./lib/crmService";
-import { inferProductFromMessage } from "./lib/products";
+import { PRODUCTS, inferProductFromMessage } from "./lib/products";
 import { getAllowedRoutes } from "./lib/accessControl";
 import { brandConfig } from "./lib/branding";
 import {
@@ -1455,6 +1455,18 @@ function OpportunityModal({
           {stages.map((stage) => (
             <option key={stage} value={stage}>
               {stage}
+            </option>
+          ))}
+        </SelectField>
+        <SelectField
+          defaultValue={opportunity?.produto ?? ""}
+          label="Produto / Serviço"
+          name="produto"
+        >
+          <option value="">Não definido</option>
+          {PRODUCTS.map((produto) => (
+            <option key={produto} value={produto}>
+              {produto}
             </option>
           ))}
         </SelectField>
