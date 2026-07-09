@@ -440,7 +440,26 @@ export default function Dashboard({
   const conversionRate = snapshot.leads.length
     ? Math.round((snapshot.opportunities.length / snapshot.leads.length) * 100)
     : 0;
-  
+
+  // Rotina comercial do DIA: contatos criados hoje e quantos viraram lead.
+  const isToday = (dateStr: string) => {
+    const d = new Date(dateStr);
+    const now = new Date();
+    return (
+      d.getFullYear() === now.getFullYear() &&
+      d.getMonth() === now.getMonth() &&
+      d.getDate() === now.getDate()
+    );
+  };
+  const contactsToday = snapshot.contacts.filter((c) => isToday(c.created_at));
+  const leadContactIds = new Set(
+    snapshot.leads.map((l) => l.contact_id).filter(Boolean),
+  );
+  const contactsTodayConverted = contactsToday.filter((c) => leadContactIds.has(c.id));
+  const contactToLeadRateToday = contactsToday.length
+    ? Math.round((contactsTodayConverted.length / contactsToday.length) * 100)
+    : 0;
+
   // Urgent Messages (Inbox)
   const pendingMessages = snapshot.messages.filter(
     (message) => message.unread_count > 0 || message.status !== "Resolvido",
@@ -501,13 +520,44 @@ export default function Dashboard({
           tone="neutral"
           emptyState="Oportunidades ativas no funil."
         />
-        <StatCard 
-          title="Taxa de Conversão" 
-          value={`${conversionRate}%`} 
-          icon={Target} 
+        <StatCard
+          title="Taxa de Conversão"
+          value={`${conversionRate}%`}
+          icon={Target}
           tone="success"
           emptyState="Histórico de tendência indisponível."
         />
+      </section>
+
+      {/* 2b. ROTINA DO DIA — Contatos criados hoje e conversão em lead */}
+      <section className="flex flex-col gap-4">
+        <div className="flex items-center gap-2">
+          <Calendar size={16} className="text-primary" />
+          <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Rotina de Hoje</h2>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <StatCard
+            title="Contatos criados hoje"
+            value={String(contactsToday.length)}
+            icon={UsersRound}
+            tone="neutral"
+            emptyState="Novos contatos cadastrados no dia."
+          />
+          <StatCard
+            title="Viraram lead hoje"
+            value={String(contactsTodayConverted.length)}
+            icon={Target}
+            tone={contactsTodayConverted.length > 0 ? "success" : "neutral"}
+            emptyState="Contatos de hoje que já viraram lead."
+          />
+          <StatCard
+            title="Conversão contato → lead"
+            value={`${contactToLeadRateToday}%`}
+            icon={TrendingUp}
+            tone="neutral"
+            emptyState={`${contactsTodayConverted.length} de ${contactsToday.length} contatos de hoje`}
+          />
+        </div>
       </section>
 
       {/* 3. EXECUÇÃO E ANÁLISE (GRID 2/3 + 1/3) */}
