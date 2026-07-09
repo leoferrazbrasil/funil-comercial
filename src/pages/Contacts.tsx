@@ -18,7 +18,6 @@ import {
   Sparkles,
   Target,
   Trash2,
-  TrendingUp,
   UsersRound,
   RotateCcw,
   Moon,
@@ -400,6 +399,15 @@ const getInitials = (name: string) => {
   return (name.substring(0, 2)).toUpperCase();
 };
 
+// Cores por potencial do contato (Frio=azul, Morno=âmbar, Quente=vermelho).
+const POTENCIAL_STYLE: Record<string, string> = {
+  Frio: "bg-sky-500/10 text-sky-400 border border-sky-500/20",
+  Morno: "bg-amber-500/10 text-amber-400 border border-amber-500/20",
+  Quente: "bg-red-500/10 text-red-400 border border-red-500/20",
+};
+const potencialStyle = (p?: string | null) =>
+  (p && POTENCIAL_STYLE[p]) || "bg-white/5 text-muted-foreground border border-white/10";
+
 export default function ContactsPage({
   contacts,
   query,
@@ -511,11 +519,10 @@ export default function ContactsPage({
                       </span>
                     </td>
                     <td className="p-4">
-                      {contact.potencial === 'Alto' ? (
-                        <span className="text-amber-500 text-xs font-semibold flex items-center gap-1"><TrendingUp size={14} /> Alto</span>
-                      ) : (
-                        <span className="text-muted-foreground text-xs">{contact.potencial || "Desconhecido"}</span>
-                      )}
+                      <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full ${potencialStyle(contact.potencial)}`}>
+                        <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                        {contact.potencial || "Não definido"}
+                      </span>
                     </td>
                     <td className="p-4 text-right">
                       <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -693,9 +700,12 @@ export default function ContactsPage({
                         <span className="text-[10px] uppercase text-muted-foreground font-semibold">Origem</span>
                         <span className="text-sm font-semibold">{selectedContact.origem || "Manual"}</span>
                       </div>
-                      <div className="p-4 bg-white/5 rounded-2xl flex flex-col gap-1">
+                      <div className="p-4 bg-white/5 rounded-2xl flex flex-col gap-2 items-start">
                         <span className="text-[10px] uppercase text-muted-foreground font-semibold">Potencial</span>
-                        <span className="text-sm font-semibold">{selectedContact.potencial || "Normal"}</span>
+                        <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full ${potencialStyle(selectedContact.potencial)}`}>
+                          <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                          {selectedContact.potencial || "Não definido"}
+                        </span>
                       </div>
                     </div>
                   </div>
