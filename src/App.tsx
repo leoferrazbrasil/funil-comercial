@@ -111,6 +111,18 @@ type EditingTarget =
 
 const navItems = navigationItems;
 
+// Rotas acessíveis SEM autenticação (o rastreador da Meta e visitantes não logados
+// precisam abri-las). Usada tanto no gate de render quanto no guard de auth que
+// redireciona para /login — manter as duas em sincronia evita o bug de páginas
+// públicas caírem no login.
+const PUBLIC_PATHS = [
+  "/",
+  "/brandbook",
+  "/privacidade",
+  "/termos",
+  "/exclusao-de-dados",
+];
+
 const stages: OpportunityStage[] = pipelineStages;
 const leadStatuses: Array<{ label: string; value: Lead["status"] }> = [
   { label: "Novo", value: "novo" },
@@ -380,12 +392,7 @@ function AppContent() {
   const location = useLocation();
   const navigate = useNavigate();
   const route = (location.pathname === "/" ? "dashboard" : location.pathname.slice(1)) as AppRoute;
-  const isPublicRoute =
-    location.pathname === "/" ||
-    location.pathname === "/brandbook" ||
-    location.pathname === "/privacidade" ||
-    location.pathname === "/termos" ||
-    location.pathname === "/exclusao-de-dados";
+  const isPublicRoute = PUBLIC_PATHS.includes(location.pathname);
   const [session, setSession] = useState<Session | null>(null);
   const [query, setQuery] = useState("");
   const [modal, setModal] = useState<ModalType | null>(null);
@@ -441,7 +448,7 @@ function AppContent() {
       if (!nextSession) {
         queryClient.removeQueries({ queryKey: ["crmSnapshot"] });
         const path = window.location.pathname;
-        if (path !== "/" && path !== "/brandbook" && path !== "/cadastro" && path !== "/login") {
+        if (!PUBLIC_PATHS.includes(path) && path !== "/cadastro" && path !== "/login") {
           navigate("/login");
         }
       }
