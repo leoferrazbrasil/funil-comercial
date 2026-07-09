@@ -44,6 +44,7 @@ import {
 } from "@tanstack/react-query";
 import LandingPage from "./pages/Landing";
 import BrandbookPage from "./pages/Brandbook";
+import { PrivacyPage, TermsPage, DataDeletionPage } from "./pages/LegalPages";
 import SignUpScreen from "./pages/SignUp";
 import LoginScreen from "./pages/Login";
 import PipelinePage from "./pages/Pipeline";
@@ -379,7 +380,12 @@ function AppContent() {
   const location = useLocation();
   const navigate = useNavigate();
   const route = (location.pathname === "/" ? "dashboard" : location.pathname.slice(1)) as AppRoute;
-  const isPublicRoute = location.pathname === "/" || location.pathname === "/brandbook";
+  const isPublicRoute =
+    location.pathname === "/" ||
+    location.pathname === "/brandbook" ||
+    location.pathname === "/privacidade" ||
+    location.pathname === "/termos" ||
+    location.pathname === "/exclusao-de-dados";
   const [session, setSession] = useState<Session | null>(null);
   const [query, setQuery] = useState("");
   const [modal, setModal] = useState<ModalType | null>(null);
@@ -950,6 +956,9 @@ function AppContent() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/brandbook" element={<BrandbookPage />} />
+        <Route path="/privacidade" element={<PrivacyPage />} />
+        <Route path="/termos" element={<TermsPage />} />
+        <Route path="/exclusao-de-dados" element={<DataDeletionPage />} />
       </Routes>
     );
   }

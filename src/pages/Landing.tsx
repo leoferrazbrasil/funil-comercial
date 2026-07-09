@@ -410,9 +410,10 @@ export default function LandingPage() {
               </div>
             </div>
           </div>
-          <div className="flex gap-6">
-            <a href="#" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">Termos</a>
-            <a href="#" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">Privacidade</a>
+          <div className="flex flex-wrap justify-center gap-4 md:gap-6">
+            <Link to="/termos" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">Termos</Link>
+            <Link to="/privacidade" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">Privacidade</Link>
+            <Link to="/exclusao-de-dados" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">Exclusão de Dados</Link>
           </div>
         </div>
       </footer>
