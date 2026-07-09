@@ -35,6 +35,7 @@ import {
   Route,
   useNavigate,
   useLocation,
+  useSearchParams,
   Navigate,
 } from "react-router-dom";
 import {
@@ -402,6 +403,29 @@ const buildLeadQualification = (lead: Lead): LeadQualification => {
 };
 
 
+// A synthetic "draft" message used to open a brand-new conversation (from the
+// Contacts "WhatsApp" button) when the contact has no message history yet. It
+// lets the composer target the phone; once the first reply is sent, the real
+// conversation replaces it via realtime.
+type WhatsAppTarget = { phone: string; nome: string; contactId: string | null };
+
+const buildDraftMessage = (target: WhatsAppTarget): InboxMessage => ({
+  id: "",
+  owner_id: "",
+  contact_id: target.contactId,
+  lead_id: null,
+  canal: "WhatsApp",
+  provider: "z-api",
+  provider_message_id: null,
+  remetente_nome: target.nome,
+  telefone: target.phone,
+  mensagem: "",
+  status: "Nova conversa",
+  unread_count: 0,
+  direction: "inbound",
+  created_at: new Date().toISOString(),
+});
+
 export default function InboxPage({
   channels,
   contacts,
@@ -499,6 +523,26 @@ export default function InboxPage({
   // Mobile UI States: "list" | "chat" | "context"
   const [mobileView, setMobileView] = useState<"list" | "chat" | "context">("list");
 
+  // Target conversation opened from another page (Contacts "WhatsApp" button)
+  // via ?to=<phone>&nome=<name>&contact=<id>.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [target, setTarget] = useState<WhatsAppTarget | null>(null);
+
+  useEffect(() => {
+    const to = searchParams.get("to");
+    if (!to) return;
+    setTarget({
+      phone: to,
+      nome: searchParams.get("nome") ?? to,
+      contactId: searchParams.get("contact"),
+    });
+    setSelectedKey(unifyPhone(to));
+    setMobileView("chat");
+    // Consume the params so a reload/back doesn't re-open the draft.
+    setSearchParams({}, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -540,7 +584,31 @@ export default function InboxPage({
   };
 
   const activeChannels = channels.filter((channel) => channel.status === "ativo");
-  const selectedConversation = conversations.find((c) => c.key === selectedKey);
+
+  const targetKey = target ? unifyPhone(target.phone) : null;
+  const hasRealTargetConversation = targetKey
+    ? conversations.some((c) => c.key === targetKey)
+    : false;
+  // Draft conversation for a contact with no history yet (opened via the
+  // Contacts "WhatsApp" button). Replaced by the real conversation once the
+  // first reply lands (realtime).
+  const draftConversation =
+    target && targetKey && !hasRealTargetConversation
+      ? {
+          key: targetKey,
+          latest: buildDraftMessage(target),
+          latestInbound: buildDraftMessage(target),
+          messages: [] as InboxMessage[],
+          unreadCount: 0,
+        }
+      : null;
+  const showDraft = Boolean(draftConversation && selectedKey === draftConversation!.key);
+  const displayedConversationsWithDraft =
+    showDraft ? [draftConversation!, ...displayedConversations] : displayedConversations;
+
+  const selectedConversation =
+    conversations.find((c) => c.key === selectedKey) ??
+    (showDraft ? draftConversation! : undefined);
   const selected = selectedConversation?.latest;
   const sourceMessage = selectedConversation?.latestInbound;
   
@@ -672,7 +740,7 @@ export default function InboxPage({
           </div>
         )}
         
-        {displayedConversations.length === 0 ? (
+        {displayedConversationsWithDraft.length === 0 ? (
           <div className="p-8 flex flex-col items-center justify-center text-center text-muted-foreground h-full">
             <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
               <MessageCircle size={28} className="opacity-40" />
@@ -682,7 +750,7 @@ export default function InboxPage({
           </div>
         ) : (
           <div className="flex flex-col">
-            {displayedConversations.map((conv) => {
+            {displayedConversationsWithDraft.map((conv) => {
               const isSelected = selectedKey === conv.key;
               const hasUnread = conv.unreadCount > 0;
               return (

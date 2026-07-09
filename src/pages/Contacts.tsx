@@ -132,10 +132,9 @@ const formatProviderName = (provider: string) => {
   return provider.trim() || "Canal";
 };
 
-// Builds a wa.me link from a contact phone. wa.me opens the WhatsApp app on
-// mobile and WhatsApp Web on desktop with a single URL. Returns null for missing
-// or clearly invalid numbers (ex.: IDs de grupo/comunidade "120363…").
-const buildWhatsAppLink = (rawPhone: string | null | undefined): string | null => {
+// Normalizes a contact phone to dialable digits (with DDI). Returns null for
+// missing or clearly invalid numbers (ex.: IDs de grupo/comunidade "120363…").
+const normalizeContactPhone = (rawPhone: string | null | undefined): string | null => {
   const digits = (rawPhone ?? "").replace(/\D/g, "");
   if (!digits) return null;
   // WhatsApp group/community/newsletter ids are not dialable phone numbers.
@@ -149,7 +148,7 @@ const buildWhatsAppLink = (rawPhone: string | null | undefined): string | null =
   // Um número internacional válido tem entre 12 e 15 dígitos (com DDI).
   if (normalized.length < 12 || normalized.length > 15) return null;
 
-  return `https://wa.me/${normalized}`;
+  return normalized;
 };
 
 const matchesQuery = (
@@ -414,6 +413,7 @@ export default function ContactsPage({
   onEditContact: (contact: Contact) => void;
   onOpenModal: (modal: ModalType) => void;
 }) {
+  const navigate = useNavigate();
   const [selectedContactId, setSelectedContactId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"overview" | "commercial">("overview");
 
@@ -599,12 +599,17 @@ export default function ContactsPage({
                       toast.error("Este contato ainda não possui telefone cadastrado.");
                       return;
                     }
-                    const link = buildWhatsAppLink(phone);
-                    if (!link) {
+                    const normalized = normalizeContactPhone(phone);
+                    if (!normalized) {
                       toast.error("Não foi possível abrir o WhatsApp. Verifique se o telefone do contato está correto.");
                       return;
                     }
-                    window.open(link, "_blank", "noopener,noreferrer");
+                    // Abre a conversa DENTRO do painel, na Inbox, com esse contato.
+                    navigate(
+                      `/inbox?to=${normalized}` +
+                        `&nome=${encodeURIComponent(selectedContact.nome)}` +
+                        `&contact=${selectedContact.id}`,
+                    );
                   }}
                   className="px-4 py-2 bg-green-500/10 hover:bg-green-500/20 text-green-500 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2"
                 >
