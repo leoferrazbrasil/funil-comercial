@@ -711,10 +711,23 @@ export default function LeadsPage({
                   <span className="text-[10px] uppercase text-muted-foreground font-semibold">Interesse</span>
                   <span className="text-sm font-semibold leading-snug">{lead.interesse || "-"}</span>
                 </div>
-                <div className="p-4 bg-white/5 rounded-2xl flex flex-col gap-1 col-span-2">
-                  <span className="text-[10px] uppercase text-muted-foreground font-semibold">Próxima Ação Manual</span>
-                  <span className="text-sm font-semibold leading-snug">{lead.proxima_acao || "-"}</span>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => onEditLead(lead)}
+                  className="p-4 bg-white/5 hover:bg-white/10 rounded-2xl flex flex-col gap-1 col-span-2 text-left transition-colors group"
+                >
+                  <span className="text-[10px] uppercase text-muted-foreground font-semibold flex items-center gap-1">
+                    <Target size={12} /> Próxima Ação Manual
+                    <Pencil size={10} className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </span>
+                  {leadHasClearNextAction(lead) ? (
+                    <span className="text-sm font-semibold leading-snug mt-1">{lead.proxima_acao}</span>
+                  ) : (
+                    <span className="text-sm italic text-muted-foreground leading-snug mt-1">
+                      Defina a próxima ação comercial deste lead…
+                    </span>
+                  )}
+                </button>
               </div>
             </div>
             
