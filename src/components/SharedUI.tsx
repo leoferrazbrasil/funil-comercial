@@ -2,7 +2,9 @@ import type { Session } from "@supabase/supabase-js";
 import type { LucideIcon } from "lucide-react";
 import {
   Bell,
+  Check,
   CheckCircle2,
+  ChevronDown,
   CircleDollarSign,
   Clock3,
   LogOut,
@@ -27,7 +29,7 @@ import type { FormEvent, ReactNode } from "react";
 import { Toaster, toast } from "react-hot-toast";
 import { DndContext, useDraggable, useDroppable } from "@dnd-kit/core";
 import { IMaskInput } from "react-imask";
-import { useEffect, useMemo, useState } from "react";
+import { Children, isValidElement, useEffect, useMemo, useRef, useState } from "react";
 import {
   BrowserRouter,
   Routes,
@@ -1023,6 +1025,10 @@ export function TextField({
   );
 }
 
+// Dropdown customizado (não-nativo) para controlar 100% a aparência — o realce da
+// opção sob o mouse usa a paleta do projeto (primary), em vez do azul nativo do SO.
+// Mantém a API antiga (filhos <option>, name, onChange) via um input hidden que
+// alimenta o FormData, então nenhum formulário existente precisa mudar.
 export function SelectField({
   children,
   defaultValue,
@@ -1036,12 +1042,88 @@ export function SelectField({
   name: string;
   onChange?: (event: React.ChangeEvent<HTMLSelectElement>) => void;
 }) {
+  const options = Children.toArray(children)
+    .filter(
+      (child): child is React.ReactElement<{ value?: string; children?: ReactNode }> =>
+        isValidElement(child) && child.type === "option",
+    )
+    .map((child) => ({
+      value: String(child.props.value ?? ""),
+      label: child.props.children as ReactNode,
+    }));
+
+  const [value, setValue] = useState<string>(defaultValue != null ? String(defaultValue) : "");
+  const [open, setOpen] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const handlePointer = (event: MouseEvent) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    };
+    const handleKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("mousedown", handlePointer);
+    document.addEventListener("keydown", handleKey);
+    return () => {
+      document.removeEventListener("mousedown", handlePointer);
+      document.removeEventListener("keydown", handleKey);
+    };
+  }, [open]);
+
+  const selected = options.find((option) => option.value === value) ?? options[0];
+  const isPlaceholder = !selected?.value;
+
+  const choose = (next: string) => {
+    setValue(next);
+    setOpen(false);
+    onChange?.({ target: { value: next } } as unknown as React.ChangeEvent<HTMLSelectElement>);
+  };
+
   return (
-    <label>
+    <label className="relative">
       {label}
-      <select className="flex min-h-10 w-full cursor-pointer rounded-md border border-white/10 bg-black/20 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all [&>option]:bg-card [&>option]:text-foreground" name={name} defaultValue={defaultValue ?? ""} onChange={onChange}>
-        {children}
-      </select>
+      <input type="hidden" name={name} value={value} />
+      <div ref={wrapperRef}>
+        <button
+          type="button"
+          onClick={() => setOpen((prev) => !prev)}
+          className="flex min-h-10 w-full items-center justify-between gap-2 cursor-pointer rounded-md border border-white/10 bg-black/20 px-3 py-2 text-sm text-left text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+        >
+          <span className={`truncate ${isPlaceholder ? "text-muted-foreground" : "text-foreground"}`}>
+            {selected?.label ?? "Selecione"}
+          </span>
+          <ChevronDown
+            size={16}
+            className={`shrink-0 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`}
+          />
+        </button>
+        {open && (
+          <div className="absolute left-0 right-0 z-[70] mt-1 max-h-60 overflow-auto rounded-md border border-white/10 bg-card shadow-2xl p-1 animate-in fade-in zoom-in-95 duration-100">
+            {options.map((option) => {
+              const active = option.value === value;
+              return (
+                <button
+                  type="button"
+                  key={option.value}
+                  onClick={() => choose(option.value)}
+                  className={`flex w-full items-center justify-between gap-2 rounded-md px-3 py-2 text-left text-sm transition-colors ${
+                    active
+                      ? "bg-primary/15 text-primary font-semibold"
+                      : "text-foreground hover:bg-white/10"
+                  }`}
+                >
+                  <span className="truncate">{option.label}</span>
+                  {active && <Check size={14} className="shrink-0 text-primary" />}
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
     </label>
   );
 }
