@@ -1,5 +1,45 @@
 # Changelog
 
+## [2026-07-09] - Sprint: Conexão WhatsApp ponta a ponta, Exclusões, Produtos/Receita e Padronização de UI
+
+### Corrigido — Conexão WhatsApp (Z-API) travada em "Conectando..."
+- **Causa raiz (multi-fator), diagnosticada com evidência:** a Z-API conectava, mas o Funil nunca detectava. Quatro falhas somadas:
+  1. `integration_channels` **não estava na publicação `supabase_realtime`** → o listener de realtime que vira a UI para "Conectado" nunca disparava. Corrigido pela migração `20260708120000_realtime_integration_channels.sql` (ADD TABLE + `REPLICA IDENTITY FULL`).
+  2. **Sem `supabase/config.toml`** → `verify_jwt=true` (padrão) rejeitava o webhook `ConnectedCallback` da Z-API com 401 antes do handler. Criado `config.toml` com `verify_jwt=false` para `whatsapp-qr-inbound` e `whatsapp-inbound`.
+  3. `getInstanceStatus` podia "engolir" o `connected:true` na busca do telefone (`/device`) e a action `status` gravava `numero='connected'` colidindo com `unique(provider,numero)` → 500. Reescrito: `connected` vem só do `/status`, busca de telefone isolada, log da resposta bruta; a action passou a gravar `status='ativo'` **separado** do `numero`, com placeholders por dono, sem 500.
+  4. Front-end: `catch` do polling só sinalizava erro em "loading" → timeout ficava silencioso. Corrigido + botão "Já escaneei — Verificar conexão".
+- Arquivos: `whatsapp-manager/index.ts`, `providers/ZApiProvider.ts`, `whatsapp-qr-inbound/index.ts`, `WhatsAppIntegration.tsx`, `App.tsx` (realtime de `integration_channels`).
+
+### Corrigido — Recebimento de mensagens no Inbox
+- **Coluna `metadata` inexistente em `inbox_messages`** fazia todo insert de mensagem recebida falhar (`PGRST204`). Migração `20260708210000_inbox_messages_metadata.sql` (add `metadata jsonb` + índice `chat_lid`).
+- `whatsapp-inbound`: instrumentação (`describeError` expõe código/detalhe do Postgres, log do payload cru); parsing robusto (ignora callbacks que não são mensagem, amplia tipos, fallback); `findExistingContact` com `.limit(1)` (contatos duplicados quebravam o `maybeSingle`); processa cada mensagem isolada (fim do retry-storm/500).
+- **Grupos/Comunidades:** newsletters/comunidades (broadcast) são ignoradas; mensagens de grupo passam a ser atribuídas ao **participante real** com rótulo "Pessoa · Grupo".
+
+### Adicionado — Botão WhatsApp nos Contatos → conversa no painel
+- No Perfil do Contato, o botão "WhatsApp" abre a conversa **dentro do Funil** (`/inbox?to=...`), selecionando a conversa existente ou criando um rascunho para contatos sem histórico. Corrigida corrida de efeitos que abria a conversa do topo em vez da do contato.
+
+### Adicionado — Exclusões seguras (Contatos, Leads, Funil)
+- Exclusão definitiva **com confirmação** (`ConfirmDialog` reutilizável). Segura porque todos os FKs usam `ON DELETE SET NULL` (só desvincula; preserva histórico da Inbox e relacionados). `crmService`: `deleteContact/deleteLead/deleteOpportunity` (RLS por dono). Botões nas 3 páginas (linha da tabela e card do Kanban, com guardas de drag).
+
+### Adicionado — Funil: Produto/Serviço, preços e receita recorrente (MRR)
+- Nova coluna `opportunities.produto` (migração `20260709120000`). Catálogo em `src/lib/products.ts` (setup + mensalidade): Site R$497 + R$37,90/mês, Google Meu Negócio R$800, Tráfego Pago R$1.497/mês.
+- Ao criar oportunidade pelo Inbox, o **produto é auto-detectado** (varre a conversa inteira do telefone) e o **valor** já nasce com o preço. No modal, escolher o produto **auto-preenche o Valor**. Tag do produto e mensalidade no card.
+- Novo card no topo do Funil: **"Fechado (Ganho)"** vs **"Projeção (pipeline aberto)"**, separando único (setup) de recorrente (MRR). Mover para "Ganho" passa a somar no Fechado automaticamente.
+
+### Adicionado / Corrigido — Dashboard
+- Nova seção **"Rotina de Hoje"**: contatos criados hoje, quantos viraram lead e a taxa contato→lead.
+- Card "Taxa de Conversão" (fórmula quebrada `oportunidades/leads`, podia passar de 100%) substituído por **Win Rate** = Ganhos ÷ (Ganhos+Perdidos), com cor dinâmica e estado honesto quando não há negócios fechados.
+
+### Padronização de UI (listas suspensas)
+- ContactModal: **Origem** (Meta Ads, Google Ads, Site, WhatsApp, Indicação, Prospecção Ativa) e **Potencial** (Frio, Morno, Quente) viraram selects, preservando valores antigos ao editar.
+- `SelectField` reescrito como **dropdown customizado** (não-nativo): realce da opção na paleta do projeto (`primary`), fim do azul nativo do SO. Mantém a API (`<option>` + `name` via input oculto + `onChange`), padronizando **todos** os selects sem quebrar formulários.
+
+### Infra / Deploy
+- Referências do Supabase migradas do projeto antigo (`dtdtewojmyhiegwmgmte`) para o atual (`juvwfxnlusrnvcarkrmc`) em 13 arquivos; **senha do banco removida** do `.codex/environments/environment.toml` (usa `${SUPABASE_DB_PASSWORD}`) — **rotacionada** pelo usuário.
+- `public/.htaccess`: política de cache — `index.html` sempre revalidado (deploy aparece na hora) + assets com hash imutáveis. Fim do "mudança não aparece sem hard refresh".
+- `.nvmrc` (22) + `engines.node >=20.19` para estabilizar o build no host (Hostinger, deploy automático via GitHub).
+- `scripts/apply-supabase-sql.mjs`: ref atualizado + tolerância a erros benignos.
+
 ## [2026-07-08] - Correção: Reconexão de WhatsApp (QR Code)
 
 ### Corrigido
@@ -113,9 +153,9 @@
 
 ### Removido
 - Imagens PNG antigas e inconsistentes do logo ("símbolo esquisito") sendo totalmente depreciadas no front-end atualizado.
-### 2026-07-08 - Corre��o Conex�o QR Code WhatsApp
-- Backend: Corrigido bug no whatsapp-manager que impedia atualiza��o do status por atraso na resposta do campo phone da Z-API.
-- Backend: Adicionado tratamento de webhook de conex�o Z-API no whatsapp-qr-inbound.
-- Frontend: Polling acelerado para 3s durante exibi��o do QR Code.
-- Frontend: Implementada expira��o do QR Code em 60s.
+### 2026-07-08 - Corre��o Conex�o QR Code WhatsApp
+- Backend: Corrigido bug no whatsapp-manager que impedia atualiza��o do status por atraso na resposta do campo phone da Z-API.
+- Backend: Adicionado tratamento de webhook de conex�o Z-API no whatsapp-qr-inbound.
+- Frontend: Polling acelerado para 3s durante exibi��o do QR Code.
+- Frontend: Implementada expira��o do QR Code em 60s.
 - Frontend: Novos feedbacks de interface ('QR Code lido', etc).
