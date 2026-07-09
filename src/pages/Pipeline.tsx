@@ -722,13 +722,28 @@ export default function PipelinePage({
                   </div>
                 </div>
                 <div className="p-4 bg-white/5 rounded-2xl flex flex-col gap-1">
-                  <span className="text-[10px] uppercase text-muted-foreground font-semibold">Fonte</span>
-                  <span className="text-sm font-semibold mt-1">{selectedOpp.lead_id ? "Lead Qualificado" : "Contato"}</span>
+                  <span className="text-[10px] uppercase text-muted-foreground font-semibold">Origem</span>
+                  <span className="text-sm font-semibold mt-1 truncate">
+                    {leads.find((l) => l.id === selectedOpp.lead_id)?.origem || "Não informada"}
+                  </span>
                 </div>
-                <div className="p-4 bg-white/5 rounded-2xl flex flex-col gap-1 col-span-2 border border-white/5">
-                  <span className="text-[10px] uppercase text-muted-foreground font-semibold flex items-center gap-1"><Target size={12}/> Próxima Ação</span>
-                  <span className="text-sm font-semibold leading-snug mt-1">{selectedOpp.proxima_acao || "Sem ação definida"}</span>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => { onEditOpportunity(selectedOpp); setSelectedOppId(null); }}
+                  className="p-4 bg-white/5 hover:bg-white/10 rounded-2xl flex flex-col gap-1 col-span-2 border border-white/5 text-left transition-colors group"
+                >
+                  <span className="text-[10px] uppercase text-muted-foreground font-semibold flex items-center gap-1">
+                    <Target size={12}/> Próxima Ação
+                    <Pencil size={10} className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </span>
+                  {isWeakNextAction(selectedOpp) ? (
+                    <span className="text-sm italic text-muted-foreground leading-snug mt-1">
+                      Defina a próxima ação comercial deste negócio…
+                    </span>
+                  ) : (
+                    <span className="text-sm font-semibold leading-snug mt-1">{selectedOpp.proxima_acao}</span>
+                  )}
+                </button>
               </div>
             </div>
             
