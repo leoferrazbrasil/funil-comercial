@@ -431,20 +431,42 @@ export default function Dashboard({
   snapshot: CrmSnapshot;
   onOpenModal: (modal: ModalType) => void;
 }) {
-  const activeLeads = snapshot.leads.filter(
+  // Filtro temporal: escopa os KPIs por `created_at` no período selecionado.
+  const [period, setPeriod] = useState<"hoje" | "7d" | "mes" | "tudo">("mes");
+  const periodStart = useMemo(() => {
+    const now = new Date();
+    if (period === "hoje") return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    if (period === "7d") {
+      const d = new Date(now);
+      d.setDate(d.getDate() - 6);
+      d.setHours(0, 0, 0, 0);
+      return d;
+    }
+    if (period === "mes") return new Date(now.getFullYear(), now.getMonth(), 1);
+    return null; // tudo
+  }, [period]);
+  const inPeriod = (dateStr: string) => !periodStart || new Date(dateStr) >= periodStart;
+
+  const periodLeads = snapshot.leads.filter((l) => inPeriod(l.created_at));
+  const periodOpps = snapshot.opportunities.filter((o) => inPeriod(o.created_at));
+  const periodMessages = snapshot.messages.filter((m) => inPeriod(m.created_at));
+
+  const activeLeads = periodLeads.filter(
     (lead) => !["convertido", "perdido"].includes(lead.status),
   );
-  const openPipeline = snapshot.opportunities
+  const openPipeline = periodOpps
     .filter((item) => !["Ganho", "Perdido"].includes(item.etapa))
     .reduce((sum, item) => sum + Number(item.valor), 0);
-  // Win rate: negócios GANHOS sobre o total de negócios FECHADOS (Ganho+Perdido).
-  // KPI de vendas correto (0–100%), ao contrário do "oportunidades/leads" antigo.
-  const wonCount = snapshot.opportunities.filter((o) => o.etapa === "Ganho").length;
-  const lostCount = snapshot.opportunities.filter((o) => o.etapa === "Perdido").length;
-  const closedCount = wonCount + lostCount;
-  const winRate = closedCount ? Math.round((wonCount / closedCount) * 100) : 0;
 
-  // Rotina comercial do DIA: contatos criados hoje e quantos viraram lead.
+  // Taxa de Conversão (por VALOR): quanto do valor total das oportunidades do
+  // período já foi convertido em venda (etapa "Ganho"). Sobe conforme os ganhos.
+  const totalValue = periodOpps.reduce((sum, o) => sum + (Number(o.valor) || 0), 0);
+  const wonValue = periodOpps
+    .filter((o) => o.etapa === "Ganho")
+    .reduce((sum, o) => sum + (Number(o.valor) || 0), 0);
+  const conversionRate = totalValue ? Math.round((wonValue / totalValue) * 100) : 0;
+
+  // Rotina comercial do DIA (sempre hoje, independente do filtro).
   const isToday = (dateStr: string) => {
     const d = new Date(dateStr);
     const now = new Date();
@@ -463,10 +485,17 @@ export default function Dashboard({
     ? Math.round((contactsTodayConverted.length / contactsToday.length) * 100)
     : 0;
 
-  // Urgent Messages (Inbox)
-  const pendingMessages = snapshot.messages.filter(
+  // Urgent Messages (Inbox) — no período selecionado.
+  const pendingMessages = periodMessages.filter(
     (message) => message.unread_count > 0 || message.status !== "Resolvido",
   );
+
+  const PERIODS: Array<{ key: typeof period; label: string }> = [
+    { key: "hoje", label: "Hoje" },
+    { key: "7d", label: "7 dias" },
+    { key: "mes", label: "Mês" },
+    { key: "tudo", label: "Tudo" },
+  ];
 
   const recommendations = buildCommercialRecommendations(snapshot);
   
@@ -484,17 +513,22 @@ export default function Dashboard({
           <h1 className="text-3xl font-bold tracking-tight mb-1">Visão Geral</h1>
           <p className="text-muted-foreground">Aqui está o resumo da sua operação neste momento.</p>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 bg-card border border-white/5 rounded-2xl px-4 py-2 text-sm text-muted-foreground mr-2 cursor-not-allowed opacity-50" title="Filtro temporal em breve">
-            <Calendar size={16} />
-            <span>Este mês</span>
-          </div>
-          <button onClick={() => onOpenModal("lead")} className="button button-primary">
-            <Plus size={18} /> Novo Lead
-          </button>
-          <button onClick={() => onOpenModal("opportunity")} className="button button-outline hidden md:flex">
-            Nova Oportunidade
-          </button>
+        <div className="flex items-center gap-2 bg-card border border-white/5 rounded-2xl p-1">
+          <Calendar size={16} className="text-muted-foreground ml-2 mr-1 shrink-0" />
+          {PERIODS.map((option) => (
+            <button
+              key={option.key}
+              type="button"
+              onClick={() => setPeriod(option.key)}
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors ${
+                period === option.key
+                  ? "bg-primary/15 text-primary"
+                  : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+              }`}
+            >
+              {option.label}
+            </button>
+          ))}
         </div>
       </header>
 
@@ -524,14 +558,14 @@ export default function Dashboard({
           emptyState="Oportunidades ativas no funil."
         />
         <StatCard
-          title="Taxa de Ganho (Win Rate)"
-          value={closedCount ? `${winRate}%` : "—"}
+          title="Taxa de Conversão"
+          value={totalValue ? `${conversionRate}%` : "—"}
           icon={Target}
-          tone={closedCount === 0 ? "neutral" : winRate >= 50 ? "success" : "warning"}
+          tone={totalValue === 0 ? "neutral" : conversionRate >= 50 ? "success" : "warning"}
           emptyState={
-            closedCount
-              ? `${wonCount} ganho(s) de ${closedCount} fechado(s)`
-              : "Sem negócios fechados ainda."
+            totalValue
+              ? `${formatMoney(wonValue)} ganho de ${formatMoney(totalValue)} no funil`
+              : "Sem oportunidades no período."
           }
         />
       </section>
