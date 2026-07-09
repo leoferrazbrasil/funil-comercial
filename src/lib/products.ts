@@ -11,30 +11,31 @@ export const PRODUCTS = [
 
 export type Product = (typeof PRODUCTS)[number];
 
-// Preço de entrada ("a partir de") de cada produto. Vira o `valor` da
-// oportunidade (que já soma no card e na métrica "Pipeline Aberto").
-export const PRODUCT_PRICES: Partial<Record<Product, number>> = {
-  "Site / Landing Page": 497,
-  "Google Meu Negócio": 800,
-  "Tráfego Pago": 1497,
-  // Social Media / Criativos: preço sob consulta (sem default).
+// Preço de cada produto separado em:
+//  - setup: pagamento ÚNICO (one-time) → vira o `valor` da oportunidade.
+//  - monthly: RECORRÊNCIA mensal (MRR) → derivada do catálogo (não editável).
+export const PRODUCT_PRICING: Record<Product, { setup: number; monthly: number }> = {
+  "Site / Landing Page": { setup: 497, monthly: 37.9 },
+  "Google Meu Negócio": { setup: 800, monthly: 0 },
+  "Tráfego Pago": { setup: 0, monthly: 1497 },
+  "Social Media / Criativos": { setup: 0, monthly: 0 }, // sob consulta
 };
 
-// Mensalidade recorrente, quando houver (apenas informativo no card).
-export const PRODUCT_MONTHLY: Partial<Record<Product, number>> = {
-  "Site / Landing Page": 37.9,
-};
+const pricingFor = (produto: string | null | undefined) =>
+  produto && produto in PRODUCT_PRICING
+    ? PRODUCT_PRICING[produto as Product]
+    : null;
 
+// Pagamento único (setup) do produto — usado para auto-preencher o `valor`.
+// Retorna null para "Não definido" (mantém o valor atual do campo).
 export const priceForProduct = (produto: string | null | undefined): number | null => {
-  if (!produto) return null;
-  const price = (PRODUCT_PRICES as Record<string, number>)[produto];
-  return typeof price === "number" ? price : null;
+  const pricing = pricingFor(produto);
+  return pricing ? pricing.setup : null;
 };
 
-export const monthlyForProduct = (produto: string | null | undefined): number | null => {
-  if (!produto) return null;
-  const monthly = (PRODUCT_MONTHLY as Record<string, number>)[produto];
-  return typeof monthly === "number" ? monthly : null;
+// Mensalidade recorrente (MRR) do produto. 0 quando não há recorrência.
+export const monthlyForProduct = (produto: string | null | undefined): number => {
+  return pricingFor(produto)?.monthly ?? 0;
 };
 
 const stripDiacritics = (value: string) =>

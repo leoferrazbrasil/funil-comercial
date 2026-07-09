@@ -445,9 +445,9 @@ function PipelineCard({
       
       <div className="flex items-baseline gap-2 flex-wrap">
         <strong className="text-xl font-black tracking-tight text-primary">{formatMoney(Number(item.valor))}</strong>
-        {monthlyForProduct(item.produto) != null && (
+        {monthlyForProduct(item.produto) > 0 && (
           <span className="text-[11px] font-semibold text-muted-foreground">
-            + {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(monthlyForProduct(item.produto)!)}/mês
+            + {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(monthlyForProduct(item.produto))}/mês
           </span>
         )}
       </div>
@@ -622,7 +622,24 @@ export default function PipelinePage({
     (sum, opportunity) => sum + Number(opportunity.valor),
     0,
   );
-  
+
+  // Receita separada em único (setup) e recorrente (MRR), derivando a
+  // mensalidade do produto. `valor` = pagamento único (respeita edição manual).
+  const sumRevenue = (opps: Opportunity[]) =>
+    opps.reduce(
+      (acc, o) => {
+        acc.unico += Number(o.valor) || 0;
+        acc.mensal += monthlyForProduct(o.produto);
+        return acc;
+      },
+      { unico: 0, mensal: 0 },
+    );
+  const wonOpportunities = opportunities.filter((o) => o.etapa === "Ganho");
+  const ganho = sumRevenue(wonOpportunities);        // já fechado
+  const projecao = sumRevenue(openOpportunities);    // pipeline em aberto
+  const formatMoneyExact = (value: number) =>
+    new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
+
   const selectedOpp = opportunities.find(o => o.id === selectedOppId);
 
   // Keyboard escape to close drawer
@@ -782,6 +799,37 @@ export default function PipelinePage({
           hint="Afetam previsão comercial"
           tone={noValueCount ? "warning" : "neutral"}
         />
+      </section>
+
+      {/* Receita: já fechado (Ganho) vs projeção (pipeline aberto) */}
+      <section className="grid grid-cols-1 sm:grid-cols-2 gap-4 shrink-0" aria-label="Receita fechada e projetada">
+        <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-2xl p-4 md:p-5 flex flex-col gap-2 relative overflow-hidden">
+          <div className="flex items-center gap-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-widest text-emerald-500">
+            <CheckCircle2 size={14} /> Fechado (Ganho)
+          </div>
+          <div className="flex items-baseline gap-2 flex-wrap">
+            <strong className="text-2xl sm:text-3xl font-black tracking-tighter text-foreground">{formatMoney(ganho.unico)}</strong>
+            <span className="text-xs font-bold text-muted-foreground">único</span>
+          </div>
+          {ganho.mensal > 0 && (
+            <span className="text-sm font-bold text-emerald-500">+ {formatMoneyExact(ganho.mensal)}/mês recorrente</span>
+          )}
+          <span className="text-[11px] text-muted-foreground mt-auto">{wonOpportunities.length} negócio(s) ganho(s)</span>
+        </div>
+
+        <div className="bg-primary/5 border border-primary/20 rounded-2xl p-4 md:p-5 flex flex-col gap-2 relative overflow-hidden">
+          <div className="flex items-center gap-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-widest text-primary">
+            <TrendingUp size={14} /> Projeção (pipeline aberto)
+          </div>
+          <div className="flex items-baseline gap-2 flex-wrap">
+            <strong className="text-2xl sm:text-3xl font-black tracking-tighter text-foreground">{formatMoney(projecao.unico)}</strong>
+            <span className="text-xs font-bold text-muted-foreground">único</span>
+          </div>
+          {projecao.mensal > 0 && (
+            <span className="text-sm font-bold text-primary">+ {formatMoneyExact(projecao.mensal)}/mês recorrente</span>
+          )}
+          <span className="text-[11px] text-muted-foreground mt-auto">{openOpportunities.length} em aberto no funil</span>
+        </div>
       </section>
 
       <div className="flex-1 overflow-hidden relative">
