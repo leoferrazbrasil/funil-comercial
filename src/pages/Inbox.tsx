@@ -567,15 +567,16 @@ export default function InboxPage({
     });
   }, [conversations, filterTab, localSearch]);
 
-  // Selection Logic
+  // Selection Logic — auto-select the first conversation on desktop, BUT never
+  // when a specific conversation was requested via ?to= (Contacts "WhatsApp"
+  // button) or is already open, otherwise it would clobber the target with the
+  // top conversation on mount.
   useEffect(() => {
-    if (!selectedKey && displayedConversations.length > 0) {
-      // Don't auto-select on mobile to keep the list view open initially
-      if (window.innerWidth >= 1024) {
-        setSelectedKey(displayedConversations[0].key);
-      }
+    if (selectedKey || target || searchParams.get("to")) return;
+    if (displayedConversations.length > 0 && window.innerWidth >= 1024) {
+      setSelectedKey(displayedConversations[0].key);
     }
-  }, [displayedConversations, selectedKey]);
+  }, [displayedConversations, selectedKey, target, searchParams]);
 
   // View handlers for mobile
   const handleSelectConversation = (key: string) => {
