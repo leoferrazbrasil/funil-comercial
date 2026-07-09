@@ -437,9 +437,12 @@ export default function Dashboard({
   const openPipeline = snapshot.opportunities
     .filter((item) => !["Ganho", "Perdido"].includes(item.etapa))
     .reduce((sum, item) => sum + Number(item.valor), 0);
-  const conversionRate = snapshot.leads.length
-    ? Math.round((snapshot.opportunities.length / snapshot.leads.length) * 100)
-    : 0;
+  // Win rate: negócios GANHOS sobre o total de negócios FECHADOS (Ganho+Perdido).
+  // KPI de vendas correto (0–100%), ao contrário do "oportunidades/leads" antigo.
+  const wonCount = snapshot.opportunities.filter((o) => o.etapa === "Ganho").length;
+  const lostCount = snapshot.opportunities.filter((o) => o.etapa === "Perdido").length;
+  const closedCount = wonCount + lostCount;
+  const winRate = closedCount ? Math.round((wonCount / closedCount) * 100) : 0;
 
   // Rotina comercial do DIA: contatos criados hoje e quantos viraram lead.
   const isToday = (dateStr: string) => {
@@ -521,11 +524,15 @@ export default function Dashboard({
           emptyState="Oportunidades ativas no funil."
         />
         <StatCard
-          title="Taxa de Conversão"
-          value={`${conversionRate}%`}
+          title="Taxa de Ganho (Win Rate)"
+          value={closedCount ? `${winRate}%` : "—"}
           icon={Target}
-          tone="success"
-          emptyState="Histórico de tendência indisponível."
+          tone={closedCount === 0 ? "neutral" : winRate >= 50 ? "success" : "warning"}
+          emptyState={
+            closedCount
+              ? `${wonCount} ganho(s) de ${closedCount} fechado(s)`
+              : "Sem negócios fechados ainda."
+          }
         />
       </section>
 
