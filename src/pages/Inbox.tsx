@@ -492,14 +492,26 @@ export default function InboxPage({
             new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
         );
         const latest = sortedMessages[sortedMessages.length - 1];
-        const latestInbound =
-          [...sortedMessages].reverse().find((item) => item.direction === "inbound") ??
-          latest;
+        const realInbound = [...sortedMessages]
+          .reverse()
+          .find((item) => item.direction === "inbound");
+        const latestInbound = realInbound ?? latest;
+
+        // Nome da conversa = o CONTATO (a outra parte), NUNCA o remetente de uma
+        // mensagem de saída (que é o titular da conta conectada). Prioridade:
+        // contato vinculado por telefone → remetente de uma mensagem recebida →
+        // telefone.
+        const contact = contacts.find(
+          (c) => unifyPhone(c.telefone) === key,
+        );
+        const displayName =
+          contact?.nome || realInbound?.remetente_nome || latest.telefone;
 
         return {
           key,
           latest,
           latestInbound,
+          displayName,
           messages: sortedMessages,
           unreadCount: sortedMessages.reduce(
             (sum, item) => sum + Number(item.unread_count || 0),
@@ -512,7 +524,7 @@ export default function InboxPage({
           new Date(b.latest.created_at).getTime() -
           new Date(a.latest.created_at).getTime(),
       );
-  }, [filteredMessages]);
+  }, [filteredMessages, contacts]);
 
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
@@ -599,6 +611,7 @@ export default function InboxPage({
           key: targetKey,
           latest: buildDraftMessage(target),
           latestInbound: buildDraftMessage(target),
+          displayName: target.nome,
           messages: [] as InboxMessage[],
           unreadCount: 0,
         }
@@ -762,7 +775,7 @@ export default function InboxPage({
                 >
                   <div className="relative shrink-0 mt-1">
                     <div className="w-12 h-12 rounded-full bg-gradient-to-br from-white/10 to-white/5 flex items-center justify-center font-bold text-lg text-foreground shadow-sm border border-white/10">
-                      {conv.latestInbound.remetente_nome.charAt(0).toUpperCase()}
+                      {conv.displayName.charAt(0).toUpperCase()}
                     </div>
                     {hasUnread && (
                       <div className="absolute -top-1 -right-1 w-4 h-4 bg-destructive rounded-full border-2 border-background shadow-sm animate-pulse" />
@@ -772,7 +785,7 @@ export default function InboxPage({
                   <div className="flex-1 min-w-0 mt-0.5">
                     <div className="flex items-center justify-between mb-1.5">
                       <strong className={`text-sm truncate ${hasUnread ? 'text-foreground font-bold' : 'text-foreground/90 font-medium'}`}>
-                        {conv.latestInbound.remetente_nome} ({conv.latest.telefone}) [{conv.key}]
+                        {conv.displayName} ({conv.latest.telefone})
                       </strong>
                       <span className={`text-[11px] shrink-0 ml-2 font-medium ${hasUnread ? 'text-primary' : 'text-muted-foreground'}`}>
                         {formatRelativeDate(conv.latest.created_at)}
@@ -818,10 +831,10 @@ export default function InboxPage({
             
             <div className="flex items-center gap-3 cursor-pointer" onClick={() => setMobileView("context")}>
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-white/10 to-white/5 flex items-center justify-center font-bold text-foreground shadow-sm border border-white/10">
-                {sourceMessage?.remetente_nome.charAt(0).toUpperCase()}
+                {(selectedConversation?.displayName ?? "?").charAt(0).toUpperCase()}
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-bold text-sm leading-tight truncate max-w-[160px] sm:max-w-xs text-foreground">{sourceMessage?.remetente_nome}</h3>
+                <h3 className="font-bold text-sm leading-tight truncate max-w-[160px] sm:max-w-xs text-foreground">{selectedConversation?.displayName}</h3>
                 <p className="text-[11px] text-muted-foreground flex items-center gap-1.5 truncate mt-0.5">
                   <span className="w-2 h-2 rounded-full bg-green-500 inline-block shrink-0 shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
                   <span className="truncate font-medium">{selected?.status ?? "Atendimento"} • {sourceMessage?.canal}</span>
