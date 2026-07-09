@@ -4,6 +4,9 @@
   "version": "0.1.0",
   "description": "Protótipo navegável do Funil Comercial para validação do MVP.",
   "type": "module",
+  "engines": {
+    "node": ">=20.19.0"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
