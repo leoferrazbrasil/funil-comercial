@@ -430,6 +430,30 @@ export async function sendInboxReply(
   throw error ?? new Error(data?.error ?? "Nao foi possivel enviar a resposta.");
 }
 
+// --- Deletions -------------------------------------------------------------
+// Hard delete, scoped to the owner by RLS. The schema uses ON DELETE SET NULL on
+// every FK (leads.contact_id, opportunities.lead_id, inbox_messages.contact_id/
+// lead_id), so deleting a contact/lead only UNLINKS related records — the Inbox
+// history and related leads/opportunities are preserved, never cascaded away.
+
+export async function deleteContact(contactId: string) {
+  const supabase = requireSupabase();
+  const { error } = await supabase.from("contacts").delete().eq("id", contactId);
+  if (error) throw error;
+}
+
+export async function deleteLead(leadId: string) {
+  const supabase = requireSupabase();
+  const { error } = await supabase.from("leads").delete().eq("id", leadId);
+  if (error) throw error;
+}
+
+export async function deleteOpportunity(opportunityId: string) {
+  const supabase = requireSupabase();
+  const { error } = await supabase.from("opportunities").delete().eq("id", opportunityId);
+  if (error) throw error;
+}
+
 export async function updateInboxMessageStatus(
   messageId: string,
   payload: MessageStatusPayload,

@@ -1,5 +1,6 @@
 import { PipelineSignalCard } from "./Pipeline";
 import { HeroPanel, PageIntro, MetricCard, Panel, ActionItem, TablePanel, EmptyState, Modal, ContactModal, LeadModal, OpportunityModal, MessageModal, ChannelModal, EntityForm, TextField, SelectField, LoadingScreen } from "../components/SharedUI";
+import { ConfirmDialog } from "../components/ConfirmDialog";
 import type { Session } from "@supabase/supabase-js";
 import type { LucideIcon } from "lucide-react";
 import {
@@ -17,6 +18,7 @@ import {
   ShieldCheck,
   Sparkles,
   Target,
+  Trash2,
   TrendingUp,
   UsersRound,
   RotateCcw,
@@ -399,6 +401,7 @@ export default function LeadsPage({
   query,
   isSaving,
   onCreateOpportunity,
+  onDeleteLead,
   onEditLead,
   onOpenModal,
 }: {
@@ -407,10 +410,24 @@ export default function LeadsPage({
   query: string;
   isSaving: boolean;
   onCreateOpportunity: (lead: Lead) => Promise<void>;
+  onDeleteLead: (leadId: string) => Promise<void>;
   onEditLead: (lead: Lead) => void;
   onOpenModal: (modal: ModalType) => void;
 }) {
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
+  const [leadToDelete, setLeadToDelete] = useState<Lead | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleConfirmDelete = async () => {
+    if (!leadToDelete) return;
+    setIsDeleting(true);
+    try {
+      await onDeleteLead(leadToDelete.id);
+      setLeadToDelete(null);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   const filteredLeads = leads.filter((lead) =>
     matchesQuery(query, [
@@ -542,6 +559,13 @@ export default function LeadsPage({
                             title="Editar"
                           >
                             <Pencil size={14} />
+                          </button>
+                          <button
+                            className="p-1.5 text-muted-foreground hover:text-red-500 bg-white/5 hover:bg-red-500/10 rounded-lg transition-colors"
+                            onClick={(e) => { e.stopPropagation(); setLeadToDelete(lead); }}
+                            title="Excluir"
+                          >
+                            <Trash2 size={14} />
                           </button>
                         </div>
                       </td>
@@ -700,7 +724,14 @@ export default function LeadsPage({
             >
               <Pencil size={16} /> Editar Dados
             </button>
-            
+
+            <button
+              className="w-full py-3 px-4 rounded-xl border border-red-500/20 text-red-500 hover:bg-red-500/10 font-semibold text-sm transition-all flex items-center justify-center gap-2"
+              onClick={() => setLeadToDelete(lead)}
+            >
+              <Trash2 size={16} /> Excluir Lead
+            </button>
+
           </div>
         </div>
       </>
@@ -775,6 +806,15 @@ export default function LeadsPage({
         {renderDataGrid()}
         {renderProfileDrawer()}
       </div>
+
+      <ConfirmDialog
+        open={Boolean(leadToDelete)}
+        title="Excluir lead?"
+        message={`Tem certeza de que deseja excluir o lead ${leadToDelete?.nome ?? ""}? Esta ação pode afetar dados vinculados (oportunidades e conversas ficam preservadas, apenas desvinculadas).`}
+        isProcessing={isDeleting}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setLeadToDelete(null)}
+      />
     </div>
   );
 }

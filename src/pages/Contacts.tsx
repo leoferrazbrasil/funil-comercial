@@ -1,4 +1,5 @@
 import { HeroPanel, PageIntro, MetricCard, Panel, ActionItem, TablePanel, EmptyState, Modal, ContactModal, LeadModal, OpportunityModal, MessageModal, ChannelModal, EntityForm, TextField, SelectField, LoadingScreen } from "../components/SharedUI";
+import { ConfirmDialog } from "../components/ConfirmDialog";
 import type { Session } from "@supabase/supabase-js";
 import type { LucideIcon } from "lucide-react";
 import {
@@ -16,6 +17,7 @@ import {
   ShieldCheck,
   Sparkles,
   Target,
+  Trash2,
   TrendingUp,
   UsersRound,
   RotateCcw,
@@ -403,6 +405,7 @@ export default function ContactsPage({
   query,
   isSaving,
   onConvertContact,
+  onDeleteContact,
   onEditContact,
   onOpenModal,
 }: {
@@ -410,12 +413,26 @@ export default function ContactsPage({
   query: string;
   isSaving: boolean;
   onConvertContact: (contact: Contact) => Promise<void>;
+  onDeleteContact: (contactId: string) => Promise<void>;
   onEditContact: (contact: Contact) => void;
   onOpenModal: (modal: ModalType) => void;
 }) {
   const navigate = useNavigate();
   const [selectedContactId, setSelectedContactId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"overview" | "commercial">("overview");
+  const [contactToDelete, setContactToDelete] = useState<Contact | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleConfirmDelete = async () => {
+    if (!contactToDelete) return;
+    setIsDeleting(true);
+    try {
+      await onDeleteContact(contactToDelete.id);
+      setContactToDelete(null);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   const filteredContacts = contacts.filter((contact) =>
     matchesQuery(query, [
@@ -508,6 +525,13 @@ export default function ContactsPage({
                           title="Editar"
                         >
                           <Pencil size={14} />
+                        </button>
+                        <button
+                          className="p-1.5 text-muted-foreground hover:text-red-500 bg-white/5 hover:bg-red-500/10 rounded-lg transition-colors"
+                          onClick={(e) => { e.stopPropagation(); setContactToDelete(contact); }}
+                          title="Excluir"
+                        >
+                          <Trash2 size={14} />
                         </button>
                       </div>
                     </td>
@@ -747,6 +771,15 @@ export default function ContactsPage({
         {renderDataGrid()}
         {renderProfileDrawer()}
       </div>
+
+      <ConfirmDialog
+        open={Boolean(contactToDelete)}
+        title="Excluir contato?"
+        message={`Tem certeza de que deseja excluir ${contactToDelete?.nome ?? "este contato"}? Esta ação pode afetar dados vinculados (leads, oportunidades e conversas ficam preservados, apenas desvinculados).`}
+        isProcessing={isDeleting}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setContactToDelete(null)}
+      />
     </div>
   );
 }

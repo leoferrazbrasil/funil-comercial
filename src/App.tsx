@@ -56,6 +56,9 @@ import {
   createIntegrationChannel,
   createLead,
   createOpportunity,
+  deleteContact,
+  deleteLead,
+  deleteOpportunity,
   sendInboxReply,
   updateContact,
   updateIntegrationChannelStatus,
@@ -578,6 +581,13 @@ function AppContent() {
     }
   };
 
+  const handleDeleteContact = (contactId: string) =>
+    runMutation(() => deleteContact(contactId), "Contato excluído com sucesso.");
+  const handleDeleteLead = (leadId: string) =>
+    runMutation(() => deleteLead(leadId), "Lead excluído com sucesso.");
+  const handleDeleteOpportunity = (opportunityId: string) =>
+    runMutation(() => deleteOpportunity(opportunityId), "Oportunidade excluída com sucesso.");
+
   const ownerId = session?.user.id;
   const findContactByPhone = (phone: string) => {
     const normalizedPhone = normalizePhone(phone);
@@ -1006,6 +1016,7 @@ function AppContent() {
                   query={query}
                   isSaving={isSaving}
                   onConvertContact={handleConvertContact}
+                  onDeleteContact={handleDeleteContact}
                   onEditContact={(contact) =>
                     openEditModal({ type: "contact", record: contact })
                   }
@@ -1022,6 +1033,7 @@ function AppContent() {
                   opportunities={snapshot.opportunities}
                   query={query}
                   onCreateOpportunity={handleCreateOpportunityFromLead}
+                  onDeleteLead={handleDeleteLead}
                   onEditLead={(lead) =>
                     openEditModal({ type: "lead", record: lead })
                   }
@@ -1041,6 +1053,7 @@ function AppContent() {
                       record: opportunity,
                     })
                   }
+                  onDeleteOpportunity={handleDeleteOpportunity}
                   onOpenModal={openModal}
                   onDragEnd={handleDragEnd}
                 />

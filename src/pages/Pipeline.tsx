@@ -1,4 +1,5 @@
 import { HeroPanel, PageIntro, MetricCard, Panel, ActionItem, TablePanel, EmptyState, Modal, ContactModal, LeadModal, OpportunityModal, MessageModal, ChannelModal, EntityForm, TextField, SelectField, LoadingScreen } from "../components/SharedUI";
+import { ConfirmDialog } from "../components/ConfirmDialog";
 import type { Session } from "@supabase/supabase-js";
 import type { LucideIcon } from "lucide-react";
 import {
@@ -16,6 +17,7 @@ import {
   ShieldCheck,
   Sparkles,
   Target,
+  Trash2,
   TrendingUp,
   UsersRound,
   RotateCcw,
@@ -382,10 +384,12 @@ const getInitials = (name: string) => {
 function PipelineCard({
   item,
   onEdit,
+  onDelete,
   onClick,
 }: {
   item: Opportunity;
   onEdit: (opportunity: Opportunity) => void;
+  onDelete: (opportunity: Opportunity) => void;
   onClick: (opportunity: Opportunity) => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
@@ -452,17 +456,31 @@ function PipelineCard({
             {getInitials(item.responsavel)}
           </div>
         </div>
-        <button
-          className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground hover:text-foreground hover:bg-white/10 px-2 py-1.5 rounded-lg transition-colors opacity-100 md:opacity-0 md:group-hover:opacity-100"
-          onClick={(event) => {
-            event.stopPropagation();
-            onEdit(item);
-          }}
-          onPointerDown={(event) => event.stopPropagation()}
-          type="button"
-        >
-          <Pencil size={12} /> Editar
-        </button>
+        <div className="flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+          <button
+            className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground hover:text-foreground hover:bg-white/10 px-2 py-1.5 rounded-lg transition-colors"
+            onClick={(event) => {
+              event.stopPropagation();
+              onEdit(item);
+            }}
+            onPointerDown={(event) => event.stopPropagation()}
+            type="button"
+          >
+            <Pencil size={12} /> Editar
+          </button>
+          <button
+            className="flex items-center justify-center text-muted-foreground hover:text-red-500 hover:bg-red-500/10 p-1.5 rounded-lg transition-colors"
+            onClick={(event) => {
+              event.stopPropagation();
+              onDelete(item);
+            }}
+            onPointerDown={(event) => event.stopPropagation()}
+            type="button"
+            title="Excluir"
+          >
+            <Trash2 size={12} />
+          </button>
+        </div>
       </footer>
     </article>
   );
@@ -489,7 +507,7 @@ function PipelineColumn({ column, onCardClick }: { column: any, onCardClick: (it
           <div className="absolute inset-0 bg-primary/5 z-0 pointer-events-none rounded-b-[1.5rem]" />
         )}
         {column.items.map((item: any) => (
-          <PipelineCard key={item.id} item={item} onEdit={column.onEdit} onClick={onCardClick} />
+          <PipelineCard key={item.id} item={item} onEdit={column.onEdit} onDelete={column.onDelete} onClick={onCardClick} />
         ))}
         {column.items.length === 0 && (
           <div className="flex flex-col items-center justify-center h-32 border-2 border-dashed border-white/10 rounded-2xl opacity-50">
@@ -546,16 +564,31 @@ export default function PipelinePage({
   leads,
   opportunities,
   onEditOpportunity,
+  onDeleteOpportunity,
   onOpenModal,
   onDragEnd,
 }: {
   leads: Lead[];
   opportunities: CrmSnapshot["opportunities"];
   onEditOpportunity: (opportunity: Opportunity) => void;
+  onDeleteOpportunity: (opportunityId: string) => Promise<void>;
   onOpenModal: (modal: ModalType) => void;
   onDragEnd: (event: any) => void;
 }) {
   const [selectedOppId, setSelectedOppId] = useState<string | null>(null);
+  const [opportunityToDelete, setOpportunityToDelete] = useState<Opportunity | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleConfirmDelete = async () => {
+    if (!opportunityToDelete) return;
+    setIsDeleting(true);
+    try {
+      await onDeleteOpportunity(opportunityToDelete.id);
+      setOpportunityToDelete(null);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   const grouped = useMemo(
     () =>
@@ -563,6 +596,7 @@ export default function PipelinePage({
         stage,
         items: opportunities.filter((item) => item.etapa === stage),
         onEdit: onEditOpportunity,
+        onDelete: (opportunity: Opportunity) => setOpportunityToDelete(opportunity),
       })),
     [onEditOpportunity, opportunities],
   );
@@ -749,8 +783,17 @@ export default function PipelinePage({
           </section>
         </DndContext>
       </div>
-      
+
       {renderProfileDrawer()}
+
+      <ConfirmDialog
+        open={Boolean(opportunityToDelete)}
+        title="Excluir oportunidade?"
+        message={`Tem certeza de que deseja excluir a oportunidade "${opportunityToDelete?.titulo ?? ""}"? Esta ação remove o card do funil e não pode ser desfeita. O lead e as conversas vinculados são preservados.`}
+        isProcessing={isDeleting}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setOpportunityToDelete(null)}
+      />
     </div>
   );
 }
