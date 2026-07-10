@@ -1,0 +1,6 @@
+# Scripts executados por bash (hooks e skills) devem manter LF.
+# CRLF quebra o shebang / printf desses scripts no Git Bash.
+.claude/hooks/session-start text eol=lf
+.claude/hooks/run-hook.cmd  text eol=lf
+.claude/skills/**/*.sh      text eol=lf
+.claude/skills/**/*.cjs     text eol=lf
