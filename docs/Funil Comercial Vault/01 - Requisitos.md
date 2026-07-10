@@ -13,10 +13,11 @@ CRM comercial focado em **prospecção ativa** e atendimento por **WhatsApp**, c
 - Cadastro (`/cadastro`) com nome, e-mail e senha (força de senha + confirmação em tempo real).
 - Login (`/login`) via Supabase Auth.
 - Perfil (`/perfil`): editar nome, telefone, avatar (upload), e-mail e senha.
-- **Conexão WhatsApp** no perfil: gerar QR Code, acompanhar status, conectar/desconectar a instância (Z-API).
+- **Integração WhatsApp** no perfil: **seletor entre Z-API (QR Code) e Meta Cloud API (Oficial)** como canal ativo. Z-API: gerar QR, status, conectar/desconectar. Meta: card de status (número + Phone Number ID). Trocar de canal ativa um e desativa o outro (envio sem ambiguidade).
 
 ## 3. Dashboard (`/dashboard`)
-- **KPIs:** Atenção Necessária (Inbox pendente), Leads Ativos, Pipeline Aberto (R$), **Win Rate** (Ganhos ÷ Ganhos+Perdidos).
+- **KPIs:** Atenção Necessária (Inbox pendente), Leads Ativos, Pipeline Aberto (R$), **Taxa de Conversão** (baseada em VALOR: Σ valor efetivo dos Ganhos ÷ Σ valor efetivo de todas as oportunidades).
+- **Filtro temporal:** Hoje, 7 dias, Mês, Tudo (controle segmentado).
 - **Rotina de Hoje:** contatos criados hoje, quantos viraram lead, taxa contato→lead.
 - Recomendações comerciais, gráfico de funil e oportunidades recentes.
 
@@ -42,9 +43,14 @@ CRM comercial focado em **prospecção ativa** e atendimento por **WhatsApp**, c
 ## 7. Funil de Vendas (`/funil`)
 - **Kanban** com drag & drop entre etapas (Novo, Em atendimento, Qualificado, Proposta, Negociação, Ganho, Perdido).
 - Oportunidade com **Produto/Serviço**, valor (pagamento único) e mensalidade (recorrente). Criar, editar e **excluir** (no card).
-- **Produto auto-detectado** ao criar pelo Inbox (varre a conversa) e **preço pré-definido** preenche o valor (Site R$497 + R$37,90/mês; Google Meu Negócio R$800; Tráfego Pago R$1.497/mês).
+- **Produto auto-detectado** ao criar pelo Inbox (varre a conversa) e **preço pré-definido** preenche o valor (Site R$497 + R$37,90/mês; Google Meu Negócio R$800; Tráfego Pago R$1.497/mês — serviço só-mensal: 1º pagamento no ato conta como único **e** recorrente).
 - **Métricas:** Pipeline Aberto, Etapas Finais, Sem Ação, Sem Valor, e comparativo **Fechado (Ganho) × Projeção (pipeline aberto)** separando único (setup) de recorrente (MRR). Mover para "Ganho" soma no Fechado automaticamente.
-- Ações rápidas de Ganho/Perdido no drawer da oportunidade.
+- **Drawer da oportunidade:** exibe a **Origem real** (do lead vinculado) e **Próxima Ação acionável** (botão que abre a edição). Ações rápidas de Ganho/Perdido.
+
+> O drawer do **Lead** também tem a **Próxima Ação acionável** (mesmo tratamento).
+
+## 7.1. Páginas legais públicas
+- `/privacidade`, `/termos` e `/exclusao-de-dados` — **públicas (sem login)**, para aprovação da integração na Meta e conformidade com a LGPD (coleta/uso/compartilhamento/exclusão de dados). Acessíveis pelo rodapé da Landing.
 
 ## 8. Criativos (`/criativos`)
 - Wizard de 4 etapas (Estratégia, Ideia, IA, Estúdio).
@@ -55,11 +61,13 @@ CRM comercial focado em **prospecção ativa** e atendimento por **WhatsApp**, c
 - **Vínculos:** lead→contato, oportunidade→lead, mensagens→contato/lead (por `contact_id`/`lead_id`).
 - **Exclusão preserva histórico:** FKs `ON DELETE SET NULL` — excluir contato/lead só desvincula; a Inbox e os relacionados permanecem.
 - **Normalização de telefone:** DDI 55 e unificação (12 dígitos) para evitar chats duplicados e vincular ao CRM.
-- **Receita:** valor único (setup) + recorrente (MRR) por produto; win rate por negócios fechados.
+- **Receita:** valor único (setup) + recorrente (MRR) por produto; **Taxa de Conversão baseada em valor** (valor dos Ganhos ÷ valor de todas as oportunidades).
+- **Janela de 24h (Meta Cloud API):** com a integração oficial, texto livre só é permitido dentro de 24h da última mensagem do cliente; 1º contato frio exige **template aprovado**. O Z-API não tem essa restrição.
 
 ## 10. Integrações
-- **Z-API** (WhatsApp): QR/conexão, recebimento (webhook), envio.
-- **Meta Graph API**: Instagram (criativos), Cloud API (WhatsApp Business, quando configurado).
+- **Z-API** (WhatsApp não-oficial): QR/conexão, recebimento (webhook), envio de texto livre.
+- **Meta Cloud API** (WhatsApp Business **oficial**): recebimento (webhook verificado + assinado) e envio via Graph API; escolhida no seletor do `/perfil`. Business verificada, app publicado, template de 1º contato.
+- **Meta Graph API**: Instagram (criativos).
 - **OpenAI / Gemini**: geração e recomendação de conteúdo.
 
 ## 11. Requisitos não-funcionais

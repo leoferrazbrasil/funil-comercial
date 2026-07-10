@@ -1,5 +1,32 @@
 # Changelog
 
+## [2026-07-09] - Sprint: Integração Meta Cloud API oficial, Drawers acionáveis, Dashboard temporal e Páginas legais
+
+### Adicionado — WhatsApp oficial (Meta Cloud API) + seletor de integração
+- Backend já suportava a Cloud API; o fluxo oficial foi ativado/documentado:
+  - `whatsapp-inbound`: verificação do webhook (GET com `hub.challenge` + `META_WEBHOOK_VERIFY_TOKEN`), assinatura (`META_APP_SECRET`) e parsing do payload Cloud API (`entry→changes→value→messages`). Resolve o dono pelo `numero` do canal = `phone_number_id`/`display_phone_number`.
+  - `whatsapp-send`: envio via Graph API (`graph.facebook.com/{v}/{phone_number_id}/messages`) com `META_WHATSAPP_ACCESS_TOKEN` + `META_WHATSAPP_PHONE_NUMBER_ID`. Canal `whatsapp_cloud` (metadata `phone_number_id`).
+  - Secrets no Supabase: `META_WHATSAPP_ACCESS_TOKEN`, `META_WHATSAPP_PHONE_NUMBER_ID`, `META_APP_SECRET`, `META_WEBHOOK_VERIFY_TOKEN`.
+- **Seletor de integração no `/perfil`** (`IntegrationSection`): escolher entre **Z-API (QR Code)** e **Meta Cloud API (Oficial)** como canal ativo. Ativa o provider escolhido e **desativa o outro** — o envio (`whatsapp-send` usa o canal `ativo` mais recente) fica sem ambiguidade. Renderiza o QR (Z-API) ou o card de status (Meta). Novo `getIntegrationChannels` no `crmService`.
+- **Regra da Meta (janela de 24h):** texto livre só é permitido dentro de 24h após a última mensagem do cliente **pela API oficial**; 1º contato frio exige **template aprovado** (`primeiro_contato`). Diferença registrada vs. Z-API (texto livre). Meta Business verificada + app publicado.
+- **Diagnóstico conhecido:** o envio pela Inbox tem *fallback* (`crmService.ts`) que salva a resposta localmente quando o envio real falha → a bolha aparece mesmo sem entregar. Se a Meta estiver ativa e a janela de 24h fechada, o texto é recusado (erro `131047`).
+
+### Adicionado — Páginas legais públicas (exigência Meta / LGPD)
+- `/privacidade`, `/termos`, `/exclusao-de-dados` (`src/pages/LegalPages.tsx`) — **públicas, sem login** — para aprovar a integração na Meta e atender à LGPD (coleta/uso/compartilhamento/exclusão de dados; menção explícita à WhatsApp Business Platform e Supabase). Links reais no rodapé da Landing.
+- **Corrigido:** o guard de auth (`onAuthStateChange` em `App.tsx`) redirecionava para `/login` qualquer rota fora da lista → páginas públicas caíam no login. Centralizado em `PUBLIC_PATHS` (usado no gate de render e no guard).
+
+### Melhorado — Drawers com "Próxima Ação" acionável (Oportunidade e Lead)
+- **Oportunidade:** a seção "FONTE" (estática, "Lead Qualificado") virou **Origem real** (do lead vinculado); "PRÓXIMA AÇÃO" virou **botão acionável** que abre a edição (detecta ação fraca/genérica).
+- **Lead:** mesmo tratamento — "Próxima Ação Manual" vira botão que abre a edição quando a ação está vaga.
+
+### Melhorado — Dashboard
+- Removidos os botões "Novo Lead" e "Nova Oportunidade" do cabeçalho (ação já centralizada nos módulos).
+- **Filtro temporal funcional** (Hoje, 7 dias, Mês, Tudo) com controle segmentado (substitui a pílula desabilitada).
+- Card "Win Rate" renomeado para **"Taxa de Conversão"** e agora **baseado em VALOR**: Σ `effectiveValue` dos Ganhos ÷ Σ `effectiveValue` de todas as oportunidades.
+
+### Corrigido — Precificação de serviço só-mensal (Tráfego Pago)
+- O 1º pagamento (no ato da contratação) é a própria mensalidade → `setup = monthly = 1497` em `products.ts`. `effectiveValue(valor, produto)` cai no preço do produto quando `valor=0` — o valor imediato passa a refletir em "Fechado (Ganho)" e na Taxa de Conversão (antes zerava).
+
 ## [2026-07-09] - Sprint: Conexão WhatsApp ponta a ponta, Exclusões, Produtos/Receita e Padronização de UI
 
 ### Corrigido — Conexão WhatsApp (Z-API) travada em "Conectando..."
