@@ -426,6 +426,36 @@ const buildDraftMessage = (target: WhatsAppTarget): InboxMessage => ({
   created_at: new Date().toISOString(),
 });
 
+// Estágio (exclusivo) de uma conversa no funil e os filtros da lista.
+type ConversationStage = "contato" | "lead" | "oportunidade";
+type DateFilter = "tudo" | "hoje" | "7d" | "30d";
+type TypeFilter = "todos" | ConversationStage;
+
+const DATE_FILTERS: ReadonlyArray<{ value: DateFilter; label: string }> = [
+  { value: "tudo", label: "Tudo" },
+  { value: "hoje", label: "Hoje" },
+  { value: "7d", label: "7d" },
+  { value: "30d", label: "30d" },
+];
+
+const TYPE_FILTERS: ReadonlyArray<{ value: TypeFilter; label: string }> = [
+  { value: "todos", label: "Todos" },
+  { value: "contato", label: "Contato" },
+  { value: "lead", label: "Lead" },
+  { value: "oportunidade", label: "Oport." },
+];
+
+// Timestamp de corte para o filtro de data (null = sem filtro).
+function dateFilterCutoff(filter: DateFilter): number | null {
+  if (filter === "tudo") return null;
+  const now = new Date();
+  if (filter === "hoje") {
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  }
+  const days = filter === "7d" ? 7 : 30;
+  return now.getTime() - days * 24 * 60 * 60 * 1000;
+}
+
 export default function InboxPage({
   channels,
   contacts,
@@ -507,11 +537,32 @@ export default function InboxPage({
         const displayName =
           contact?.nome || realInbound?.remetente_nome || latest.telefone;
 
+        // Estágio no funil (exclusivo) para o filtro de Tipo: "contato" até
+        // virar lead, "lead" até o lead ter oportunidade, "oportunidade" quando
+        // o lead vinculado já tem uma.
+        const leadId = sortedMessages.find((m) => m.lead_id)?.lead_id ?? null;
+        const stage: ConversationStage = leadId
+          ? opportunities.some((o) => o.lead_id === leadId)
+            ? "oportunidade"
+            : "lead"
+          : "contato";
+
+        // Sinais confiáveis (auto-mantidos) para as abas de status, em vez de
+        // depender de unread_count (que nunca é resetado na leitura):
+        //  - resolvida: a última mensagem RECEBIDA foi marcada como "Resolvido"
+        //    (uma nova mensagem recebida reabre a conversa automaticamente);
+        //  - precisa de resposta: o cliente falou por último e não está resolvida.
+        const isResolved = latestInbound.status === "Resolvido";
+        const needsReply = latest.direction === "inbound" && !isResolved;
+
         return {
           key,
           latest,
           latestInbound,
           displayName,
+          stage,
+          isResolved,
+          needsReply,
           messages: sortedMessages,
           unreadCount: sortedMessages.reduce(
             (sum, item) => sum + Number(item.unread_count || 0),
@@ -524,11 +575,13 @@ export default function InboxPage({
           new Date(b.latest.created_at).getTime() -
           new Date(a.latest.created_at).getTime(),
       );
-  }, [filteredMessages, contacts]);
+  }, [filteredMessages, contacts, opportunities]);
 
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
   const [filterTab, setFilterTab] = useState<"abertas" | "nao_lidas" | "todas">("abertas");
+  const [dateFilter, setDateFilter] = useState<DateFilter>("tudo");
+  const [typeFilter, setTypeFilter] = useState<TypeFilter>("todos");
   const [localSearch, setLocalSearch] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
@@ -561,10 +614,20 @@ export default function InboxPage({
   }, [conversations, selectedKey]);
 
   const displayedConversations = useMemo(() => {
+    const dateCutoff = dateFilterCutoff(dateFilter);
     return conversations.filter(conv => {
-      if (filterTab === "nao_lidas" && conv.unreadCount === 0) return false;
-      if (filterTab === "abertas" && conv.latest.status === "Resolvido") return false;
-      
+      // Abas de status (sinais confiáveis, auto-mantidos)
+      if (filterTab === "abertas" && conv.isResolved) return false;
+      if (filterTab === "nao_lidas" && !conv.needsReply) return false;
+
+      // Filtro de Tipo (estágio exclusivo do funil)
+      if (typeFilter !== "todos" && conv.stage !== typeFilter) return false;
+
+      // Filtro de Data (pela data da última mensagem da conversa)
+      if (dateCutoff !== null && new Date(conv.latest.created_at).getTime() < dateCutoff) {
+        return false;
+      }
+
       if (localSearch) {
         const searchTerms = [
           conv.latestInbound.remetente_nome,
@@ -577,7 +640,7 @@ export default function InboxPage({
       }
       return true;
     });
-  }, [conversations, filterTab, localSearch]);
+  }, [conversations, filterTab, localSearch, typeFilter, dateFilter]);
 
   // Selection Logic — auto-select the first conversation on desktop, BUT never
   // when a specific conversation was requested via ?to= (Contacts "WhatsApp"
@@ -612,6 +675,9 @@ export default function InboxPage({
           latest: buildDraftMessage(target),
           latestInbound: buildDraftMessage(target),
           displayName: target.nome,
+          stage: "contato" as ConversationStage,
+          isResolved: false,
+          needsReply: false,
           messages: [] as InboxMessage[],
           unreadCount: 0,
         }
@@ -736,13 +802,55 @@ export default function InboxPage({
             Todas
           </button>
           {/* Active pill background */}
-          <div 
+          <div
             className="absolute top-1 bottom-1 bg-white/10 shadow-sm rounded-lg transition-all duration-300 ease-in-out border border-white/5"
             style={{
               width: 'calc(33.333% - 2.6px)',
               left: filterTab === 'abertas' ? '4px' : filterTab === 'nao_lidas' ? 'calc(33.333% + 2px)' : 'calc(66.666%)'
             }}
           />
+        </div>
+
+        {/* Filtros: Data + Tipo (combinam com as abas acima) */}
+        <div className="space-y-1.5">
+          {(dateFilter !== "tudo" || typeFilter !== "todos") && (
+            <div className="flex justify-end">
+              <button
+                onClick={() => { setDateFilter("tudo"); setTypeFilter("todos"); }}
+                className="text-[10px] font-medium text-muted-foreground hover:text-primary transition-colors"
+              >
+                Limpar filtros
+              </button>
+            </div>
+          )}
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground w-9 shrink-0">Data</span>
+            <div className="flex gap-1 flex-1">
+              {DATE_FILTERS.map((f) => (
+                <button
+                  key={f.value}
+                  onClick={() => setDateFilter(f.value)}
+                  className={`flex-1 py-1 text-[11px] font-medium rounded-lg border transition-colors ${dateFilter === f.value ? "bg-primary/15 border-primary/40 text-primary" : "bg-white/5 border-white/10 text-muted-foreground hover:text-foreground hover:bg-white/10"}`}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground w-9 shrink-0">Tipo</span>
+            <div className="flex gap-1 flex-1">
+              {TYPE_FILTERS.map((f) => (
+                <button
+                  key={f.value}
+                  onClick={() => setTypeFilter(f.value)}
+                  className={`flex-1 py-1 text-[11px] font-medium rounded-lg border transition-colors ${typeFilter === f.value ? "bg-primary/15 border-primary/40 text-primary" : "bg-white/5 border-white/10 text-muted-foreground hover:text-foreground hover:bg-white/10"}`}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -766,7 +874,7 @@ export default function InboxPage({
           <div className="flex flex-col">
             {displayedConversationsWithDraft.map((conv) => {
               const isSelected = selectedKey === conv.key;
-              const hasUnread = conv.unreadCount > 0;
+              const hasUnread = conv.needsReply;
               return (
                 <button
                   key={conv.key}
