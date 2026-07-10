@@ -22,7 +22,7 @@ date: 2026-07-10
 
 - **Filtros da Inbox** — Data (Tudo/Hoje/7d/30d) + Tipo por estágio do funil (Contato **cadastrado no CRM** / Lead / Oportunidade), e correção das abas Abertas/Não Lidas/Todas. Ver [[03 - Changelog]].
 - **Seletor Z-API × Meta Cloud API** no `/perfil`.
-- **Integração oficial Meta Cloud API** (webhook, envio, secrets) + **páginas legais** públicas.
+- **Integração oficial Meta Cloud API** (webhook, envio, secrets) — **envio validado ponta a ponta (2026-07-09)** — + **páginas legais** públicas.
 - **Drawers acionáveis** (Origem real + Próxima Ação) em Oportunidade e Lead.
 - **Dashboard**: filtro temporal + Taxa de Conversão por valor.
 
@@ -30,11 +30,10 @@ date: 2026-07-10
 
 ## 🔜 Próximo (curto prazo)
 
-### 1. Fechar o envio pela Meta Cloud API
-> [!warning] Pendência ativa
-> Diagnosticar/validar o envio oficial: a **janela de 24h** bloqueia texto livre para quem não mandou mensagem nas últimas 24h → 1º contato exige **template aprovado**. Confirmar via log `whatsapp_send_meta_error` e o teste de recebimento (mandar msg para o número oficial e ver cair no `/inbox`).
+> [!success] Envio pela Meta validado (2026-07-09)
+> O teste de envio pela Meta Cloud API funcionou. Lembrete operacional: fora da **janela de 24h**, o 1º contato exige **template aprovado** (`primeiro_contato`).
 
-### 2. (Opcional) "Marcar como lida ao abrir" no Inbox
+### (Opcional) "Marcar como lida ao abrir" no Inbox
 Hoje "Não Lidas" = "cliente falou por último e não resolvida" (auto-mantido, sem tocar no banco). Se quisermos a semântica literal de *não lida*, marcar como lida ao **abrir** a conversa (reset de `unread_count` no banco) — exige mudança em `crmService` + `App.tsx` + escrita por abertura.
 
 ---
