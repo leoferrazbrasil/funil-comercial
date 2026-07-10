@@ -1,6 +1,6 @@
 # Design — Evolution API na Railway (Sub-projeto 1)
 
-> Spec de design. Data: 2026-07-10. Status: aprovado o design; aguardando revisão do spec.
+> Spec de design. Data: 2026-07-10. **Status: ADIADO para o futuro** (decisão de 2026-07-10). Design aprovado; execução pausada. Ver o horizonte no Roadmap: `docs/Funil Comercial Vault/04 - Roadmap.md`.
 
 ## Contexto
 

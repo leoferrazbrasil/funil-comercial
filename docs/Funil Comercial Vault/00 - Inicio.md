@@ -15,10 +15,11 @@ cssclasses:
 Bem-vindo ao cofre do projeto **Funil Comercial** — o CRM de prospecção ativa e atendimento por WhatsApp.
 
 > [!info] Como navegar
-> Este cofre tem três notas principais. Comece pelo que procura:
+> Este cofre tem quatro notas principais. Comece pelo que procura:
 > - 📋 [[01 - Requisitos]] — o que o produto **faz hoje** (funcionalidades por página).
 > - 🏛️ [[02 - Arquitetura e Design]] — **como** está construído (stack, banco, Edge Functions, fluxos).
 > - 🗒️ [[03 - Changelog]] — **o que mudou** e por quê, sprint a sprint.
+> - 🗺️ [[04 - Roadmap]] — **o que vem** (por horizonte) e o que está adiado.
 
 ## 🗺️ Mapa do cofre
 
@@ -27,6 +28,7 @@ Bem-vindo ao cofre do projeto **Funil Comercial** — o CRM de prospecção ativ
 | [[01 - Requisitos]] | Funcionalidades implementadas | "O que a tela X faz?" |
 | [[02 - Arquitetura e Design]] | Stack, banco, Edge Functions, fluxos | "Como isso funciona por baixo?" |
 | [[03 - Changelog]] | Histórico de mudanças | "O que mudou e quando?" |
+| [[04 - Roadmap]] | Planejamento por horizonte | "O que vem a seguir?" |
 
 ## ⚡ Fatos rápidos
 
