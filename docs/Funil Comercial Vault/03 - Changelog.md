@@ -1,4 +1,15 @@
-# Changelog
+---
+title: Changelog
+aliases:
+  - Histórico de mudanças
+tags:
+  - funil-comercial/changelog
+---
+
+# 🗒️ Changelog
+
+> [!note] Navegação
+> Histórico de mudanças, mais recente primeiro. Contexto do produto em [[01 - Requisitos]]; arquitetura em [[02 - Arquitetura e Design]]; índice em [[00 - Inicio]].
 
 ## [2026-07-09] - Sprint: Integração Meta Cloud API oficial, Drawers acionáveis, Dashboard temporal e Páginas legais
 
@@ -9,7 +20,9 @@
   - Secrets no Supabase: `META_WHATSAPP_ACCESS_TOKEN`, `META_WHATSAPP_PHONE_NUMBER_ID`, `META_APP_SECRET`, `META_WEBHOOK_VERIFY_TOKEN`.
 - **Seletor de integração no `/perfil`** (`IntegrationSection`): escolher entre **Z-API (QR Code)** e **Meta Cloud API (Oficial)** como canal ativo. Ativa o provider escolhido e **desativa o outro** — o envio (`whatsapp-send` usa o canal `ativo` mais recente) fica sem ambiguidade. Renderiza o QR (Z-API) ou o card de status (Meta). Novo `getIntegrationChannels` no `crmService`.
 - **Regra da Meta (janela de 24h):** texto livre só é permitido dentro de 24h após a última mensagem do cliente **pela API oficial**; 1º contato frio exige **template aprovado** (`primeiro_contato`). Diferença registrada vs. Z-API (texto livre). Meta Business verificada + app publicado.
-- **Diagnóstico conhecido:** o envio pela Inbox tem *fallback* (`crmService.ts`) que salva a resposta localmente quando o envio real falha → a bolha aparece mesmo sem entregar. Se a Meta estiver ativa e a janela de 24h fechada, o texto é recusado (erro `131047`).
+
+> [!bug] Diagnóstico conhecido — envio "aparenta" entregar
+> O envio pela Inbox tem um *fallback* (`crmService.ts`) que salva a resposta localmente quando o envio real falha → a bolha aparece **mesmo sem entregar**. Se a Meta estiver ativa e a **janela de 24h** fechada, o texto é recusado (erro `131047`). Ver [[02 - Arquitetura e Design#Fluxos importantes]].
 
 ### Adicionado — Páginas legais públicas (exigência Meta / LGPD)
 - `/privacidade`, `/termos`, `/exclusao-de-dados` (`src/pages/LegalPages.tsx`) — **públicas, sem login** — para aprovar a integração na Meta e atender à LGPD (coleta/uso/compartilhamento/exclusão de dados; menção explícita à WhatsApp Business Platform e Supabase). Links reais no rodapé da Landing.
@@ -180,9 +193,10 @@
 
 ### Removido
 - Imagens PNG antigas e inconsistentes do logo ("símbolo esquisito") sendo totalmente depreciadas no front-end atualizado.
-### 2026-07-08 - Corre��o Conex�o QR Code WhatsApp
-- Backend: Corrigido bug no whatsapp-manager que impedia atualiza��o do status por atraso na resposta do campo phone da Z-API.
-- Backend: Adicionado tratamento de webhook de conex�o Z-API no whatsapp-qr-inbound.
-- Frontend: Polling acelerado para 3s durante exibi��o do QR Code.
-- Frontend: Implementada expira��o do QR Code em 60s.
-- Frontend: Novos feedbacks de interface ('QR Code lido', etc).
+## [2026-07-08] - Correção Conexão QR Code WhatsApp
+
+- Backend: Corrigido bug no `whatsapp-manager` que impedia atualização do status por atraso na resposta do campo `phone` da Z-API.
+- Backend: Adicionado tratamento de webhook de conexão Z-API no `whatsapp-qr-inbound`.
+- Frontend: Polling acelerado para 3s durante exibição do QR Code.
+- Frontend: Implementada expiração do QR Code em 60s.
+- Frontend: Novos feedbacks de interface ("QR Code lido", etc).
