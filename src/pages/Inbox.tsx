@@ -427,7 +427,9 @@ const buildDraftMessage = (target: WhatsAppTarget): InboxMessage => ({
 });
 
 // Estágio (exclusivo) de uma conversa no funil e os filtros da lista.
-type ConversationStage = "contato" | "lead" | "oportunidade";
+// "nao_cadastrado" = conversa de um número que NÃO está no CRM (nem contato,
+// nem lead) — aparece só em "Todos", nunca no filtro "Contato".
+type ConversationStage = "contato" | "lead" | "oportunidade" | "nao_cadastrado";
 type DateFilter = "tudo" | "hoje" | "7d" | "30d";
 type TypeFilter = "todos" | ConversationStage;
 
@@ -537,15 +539,20 @@ export default function InboxPage({
         const displayName =
           contact?.nome || realInbound?.remetente_nome || latest.telefone;
 
-        // Estágio no funil (exclusivo) para o filtro de Tipo: "contato" até
-        // virar lead, "lead" até o lead ter oportunidade, "oportunidade" quando
-        // o lead vinculado já tem uma.
+        // Estágio no funil (exclusivo) para o filtro de Tipo. "Contato" exige
+        // que a pessoa esteja REGISTRADA no CRM (existe em `contacts` por
+        // telefone, ou alguma mensagem já tem contact_id) — não basta ter
+        // conversado no WhatsApp. Sem esse registro e sem lead → "nao_cadastrado".
         const leadId = sortedMessages.find((m) => m.lead_id)?.lead_id ?? null;
+        const hasContactRecord =
+          Boolean(contact) || sortedMessages.some((m) => m.contact_id);
         const stage: ConversationStage = leadId
           ? opportunities.some((o) => o.lead_id === leadId)
             ? "oportunidade"
             : "lead"
-          : "contato";
+          : hasContactRecord
+            ? "contato"
+            : "nao_cadastrado";
 
         // Sinais confiáveis (auto-mantidos) para as abas de status, em vez de
         // depender de unread_count (que nunca é resetado na leitura):
