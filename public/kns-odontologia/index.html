@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KNS Odontologia | Atendimento odontológico</title>
+  <meta name="description" content="Nova versão demonstrativa para KNS Odontologia, com serviços reais, contato e endereço preservados.">
+  <style>
+    :root {
+      --primary: #0f766e;
+      --secondary: #164e63;
+      --accent: #d4af37;
+      --ink: #12323f;
+      --muted: #5f7380;
+      --line: #dbe7ec;
+      --paper: #f7fbfc;
+      --white: #ffffff;
+      --shadow: 0 24px 70px rgba(18, 50, 63, .14);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; font-family: Arial, Helvetica, sans-serif; color: var(--ink); background: var(--paper); line-height: 1.55; }
+    a { color: inherit; text-decoration: none; }
+    .wrap { width: min(1120px, calc(100% - 32px)); margin: 0 auto; }
+    .topbar { background: var(--secondary); color: var(--white); font-size: 14px; }
+    .topbar .wrap { display: flex; justify-content: space-between; gap: 16px; padding: 10px 0; flex-wrap: wrap; }
+    header { position: sticky; top: 0; z-index: 20; background: rgba(255,255,255,.94); border-bottom: 1px solid var(--line); backdrop-filter: blur(14px); }
+    header .wrap { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 24px; padding: 14px 0; }
+    .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .mark { width: 52px; height: 52px; border-radius: 8px; display: grid; place-items: center; color: white; background: linear-gradient(135deg, var(--primary), var(--accent)); font-weight: 800; }
+    .brand strong { display: block; font-size: 18px; }
+    .brand small { color: var(--muted); }
+    nav { display: flex; justify-content: center; gap: 22px; color: var(--muted); font-size: 14px; }
+    .btn { min-height: 48px; border-radius: 8px; padding: 0 18px; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; color: white; background: var(--accent); box-shadow: 0 14px 28px rgba(5, 150, 105, .22); border: 1px solid transparent; }
+    .btn.alt { background: white; color: var(--ink); border-color: var(--line); box-shadow: none; }
+    .hero { background: radial-gradient(circle at 85% 18%, rgba(34,211,238,.26), transparent 28%), linear-gradient(120deg, rgba(255,255,255,.98), rgba(236,254,255,.90)); border-bottom: 1px solid var(--line); }
+    .hero-grid { min-height: 650px; display: grid; grid-template-columns: 1.05fr .75fr; gap: 44px; align-items: center; padding: 72px 0; }
+    .eyebrow { color: var(--primary); font-size: 13px; font-weight: 900; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 14px; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { font-size: clamp(42px, 6vw, 72px); line-height: 1; letter-spacing: 0; margin-bottom: 22px; }
+    h2 { font-size: clamp(30px, 4vw, 48px); line-height: 1.08; margin-bottom: 14px; }
+    .lead { color: var(--muted); font-size: 20px; max-width: 720px; margin-bottom: 28px; }
+    .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
+    .trust { display: flex; gap: 10px; flex-wrap: wrap; }
+    .pill { border: 1px solid var(--line); background: rgba(255,255,255,.72); border-radius: 999px; padding: 9px 13px; color: var(--muted); font-size: 14px; }
+    .hero-panel { background: white; border: 1px solid var(--line); border-radius: 8px; box-shadow: var(--shadow); overflow: hidden; }
+    .photo { min-height: 260px; background: linear-gradient(135deg, var(--secondary), var(--primary)); position: relative; display: grid; place-items: center; color: white; padding: 32px; text-align: center; }
+    .photo svg { width: min(260px, 80%); height: auto; opacity: .92; }
+    .panel-body { padding: 24px; }
+    .metric-grid { display: grid; grid-template-columns: repeat(2, 1fr); border-top: 1px solid var(--line); }
+    .metric { padding: 18px 24px; border-right: 1px solid var(--line); }
+    .metric:last-child { border-right: 0; }
+    .metric strong { display: block; font-size: 24px; color: var(--primary); }
+    section { padding: 78px 0; }
+    .section-head { max-width: 760px; margin-bottom: 34px; }
+    .section-head p, .split p { color: var(--muted); font-size: 18px; }
+    .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+    .service-card, .quote, .info-card { background: white; border: 1px solid var(--line); border-radius: 8px; padding: 24px; box-shadow: 0 12px 28px rgba(18,50,63,.07); }
+    .service-card span { width: 38px; height: 38px; border-radius: 8px; display: block; background: linear-gradient(135deg, var(--primary), var(--accent)); margin-bottom: 16px; }
+    .service-card h3 { font-size: 21px; margin-bottom: 9px; }
+    .service-card p, .quote p, .info-card p { color: var(--muted); margin-bottom: 0; }
+    .soft { background: #eaf7fa; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .split { display: grid; grid-template-columns: .9fr 1.1fr; gap: 42px; align-items: center; }
+    .proof-list { display: grid; gap: 14px; }
+    .proof-item { display: grid; grid-template-columns: 44px 1fr; gap: 14px; align-items: start; }
+    .proof-item b { width: 44px; height: 44px; border-radius: 8px; background: white; border: 1px solid var(--line); display: grid; place-items: center; color: var(--primary); }
+    .cta-band { background: var(--secondary); color: white; padding: 58px 0; }
+    .cta-band .wrap { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: center; }
+    .cta-band p { color: rgba(255,255,255,.78); margin-bottom: 0; }
+    footer { background: white; border-top: 1px solid var(--line); padding: 42px 0; color: var(--muted); }
+    .footer-grid { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 24px; }
+    footer strong { color: var(--ink); display: block; margin-bottom: 7px; }
+    @media (max-width: 860px) {
+      header .wrap, .hero-grid, .cards, .split, .cta-band .wrap, .footer-grid { grid-template-columns: 1fr; }
+      nav { display: none; }
+      header .btn, .actions .btn { width: 100%; }
+      .hero-grid { min-height: auto; padding: 52px 0; }
+      h1 { font-size: 42px; }
+      section { padding: 56px 0; }
+      .metric-grid { grid-template-columns: 1fr; }
+      .metric { border-right: 0; border-bottom: 1px solid var(--line); }
+      .metric:last-child { border-bottom: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="wrap">
+      <span>Av. Tucuruvi, 666, sala 7 - Tucuruvi, São Paulo/SP</span>
+      <a href="https://wa.me/5511974151008?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20gostaria%20de%20agendar%20uma%20avalia%C3%A7%C3%A3o%20com%20KNS%20Odontologia." target="_blank" rel="noopener">WhatsApp (11) 97415-1008</a>
+    </div>
+  </div>
+  <header>
+    <div class="wrap">
+      <a class="brand" href="#inicio" aria-label="KNS Odontologia">
+        <div class="mark">KO</div>
+        <div><strong>KNS Odontologia</strong><small>Dentista em São Paulo</small></div>
+      </a>
+      <nav aria-label="Navegação principal">
+        <a href="#servicos">Serviços</a>
+        <a href="#prova">Diferenciais</a>
+        <a href="#localizacao">Localização</a>
+      </nav>
+      <a class="btn" href="https://wa.me/5511974151008?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20gostaria%20de%20agendar%20uma%20avalia%C3%A7%C3%A3o%20com%20KNS%20Odontologia." target="_blank" rel="noopener">Agendar pelo WhatsApp</a>
+    </div>
+  </header>
+  <main id="inicio">
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div>
+          <div class="eyebrow">Nova versão demonstrativa</div>
+          <h1>KNS Odontologia com presença digital mais clara e premium</h1>
+          <p class="lead">Uma reorganização da página atual com as informações reais preservadas: serviços, contato, localização e chamadas diretas para agendamento.</p>
+          <div class="actions">
+            <a class="btn" href="https://wa.me/5511974151008?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20gostaria%20de%20agendar%20uma%20avalia%C3%A7%C3%A3o%20com%20KNS%20Odontologia." target="_blank" rel="noopener">Quero agendar uma avaliação</a>
+            <a class="btn alt" href="#servicos">Ver serviços</a>
+          </div>
+          <div class="trust">
+            <span class="pill">5,0 no Google</span>
+            <span class="pill">5 avaliações</span>
+            <span class="pill">Google Sites</span>
+          </div>
+        </div>
+        <aside class="hero-panel" aria-label="Resumo">
+          <div class="photo">
+            <svg viewBox="0 0 320 220" role="img" aria-label="Ilustração de consultório odontológico">
+              <rect x="24" y="42" width="272" height="136" rx="18" fill="rgba(255,255,255,.20)"/>
+              <circle cx="108" cy="105" r="34" fill="rgba(255,255,255,.86)"/>
+              <path d="M174 78h68M174 108h88M174 138h58" stroke="white" stroke-width="13" stroke-linecap="round"/>
+              <path d="M94 101c12-22 36-22 48 0 7 14-2 38-15 54-4 5-10 5-14 0-13-16-22-40-19-54z" fill="var(--accent)"/>
+            </svg>
+          </div>
+          <div class="panel-body">
+            <h2>Atendimento mais fácil de entender e chamar</h2>
+            <p>Site em Google Sites com layout simples, pouca hierarquia visual e CTA pouco premium para uma clínica com implante, estética e avaliação 5,0.</p>
+          </div>
+          <div class="metric-grid">
+            <div class="metric"><strong>5,0 no Google</strong><span>prova social</span></div>
+            <div class="metric"><strong>CTA direto</strong><span>WhatsApp em todos os pontos</span></div>
+          </div>
+        </aside>
+      </div>
+    </section>
+    <section id="servicos">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="eyebrow">Serviços reais do site atual</div>
+          <h2>Especialidades organizadas para decisão rápida</h2>
+          <p>O conteúdo foi reorganizado para que o visitante entenda rapidamente o que a clínica faz e tenha um caminho claro para conversar pelo WhatsApp.</p>
+        </div>
+        <div class="cards">
+          <article class="service-card">
+            <span aria-hidden="true"></span>
+            <h3>Implantodontia</h3>
+            <p>Serviço real identificado no site atual, reorganizado para facilitar decisão e contato pelo WhatsApp.</p>
+          </article>
+          <article class="service-card">
+            <span aria-hidden="true"></span>
+            <h3>Odontologia estética</h3>
+            <p>Serviço real identificado no site atual, reorganizado para facilitar decisão e contato pelo WhatsApp.</p>
+          </article>
+          <article class="service-card">
+            <span aria-hidden="true"></span>
+            <h3>Atendimento com hora marcada</h3>
+            <p>Serviço real identificado no site atual, reorganizado para facilitar decisão e contato pelo WhatsApp.</p>
+          </article>
+          <article class="service-card">
+            <span aria-hidden="true"></span>
+            <h3>Tratamento integral</h3>
+            <p>Serviço real identificado no site atual, reorganizado para facilitar decisão e contato pelo WhatsApp.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+    <section class="soft" id="prova">
+      <div class="wrap split">
+        <div class="quote">
+          <div class="eyebrow">Identidade preservada</div>
+          <h2>Reconhecível, só que mais forte</h2>
+          <p>Site atual em Google Sites, com prova social pública localizada em diretório de dentistas. A nova versão mantém as informações principais e melhora hierarquia, clareza, leitura no celular e chamadas de agendamento.</p>
+        </div>
+        <div class="proof-list">
+          <div class="proof-item"><b>1</b><p><strong>Dados reais.</strong> Serviços, endereço e contato vieram do site atual ou de fonte pública localizada durante a simulação.</p></div>
+          <div class="proof-item"><b>2</b><p><strong>Prova social.</strong> atuação em implantodontia no Tucuruvi.</p></div>
+          <div class="proof-item"><b>3</b><p><strong>Conversão.</strong> CTAs de consulta, localização e informações levam para WhatsApp/telefone publicado.</p></div>
+        </div>
+      </div>
+    </section>
+    <section id="localizacao">
+      <div class="wrap split">
+        <div>
+          <div class="eyebrow">Localização</div>
+          <h2>Av. Tucuruvi, 666, sala 7 - Tucuruvi, São Paulo/SP</h2>
+          <p>Endereço preservado do site atual ou da fonte pública consultada. Antes de publicar no domínio definitivo do cliente, a rotina deve revisar eventuais mudanças de endereço e horário.</p>
+          <div class="actions">
+            <a class="btn" href="https://wa.me/5511974151008?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20gostaria%20de%20agendar%20uma%20avalia%C3%A7%C3%A3o%20com%20KNS%20Odontologia." target="_blank" rel="noopener">Confirmar atendimento</a>
+            <a class="btn alt" href="https://www.google.com/maps/search/KNS+Odontologia+Tucuruvi+São+Paulo" target="_blank" rel="noopener">Abrir localização</a>
+          </div>
+        </div>
+        <div class="info-card">
+          <h3>Contato</h3>
+          <p>WhatsApp (11) 97415-1008</p>
+          
+          <p>Site atual: https://sites.google.com/view/knsodontologia/home</p>
+        </div>
+      </div>
+    </section>
+    <section class="cta-band">
+      <div class="wrap">
+        <div>
+          <h2>Pronto para receber pacientes com mais clareza</h2>
+          <p>Versão demonstrativa criada para mostrar como a página atual pode ficar mais profissional sem perder a identidade.</p>
+        </div>
+        <a class="btn" href="https://wa.me/5511974151008?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20gostaria%20de%20agendar%20uma%20avalia%C3%A7%C3%A3o%20com%20KNS%20Odontologia." target="_blank" rel="noopener">Falar pelo WhatsApp</a>
+      </div>
+    </section>
+  </main>
+  <footer>
+    <div class="wrap footer-grid">
+      <div><strong>KNS Odontologia</strong><span>Redesign demonstrativo baseado em informações públicas do site atual.</span></div>
+      <div><strong>Contato</strong><span>WhatsApp (11) 97415-1008</span></div>
+      <div><strong>Site atual</strong><span>Google Sites</span></div>
+    </div>
+  </footer>
+</body>
+</html>
