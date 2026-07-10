@@ -536,6 +536,18 @@ export async function createIntegrationChannel(
   return data as IntegrationChannel;
 }
 
+// Lista os canais de integração do usuário logado (RLS já restringe ao owner).
+export async function getIntegrationChannels() {
+  const supabase = requireSupabase();
+  const { data, error } = await supabase
+    .from("integration_channels")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) throw error;
+  return (data as IntegrationChannel[]) ?? [];
+}
+
 export async function updateIntegrationChannelStatus(
   channelId: string,
   status: IntegrationChannel["status"],
