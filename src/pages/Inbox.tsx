@@ -471,6 +471,7 @@ export default function InboxPage({
   onCreateOpportunity,
   onOpenModal,
   onSendReply,
+  onMarkConversationRead,
   onUpdateChannelStatus,
   onUpdateMessageStatus,
 }: {
@@ -486,6 +487,7 @@ export default function InboxPage({
   onCreateOpportunity: (message: InboxMessage) => Promise<void>;
   onOpenModal: (modal: ModalType) => void;
   onSendReply: (message: InboxMessage, reply: string) => Promise<void>;
+  onMarkConversationRead: (messageIds: string[]) => Promise<void>;
   onUpdateChannelStatus: (
     channel: IntegrationChannel,
     status: IntegrationChannel["status"],
@@ -554,13 +556,9 @@ export default function InboxPage({
             ? "contato"
             : "nao_cadastrado";
 
-        // Sinais confiáveis (auto-mantidos) para as abas de status, em vez de
-        // depender de unread_count (que nunca é resetado na leitura):
-        //  - resolvida: a última mensagem RECEBIDA foi marcada como "Resolvido"
-        //    (uma nova mensagem recebida reabre a conversa automaticamente);
-        //  - precisa de resposta: o cliente falou por último e não está resolvida.
+        // "Resolvida" = a última mensagem RECEBIDA foi marcada como "Resolvido"
+        // (uma nova mensagem recebida reabre a conversa). Usado pela aba "Abertas".
         const isResolved = latestInbound.status === "Resolvido";
-        const needsReply = latest.direction === "inbound" && !isResolved;
 
         return {
           key,
@@ -569,7 +567,6 @@ export default function InboxPage({
           displayName,
           stage,
           isResolved,
-          needsReply,
           messages: sortedMessages,
           unreadCount: sortedMessages.reduce(
             (sum, item) => sum + Number(item.unread_count || 0),
@@ -623,9 +620,9 @@ export default function InboxPage({
   const displayedConversations = useMemo(() => {
     const dateCutoff = dateFilterCutoff(dateFilter);
     return conversations.filter(conv => {
-      // Abas de status (sinais confiáveis, auto-mantidos)
+      // Abas de status
       if (filterTab === "abertas" && conv.isResolved) return false;
-      if (filterTab === "nao_lidas" && !conv.needsReply) return false;
+      if (filterTab === "nao_lidas" && conv.unreadCount === 0) return false;
 
       // Filtro de Tipo (estágio exclusivo do funil)
       if (typeFilter !== "todos" && conv.stage !== typeFilter) return false;
@@ -664,6 +661,14 @@ export default function InboxPage({
   const handleSelectConversation = (key: string) => {
     setSelectedKey(key);
     setMobileView("chat");
+    // Semântica literal de "não lida": abrir a conversa zera o unread das suas
+    // mensagens (persistido no banco). Só no clique explícito — a auto-seleção
+    // da 1ª conversa no desktop usa setSelectedKey direto e não marca como lida.
+    const conv = conversations.find((c) => c.key === key);
+    const unreadIds = (conv?.messages ?? [])
+      .filter((m) => Number(m.unread_count) > 0)
+      .map((m) => m.id);
+    if (unreadIds.length > 0) void onMarkConversationRead(unreadIds);
   };
 
   const activeChannels = channels.filter((channel) => channel.status === "ativo");
@@ -684,7 +689,6 @@ export default function InboxPage({
           displayName: target.nome,
           stage: "contato" as ConversationStage,
           isResolved: false,
-          needsReply: false,
           messages: [] as InboxMessage[],
           unreadCount: 0,
         }
@@ -881,7 +885,7 @@ export default function InboxPage({
           <div className="flex flex-col">
             {displayedConversationsWithDraft.map((conv) => {
               const isSelected = selectedKey === conv.key;
-              const hasUnread = conv.needsReply;
+              const hasUnread = conv.unreadCount > 0;
               return (
                 <button
                   key={conv.key}

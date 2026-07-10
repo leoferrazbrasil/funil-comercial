@@ -60,6 +60,7 @@ import {
   deleteContact,
   deleteLead,
   deleteOpportunity,
+  markInboxConversationRead,
   sendInboxReply,
   updateContact,
   updateIntegrationChannelStatus,
@@ -754,6 +755,18 @@ function AppContent() {
     );
   };
 
+  // Marca a conversa como lida ao ABRIR (silencioso: sem toast/fechar modal).
+  // Falha aqui não deve atrapalhar a leitura — apenas loga.
+  const handleMarkConversationRead = async (messageIds: string[]) => {
+    if (messageIds.length === 0) return;
+    try {
+      await markInboxConversationRead(messageIds);
+      reloadData();
+    } catch (error) {
+      console.error("markConversationRead", error);
+    }
+  };
+
   const handleSendInboxReply = async (
     message: InboxMessage,
     reply: string,
@@ -1043,6 +1056,7 @@ function AppContent() {
                   onCreateOpportunity={handleCreateOpportunityFromInbox}
                   onOpenModal={openModal}
                   onSendReply={handleSendInboxReply}
+                  onMarkConversationRead={handleMarkConversationRead}
                   onUpdateChannelStatus={handleUpdateChannelStatus}
                   onUpdateMessageStatus={handleUpdateInboxStatus}
                 />

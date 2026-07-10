@@ -476,6 +476,19 @@ export async function updateInboxMessageStatus(
   return data as InboxMessage;
 }
 
+// Marca como lidas as mensagens informadas (unread_count = 0). Usada ao ABRIR
+// uma conversa no Inbox — semântica literal de "não lida". RLS restringe ao dono.
+export async function markInboxConversationRead(messageIds: string[]) {
+  if (messageIds.length === 0) return;
+  const supabase = requireSupabase();
+  const { error } = await supabase
+    .from("inbox_messages")
+    .update({ unread_count: 0 })
+    .in("id", messageIds);
+
+  if (error) throw error;
+}
+
 export async function updateInboxConversationLinks(
   ownerId: string,
   phone: string,
