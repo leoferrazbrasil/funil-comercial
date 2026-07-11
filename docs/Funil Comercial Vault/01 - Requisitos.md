@@ -78,6 +78,12 @@ CRM comercial focado em **prospecção ativa** e atendimento por **WhatsApp**, c
 > [!info] Exigidas pela Meta + LGPD
 > `/privacidade`, `/termos` e `/exclusao-de-dados` — **públicas (sem login)**, para aprovação da integração na Meta e conformidade com a LGPD (coleta/uso/compartilhamento/exclusão de dados). Acessíveis pelo rodapé da Landing. Detalhe técnico em [[02 - Arquitetura e Design#Front-end — módulos-chave]].
 
+## 7.2. Campanhas (`/campanhas`)
+
+- Wizard de 3 etapas — **Configurar** (nome, canal Meta ativo, template aprovado, variáveis por *nome do contato* ou *valor fixo*, enviar agora), **Contatos** (do CRM por checkbox + busca **ou** importação de **CSV**), **Confirmação** (disparo 1 a 1 com progresso e status por destinatário; dedupe por telefone).
+- **Preview de iPhone** ao vivo, mostrando a mensagem do WhatsApp conforme a configuração.
+- Reusa o motor de templates da Meta; **enviar agora** (agendamento e múltiplas contas Meta são fases futuras — ver [[04 - Roadmap]]).
+
 ## 8. Criativos (`/criativos`)
 
 - Wizard de 4 etapas (Estratégia, Ideia, IA, Estúdio).

@@ -56,6 +56,9 @@ date: 2026-07-09
 - `src/components/ConfirmDialog.tsx` — confirmação de exclusão reutilizável.
 - `src/components/IntegrationSection.tsx` — **seletor Z-API × Meta Cloud API** no `/perfil` (ativa um provider, desativa o outro); renderiza o QR (`WhatsAppIntegration.tsx`) ou o card de status da Meta.
 - `src/components/TemplatePicker.tsx` — seletor de **templates da Meta** no Inbox (preview + campos por variável); só oferece os suportados, os demais desabilitados com motivo.
+- `src/pages/Campaigns.tsx` — **página de Campanhas** (`/campanhas`): wizard de 3 etapas + preview iPhone; dispara templates para contatos do CRM ou lista CSV.
+- `src/components/PhonePreview.tsx` — mockup de iPhone/WhatsApp (prévia ao vivo).
+- `src/lib/csv.ts` — parser de CSV (aspas RFC 4180) + extração de destinatários nome/telefone.
 - `src/lib/products.ts` — catálogo de produtos, preço (setup/mensalidade), auto-detecção por palavra-chave, **`effectiveValue`** (valor imediato = valor gravado ou preço do produto).
 - `src/lib/crmService.ts` — CRUD (create/update/delete de contato, lead, oportunidade; sendInboxReply; snapshot; **`getIntegrationChannels`**, `updateIntegrationChannelStatus`; **`markInboxConversationRead`**, **`getApprovedWhatsAppTemplates`**, **`sendInboxTemplate`**).
 

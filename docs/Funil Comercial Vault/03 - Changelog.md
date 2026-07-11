@@ -11,7 +11,12 @@ tags:
 > [!note] Navegação
 > Histórico de mudanças, mais recente primeiro. Contexto do produto em [[01 - Requisitos]]; arquitetura em [[02 - Arquitetura e Design]]; índice em [[00 - Inicio]].
 
-## [2026-07-10] - Templates da Meta (Inbox 1 a 1 + disparo em massa), filtros e "não lida" literal
+## [2026-07-10] - Página de Campanhas, templates da Meta (Inbox + massa), filtros e "não lida" literal
+
+### Adicionado — Página de Campanhas (Fase 1)
+- Novo menu/rota **`/campanhas`**: wizard de 3 etapas (**Configurar → Contatos → Confirmação**) com **preview de iPhone** (WhatsApp) ao vivo ao lado. Etapa 1: nome da campanha, canal Meta ativo (read-only), template aprovado, variáveis (nome por-destinatário ou fixo), *enviar agora* (agendar "em breve"). Etapa 2: contatos do **CRM** (checkbox + busca) ou **import CSV**. Etapa 3: disparo 1 a 1 com progresso e status por destinatário. **Front-end apenas** — reusa `whatsapp-templates` + `sendInboxTemplate`.
+- Novos: `Campaigns.tsx`, `PhonePreview.tsx` (mockup iPhone), `csv.ts` (parser + extração de destinatários). Endurecido por **revisão adversarial** (19 agentes; 10 achados corrigidos): reset do estado de envio ("Nova campanha"), dedupe por telefone, fallback de nome, "Todos" aditivo, e CSV robusto (aspas RFC 4180, separador ignorando aspas, header independente, `\r`/BOM, preferência 10–13 dígitos).
+- **Fases futuras:** agendamento (Fase 2) e múltiplas contas Meta/dispositivo (Fase 3). Spec: `docs/superpowers/specs/2026-07-10-campanhas-fase1-design.md`.
 
 ### Adicionado — Envio de templates aprovados da Meta pelo Inbox
 - Botão **📄 Template** no compositor (só com **canal Meta ativo**) abre um seletor dos templates **APROVADOS** da Meta, com preview e um campo por variável; envia via Graph API (`type: "template"`). Serve para **iniciar** conversa / fora da janela de 24h.
