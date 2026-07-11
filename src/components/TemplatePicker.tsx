@@ -95,20 +95,20 @@ export function TemplatePicker({
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4"
+      className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-foreground/10 backdrop-blur-sm p-0 sm:p-4"
       onClick={onClose}
     >
       <div
-        className="w-full sm:max-w-lg bg-card border border-white/10 rounded-t-3xl sm:rounded-3xl shadow-2xl max-h-[85vh] flex flex-col overflow-hidden"
+        className="w-full sm:max-w-lg bg-card border border-foreground/10 rounded-t-3xl sm:rounded-3xl shadow-2xl max-h-[85vh] flex flex-col overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center gap-3 p-4 border-b border-white/10 shrink-0">
+        <div className="flex items-center gap-3 p-4 border-b border-foreground/10 shrink-0">
           {selected ? (
             <button
               type="button"
               onClick={() => setSelected(null)}
-              className="p-1.5 -ml-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors"
+              className="p-1.5 -ml-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-foreground/5 transition-colors"
             >
               <ChevronLeft size={18} />
             </button>
@@ -130,7 +130,7 @@ export function TemplatePicker({
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors"
+            className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-foreground/5 transition-colors"
           >
             <X size={18} />
           </button>
@@ -171,8 +171,8 @@ export function TemplatePicker({
                     title={t.supported ? undefined : t.unsupportedReason}
                     className={`w-full text-left p-3 rounded-2xl border transition-colors ${
                       t.supported
-                        ? "border-white/10 bg-white/[0.02] hover:border-primary/40 hover:bg-white/5"
-                        : "border-white/5 bg-white/[0.01] opacity-60 cursor-not-allowed"
+                        ? "border-foreground/10 bg-foreground/[0.02] hover:border-primary/40 hover:bg-foreground/5"
+                        : "border-foreground/5 bg-foreground/[0.01] opacity-60 cursor-not-allowed"
                     }`}
                   >
                     <div className="flex items-center justify-between gap-2">
@@ -242,7 +242,7 @@ export function TemplatePicker({
                           setVariables(next);
                         }}
                         placeholder={`Valor para {{${i + 1}}}`}
-                        className="mt-1 w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm outline-none focus:border-primary/50 focus:bg-white/10 transition-colors text-foreground placeholder:text-muted-foreground"
+                        className="mt-1 w-full bg-foreground/5 border border-foreground/10 rounded-xl px-3 py-2 text-sm outline-none focus:border-primary/50 focus:bg-foreground/10 transition-colors text-foreground placeholder:text-muted-foreground"
                       />
                     </div>
                   ))}
@@ -254,7 +254,7 @@ export function TemplatePicker({
 
         {/* Footer */}
         {selected && (
-          <div className="p-4 border-t border-white/10 shrink-0">
+          <div className="p-4 border-t border-foreground/10 shrink-0">
             <button
               type="button"
               onClick={handleSend}

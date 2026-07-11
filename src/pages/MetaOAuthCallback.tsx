@@ -57,7 +57,7 @@ export default function MetaOAuthCallback() {
 
   return (
     <div className="flex h-screen items-center justify-center bg-background text-foreground p-6 font-sans">
-      <div className="bg-card border border-white/10 rounded-2xl p-8 max-w-md w-full text-center shadow-2xl flex flex-col items-center gap-4">
+      <div className="bg-card border border-foreground/10 rounded-2xl p-8 max-w-md w-full text-center shadow-2xl flex flex-col items-center gap-4">
         {status === "loading" && <RefreshCw className="animate-spin text-primary" size={48} />}
         {status === "success" && <CheckCircle2 className="text-green-500" size={48} />}
         {status === "error" && <XCircle className="text-red-500" size={48} />}
@@ -68,7 +68,7 @@ export default function MetaOAuthCallback() {
         {status !== "loading" && (
           <button 
             onClick={() => window.close()} 
-            className="mt-4 px-6 py-2 bg-white/5 hover:bg-white/10 rounded-lg text-sm font-semibold transition-colors"
+            className="mt-4 px-6 py-2 bg-foreground/5 hover:bg-foreground/10 rounded-lg text-sm font-semibold transition-colors"
           >
             Fechar Janela
           </button>

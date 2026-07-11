@@ -141,20 +141,20 @@ export function BulkTemplateDialog({ open, onClose, contacts }: BulkTemplateDial
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4"
+      className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-foreground/10 backdrop-blur-sm p-0 sm:p-4"
       onClick={sendState === "sending" ? undefined : onClose}
     >
       <div
-        className="w-full sm:max-w-xl bg-card border border-white/10 rounded-t-3xl sm:rounded-3xl shadow-2xl max-h-[88vh] flex flex-col overflow-hidden"
+        className="w-full sm:max-w-xl bg-card border border-foreground/10 rounded-t-3xl sm:rounded-3xl shadow-2xl max-h-[88vh] flex flex-col overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center gap-3 p-4 border-b border-white/10 shrink-0">
+        <div className="flex items-center gap-3 p-4 border-b border-foreground/10 shrink-0">
           {selected && sendState === "idle" ? (
             <button
               type="button"
               onClick={() => setSelected(null)}
-              className="p-1.5 -ml-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors"
+              className="p-1.5 -ml-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-foreground/5 transition-colors"
             >
               <ChevronLeft size={18} />
             </button>
@@ -177,7 +177,7 @@ export function BulkTemplateDialog({ open, onClose, contacts }: BulkTemplateDial
             <button
               type="button"
               onClick={onClose}
-              className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors"
+              className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-foreground/5 transition-colors"
             >
               <X size={18} />
             </button>
@@ -220,8 +220,8 @@ export function BulkTemplateDialog({ open, onClose, contacts }: BulkTemplateDial
                     title={t.supported ? undefined : t.unsupportedReason}
                     className={`w-full text-left p-3 rounded-2xl border transition-colors ${
                       t.supported
-                        ? "border-white/10 bg-white/[0.02] hover:border-primary/40 hover:bg-white/5"
-                        : "border-white/5 bg-white/[0.01] opacity-60 cursor-not-allowed"
+                        ? "border-foreground/10 bg-foreground/[0.02] hover:border-primary/40 hover:bg-foreground/5"
+                        : "border-foreground/5 bg-foreground/[0.01] opacity-60 cursor-not-allowed"
                     }`}
                   >
                     <div className="flex items-center justify-between gap-2">
@@ -252,10 +252,10 @@ export function BulkTemplateDialog({ open, onClose, contacts }: BulkTemplateDial
                     Variáveis
                   </p>
                   {varModes.map((mode, i) => (
-                    <div key={i} className="rounded-xl border border-white/10 p-3">
+                    <div key={i} className="rounded-xl border border-foreground/10 p-3">
                       <div className="flex items-center justify-between gap-2 mb-2">
                         <span className="text-xs font-medium text-foreground">{`{{${i + 1}}}`}</span>
-                        <div className="flex rounded-lg bg-white/5 p-0.5 text-[11px]">
+                        <div className="flex rounded-lg bg-foreground/5 p-0.5 text-[11px]">
                           <button
                             type="button"
                             disabled={sendState !== "idle"}
@@ -294,7 +294,7 @@ export function BulkTemplateDialog({ open, onClose, contacts }: BulkTemplateDial
                             setFixedValues((v) => v.map((x, idx) => (idx === i ? e.target.value : x)))
                           }
                           placeholder={`Valor único para {{${i + 1}}}`}
-                          className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:border-primary/50 text-foreground placeholder:text-muted-foreground"
+                          className="w-full bg-foreground/5 border border-foreground/10 rounded-lg px-3 py-2 text-sm outline-none focus:border-primary/50 text-foreground placeholder:text-muted-foreground"
                         />
                       )}
                     </div>
@@ -349,14 +349,14 @@ export function BulkTemplateDialog({ open, onClose, contacts }: BulkTemplateDial
                     Você vai enviar para {total} contatos — o envio é sequencial e pode levar alguns minutos.
                   </p>
                 )}
-                <div className="max-h-48 overflow-y-auto rounded-xl border border-white/10 divide-y divide-white/5">
+                <div className="max-h-48 overflow-y-auto rounded-xl border border-foreground/10 divide-y divide-foreground/5">
                   {candidates.map((c) => {
                     const checked = !excludedIds.has(c.id);
                     const status = results[c.id];
                     return (
                       <label
                         key={c.id}
-                        className="flex items-center gap-3 px-3 py-2 text-sm cursor-pointer hover:bg-white/[0.02]"
+                        className="flex items-center gap-3 px-3 py-2 text-sm cursor-pointer hover:bg-foreground/[0.02]"
                       >
                         <input
                           type="checkbox"
@@ -387,7 +387,7 @@ export function BulkTemplateDialog({ open, onClose, contacts }: BulkTemplateDial
 
               {/* Resultado */}
               {sendState === "done" && (
-                <div className="p-3 rounded-xl bg-white/5 border border-white/10 text-sm">
+                <div className="p-3 rounded-xl bg-foreground/5 border border-foreground/10 text-sm">
                   <span className="text-emerald-500 font-semibold">{sentCount} enviado(s)</span>
                   {errorCount > 0 && (
                     <span className="text-red-500 font-semibold"> · {errorCount} falha(s)</span>
@@ -400,10 +400,10 @@ export function BulkTemplateDialog({ open, onClose, contacts }: BulkTemplateDial
 
         {/* Footer */}
         {selected && (
-          <div className="p-4 border-t border-white/10 shrink-0">
+          <div className="p-4 border-t border-foreground/10 shrink-0">
             {sendState === "sending" ? (
               <div className="flex items-center gap-3">
-                <div className="flex-1 h-2 rounded-full bg-white/10 overflow-hidden">
+                <div className="flex-1 h-2 rounded-full bg-foreground/10 overflow-hidden">
                   <div
                     className="h-full bg-primary transition-all"
                     style={{ width: `${total ? (progress / total) * 100 : 0}%` }}
@@ -417,7 +417,7 @@ export function BulkTemplateDialog({ open, onClose, contacts }: BulkTemplateDial
               <button
                 type="button"
                 onClick={onClose}
-                className="w-full py-2.5 rounded-xl bg-white/10 text-foreground font-semibold hover:bg-white/15 transition-colors"
+                className="w-full py-2.5 rounded-xl bg-foreground/10 text-foreground font-semibold hover:bg-foreground/15 transition-colors"
               >
                 Fechar
               </button>

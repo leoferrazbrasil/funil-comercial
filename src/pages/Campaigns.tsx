@@ -63,7 +63,7 @@ const STATUS_STYLE: Record<Campaign["status"], string> = {
   sending: "text-amber-500 bg-amber-500/10 border-amber-500/20",
   done: "text-emerald-500 bg-emerald-500/10 border-emerald-500/20",
   failed: "text-red-500 bg-red-500/10 border-red-500/20",
-  canceled: "text-muted-foreground bg-white/5 border-white/10",
+  canceled: "text-muted-foreground bg-foreground/5 border-foreground/10",
 };
 
 const formatDateTime = (iso: string) => {
@@ -336,18 +336,18 @@ export default function CampaignsPage({
             Dispare (ou agende) um template aprovado da Meta para uma lista de contatos.
           </p>
         </div>
-        <div className="flex rounded-xl bg-white/5 p-1">
+        <div className="flex rounded-xl bg-foreground/5 p-1">
           <button
             type="button"
             onClick={() => setView("wizard")}
-            className={`px-4 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors ${view === "wizard" ? "bg-white/10 text-foreground" : "text-muted-foreground"}`}
+            className={`px-4 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors ${view === "wizard" ? "bg-foreground/10 text-foreground" : "text-muted-foreground"}`}
           >
             <Megaphone size={14} /> Nova campanha
           </button>
           <button
             type="button"
             onClick={() => setView("history")}
-            className={`px-4 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors ${view === "history" ? "bg-white/10 text-foreground" : "text-muted-foreground"}`}
+            className={`px-4 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors ${view === "history" ? "bg-foreground/10 text-foreground" : "text-muted-foreground"}`}
           >
             <List size={14} /> Histórico
           </button>
@@ -355,7 +355,7 @@ export default function CampaignsPage({
       </div>
 
       {view === "history" ? (
-        <div className="panel bg-card border border-white/5 rounded-3xl p-5 md:p-6">
+        <div className="panel bg-card border border-foreground/5 rounded-3xl p-5 md:p-6">
           {historyLoading ? (
             <div className="flex items-center gap-2 text-sm text-muted-foreground py-8 justify-center">
               <Loader2 size={16} className="animate-spin" /> Carregando...
@@ -373,7 +373,7 @@ export default function CampaignsPage({
               </button>
             </div>
           ) : (
-            <div className="divide-y divide-white/5">
+            <div className="divide-y divide-foreground/5">
               {history.map((c) => (
                 <div key={c.id} className="flex items-center gap-3 py-3">
                   <div className="flex-1 min-w-0">
@@ -406,7 +406,7 @@ export default function CampaignsPage({
       ) : (
         <div className="grid lg:grid-cols-[1fr_340px] gap-6 items-start">
           {/* Wizard */}
-          <div className="panel bg-card border border-white/5 rounded-3xl p-5 md:p-6">
+          <div className="panel bg-card border border-foreground/5 rounded-3xl p-5 md:p-6">
             <div className="flex items-center gap-2 mb-6">
               {STEPS.map((s, i) => (
                 <div key={s.n} className="flex items-center gap-2 flex-1">
@@ -416,7 +416,7 @@ export default function CampaignsPage({
                         ? "bg-primary text-primary-foreground"
                         : step > s.n
                           ? "bg-primary/20 text-primary"
-                          : "bg-white/5 text-muted-foreground"
+                          : "bg-foreground/5 text-muted-foreground"
                     }`}
                   >
                     {step > s.n ? <CheckCircle2 size={15} /> : s.n}
@@ -424,7 +424,7 @@ export default function CampaignsPage({
                   <span className={`text-xs font-semibold ${step === s.n ? "text-foreground" : "text-muted-foreground"} hidden sm:block`}>
                     {s.label}
                   </span>
-                  {i < STEPS.length - 1 && <div className="flex-1 h-px bg-white/10" />}
+                  {i < STEPS.length - 1 && <div className="flex-1 h-px bg-foreground/10" />}
                 </div>
               ))}
             </div>
@@ -438,14 +438,14 @@ export default function CampaignsPage({
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Ex.: Prospecção clínicas — Julho"
-                    className="mt-1 w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/50 text-foreground placeholder:text-muted-foreground"
+                    className="mt-1 w-full bg-foreground/5 border border-foreground/10 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/50 text-foreground placeholder:text-muted-foreground"
                   />
                 </label>
 
                 <div>
                   <span className="text-sm font-medium text-foreground">Enviando de</span>
                   {metaActive ? (
-                    <div className="mt-1 flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm">
+                    <div className="mt-1 flex items-center gap-2 rounded-xl border border-foreground/10 bg-foreground/5 px-3 py-2.5 text-sm">
                       <Smartphone size={16} className="text-emerald-500 shrink-0" />
                       <span className="text-foreground">{metaChannel?.numero || "WhatsApp (Meta Cloud API)"}</span>
                       <span className="ml-auto text-[10px] font-semibold text-emerald-500 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-2 py-0.5">
@@ -491,8 +491,8 @@ export default function CampaignsPage({
                               active
                                 ? "border-primary bg-primary/10"
                                 : t.supported
-                                  ? "border-white/10 bg-white/[0.02] hover:border-primary/40 hover:bg-white/5"
-                                  : "border-white/5 bg-white/[0.01] opacity-60 cursor-not-allowed"
+                                  ? "border-foreground/10 bg-foreground/[0.02] hover:border-primary/40 hover:bg-foreground/5"
+                                  : "border-foreground/5 bg-foreground/[0.01] opacity-60 cursor-not-allowed"
                             }`}
                           >
                             <div className="flex items-center justify-between gap-2">
@@ -517,10 +517,10 @@ export default function CampaignsPage({
                   <div className="space-y-3">
                     <span className="text-sm font-medium text-foreground">Variáveis</span>
                     {varModes.map((mode, i) => (
-                      <div key={i} className="rounded-xl border border-white/10 p-3">
+                      <div key={i} className="rounded-xl border border-foreground/10 p-3">
                         <div className="flex items-center justify-between gap-2 mb-2">
                           <span className="text-xs font-medium text-foreground">{`{{${i + 1}}}`}</span>
-                          <div className="flex rounded-lg bg-white/5 p-0.5 text-[11px]">
+                          <div className="flex rounded-lg bg-foreground/5 p-0.5 text-[11px]">
                             <button
                               type="button"
                               onClick={() => setVarModes((m) => m.map((v, idx) => (idx === i ? "name" : v)))}
@@ -544,7 +544,7 @@ export default function CampaignsPage({
                             value={fixedValues[i]}
                             onChange={(e) => setFixedValues((v) => v.map((x, idx) => (idx === i ? e.target.value : x)))}
                             placeholder={`Valor único para {{${i + 1}}}`}
-                            className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:border-primary/50 text-foreground placeholder:text-muted-foreground"
+                            className="w-full bg-foreground/5 border border-foreground/10 rounded-lg px-3 py-2 text-sm outline-none focus:border-primary/50 text-foreground placeholder:text-muted-foreground"
                           />
                         )}
                       </div>
@@ -558,7 +558,7 @@ export default function CampaignsPage({
                     <button
                       type="button"
                       onClick={() => setSendMode("now")}
-                      className={`rounded-xl border px-3 py-2.5 text-sm font-medium flex items-center gap-2 transition-colors ${sendMode === "now" ? "border-primary bg-primary/10 text-primary" : "border-white/10 bg-white/[0.02] text-muted-foreground hover:text-foreground"}`}
+                      className={`rounded-xl border px-3 py-2.5 text-sm font-medium flex items-center gap-2 transition-colors ${sendMode === "now" ? "border-primary bg-primary/10 text-primary" : "border-foreground/10 bg-foreground/[0.02] text-muted-foreground hover:text-foreground"}`}
                     >
                       <Send size={15} /> Enviar agora
                     </button>
@@ -568,7 +568,7 @@ export default function CampaignsPage({
                         setSendMode("schedule");
                         if (!scheduleAt) setScheduleAt(nowLocalInput());
                       }}
-                      className={`rounded-xl border px-3 py-2.5 text-sm font-medium flex items-center gap-2 transition-colors ${sendMode === "schedule" ? "border-primary bg-primary/10 text-primary" : "border-white/10 bg-white/[0.02] text-muted-foreground hover:text-foreground"}`}
+                      className={`rounded-xl border px-3 py-2.5 text-sm font-medium flex items-center gap-2 transition-colors ${sendMode === "schedule" ? "border-primary bg-primary/10 text-primary" : "border-foreground/10 bg-foreground/[0.02] text-muted-foreground hover:text-foreground"}`}
                     >
                       <CalendarClock size={15} /> Agendar
                     </button>
@@ -580,7 +580,7 @@ export default function CampaignsPage({
                         value={scheduleAt}
                         min={nowLocalInput()}
                         onChange={(e) => setScheduleAt(e.target.value)}
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/50 text-foreground"
+                        className="w-full bg-foreground/5 border border-foreground/10 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary/50 text-foreground"
                       />
                       {!scheduleValid && (
                         <p className="text-[11px] text-amber-500 mt-1">Escolha uma data/hora futura.</p>
@@ -594,18 +594,18 @@ export default function CampaignsPage({
             {/* Etapa 2 */}
             {step === 2 && (
               <div className="space-y-4">
-                <div className="flex rounded-xl bg-white/5 p-1">
+                <div className="flex rounded-xl bg-foreground/5 p-1">
                   <button
                     type="button"
                     onClick={() => setSourceTab("crm")}
-                    className={`flex-1 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 ${sourceTab === "crm" ? "bg-white/10 text-foreground" : "text-muted-foreground"}`}
+                    className={`flex-1 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 ${sourceTab === "crm" ? "bg-foreground/10 text-foreground" : "text-muted-foreground"}`}
                   >
                     <Users size={14} /> Do CRM
                   </button>
                   <button
                     type="button"
                     onClick={() => setSourceTab("csv")}
-                    className={`flex-1 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 ${sourceTab === "csv" ? "bg-white/10 text-foreground" : "text-muted-foreground"}`}
+                    className={`flex-1 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 ${sourceTab === "csv" ? "bg-foreground/10 text-foreground" : "text-muted-foreground"}`}
                   >
                     <Upload size={14} /> Importar CSV
                   </button>
@@ -620,7 +620,7 @@ export default function CampaignsPage({
                           value={crmSearch}
                           onChange={(e) => setCrmSearch(e.target.value)}
                           placeholder="Buscar contato..."
-                          className="w-full bg-white/5 border border-white/10 rounded-xl py-2 pl-9 pr-3 text-sm outline-none focus:border-primary/50 text-foreground placeholder:text-muted-foreground"
+                          className="w-full bg-foreground/5 border border-foreground/10 rounded-xl py-2 pl-9 pr-3 text-sm outline-none focus:border-primary/50 text-foreground placeholder:text-muted-foreground"
                         />
                       </div>
                       <div className="flex gap-2 text-[11px] shrink-0">
@@ -640,12 +640,12 @@ export default function CampaignsPage({
                         </button>
                       </div>
                     </div>
-                    <div className="max-h-64 overflow-y-auto rounded-xl border border-white/10 divide-y divide-white/5">
+                    <div className="max-h-64 overflow-y-auto rounded-xl border border-foreground/10 divide-y divide-foreground/5">
                       {crmCandidates.length === 0 ? (
                         <p className="p-4 text-sm text-muted-foreground text-center">Nenhum contato com telefone.</p>
                       ) : (
                         crmCandidates.map((c) => (
-                          <label key={c.id} className="flex items-center gap-3 px-3 py-2 text-sm cursor-pointer hover:bg-white/[0.02]">
+                          <label key={c.id} className="flex items-center gap-3 px-3 py-2 text-sm cursor-pointer hover:bg-foreground/[0.02]">
                             <input
                               type="checkbox"
                               checked={crmSelected.has(c.id)}
@@ -675,7 +675,7 @@ export default function CampaignsPage({
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="w-full flex flex-col items-center justify-center gap-2 py-8 rounded-2xl border-2 border-dashed border-white/15 hover:border-primary/40 hover:bg-white/[0.02] transition-colors text-muted-foreground"
+                      className="w-full flex flex-col items-center justify-center gap-2 py-8 rounded-2xl border-2 border-dashed border-foreground/15 hover:border-primary/40 hover:bg-foreground/[0.02] transition-colors text-muted-foreground"
                     >
                       <Upload size={22} />
                       <span className="text-sm font-medium">Escolher arquivo .csv</span>
@@ -704,7 +704,7 @@ export default function CampaignsPage({
                 {phase === "idle" ? (
                   <>
                     <h3 className="font-bold text-foreground">Confirme a campanha</h3>
-                    <dl className="rounded-2xl border border-white/10 divide-y divide-white/5 text-sm">
+                    <dl className="rounded-2xl border border-foreground/10 divide-y divide-foreground/5 text-sm">
                       {[
                         ["Campanha", name || "—"],
                         ["Template", selected?.name ?? "—"],
@@ -730,7 +730,7 @@ export default function CampaignsPage({
                       )}
                     </div>
                     <div className="flex items-center gap-3">
-                      <div className="flex-1 h-2 rounded-full bg-white/10 overflow-hidden">
+                      <div className="flex-1 h-2 rounded-full bg-foreground/10 overflow-hidden">
                         <div
                           className="h-full bg-primary transition-all"
                           style={{ width: `${acTotal ? ((ac?.sent ?? 0) + (ac?.failed ?? 0)) / acTotal * 100 : 0}%` }}
@@ -760,12 +760,12 @@ export default function CampaignsPage({
             )}
 
             {/* Navegação */}
-            <div className="flex items-center justify-between gap-3 mt-6 pt-5 border-t border-white/5">
+            <div className="flex items-center justify-between gap-3 mt-6 pt-5 border-t border-foreground/5">
               <button
                 type="button"
                 onClick={() => setStep((s) => Math.max(1, s - 1))}
                 disabled={step === 1 || phase !== "idle"}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors disabled:opacity-40"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-foreground/5 transition-colors disabled:opacity-40"
               >
                 <ChevronLeft size={16} /> Voltar
               </button>
@@ -784,7 +784,7 @@ export default function CampaignsPage({
                   <button
                     type="button"
                     onClick={() => setView("history")}
-                    className="px-4 py-2 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors"
+                    className="px-4 py-2 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-foreground/5 transition-colors"
                   >
                     Ver histórico
                   </button>

@@ -408,7 +408,7 @@ const POTENCIAL_STYLE: Record<string, string> = {
   Quente: "bg-red-500/10 text-red-400 border border-red-500/20",
 };
 const potencialStyle = (p?: string | null) =>
-  (p && POTENCIAL_STYLE[p]) || "bg-white/5 text-muted-foreground border border-white/10";
+  (p && POTENCIAL_STYLE[p]) || "bg-foreground/5 text-muted-foreground border border-foreground/10";
 
 export default function ContactsPage({
   contacts,
@@ -468,7 +468,7 @@ export default function ContactsPage({
 
   const renderDataGrid = () => {
     return (
-      <div className="flex-1 overflow-auto bg-card rounded-2xl border border-white/5 shadow-2xl relative min-h-0 md:min-h-[500px]">
+      <div className="flex-1 overflow-auto bg-card rounded-2xl border border-foreground/5 shadow-2xl relative min-h-0 md:min-h-[500px]">
         {filteredContacts.length === 0 ? (
           <EmptyState
             action="Novo Contato"
@@ -479,7 +479,7 @@ export default function ContactsPage({
           <>
             {/* Desktop Table View */}
             <table className="w-full text-left hidden md:table border-collapse">
-              <thead className="bg-white/[0.02] border-b border-white/5 text-xs uppercase tracking-wider text-muted-foreground sticky top-0 z-10 backdrop-blur-md">
+              <thead className="bg-foreground/[0.02] border-b border-foreground/5 text-xs uppercase tracking-wider text-muted-foreground sticky top-0 z-10 backdrop-blur-md">
                 <tr>
                   <th className="p-4 font-semibold">Contato</th>
                   <th className="p-4 font-semibold">Canais</th>
@@ -493,7 +493,7 @@ export default function ContactsPage({
                   <tr 
                     key={contact.id} 
                     onClick={() => setSelectedContactId(contact.id)}
-                    className={`group border-b border-white/5 transition-colors cursor-pointer ${selectedContactId === contact.id ? 'bg-primary/5' : 'hover:bg-white/[0.02]'}`}
+                    className={`group border-b border-foreground/5 transition-colors cursor-pointer ${selectedContactId === contact.id ? 'bg-primary/5' : 'hover:bg-foreground/[0.02]'}`}
                   >
                     <td className="p-4">
                       <div className="flex items-center gap-3">
@@ -517,7 +517,7 @@ export default function ContactsPage({
                       </div>
                     </td>
                     <td className="p-4">
-                      <span className="px-2.5 py-1 text-[10px] font-bold tracking-wider uppercase bg-white/5 rounded-full text-muted-foreground">
+                      <span className="px-2.5 py-1 text-[10px] font-bold tracking-wider uppercase bg-foreground/5 rounded-full text-muted-foreground">
                         {contact.origem || "Manual"}
                       </span>
                     </td>
@@ -530,14 +530,14 @@ export default function ContactsPage({
                     <td className="p-4 text-right">
                       <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
-                          className="p-1.5 text-muted-foreground hover:text-foreground bg-white/5 hover:bg-white/10 rounded-lg transition-colors"
+                          className="p-1.5 text-muted-foreground hover:text-foreground bg-foreground/5 hover:bg-foreground/10 rounded-lg transition-colors"
                           onClick={(e) => { e.stopPropagation(); onEditContact(contact); }}
                           title="Editar"
                         >
                           <Pencil size={14} />
                         </button>
                         <button
-                          className="p-1.5 text-muted-foreground hover:text-red-500 bg-white/5 hover:bg-red-500/10 rounded-lg transition-colors"
+                          className="p-1.5 text-muted-foreground hover:text-red-500 bg-foreground/5 hover:bg-red-500/10 rounded-lg transition-colors"
                           onClick={(e) => { e.stopPropagation(); setContactToDelete(contact); }}
                           title="Excluir"
                         >
@@ -556,7 +556,7 @@ export default function ContactsPage({
                 <div 
                   key={contact.id}
                   onClick={() => setSelectedContactId(contact.id)}
-                  className="bg-white/5 border border-white/5 rounded-2xl p-4 flex flex-col gap-3 active:scale-[0.98] transition-transform"
+                  className="bg-foreground/5 border border-foreground/5 rounded-2xl p-4 flex flex-col gap-3 active:scale-[0.98] transition-transform"
                 >
                   <div className="flex items-center gap-3">
                     <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg ${getAvatarColor(contact.nome)}`}>
@@ -564,7 +564,7 @@ export default function ContactsPage({
                     </div>
                     <div className="flex-1">
                       <strong className="block text-base font-semibold text-foreground">{contact.nome}</strong>
-                      <span className="px-2 py-0.5 mt-1 inline-block text-[10px] font-bold tracking-wider uppercase bg-black/40 rounded-full text-muted-foreground">
+                      <span className="px-2 py-0.5 mt-1 inline-block text-[10px] font-bold tracking-wider uppercase bg-foreground/10 rounded-full text-muted-foreground">
                         {contact.origem || "Manual"}
                       </span>
                     </div>
@@ -590,18 +590,18 @@ export default function ContactsPage({
       <>
         {/* Backdrop for Mobile */}
         <div 
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+          className="fixed inset-0 bg-foreground/10 backdrop-blur-sm z-40 lg:hidden"
           onClick={() => setSelectedContactId(null)}
         />
         
         {/* The Drawer */}
-        <div className="fixed lg:relative inset-y-0 right-0 z-50 w-full md:w-[450px] lg:w-[400px] xl:w-[450px] bg-card lg:bg-transparent lg:border-l border-white/5 shadow-2xl lg:shadow-none flex flex-col shrink-0 transition-transform animate-in slide-in-from-right lg:animate-none">
+        <div className="fixed lg:relative inset-y-0 right-0 z-50 w-full md:w-[450px] lg:w-[400px] xl:w-[450px] bg-card lg:bg-transparent lg:border-l border-foreground/5 shadow-2xl lg:shadow-none flex flex-col shrink-0 transition-transform animate-in slide-in-from-right lg:animate-none">
           
-          <div className="h-16 shrink-0 border-b border-white/5 flex items-center justify-between px-6 bg-card/50">
+          <div className="h-16 shrink-0 border-b border-foreground/5 flex items-center justify-between px-6 bg-card/50">
             <h3 className="font-bold text-sm tracking-widest uppercase text-muted-foreground">Perfil do Contato</h3>
             <button 
               onClick={() => setSelectedContactId(null)} 
-              className="p-3 -mr-3 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-muted-foreground hover:bg-white/10 transition-colors"
+              className="p-3 -mr-3 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-muted-foreground hover:bg-foreground/10 transition-colors"
             >
               <X size={20} />
             </button>
@@ -609,7 +609,7 @@ export default function ContactsPage({
 
           <div className="flex-1 overflow-y-auto bg-card">
             {/* Header / Hero */}
-            <div className="p-8 flex flex-col items-center text-center border-b border-white/5 bg-gradient-to-b from-white/[0.02] to-transparent">
+            <div className="p-8 flex flex-col items-center text-center border-b border-foreground/5 bg-gradient-to-b from-foreground/[0.02] to-transparent">
               <div className={`w-24 h-24 rounded-full flex items-center justify-center font-bold text-3xl mb-4 shadow-xl border-4 border-card ${getAvatarColor(selectedContact.nome)}`}>
                 {getInitials(selectedContact.nome)}
               </div>
@@ -621,7 +621,7 @@ export default function ContactsPage({
               <div className="flex gap-2 mt-6">
                 <button 
                   onClick={() => onEditContact(selectedContact)}
-                  className="px-4 py-2 bg-white/5 hover:bg-white/10 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2"
+                  className="px-4 py-2 bg-foreground/5 hover:bg-foreground/10 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2"
                 >
                   <Pencil size={16} /> Editar
                 </button>
@@ -653,7 +653,7 @@ export default function ContactsPage({
             </div>
 
             {/* Tabs */}
-            <div className="flex border-b border-white/5">
+            <div className="flex border-b border-foreground/5">
               <button 
                 onClick={() => setActiveTab("overview")}
                 className={`flex-1 py-4 text-sm font-semibold transition-colors ${activeTab === "overview" ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground hover:text-foreground'}`}
@@ -675,7 +675,7 @@ export default function ContactsPage({
                   <div className="flex flex-col gap-4">
                     <h4 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Informações</h4>
                     
-                    <div className="p-4 bg-white/5 rounded-2xl flex flex-col gap-3">
+                    <div className="p-4 bg-foreground/5 rounded-2xl flex flex-col gap-3">
                       <div className="flex items-center gap-3">
                         <MessageCircle size={16} className="text-muted-foreground" />
                         <div className="flex flex-col">
@@ -684,7 +684,7 @@ export default function ContactsPage({
                         </div>
                       </div>
                       
-                      <div className="w-full h-px bg-white/5 my-1" />
+                      <div className="w-full h-px bg-foreground/5 my-1" />
                       
                       <div className="flex items-center gap-3">
                         <Send size={16} className="text-muted-foreground" />
@@ -699,11 +699,11 @@ export default function ContactsPage({
                   <div className="flex flex-col gap-4">
                     <h4 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Contexto</h4>
                     <div className="grid grid-cols-2 gap-3">
-                      <div className="p-4 bg-white/5 rounded-2xl flex flex-col gap-1">
+                      <div className="p-4 bg-foreground/5 rounded-2xl flex flex-col gap-1">
                         <span className="text-[10px] uppercase text-muted-foreground font-semibold">Origem</span>
                         <span className="text-sm font-semibold">{selectedContact.origem || "Manual"}</span>
                       </div>
-                      <div className="p-4 bg-white/5 rounded-2xl flex flex-col gap-2 items-start">
+                      <div className="p-4 bg-foreground/5 rounded-2xl flex flex-col gap-2 items-start">
                         <span className="text-[10px] uppercase text-muted-foreground font-semibold">Potencial</span>
                         <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full ${potencialStyle(selectedContact.potencial)}`}>
                           <span className="w-1.5 h-1.5 rounded-full bg-current" />
@@ -738,7 +738,7 @@ export default function ContactsPage({
                     </button>
                   </div>
                   
-                  <div className="p-5 rounded-3xl border border-white/5 bg-white/[0.02] flex flex-col gap-3 text-center">
+                  <div className="p-5 rounded-3xl border border-foreground/5 bg-foreground/[0.02] flex flex-col gap-3 text-center">
                     <CircleDollarSign size={24} className="mx-auto text-muted-foreground/50 mb-1" />
                     <h4 className="font-semibold text-sm text-muted-foreground">Oportunidades</h4>
                     <p className="text-xs text-muted-foreground/60">
@@ -767,7 +767,7 @@ export default function ContactsPage({
         <div className="hidden sm:flex items-center gap-2">
           <button
             onClick={() => setBulkOpen(true)}
-            className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-foreground hover:bg-white/10 transition-colors"
+            className="flex items-center gap-2 rounded-xl border border-foreground/10 bg-foreground/5 px-4 py-2 text-sm font-semibold text-foreground hover:bg-foreground/10 transition-colors"
           >
             <Megaphone size={16} /> Disparar template
           </button>

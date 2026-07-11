@@ -420,7 +420,7 @@ function PipelineCard({
         if (!transform) onClick(item);
       }}
       className={`group w-full min-w-0 max-w-full bg-card p-4 flex flex-col gap-3 rounded-2xl border transition-all cursor-grab active:cursor-grabbing hover:border-primary/50 relative overflow-hidden
-        ${isDragging ? 'shadow-2xl border-primary scale-[1.03] rotate-2' : 'border-white/10 shadow-sm'}
+        ${isDragging ? 'shadow-2xl border-primary scale-[1.03] rotate-2' : 'border-foreground/10 shadow-sm'}
         ${showWarning ? 'border-amber-500/30' : ''}
       `}
     >
@@ -452,7 +452,7 @@ function PipelineCard({
         )}
       </div>
       
-      <div className="bg-white/5 p-2 rounded-xl border border-white/5 w-full min-w-0 max-w-full overflow-hidden">
+      <div className="bg-foreground/5 p-2 rounded-xl border border-foreground/5 w-full min-w-0 max-w-full overflow-hidden">
         <p className="text-xs text-muted-foreground font-medium flex items-start gap-1.5 leading-snug">
           <Target size={14} className="shrink-0 mt-0.5" /> 
           <span className="min-w-0 flex-1 break-words line-clamp-3">
@@ -461,7 +461,7 @@ function PipelineCard({
         </p>
       </div>
       
-      <footer className="flex items-center justify-between mt-auto pt-2 border-t border-white/5">
+      <footer className="flex items-center justify-between mt-auto pt-2 border-t border-foreground/5">
         <div className="flex items-center gap-2">
           <div className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-[10px] ${getAvatarColor(item.responsavel)}`} title={item.responsavel}>
             {getInitials(item.responsavel)}
@@ -469,7 +469,7 @@ function PipelineCard({
         </div>
         <div className="flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
           <button
-            className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground hover:text-foreground hover:bg-white/10 px-2 py-1.5 rounded-lg transition-colors"
+            className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground hover:text-foreground hover:bg-foreground/10 px-2 py-1.5 rounded-lg transition-colors"
             onClick={(event) => {
               event.stopPropagation();
               onEdit(item);
@@ -505,13 +505,13 @@ function PipelineColumn({ column, onCardClick }: { column: any, onCardClick: (it
   return (
     <div
       ref={setNodeRef}
-      className={`flex flex-col min-w-[85vw] w-[85vw] max-w-[85vw] md:min-w-[340px] md:w-[340px] md:max-w-[340px] rounded-[1.5rem] bg-card/40 border border-white/5 overflow-hidden transition-colors ${isOver ? "bg-primary/5 border-primary/30 ring-1 ring-primary/30" : ""}`}
+      className={`flex flex-col min-w-[85vw] w-[85vw] max-w-[85vw] md:min-w-[340px] md:w-[340px] md:max-w-[340px] rounded-[1.5rem] bg-card/40 border border-foreground/5 overflow-hidden transition-colors ${isOver ? "bg-primary/5 border-primary/30 ring-1 ring-primary/30" : ""}`}
     >
-      <header className="flex items-center justify-between p-5 border-b border-white/5 bg-background/50 backdrop-blur-md sticky top-0 z-10">
+      <header className="flex items-center justify-between p-5 border-b border-foreground/5 bg-background/50 backdrop-blur-md sticky top-0 z-10">
         <div className="flex flex-col">
           <span className="font-bold text-sm tracking-wide text-foreground">{column.stage}</span>
         </div>
-        <strong className="text-xs font-black bg-white/10 text-muted-foreground px-2.5 py-1 rounded-full shadow-inner">{column.items.length}</strong>
+        <strong className="text-xs font-black bg-foreground/10 text-muted-foreground px-2.5 py-1 rounded-full shadow-inner">{column.items.length}</strong>
       </header>
       <div className="flex-1 p-3 space-y-3 overflow-y-auto overflow-x-hidden min-h-[150px] relative w-full max-w-full">
         {isOver && (
@@ -521,7 +521,7 @@ function PipelineColumn({ column, onCardClick }: { column: any, onCardClick: (it
           <PipelineCard key={item.id} item={item} onEdit={column.onEdit} onDelete={column.onDelete} onClick={onCardClick} />
         ))}
         {column.items.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-32 border-2 border-dashed border-white/10 rounded-2xl opacity-50">
+          <div className="flex flex-col items-center justify-center h-32 border-2 border-dashed border-foreground/10 rounded-2xl opacity-50">
             <MoveRight size={24} className="mb-2 text-muted-foreground" />
             <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Solte aqui</p>
           </div>
@@ -544,7 +544,7 @@ export function PipelineSignalCard({
   hint: string;
   tone?: "neutral" | "warning" | "success";
 }) {
-  let styleClasses = "bg-card border border-white/5 text-muted-foreground";
+  let styleClasses = "bg-card border border-foreground/5 text-muted-foreground";
   let iconColor = "text-muted-foreground opacity-50";
   
   if (tone === "warning") {
@@ -658,20 +658,20 @@ export default function PipelinePage({
       <>
         {/* Backdrop */}
         <div 
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+          className="fixed inset-0 bg-foreground/10 backdrop-blur-sm z-40"
           onClick={() => setSelectedOppId(null)}
         />
         
         {/* The Drawer */}
-        <div className="fixed inset-y-0 right-0 z-50 w-full md:w-[450px] bg-card border-l border-white/5 shadow-2xl flex flex-col shrink-0 transition-transform animate-in slide-in-from-right">
+        <div className="fixed inset-y-0 right-0 z-50 w-full md:w-[450px] bg-card border-l border-foreground/5 shadow-2xl flex flex-col shrink-0 transition-transform animate-in slide-in-from-right">
           
-          <div className="h-16 shrink-0 border-b border-white/5 flex items-center justify-between px-6 bg-card/50">
+          <div className="h-16 shrink-0 border-b border-foreground/5 flex items-center justify-between px-6 bg-card/50">
             <h3 className="font-bold text-sm tracking-widest uppercase text-muted-foreground flex items-center gap-2">
               <TrendingUp size={16} /> Oportunidade
             </h3>
             <button 
               onClick={() => setSelectedOppId(null)} 
-              className="p-3 -mr-3 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-muted-foreground hover:bg-white/10 transition-colors"
+              className="p-3 -mr-3 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-muted-foreground hover:bg-foreground/10 transition-colors"
             >
               <X size={20} />
             </button>
@@ -712,7 +712,7 @@ export default function PipelinePage({
             <div className="flex flex-col gap-4">
               <h4 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Contexto Comercial</h4>
               <div className="grid grid-cols-2 gap-3">
-                <div className="p-4 bg-white/5 rounded-2xl flex flex-col gap-1">
+                <div className="p-4 bg-foreground/5 rounded-2xl flex flex-col gap-1">
                   <span className="text-[10px] uppercase text-muted-foreground font-semibold">Responsável</span>
                   <div className="flex items-center gap-2 mt-1">
                     <div className={`w-5 h-5 rounded-full flex items-center justify-center font-bold text-[9px] ${getAvatarColor(selectedOpp.responsavel)}`}>
@@ -721,7 +721,7 @@ export default function PipelinePage({
                     <span className="text-sm font-semibold truncate">{selectedOpp.responsavel}</span>
                   </div>
                 </div>
-                <div className="p-4 bg-white/5 rounded-2xl flex flex-col gap-1">
+                <div className="p-4 bg-foreground/5 rounded-2xl flex flex-col gap-1">
                   <span className="text-[10px] uppercase text-muted-foreground font-semibold">Origem</span>
                   <span className="text-sm font-semibold mt-1 truncate">
                     {leads.find((l) => l.id === selectedOpp.lead_id)?.origem || "Não informada"}
@@ -730,7 +730,7 @@ export default function PipelinePage({
                 <button
                   type="button"
                   onClick={() => { onEditOpportunity(selectedOpp); setSelectedOppId(null); }}
-                  className="p-4 bg-white/5 hover:bg-white/10 rounded-2xl flex flex-col gap-1 col-span-2 border border-white/5 text-left transition-colors group"
+                  className="p-4 bg-foreground/5 hover:bg-foreground/10 rounded-2xl flex flex-col gap-1 col-span-2 border border-foreground/5 text-left transition-colors group"
                 >
                   <span className="text-[10px] uppercase text-muted-foreground font-semibold flex items-center gap-1">
                     <Target size={12}/> Próxima Ação
@@ -748,7 +748,7 @@ export default function PipelinePage({
             </div>
             
             <button
-              className="w-full py-3 px-4 rounded-xl border border-white/10 hover:bg-white/5 text-foreground font-semibold text-sm transition-all flex items-center justify-center gap-2 mt-auto"
+              className="w-full py-3 px-4 rounded-xl border border-foreground/10 hover:bg-foreground/5 text-foreground font-semibold text-sm transition-all flex items-center justify-center gap-2 mt-auto"
               onClick={() => { onEditOpportunity(selectedOpp); setSelectedOppId(null); }}
             >
               <Pencil size={16} /> Editar Oportunidade

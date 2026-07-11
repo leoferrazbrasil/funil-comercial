@@ -369,7 +369,7 @@ export function HeroPanel({
   onAction: () => void;
 }) {
   return (
-    <section className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 p-8 rounded-xl bg-card border border-white/5">
+    <section className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 p-8 rounded-xl bg-card border border-foreground/5">
       <div>
         <p className="text-xs font-bold tracking-wider text-primary uppercase mb-2">{eyebrow}</p>
         <h2 className="text-3xl font-bold tracking-tight text-foreground">{title}</h2>
@@ -427,7 +427,7 @@ export function MetricCard({
   tone?: "neutral" | "warning" | "success";
 }) {
   return (
-    <article className={`flex flex-row items-center justify-between p-6 rounded-xl bg-card border border-white/5 ${tone === "warning" ? "border-l-4 border-l-yellow-500" : tone === "success" ? "border-l-4 border-l-green-500" : ""}`}>
+    <article className={`flex flex-row items-center justify-between p-6 rounded-xl bg-card border border-foreground/5 ${tone === "warning" ? "border-l-4 border-l-yellow-500" : tone === "success" ? "border-l-4 border-l-green-500" : ""}`}>
       <div>
         <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground block">{label}</span>
         <strong className="text-2xl font-bold text-foreground mt-1 mb-1 block">{value}</strong>
@@ -448,8 +448,8 @@ export function Panel({
   children: ReactNode;
 }) {
   return (
-    <section className="rounded-xl border border-white/5 bg-card overflow-hidden">
-      <header className="p-6 border-b border-white/5"><p className="text-xs font-bold tracking-wider text-primary uppercase mb-1">{eyebrow}</p><h2 className="text-lg font-semibold text-foreground">{title}</h2></header>
+    <section className="rounded-xl border border-foreground/5 bg-card overflow-hidden">
+      <header className="p-6 border-b border-foreground/5"><p className="text-xs font-bold tracking-wider text-primary uppercase mb-1">{eyebrow}</p><h2 className="text-lg font-semibold text-foreground">{title}</h2></header>
       {children}
     </section>
   );
@@ -465,7 +465,7 @@ export function ActionItem({
   priority: string;
 }) {
   return (
-    <article className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 border border-white/5 rounded-lg bg-background">
+    <article className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 border border-foreground/5 rounded-lg bg-background">
       <div className="mt-1 sm:mt-0 text-muted-foreground"><Target size={18} /></div>
       <div className="flex-1"><strong className="text-sm font-medium text-foreground block">{title}</strong><p className="text-xs text-muted-foreground mt-1 max-w-2xl">{description}</p></div>
       <span className="text-[9px] uppercase font-bold px-2 py-0.5 rounded-full bg-primary text-primary-foreground mt-2 sm:mt-0">{priority}</span>
@@ -485,7 +485,7 @@ export function TablePanel({
   isEmpty: boolean;
 }) {
   return (
-    <section className="rounded-xl border border-white/5 bg-card overflow-hidden">
+    <section className="rounded-xl border border-foreground/5 bg-card overflow-hidden">
       {isEmpty ? (
         <EmptyState
           action={emptyLabel}
@@ -509,7 +509,7 @@ export function EmptyState({
   onAction: () => void;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-4 py-16 px-4 text-center border-2 border-dashed border-white/10 rounded-xl bg-background/50">
+    <div className="flex flex-col items-center justify-center gap-4 py-16 px-4 text-center border-2 border-dashed border-foreground/10 rounded-xl bg-background/50">
       <p className="text-muted-foreground mt-2 max-w-2xl">{description}</p>
       <button className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground font-medium rounded-md hover:bg-secondary/80 transition-colors" onClick={onAction}>
         <Plus size={16} />
@@ -530,10 +530,10 @@ export function Modal({
 }) {
   return (
     <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4" role="presentation">
-      <section aria-modal="true" className="bg-card border border-white/10 shadow-2xl rounded-t-2xl sm:rounded-xl w-full max-w-lg max-h-[90dvh] flex flex-col animate-in slide-in-from-bottom-1/2 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200" role="dialog">
-        <header className="flex justify-between items-center p-5 sm:p-6 border-b border-white/5 shrink-0">
+      <section aria-modal="true" className="bg-card border border-foreground/10 shadow-2xl rounded-t-2xl sm:rounded-xl w-full max-w-lg max-h-[90dvh] flex flex-col animate-in slide-in-from-bottom-1/2 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200" role="dialog">
+        <header className="flex justify-between items-center p-5 sm:p-6 border-b border-foreground/5 shrink-0">
           <h2 className="text-lg font-semibold text-foreground">{title}</h2>
-          <button aria-label="Fechar" className="p-2 -mr-2 rounded-md hover:bg-white/5 transition-colors text-muted-foreground hover:text-foreground" onClick={onClose}><X size={18} /></button>
+          <button aria-label="Fechar" className="p-2 -mr-2 rounded-md hover:bg-foreground/5 transition-colors text-muted-foreground hover:text-foreground" onClick={onClose}><X size={18} /></button>
         </header>
         <div className="overflow-y-auto flex-1 custom-scrollbar">
           {children}
@@ -781,7 +781,7 @@ export function MessageModal({
         <TextField label="Status" name="status" placeholder="Novo lead" />
         <label className="flex flex-col gap-2 mb-4 text-sm font-medium">
           Mensagem
-          <textarea className="flex min-h-10 w-full rounded-md border border-white/10 bg-black/20 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" name="mensagem"
+          <textarea className="flex min-h-10 w-full rounded-md border border-foreground/10 bg-foreground/5 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" name="mensagem"
             placeholder="Tenho interesse em conhecer a solução."
             required
           />
@@ -996,14 +996,14 @@ export function TextField({
     <label>
       {label}
       {isPhone ? (
-        <IMaskInput className="flex min-h-10 w-full rounded-md border border-white/10 bg-black/20 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" defaultValue={defaultText}
+        <IMaskInput className="flex min-h-10 w-full rounded-md border border-foreground/10 bg-foreground/5 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" defaultValue={defaultText}
           name={name}
           mask="(00) 00000-0000"
           placeholder={placeholder || "(11) 99999-9999"}
           required={required}
         />
       ) : isMoney ? (
-        <IMaskInput className="flex min-h-10 w-full rounded-md border border-white/10 bg-black/20 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" defaultValue={defaultText}
+        <IMaskInput className="flex min-h-10 w-full rounded-md border border-foreground/10 bg-foreground/5 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" defaultValue={defaultText}
           name={name}
           mask={Number}
           scale={0}
@@ -1015,7 +1015,7 @@ export function TextField({
           required={required}
         />
       ) : (
-        <input className="flex min-h-10 w-full rounded-md border border-white/10 bg-black/20 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" defaultValue={defaultText}
+        <input className="flex min-h-10 w-full rounded-md border border-foreground/10 bg-foreground/5 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" defaultValue={defaultText}
           name={name}
           placeholder={placeholder}
           required={required}
@@ -1092,7 +1092,7 @@ export function SelectField({
         <button
           type="button"
           onClick={() => setOpen((prev) => !prev)}
-          className="flex min-h-10 w-full items-center justify-between gap-2 cursor-pointer rounded-md border border-white/10 bg-black/20 px-3 py-2 text-sm text-left text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+          className="flex min-h-10 w-full items-center justify-between gap-2 cursor-pointer rounded-md border border-foreground/10 bg-foreground/5 px-3 py-2 text-sm text-left text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
         >
           <span className={`truncate ${isPlaceholder ? "text-muted-foreground" : "text-foreground"}`}>
             {selected?.label ?? "Selecione"}
@@ -1103,7 +1103,7 @@ export function SelectField({
           />
         </button>
         {open && (
-          <div className="absolute left-0 right-0 z-[70] mt-1 max-h-60 overflow-auto rounded-md border border-white/10 bg-card shadow-2xl p-1 animate-in fade-in zoom-in-95 duration-100">
+          <div className="absolute left-0 right-0 z-[70] mt-1 max-h-60 overflow-auto rounded-md border border-foreground/10 bg-card shadow-2xl p-1 animate-in fade-in zoom-in-95 duration-100">
             {options.map((option) => {
               const active = option.value === value;
               return (
@@ -1114,7 +1114,7 @@ export function SelectField({
                   className={`flex w-full items-center justify-between gap-2 rounded-md px-3 py-2 text-left text-sm transition-colors ${
                     active
                       ? "bg-primary/15 text-primary font-semibold"
-                      : "text-foreground hover:bg-white/10"
+                      : "text-foreground hover:bg-foreground/10"
                   }`}
                 >
                   <span className="truncate">{option.label}</span>

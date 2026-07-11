@@ -941,11 +941,11 @@ export default function InboxPage({
   // Renders the list column
   const renderListColumn = () => (
     <div className={`flex-col bg-background lg:bg-card border-r border-border h-full overflow-hidden ${mobileView === "list" ? "flex animate-in slide-in-from-left duration-200" : "hidden lg:flex"} w-full lg:w-[320px] xl:w-[380px] shrink-0 z-10`}>
-      <div className="p-4 border-b border-border bg-black/20 flex flex-col gap-4 shrink-0">
+      <div className="p-4 border-b border-border bg-foreground/5 flex flex-col gap-4 shrink-0">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold tracking-tight text-foreground">Inbox</h2>
           <div className="flex items-center gap-2">
-            <button onClick={() => onOpenModal("channel")} className="p-2 rounded-xl bg-white/5 hover:bg-white/10 transition-colors text-foreground" title="Canais">
+            <button onClick={() => onOpenModal("channel")} className="p-2 rounded-xl bg-foreground/5 hover:bg-foreground/10 transition-colors text-foreground" title="Canais">
               <Plus size={18} />
             </button>
           </div>
@@ -957,14 +957,14 @@ export default function InboxPage({
           <input
             type="text"
             placeholder="Buscar mensagens..."
-            className="w-full bg-white/5 border border-white/10 rounded-xl py-2 pl-9 pr-4 text-sm outline-none focus:border-primary/50 focus:bg-white/10 transition-colors text-foreground placeholder:text-muted-foreground"
+            className="w-full bg-foreground/5 border border-foreground/10 rounded-xl py-2 pl-9 pr-4 text-sm outline-none focus:border-primary/50 focus:bg-foreground/10 transition-colors text-foreground placeholder:text-muted-foreground"
             value={localSearch}
             onChange={(e) => setLocalSearch(e.target.value)}
           />
         </div>
         
         {/* Search / Filters (Segmented Control) */}
-        <div className="flex bg-white/5 rounded-xl p-1 relative">
+        <div className="flex bg-foreground/5 rounded-xl p-1 relative">
           <button 
             onClick={() => setFilterTab("abertas")}
             className={`flex-1 py-1.5 px-3 text-xs font-semibold rounded-lg transition-all relative z-10 ${filterTab === 'abertas' ? 'text-foreground' : 'text-muted-foreground hover:text-foreground/80'}`}
@@ -985,7 +985,7 @@ export default function InboxPage({
           </button>
           {/* Active pill background */}
           <div
-            className="absolute top-1 bottom-1 bg-white/10 shadow-sm rounded-lg transition-all duration-300 ease-in-out border border-white/5"
+            className="absolute top-1 bottom-1 bg-foreground/10 shadow-sm rounded-lg transition-all duration-300 ease-in-out border border-foreground/5"
             style={{
               width: 'calc(33.333% - 2.6px)',
               left: filterTab === 'abertas' ? '4px' : filterTab === 'nao_lidas' ? 'calc(33.333% + 2px)' : 'calc(66.666%)'
@@ -1012,7 +1012,7 @@ export default function InboxPage({
                 <button
                   key={f.value}
                   onClick={() => setDateFilter(f.value)}
-                  className={`flex-1 py-1 text-[11px] font-medium rounded-lg border transition-colors ${dateFilter === f.value ? "bg-primary/15 border-primary/40 text-primary" : "bg-white/5 border-white/10 text-muted-foreground hover:text-foreground hover:bg-white/10"}`}
+                  className={`flex-1 py-1 text-[11px] font-medium rounded-lg border transition-colors ${dateFilter === f.value ? "bg-primary/15 border-primary/40 text-primary" : "bg-foreground/5 border-foreground/10 text-muted-foreground hover:text-foreground hover:bg-foreground/10"}`}
                 >
                   {f.label}
                 </button>
@@ -1026,7 +1026,7 @@ export default function InboxPage({
                 <button
                   key={f.value}
                   onClick={() => setTypeFilter(f.value)}
-                  className={`flex-1 py-1 text-[11px] font-medium rounded-lg border transition-colors ${typeFilter === f.value ? "bg-primary/15 border-primary/40 text-primary" : "bg-white/5 border-white/10 text-muted-foreground hover:text-foreground hover:bg-white/10"}`}
+                  className={`flex-1 py-1 text-[11px] font-medium rounded-lg border transition-colors ${typeFilter === f.value ? "bg-primary/15 border-primary/40 text-primary" : "bg-foreground/5 border-foreground/10 text-muted-foreground hover:text-foreground hover:bg-foreground/10"}`}
                 >
                   {f.label}
                 </button>
@@ -1039,7 +1039,7 @@ export default function InboxPage({
               <div className="flex gap-1 flex-1">
                 <button
                   onClick={() => setOnlyMine((v) => !v)}
-                  className={`flex-1 py-1 text-[11px] font-medium rounded-lg border transition-colors ${onlyMine ? "bg-primary/15 border-primary/40 text-primary" : "bg-white/5 border-white/10 text-muted-foreground hover:text-foreground hover:bg-white/10"}`}
+                  className={`flex-1 py-1 text-[11px] font-medium rounded-lg border transition-colors ${onlyMine ? "bg-primary/15 border-primary/40 text-primary" : "bg-foreground/5 border-foreground/10 text-muted-foreground hover:text-foreground hover:bg-foreground/10"}`}
                 >
                   Atribuídas a mim
                 </button>
@@ -1059,7 +1059,7 @@ export default function InboxPage({
         
         {displayedConversationsWithDraft.length === 0 ? (
           <div className="p-8 flex flex-col items-center justify-center text-center text-muted-foreground h-full">
-            <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
+            <div className="w-16 h-16 rounded-full bg-foreground/5 flex items-center justify-center mb-4">
               <MessageCircle size={28} className="opacity-40" />
             </div>
             <p className="text-sm font-medium">Nenhuma conversa por aqui.</p>
@@ -1080,10 +1080,10 @@ export default function InboxPage({
                 <button
                   key={conv.key}
                   onClick={() => handleSelectConversation(conv.key)}
-                  className={`flex items-start gap-3 p-4 border-b border-border text-left transition-all ${isSelected ? 'bg-primary/10 lg:border-l-2 lg:border-l-primary' : 'hover:bg-white/[0.03] lg:border-l-2 lg:border-l-transparent'}`}
+                  className={`flex items-start gap-3 p-4 border-b border-border text-left transition-all ${isSelected ? 'bg-primary/10 lg:border-l-2 lg:border-l-primary' : 'hover:bg-foreground/[0.03] lg:border-l-2 lg:border-l-transparent'}`}
                 >
                   <div className="relative shrink-0 mt-1">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-white/10 to-white/5 flex items-center justify-center font-bold text-lg text-foreground shadow-sm border border-white/10">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-foreground/10 to-foreground/5 flex items-center justify-center font-bold text-lg text-foreground shadow-sm border border-foreground/10">
                       {conv.displayName.charAt(0).toUpperCase()}
                     </div>
                     {hasUnread && (
@@ -1123,7 +1123,7 @@ export default function InboxPage({
     if (!selectedConversation) {
       return (
         <div className={`flex-1 bg-background lg:bg-card/50 hidden lg:flex flex-col items-center justify-center text-center p-8 z-0`}>
-          <div className="w-24 h-24 rounded-3xl bg-white/5 flex items-center justify-center mb-6 shadow-xl border border-white/10 relative overflow-hidden">
+          <div className="w-24 h-24 rounded-3xl bg-foreground/5 flex items-center justify-center mb-6 shadow-xl border border-foreground/10 relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent opacity-50" />
             <MessageCircle size={40} className="text-foreground/60 relative z-10" />
           </div>
@@ -1139,12 +1139,12 @@ export default function InboxPage({
         <div className="h-16 shrink-0 border-b border-border bg-card/80 backdrop-blur-md flex items-center justify-between px-4 lg:px-6 shadow-sm z-10">
           <div className="flex items-center gap-3">
             {/* Mobile back button */}
-            <button onClick={() => setMobileView("list")} className="lg:hidden p-2.5 -ml-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-foreground hover:bg-white/10 transition-colors">
+            <button onClick={() => setMobileView("list")} className="lg:hidden p-2.5 -ml-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-foreground hover:bg-foreground/10 transition-colors">
               <MoveRight size={22} className="rotate-180" />
             </button>
             
             <div className="flex items-center gap-3 cursor-pointer" onClick={() => setMobileView("context")}>
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-white/10 to-white/5 flex items-center justify-center font-bold text-foreground shadow-sm border border-white/10">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-foreground/10 to-foreground/5 flex items-center justify-center font-bold text-foreground shadow-sm border border-foreground/10">
                 {(selectedConversation?.displayName ?? "?").charAt(0).toUpperCase()}
               </div>
               <div className="flex-1 min-w-0">
@@ -1179,7 +1179,7 @@ export default function InboxPage({
                         type="button"
                         onClick={() => handleAssign(member)}
                         disabled={assigning}
-                        className={`w-full text-left px-3.5 py-2 text-xs font-medium transition-colors flex items-center justify-between gap-2 hover:bg-white/10 disabled:opacity-50 ${selectedAssignment?.assigned_to === member.id ? "text-primary" : "text-foreground"}`}
+                        className={`w-full text-left px-3.5 py-2 text-xs font-medium transition-colors flex items-center justify-between gap-2 hover:bg-foreground/10 disabled:opacity-50 ${selectedAssignment?.assigned_to === member.id ? "text-primary" : "text-foreground"}`}
                       >
                         <span className="truncate">{member.nome || member.email}</span>
                         {selectedAssignment?.assigned_to === member.id && (
@@ -1199,7 +1199,7 @@ export default function InboxPage({
             </button>
             <button
               onClick={() => setMobileView("context")}
-              className="lg:hidden p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-foreground bg-white/5 hover:bg-white/10 transition-colors"
+              className="lg:hidden p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-foreground bg-foreground/5 hover:bg-foreground/10 transition-colors"
             >
               <UsersRound size={20} />
             </button>
@@ -1276,7 +1276,7 @@ export default function InboxPage({
                   type="button"
                   onClick={() => setTemplatePickerOpen(true)}
                   title="Enviar template aprovado (Meta)"
-                  className="shrink-0 h-[52px] w-[52px] rounded-2xl bg-white/5 border border-border flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/40 transition-all"
+                  className="shrink-0 h-[52px] w-[52px] rounded-2xl bg-foreground/5 border border-border flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/40 transition-all"
                 >
                   <FileText size={20} />
                 </button>
@@ -1339,7 +1339,7 @@ export default function InboxPage({
         
         {/* Mobile header for context */}
         <div className="lg:hidden h-16 shrink-0 border-b border-border bg-background/80 backdrop-blur-md flex items-center px-4 shadow-sm z-10 sticky top-0">
-          <button onClick={() => setMobileView("chat")} className="p-2.5 -ml-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-foreground hover:bg-white/10 transition-colors gap-2">
+          <button onClick={() => setMobileView("chat")} className="p-2.5 -ml-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-foreground hover:bg-foreground/10 transition-colors gap-2">
             <MoveRight size={22} className="rotate-180 shrink-0" /> <span className="font-bold text-sm">Voltar ao Chat</span>
           </button>
         </div>

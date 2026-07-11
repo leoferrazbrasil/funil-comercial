@@ -369,7 +369,7 @@ const ScoreRing = ({ score }: { score: number }) => {
     <div className="relative flex items-center justify-center w-10 h-10">
       <svg className="transform -rotate-90 w-10 h-10">
         <circle
-          className="text-white/10"
+          className="text-foreground/10"
           strokeWidth="4"
           stroke="currentColor"
           fill="transparent"
@@ -485,7 +485,7 @@ export default function LeadsPage({
 
   const renderDataGrid = () => {
     return (
-      <div className="flex-1 overflow-auto bg-card rounded-2xl border border-white/5 shadow-2xl relative min-h-0 md:min-h-[500px]">
+      <div className="flex-1 overflow-auto bg-card rounded-2xl border border-foreground/5 shadow-2xl relative min-h-0 md:min-h-[500px]">
         {sortedQualifications.length === 0 ? (
           <EmptyState
             action="Cadastrar Lead"
@@ -496,7 +496,7 @@ export default function LeadsPage({
           <>
             {/* Desktop Table View */}
             <table className="w-full text-left hidden md:table border-collapse">
-              <thead className="bg-white/[0.02] border-b border-white/5 text-xs uppercase tracking-wider text-muted-foreground sticky top-0 z-10 backdrop-blur-md">
+              <thead className="bg-foreground/[0.02] border-b border-foreground/5 text-xs uppercase tracking-wider text-muted-foreground sticky top-0 z-10 backdrop-blur-md">
                 <tr>
                   <th className="p-4 font-semibold text-center w-20">Score</th>
                   <th className="p-4 font-semibold">Lead</th>
@@ -516,7 +516,7 @@ export default function LeadsPage({
                     <tr 
                       key={lead.id} 
                       onClick={() => setSelectedLeadId(lead.id)}
-                      className={`group border-b border-white/5 transition-colors cursor-pointer ${isSelected ? 'bg-primary/5' : 'hover:bg-white/[0.02]'}`}
+                      className={`group border-b border-foreground/5 transition-colors cursor-pointer ${isSelected ? 'bg-primary/5' : 'hover:bg-foreground/[0.02]'}`}
                     >
                       <td className="p-4">
                         <div className="flex justify-center">
@@ -547,21 +547,21 @@ export default function LeadsPage({
                         <span className="text-xs text-muted-foreground truncate max-w-[150px] inline-block" title={lead.interesse}>{lead.interesse || "-"}</span>
                       </td>
                       <td className="p-4">
-                        <span className={`px-2.5 py-1 text-[10px] font-bold tracking-wider uppercase rounded-full ${hasOpp ? 'bg-green-500/10 text-green-500 border border-green-500/20' : 'bg-white/5 text-muted-foreground'}`}>
+                        <span className={`px-2.5 py-1 text-[10px] font-bold tracking-wider uppercase rounded-full ${hasOpp ? 'bg-green-500/10 text-green-500 border border-green-500/20' : 'bg-foreground/5 text-muted-foreground'}`}>
                           {hasOpp ? "No Funil" : lead.status.replace("_", " ")}
                         </span>
                       </td>
                       <td className="p-4 text-right">
                         <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button
-                            className="p-1.5 text-muted-foreground hover:text-foreground bg-white/5 hover:bg-white/10 rounded-lg transition-colors"
+                            className="p-1.5 text-muted-foreground hover:text-foreground bg-foreground/5 hover:bg-foreground/10 rounded-lg transition-colors"
                             onClick={(e) => { e.stopPropagation(); onEditLead(lead); }}
                             title="Editar"
                           >
                             <Pencil size={14} />
                           </button>
                           <button
-                            className="p-1.5 text-muted-foreground hover:text-red-500 bg-white/5 hover:bg-red-500/10 rounded-lg transition-colors"
+                            className="p-1.5 text-muted-foreground hover:text-red-500 bg-foreground/5 hover:bg-red-500/10 rounded-lg transition-colors"
                             onClick={(e) => { e.stopPropagation(); setLeadToDelete(lead); }}
                             title="Excluir"
                           >
@@ -584,7 +584,7 @@ export default function LeadsPage({
                   <div 
                     key={lead.id}
                     onClick={() => setSelectedLeadId(lead.id)}
-                    className="bg-white/5 border border-white/5 rounded-2xl p-4 flex flex-col gap-3 active:scale-[0.98] transition-transform"
+                    className="bg-foreground/5 border border-foreground/5 rounded-2xl p-4 flex flex-col gap-3 active:scale-[0.98] transition-transform"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
@@ -600,7 +600,7 @@ export default function LeadsPage({
                           <span className="text-xs text-muted-foreground mt-0.5 inline-block">{lead.telefone || "Sem telefone"}</span>
                         </div>
                       </div>
-                      <span className={`px-2 py-0.5 text-[9px] font-bold tracking-wider uppercase rounded-full ${hasOpp ? 'bg-green-500/10 text-green-500' : 'bg-white/10 text-muted-foreground'}`}>
+                      <span className={`px-2 py-0.5 text-[9px] font-bold tracking-wider uppercase rounded-full ${hasOpp ? 'bg-green-500/10 text-green-500' : 'bg-foreground/10 text-muted-foreground'}`}>
                         {hasOpp ? "Funil" : lead.status.replace("_", " ")}
                       </span>
                     </div>
@@ -624,20 +624,20 @@ export default function LeadsPage({
       <>
         {/* Backdrop for Mobile */}
         <div 
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+          className="fixed inset-0 bg-foreground/10 backdrop-blur-sm z-40 lg:hidden"
           onClick={() => setSelectedLeadId(null)}
         />
         
         {/* The Drawer */}
-        <div className="fixed lg:relative inset-y-0 right-0 z-50 w-full md:w-[450px] lg:w-[400px] xl:w-[450px] bg-card lg:bg-transparent lg:border-l border-white/5 shadow-2xl lg:shadow-none flex flex-col shrink-0 transition-transform animate-in slide-in-from-right lg:animate-none">
+        <div className="fixed lg:relative inset-y-0 right-0 z-50 w-full md:w-[450px] lg:w-[400px] xl:w-[450px] bg-card lg:bg-transparent lg:border-l border-foreground/5 shadow-2xl lg:shadow-none flex flex-col shrink-0 transition-transform animate-in slide-in-from-right lg:animate-none">
           
-          <div className="h-16 shrink-0 border-b border-white/5 flex items-center justify-between px-6 bg-card/50">
+          <div className="h-16 shrink-0 border-b border-foreground/5 flex items-center justify-between px-6 bg-card/50">
             <h3 className="font-bold text-sm tracking-widest uppercase text-muted-foreground flex items-center gap-2">
               <Target size={16} /> Qualificação
             </h3>
             <button 
               onClick={() => setSelectedLeadId(null)} 
-              className="p-3 -mr-3 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-muted-foreground hover:bg-white/10 transition-colors"
+              className="p-3 -mr-3 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-muted-foreground hover:bg-foreground/10 transition-colors"
             >
               <X size={20} />
             </button>
@@ -649,8 +649,8 @@ export default function LeadsPage({
             <div>
               <h2 className="text-2xl font-bold tracking-tight mb-2">{lead.nome}</h2>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-muted-foreground bg-white/5 px-2 py-1 rounded-md uppercase tracking-wider">{lead.status.replace("_", " ")}</span>
-                <span className="text-xs font-semibold text-muted-foreground bg-white/5 px-2 py-1 rounded-md uppercase tracking-wider">{lead.origem || "Manual"}</span>
+                <span className="text-xs font-semibold text-muted-foreground bg-foreground/5 px-2 py-1 rounded-md uppercase tracking-wider">{lead.status.replace("_", " ")}</span>
+                <span className="text-xs font-semibold text-muted-foreground bg-foreground/5 px-2 py-1 rounded-md uppercase tracking-wider">{lead.origem || "Manual"}</span>
               </div>
             </div>
             
@@ -678,7 +678,7 @@ export default function LeadsPage({
                   </button>
                 ) : (
                   <button
-                    className="w-full py-2 px-4 rounded-xl bg-white/10 hover:bg-white/20 text-foreground font-semibold text-sm transition-all flex items-center justify-center gap-2"
+                    className="w-full py-2 px-4 rounded-xl bg-foreground/10 hover:bg-foreground/20 text-foreground font-semibold text-sm transition-all flex items-center justify-center gap-2"
                     onClick={() => onEditLead(lead)}
                   >
                     <Pencil size={16} /> Completar Cadastro
@@ -699,22 +699,22 @@ export default function LeadsPage({
             <div className="flex flex-col gap-4">
               <h4 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Dados Base</h4>
               <div className="grid grid-cols-2 gap-3">
-                <div className="p-4 bg-white/5 rounded-2xl flex flex-col gap-1">
+                <div className="p-4 bg-foreground/5 rounded-2xl flex flex-col gap-1">
                   <span className="text-[10px] uppercase text-muted-foreground font-semibold">Valor Estimado</span>
                   <span className="text-sm font-semibold">{formatMoney(Number(lead.valor_estimado))}</span>
                 </div>
-                <div className="p-4 bg-white/5 rounded-2xl flex flex-col gap-1">
+                <div className="p-4 bg-foreground/5 rounded-2xl flex flex-col gap-1">
                   <span className="text-[10px] uppercase text-muted-foreground font-semibold">Telefone</span>
                   <span className="text-sm font-semibold">{lead.telefone || "-"}</span>
                 </div>
-                <div className="p-4 bg-white/5 rounded-2xl flex flex-col gap-1 col-span-2">
+                <div className="p-4 bg-foreground/5 rounded-2xl flex flex-col gap-1 col-span-2">
                   <span className="text-[10px] uppercase text-muted-foreground font-semibold">Interesse</span>
                   <span className="text-sm font-semibold leading-snug">{lead.interesse || "-"}</span>
                 </div>
                 <button
                   type="button"
                   onClick={() => onEditLead(lead)}
-                  className="p-4 bg-white/5 hover:bg-white/10 rounded-2xl flex flex-col gap-1 col-span-2 text-left transition-colors group"
+                  className="p-4 bg-foreground/5 hover:bg-foreground/10 rounded-2xl flex flex-col gap-1 col-span-2 text-left transition-colors group"
                 >
                   <span className="text-[10px] uppercase text-muted-foreground font-semibold flex items-center gap-1">
                     <Target size={12} /> Próxima Ação Manual
@@ -732,7 +732,7 @@ export default function LeadsPage({
             </div>
             
             <button
-              className="w-full py-3 px-4 rounded-xl border border-white/10 hover:bg-white/5 text-foreground font-semibold text-sm transition-all flex items-center justify-center gap-2 mt-auto"
+              className="w-full py-3 px-4 rounded-xl border border-foreground/10 hover:bg-foreground/5 text-foreground font-semibold text-sm transition-all flex items-center justify-center gap-2 mt-auto"
               onClick={() => onEditLead(lead)}
             >
               <Pencil size={16} /> Editar Dados
@@ -779,7 +779,7 @@ export default function LeadsPage({
 
       {/* Top Metrics (KPIs) */}
       <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 shrink-0">
-        <div className="bg-card border border-white/5 rounded-2xl p-4 md:p-5 flex flex-col gap-3 relative overflow-hidden group">
+        <div className="bg-card border border-foreground/5 rounded-2xl p-4 md:p-5 flex flex-col gap-3 relative overflow-hidden group">
           <div className="flex items-center justify-between z-10 relative">
             <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5"><UsersRound size={14}/> Ativos</span>
           </div>
@@ -796,7 +796,7 @@ export default function LeadsPage({
           <strong className="text-3xl sm:text-4xl font-black text-foreground z-10 relative tracking-tighter">{qualifiedLeads.length}</strong>
         </div>
         
-        <div className="bg-card border border-white/5 rounded-2xl p-4 md:p-5 flex flex-col gap-3 relative overflow-hidden group">
+        <div className="bg-card border border-foreground/5 rounded-2xl p-4 md:p-5 flex flex-col gap-3 relative overflow-hidden group">
           <div className="flex items-center justify-between z-10 relative">
             <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5"><Clock3 size={14}/> Pendentes</span>
           </div>

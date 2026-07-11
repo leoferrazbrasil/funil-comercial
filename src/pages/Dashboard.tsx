@@ -342,14 +342,14 @@ function StatCard({ title, value, icon: Icon, tone = "neutral", actionLabel, onA
     danger: "text-red-500",
   };
   const bgTones: Record<string, string> = {
-    neutral: "bg-white/5",
+    neutral: "bg-foreground/5",
     success: "bg-green-500/10",
     warning: "bg-amber-500/10",
     danger: "bg-red-500/10",
   };
 
   return (
-    <div className="flex flex-col rounded-3xl border border-white/5 bg-card p-6 shadow-sm relative overflow-hidden group transition-all hover:border-white/10 hover:bg-white/[0.02]">
+    <div className="flex flex-col rounded-3xl border border-foreground/5 bg-card p-6 shadow-sm relative overflow-hidden group transition-all hover:border-foreground/10 hover:bg-foreground/[0.02]">
       <div className="flex items-start justify-between mb-4">
         <div className={`p-3 rounded-2xl ${bgTones[tone]}`}>
           <Icon size={24} className={tones[tone]} strokeWidth={1.5} />
@@ -362,7 +362,7 @@ function StatCard({ title, value, icon: Icon, tone = "neutral", actionLabel, onA
       </div>
       <h3 className="text-sm font-medium text-muted-foreground mb-1">{title}</h3>
       <div className="text-3xl font-bold tracking-tight mb-2">{value}</div>
-      <div className="text-xs text-muted-foreground/50 border-t border-white/5 pt-3 mt-auto">
+      <div className="text-xs text-muted-foreground/50 border-t border-foreground/5 pt-3 mt-auto">
         {emptyState}
       </div>
     </div>
@@ -372,7 +372,7 @@ function StatCard({ title, value, icon: Icon, tone = "neutral", actionLabel, onA
 function PriorityTaskCard({ task, onAction }: { task: any, onAction: () => void }) {
   const isHigh = task.priority === "Alta";
   return (
-    <div className={`flex items-start gap-4 p-5 rounded-2xl border ${isHigh ? 'border-amber-500/30 bg-amber-500/5' : 'border-white/5 bg-white/[0.02]'} transition-colors hover:border-primary/50`}>
+    <div className={`flex items-start gap-4 p-5 rounded-2xl border ${isHigh ? 'border-amber-500/30 bg-amber-500/5' : 'border-foreground/5 bg-foreground/[0.02]'} transition-colors hover:border-primary/50`}>
       <div className={`mt-0.5 flex-shrink-0 w-2.5 h-2.5 rounded-full ${isHigh ? 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]' : 'bg-primary'}`} />
       <div className="flex-1 min-w-0">
         <h4 className="text-sm font-semibold text-foreground mb-1 truncate">{task.title}</h4>
@@ -380,7 +380,7 @@ function PriorityTaskCard({ task, onAction }: { task: any, onAction: () => void 
       </div>
       <button 
         onClick={onAction}
-        className="flex-shrink-0 p-2 rounded-xl bg-white/5 hover:bg-white/10 text-muted-foreground hover:text-foreground transition-colors"
+        className="flex-shrink-0 p-2 rounded-xl bg-foreground/5 hover:bg-foreground/10 text-muted-foreground hover:text-foreground transition-colors"
         title="Agir agora"
       >
         <MoveRight size={16} />
@@ -412,9 +412,9 @@ function FunnelChart({ opportunities, stages }: { opportunities: Opportunity[], 
               <span className="font-medium text-muted-foreground">{data.stage}</span>
               <span className="text-foreground font-semibold">{data.count} <span className="opacity-50 text-[10px] ml-1">({formatMoney(data.value)})</span></span>
             </div>
-            <div className="w-full bg-black/40 rounded-full h-2.5 overflow-hidden">
+            <div className="w-full bg-foreground/10 rounded-full h-2.5 overflow-hidden">
               <div 
-                className={`h-full rounded-full transition-all duration-1000 ease-out ${isFirst ? 'bg-white/20' : isLast ? 'bg-green-500' : 'bg-primary'}`}
+                className={`h-full rounded-full transition-all duration-1000 ease-out ${isFirst ? 'bg-foreground/20' : isLast ? 'bg-green-500' : 'bg-primary'}`}
                 style={{ width: `${percentage}%` }}
               />
             </div>
@@ -510,12 +510,12 @@ export default function Dashboard({
     <div className="flex flex-col gap-8 w-full max-w-[1600px] mx-auto pb-12">
       
       {/* 1. HEADER & Z-PATTERN TOP */}
-      <header className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pb-6 border-b border-white/5">
+      <header className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pb-6 border-b border-foreground/5">
         <div>
           <h1 className="text-3xl font-bold tracking-tight mb-1">Visão Geral</h1>
           <p className="text-muted-foreground">Aqui está o resumo da sua operação neste momento.</p>
         </div>
-        <div className="flex items-center gap-2 bg-card border border-white/5 rounded-2xl p-1">
+        <div className="flex items-center gap-2 bg-card border border-foreground/5 rounded-2xl p-1">
           <Calendar size={16} className="text-muted-foreground ml-2 mr-1 shrink-0" />
           {PERIODS.map((option) => (
             <button
@@ -525,7 +525,7 @@ export default function Dashboard({
               className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors ${
                 period === option.key
                   ? "bg-primary/15 text-primary"
-                  : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+                  : "text-muted-foreground hover:text-foreground hover:bg-foreground/5"
               }`}
             >
               {option.label}
@@ -610,15 +610,15 @@ export default function Dashboard({
         <div className="xl:col-span-2 flex flex-col gap-8">
           
           {/* Prioridades do Dia */}
-          <div className="flex flex-col rounded-3xl border border-white/5 bg-card overflow-hidden shadow-lg">
-            <div className="p-6 border-b border-white/5 flex items-center justify-between">
+          <div className="flex flex-col rounded-3xl border border-foreground/5 bg-card overflow-hidden shadow-lg">
+            <div className="p-6 border-b border-foreground/5 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-xl bg-primary/10 text-primary">
                   <Sparkles size={20} />
                 </div>
                 <h2 className="text-xl font-bold">Inteligência Comercial</h2>
               </div>
-              <span className="text-xs font-semibold px-3 py-1 rounded-full bg-white/5 text-muted-foreground">Prioridades do dia</span>
+              <span className="text-xs font-semibold px-3 py-1 rounded-full bg-foreground/5 text-muted-foreground">Prioridades do dia</span>
             </div>
             
             <div className="p-6 flex flex-col gap-4">
@@ -641,8 +641,8 @@ export default function Dashboard({
           </div>
 
           {/* Saúde do Funil */}
-          <div className="flex flex-col rounded-3xl border border-white/5 bg-card overflow-hidden shadow-lg">
-            <div className="p-6 border-b border-white/5">
+          <div className="flex flex-col rounded-3xl border border-foreground/5 bg-card overflow-hidden shadow-lg">
+            <div className="p-6 border-b border-foreground/5">
               <h2 className="text-xl font-bold mb-1">Saúde do Funil</h2>
               <p className="text-sm text-muted-foreground">Distribuição atual de volume e receita esperada.</p>
             </div>
@@ -657,20 +657,20 @@ export default function Dashboard({
         <div className="flex flex-col gap-8">
           
           {/* Oportunidades Recentes */}
-          <div className="flex flex-col rounded-3xl border border-white/5 bg-card overflow-hidden shadow-lg">
-            <div className="p-6 border-b border-white/5 flex items-center justify-between">
+          <div className="flex flex-col rounded-3xl border border-foreground/5 bg-card overflow-hidden shadow-lg">
+            <div className="p-6 border-b border-foreground/5 flex items-center justify-between">
               <h2 className="text-lg font-bold">Oportunidades Recentes</h2>
-              <button onClick={() => onOpenModal("opportunity")} className="p-2 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">
+              <button onClick={() => onOpenModal("opportunity")} className="p-2 rounded-xl bg-foreground/5 hover:bg-foreground/10 transition-colors">
                 <Plus size={16} />
               </button>
             </div>
             <div className="p-0">
               {recentOpportunities.length > 0 ? (
-                <div className="flex flex-col divide-y divide-white/5">
+                <div className="flex flex-col divide-y divide-foreground/5">
                   {recentOpportunities.map(opp => (
-                    <div key={opp.id} className="p-5 hover:bg-white/[0.02] transition-colors flex items-center justify-between group">
+                    <div key={opp.id} className="p-5 hover:bg-foreground/[0.02] transition-colors flex items-center justify-between group">
                       <div className="flex items-center gap-4">
-                        <div className="h-10 w-10 rounded-full bg-white/5 flex items-center justify-center text-muted-foreground border border-white/10 group-hover:border-primary/50 transition-colors">
+                        <div className="h-10 w-10 rounded-full bg-foreground/5 flex items-center justify-center text-muted-foreground border border-foreground/10 group-hover:border-primary/50 transition-colors">
                           <CircleDollarSign size={18} />
                         </div>
                         <div>
@@ -690,7 +690,7 @@ export default function Dashboard({
                 </div>
               )}
             </div>
-            <div className="p-4 border-t border-white/5 bg-black/20 text-center">
+            <div className="p-4 border-t border-foreground/5 bg-foreground/5 text-center">
               <button className="text-xs font-semibold text-muted-foreground hover:text-primary transition-colors">Ver todo o funil</button>
             </div>
           </div>

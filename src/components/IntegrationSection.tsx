@@ -155,7 +155,7 @@ export function IntegrationSection() {
                   className={`text-left rounded-2xl border p-4 transition-all ${
                     isActive
                       ? "border-primary bg-primary/10 ring-1 ring-primary/30"
-                      : "border-white/10 bg-card hover:border-white/20 hover:bg-white/5"
+                      : "border-foreground/10 bg-card hover:border-foreground/20 hover:bg-foreground/5"
                   } ${isBusy || isActive ? "" : "active:scale-[0.99]"}`}
                 >
                   <div className="flex items-start gap-3">
@@ -163,7 +163,7 @@ export function IntegrationSection() {
                       className={`mt-0.5 w-9 h-9 shrink-0 rounded-xl flex items-center justify-center ${
                         isActive
                           ? "bg-primary/20 text-primary"
-                          : "bg-white/5 text-muted-foreground"
+                          : "bg-foreground/5 text-muted-foreground"
                       }`}
                     >
                       {isBusy ? (
@@ -182,7 +182,7 @@ export function IntegrationSection() {
                             <CheckCircle2 className="w-3 h-3" /> Ativo
                           </span>
                         ) : configured ? (
-                          <span className="text-[11px] font-medium text-muted-foreground bg-white/5 border border-white/10 rounded-full px-2 py-0.5">
+                          <span className="text-[11px] font-medium text-muted-foreground bg-foreground/5 border border-foreground/10 rounded-full px-2 py-0.5">
                             Configurado
                           </span>
                         ) : (
@@ -203,7 +203,7 @@ export function IntegrationSection() {
 
           {/* Conteúdo do provider selecionado */}
           {activeKey === "meta" ? (
-            <div className="bg-card border border-white/5 rounded-2xl overflow-hidden shadow-sm">
+            <div className="bg-card border border-foreground/5 rounded-2xl overflow-hidden shadow-sm">
               <div className="p-6 space-y-4">
                 <div className="flex flex-col items-center justify-center p-6 space-y-3 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
                   <div className="w-12 h-12 bg-emerald-500/20 rounded-full flex items-center justify-center">
