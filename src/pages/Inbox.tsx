@@ -1452,7 +1452,7 @@ export default function InboxPage({
   return (
     // Fixed height wrapper taking full space below top navbar
     // Added negative top margin to counteract `.content` padding (18px mobile, 32px desktop)
-    <div className="flex -mx-4 sm:-mx-8 -mt-[18px] lg:-mt-8 h-[calc(100dvh-5rem+18px)] lg:h-[calc(100vh-6rem+32px)] lg:min-h-[600px] border-t border-border overflow-hidden relative">
+    <div className="flex -mx-4 sm:-mx-8 -mt-[18px] lg:-mt-8 -mb-[18px] lg:-mb-8 h-[calc(100%+2.25rem)] lg:h-[calc(100%+4rem)] border-t border-border overflow-hidden relative">
       {renderListColumn()}
       {renderChatColumn()}
       {renderContextColumn()}

@@ -522,6 +522,8 @@ button:disabled {
 }
 
 .loading-strip {
+  position: relative;
+  z-index: 20;
   border-color: color-mix(in srgb, var(--amber) 34%, transparent);
   background: var(--amber-soft);
   color: var(--amber);
