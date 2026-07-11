@@ -720,6 +720,9 @@ export default function InboxPage({
   const isAdmin = Boolean(
     myProfile && myProfile.role !== "vendedor" && !myProfile.admin_id,
   );
+  // Vendedor: vinculado a um admin. Responde pelo canal do admin (resolvido no
+  // server pelo whatsapp-send), então não precisa de canal próprio conectado.
+  const isSeller = Boolean(myProfile?.admin_id);
 
   // Mapa telefone (unificado) -> atribuição, para casar com `conv.key` (que já
   // é `unifyPhone`). `conversation_assignments.telefone` é gravado cru, então
@@ -1247,7 +1250,7 @@ export default function InboxPage({
 
         {/* Chat Footer / Composer */}
         <div className="p-3 lg:p-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] bg-background lg:bg-card/90 border-t border-border shrink-0 backdrop-blur-lg">
-          {activeChannels.length === 0 ? (
+          {activeChannels.length === 0 && !isSeller ? (
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-500 max-w-4xl mx-auto">
               <div className="flex items-center gap-3 text-sm">
                 <span className="shrink-0 w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center">
