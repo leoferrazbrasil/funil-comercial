@@ -20,6 +20,8 @@ date: 2026-07-10
 
 ## ✅ Entregue recentemente
 
+- **Estúdio de Criativos — Fase A (taxonomia editorial)** — `/criativos` deixou de gerar conteúdo do posicionamento antigo (B2B/SaaS/CRM). Pilares, objetivos, defaults, CTAs por pilar e um checklist "Antes de publicar" foram realinhados à **[[Linha_Editorial_Funil_Comercial|Linha Editorial]]** e ao Brandbook 04. Canvas da arte preservado. Só front-end (sem deploy). Ver [[03 - Changelog]].
+- **Brandbook 04 — Diretrizes de Conteúdo & Ativação** — pilares editoriais + matriz 5W2H + checklist publicados em `/brandbook` (`ContentGuidelinesSection`). Fonte de verdade da doutrina de conteúdo. Ver [[03 - Changelog]].
 - **Handoff de conversas (time)** — admin cria vendedores e transfere conversas; o vendedor vê/responde só as atribuídas, pelo canal do admin. Código pronto (7 tasks, endurecido por review). **Ativação pendente:** aplicar migração + deployar `team-create-member`/`whatsapp-send`. Ver [[03 - Changelog]].
 - **Observabilidade de entrega (WhatsApp)** — `whatsapp-inbound` processa os `statuses` da Meta; selinho por mensagem no Inbox (enviada/entregue/lida/falhou) + erro inline. Ver [[03 - Changelog]].
 - **Página Configurações** — hub de integrações (`/configuracoes` + engrenagem no header); integração de WhatsApp saiu do Perfil. Ver [[03 - Changelog]].
@@ -58,6 +60,11 @@ date: 2026-07-10
 Escolher entre várias contas Meta/números no disparo (hoje usa a conta ativa) — ligada à **multi-instância**.
 
 _Menores:_ disparo em massa também a partir de `/leads`; suporte a templates com mídia/botões (hoje desabilitados); mover o secret do cron para o **Vault**.
+
+### Estúdio de Criativos — Fase B (prompts da IA)
+Reescrever os **system prompts** das Edge Functions `ai-generate-post` e `ai-recommend-post`, hoje presos ao posicionamento antigo ("ferramenta B2B", "gestão comercial/CRM/automação"), para a voz da [[Linha_Editorial_Funil_Comercial|Linha Editorial]] (estrutura de vendas, negócio local, 4 camadas, CTA de diagnóstico no WhatsApp). **Requer deploy** (`ai-generate-post` + `ai-recommend-post`) — bloqueado neste ambiente (403 da CLI), então executa quando o dono puder deployar. Enquanto não for feito, a Fase A já garante que o esqueleto (pilares/defaults/CTA/checklist) esteja on-brand; a IA continua gerando texto na voz antiga enquanto as funções estiverem realmente ativas em prod.
+
+_Fase C (opcional):_ templates de arte por pilar editorial.
 
 > [!info] Deploy dos templates (Ciclos 1 e 2)
 > As Edge Functions `whatsapp-send` (atualizada) e `whatsapp-templates` (nova) já foram publicadas; o secret `META_WABA_ID` é obrigatório para a listagem funcionar. O **Ciclo 2 é 100% front-end** (sem deploy de função — já foi ao ar no push).
