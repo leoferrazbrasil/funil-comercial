@@ -3,6 +3,7 @@ import { requireSupabase } from "./supabase";
 import type {
   Campaign,
   CampaignVariable,
+  ConversationAssignment,
   Contact,
   CrmSnapshot,
   InboxMessage,
@@ -11,6 +12,7 @@ import type {
   Opportunity,
   OpportunityStage,
   Profile,
+  TeamMember,
 } from "./types";
 
 const defaultStages: OpportunityStage[] = [
@@ -817,5 +819,65 @@ export async function updateUserSecurity(payload: { email?: string; password?: s
   const { data, error } = await supabase.auth.updateUser(payload);
   if (error) throw error;
   return data;
+}
+
+// --- Handoff (time e atribuição) -------------------------------------------
+
+export async function createTeamMember(payload: {
+  email: string; password: string; nome: string;
+}): Promise<TeamMember> {
+  const supabase = requireSupabase();
+  const { data, error } = await supabase.functions.invoke("team-create-member", { body: payload });
+  if (error || data?.error || !data?.ok) throw new Error(await extractFunctionError(error, data));
+  const m = data.member;
+  return { id: m.id, email: m.email, nome: m.nome, role: "vendedor", admin_id: null };
+}
+
+export async function getTeamMembers(): Promise<TeamMember[]> {
+  const supabase = requireSupabase();
+  const { data: userData } = await supabase.auth.getUser();
+  const adminId = userData.user?.id;
+  if (!adminId) return [];
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("id, nome, email, role, admin_id, avatar_url")
+    .eq("admin_id", adminId)
+    .order("nome", { ascending: true });
+  if (error) throw error;
+  return (data ?? []) as TeamMember[];
+}
+
+export async function getConversationAssignments(): Promise<ConversationAssignment[]> {
+  const supabase = requireSupabase();
+  const { data, error } = await supabase
+    .from("conversation_assignments")
+    .select("id, owner_id, telefone, assigned_to, assigned_by, updated_at");
+  if (error) throw error;
+  return (data ?? []) as ConversationAssignment[];
+}
+
+export async function assignConversation(
+  ownerId: string, telefone: string, assignedTo: string,
+): Promise<void> {
+  const supabase = requireSupabase();
+  const { data: userData } = await supabase.auth.getUser();
+  const { error } = await supabase
+    .from("conversation_assignments")
+    .upsert(
+      { owner_id: ownerId, telefone, assigned_to: assignedTo, assigned_by: userData.user?.id ?? null },
+      { onConflict: "owner_id,telefone" },
+    );
+  if (error) throw error;
+}
+
+export async function getMyProfile(): Promise<Profile | null> {
+  const supabase = requireSupabase();
+  const { data: userData } = await supabase.auth.getUser();
+  const id = userData.user?.id;
+  if (!id) return null;
+  const { data, error } = await supabase
+    .from("profiles").select("*").eq("id", id).maybeSingle();
+  if (error) throw error;
+  return (data as Profile) ?? null;
 }
 
