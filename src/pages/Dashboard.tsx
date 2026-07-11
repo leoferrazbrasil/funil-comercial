@@ -267,7 +267,7 @@ const isWeakNextAction = (opportunity: Opportunity) => {
 };
 
 const isClosingStage = (opportunity: Opportunity) =>
-  ["Proposta", "NegociaÃ§Ã£o"].includes(opportunity.etapa);
+  ["Proposta", "Negociação"].includes(opportunity.etapa);
 
 const buildPipelineRisks = (opportunities: Opportunity[]): PipelineRisk[] => {
   const risks: PipelineRisk[] = [];

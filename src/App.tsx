@@ -43,6 +43,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import LandingPage from "./pages/Landing";
+import CrmLandingPage from "./pages/CrmLanding";
 import BrandbookPage from "./pages/Brandbook";
 import { PrivacyPage, TermsPage, DataDeletionPage } from "./pages/LegalPages";
 import SignUpScreen from "./pages/SignUp";
@@ -121,6 +122,7 @@ const navItems = navigationItems;
 // públicas caírem no login.
 const PUBLIC_PATHS = [
   "/",
+  "/crm",
   "/brandbook",
   "/privacidade",
   "/termos",
@@ -328,7 +330,7 @@ const isWeakNextAction = (opportunity: Opportunity) => {
 };
 
 const isClosingStage = (opportunity: Opportunity) =>
-  ["Proposta", "NegociaÃ§Ã£o"].includes(opportunity.etapa);
+  ["Proposta", "Negociação"].includes(opportunity.etapa);
 
 const buildPipelineRisks = (opportunities: Opportunity[]): PipelineRisk[] => {
   const risks: PipelineRisk[] = [];
@@ -995,6 +997,7 @@ function AppContent() {
     return (
       <Routes>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/crm" element={<CrmLandingPage />} />
         <Route path="/brandbook" element={<BrandbookPage />} />
         <Route path="/privacidade" element={<PrivacyPage />} />
         <Route path="/termos" element={<TermsPage />} />

@@ -532,7 +532,7 @@ export default function LoginScreen({
         </form>
         
         <p className="mt-8 mb-10 md:mb-0 text-xs text-muted-foreground/60">
-          Protegido por criptografia de ponta a ponta.
+          Conexão criptografada (TLS) e dados isolados por conta.
         </p>
       </div>
     </main>
