@@ -18,6 +18,7 @@ export type Profile = {
   telefone: string | null
   role: 'diretor' | 'gestor' | 'vendedor'
   avatar_url?: string | null
+  admin_id?: string | null
   created_at: string
 }
 
@@ -77,6 +78,7 @@ export type InboxMessage = {
   // Status de entrega (mensagens de saída via Meta), atualizado pelo webhook.
   delivery_status?: 'sent' | 'delivered' | 'read' | 'failed' | null
   delivery_error?: string | null
+  sent_by?: string | null
   created_at: string
 }
 
@@ -126,5 +128,23 @@ export type Campaign = {
   started_at: string | null
   finished_at: string | null
   created_at: string
+  updated_at: string
+}
+
+export type TeamMember = {
+  id: string
+  nome: string | null
+  email: string | null
+  role: 'diretor' | 'gestor' | 'vendedor'
+  admin_id: string | null
+  avatar_url?: string | null
+}
+
+export type ConversationAssignment = {
+  id: string
+  owner_id: string
+  telefone: string
+  assigned_to: string
+  assigned_by: string | null
   updated_at: string
 }
