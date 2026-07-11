@@ -367,9 +367,9 @@ export default function CreativesPage() {
                     onClick={acceptRecommendation}
                     className="w-full bg-primary text-black font-bold py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-primary/90 transition-transform active:scale-95 shadow-lg"
                   >
-                    Aceitar e gerar <Wand2 size={18} />
+                    Aceitar e continuar <Wand2 size={18} />
                   </button>
-                  <p className="text-xs text-center text-muted-foreground mt-3">A IA já escreve a copy e monta a arte para você</p>
+                  <p className="text-xs text-center text-muted-foreground mt-3">Aproveita a recomendação e abre o editor com tudo pré-preenchido</p>
                 </div>
               </div>
             </div>
@@ -508,7 +508,7 @@ export default function CreativesPage() {
 
               <div>
                 <h2 className="text-xl font-bold mb-1">Passo 3: Sobre o que é o post?</h2>
-                <p className="text-sm text-muted-foreground mb-4">Um resumo em uma ou duas frases. A IA escreve a copy e monta a arte a partir daqui.</p>
+                <p className="text-sm text-muted-foreground mb-4">Um resumo em uma ou duas frases. É o ponto de partida do criativo — você monta e ajusta tudo no editor a seguir.</p>
                 <div className="bg-card border border-foreground/10 rounded-2xl p-2 shadow-xl relative overflow-hidden group">
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity pointer-events-none"></div>
                   <textarea
@@ -547,8 +547,8 @@ export default function CreativesPage() {
           <div className="absolute inset-0 border-4 border-primary rounded-full border-t-transparent animate-spin"></div>
           <Sparkles className="text-primary animate-pulse" size={32} />
         </div>
-        <h2 className="text-2xl font-bold mb-2">Escrevendo a Copy...</h2>
-        <p className="text-muted-foreground">O motor de inteligência artificial está selecionando o melhor template e validando o Brandbook.</p>
+        <h2 className="text-2xl font-bold mb-2">Preparando seu criativo...</h2>
+        <p className="text-muted-foreground">Montando o editor com base no seu resumo. Em seguida você ajusta a copy e a arte.</p>
       </div>
     );
   }
