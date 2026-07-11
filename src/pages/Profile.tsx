@@ -239,6 +239,9 @@ export default function ProfilePage({ profile, onProfileUpdated }: ProfilePagePr
                   onChange={(e) => setNovaSenha(e.target.value)}
                   placeholder="Deixe em branco para não alterar"
                   minLength={6}
+                  // Impede o navegador de autofill a senha salva (que marcava
+                  // "alterações não salvas" sozinho) — campo de NOVA senha.
+                  autoComplete="new-password"
                 />
               </label>
 
@@ -250,6 +253,7 @@ export default function ProfilePage({ profile, onProfileUpdated }: ProfilePagePr
                   onChange={(e) => setConfirmaSenha(e.target.value)}
                   placeholder="Repita a nova senha"
                   minLength={6}
+                  autoComplete="new-password"
                 />
               </label>
             </div>
