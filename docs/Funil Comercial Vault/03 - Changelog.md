@@ -11,6 +11,22 @@ tags:
 > [!note] Navegação
 > Histórico de mudanças, mais recente primeiro. Contexto do produto em [[01 - Requisitos]]; arquitetura em [[02 - Arquitetura e Design]]; índice em [[00 - Inicio]].
 
+## [2026-07-10] - Inbox: filtros, "não lida" literal e envio de templates da Meta
+
+### Adicionado — Envio de templates aprovados da Meta pelo Inbox
+- Botão **📄 Template** no compositor (só com **canal Meta ativo**) abre um seletor dos templates **APROVADOS** da Meta, com preview e um campo por variável; envia via Graph API (`type: "template"`). Serve para **iniciar** conversa / fora da janela de 24h.
+- Nova Edge Function **`whatsapp-templates`** (GET, com paginação `paging.next`) lista os aprovados; **`whatsapp-send`** ganhou branch de template. Novo secret **`META_WABA_ID`**. Componente **`TemplatePicker`** + `getApprovedWhatsAppTemplates`/`sendInboxTemplate` no service.
+
+> [!success] v1 endurecido por revisão adversarial (28 agentes, 7 achados corrigidos)
+> Só oferece templates que o CRM **consegue** enviar (corpo com variáveis numéricas). Cabeçalho de mídia, header com variável, botão dinâmico, variáveis nomeadas (`{{nome}}`) e templates sem corpo aparecem **desabilitados com o motivo** — evita envios que a Meta recusaria (erro `132000`). Sem prefill presunçoso de `{{1}}` (botão "usar nome do contato" sob demanda); trim consistente entre o texto gravado e o enviado; paginação para não perder aprovados após a 1ª página. `whatsapp-templates` adicionada ao `deno check`, script e CI de deploy.
+
+### Adicionado — Filtros na lista de conversas + correção das abas
+- Filtros de **Data** (Tudo/Hoje/7d/30d, pela última mensagem) e **Tipo** por estágio exclusivo do funil: **Contato** (cadastrado no CRM), **Lead** (sem oportunidade), **Oportunidade**. Combinam com as abas e a busca.
+- **Correção das abas** Abertas/Não Lidas/Todas (que não funcionavam — dependiam de `unread_count` nunca resetado e de `Resolvido` quase nunca na última msg): passaram a usar sinais confiáveis — Abertas = não resolvida.
+
+### Adicionado — "Marcar como lida ao abrir"
+- Abrir uma conversa (clique) zera o `unread_count` das suas mensagens no banco (`markInboxConversationRead` + handler silencioso). "Não Lidas" e o ponto vermelho voltam à semântica **literal** de não-lida (some ao abrir, reaparece com mensagem nova). Só no clique explícito — a auto-seleção da 1ª conversa no desktop não marca.
+
 ## [2026-07-09] - Sprint: Integração Meta Cloud API oficial, Drawers acionáveis, Dashboard temporal e Páginas legais
 
 ### Adicionado — WhatsApp oficial (Meta Cloud API) + seletor de integração

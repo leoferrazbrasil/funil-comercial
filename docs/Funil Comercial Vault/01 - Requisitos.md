@@ -37,9 +37,11 @@ CRM comercial focado em **prospecção ativa** e atendimento por **WhatsApp**, c
 ## 4. Inbox (`/inbox`)
 
 - Lista de conversas de WhatsApp agrupadas por telefone (sem duplicidade).
-- **Abas:** Abertas, Não Lidas, Todas + busca.
+- **Abas:** Abertas (não resolvidas), Não Lidas (some ao **abrir** a conversa), Todas + busca.
+- **Filtros:** **Data** (Tudo/Hoje/7d/30d, pela última mensagem) e **Tipo** por estágio do funil — **Contato** (cadastrado no CRM), **Lead** (sem oportunidade), **Oportunidade** — combinando com abas e busca.
 - **Tempo real:** novas mensagens aparecem sem recarregar (realtime em `inbox_messages`).
 - **Responder** pela instância conectada; histórico preservado mesmo desconectado.
+- **Templates da Meta:** com canal Meta ativo, botão 📄 para enviar um **template aprovado** (preview + variáveis) — para **iniciar** conversa / fora da janela de 24h.
 - **Bloqueio de envio** quando não há instância ativa (painel "WhatsApp Desconectado" + atalho para reconectar).
 - **Contexto CRM** na conversa: criar/vincular Contato, Lead e Oportunidade a partir da mensagem.
 - **Grupos:** mensagens atribuídas ao participante real (rótulo "Pessoa · Grupo"). **Newsletters/comunidades** (broadcast) são ignoradas.

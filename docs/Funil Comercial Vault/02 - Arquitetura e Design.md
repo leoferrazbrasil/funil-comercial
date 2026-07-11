@@ -39,12 +39,13 @@ date: 2026-07-09
 - `whatsapp-manager` — cria instância/QR, consulta status (Z-API `/status` + `/device`), desconecta. Grava `status='ativo'` separado do `numero`.
 - `whatsapp-inbound` — webhook de mensagens recebidas (Z-API/Meta Cloud API). Z-API: resolve o dono por `instanceId`. Meta: verificação GET (`hub.challenge` + `META_WEBHOOK_VERIFY_TOKEN`), assinatura (`META_APP_SECRET`), parsing `entry→changes→value→messages`, resolve o dono pelo `numero` do canal = `phone_number_id`/`display_phone_number`. Normaliza, ignora newsletters, atribui grupos ao participante, grava em `inbox_messages`. **`verify_jwt=false`**.
 - `whatsapp-qr-inbound` — webhook de conexão/desconexão (`ConnectedCallback`) e Evolution. **`verify_jwt=false`**.
-- `whatsapp-send` — envio pela Z-API/Evolution/**Meta Cloud API** (Graph API `.../{phone_number_id}/messages`). Usa o canal `ativo` mais recente (`getActiveWhatsAppChannel`).
+- `whatsapp-send` — envio de **texto** e de **template** pela Z-API/Evolution/**Meta Cloud API** (Graph API `.../{phone_number_id}/messages`). Usa o canal `ativo` mais recente (`getActiveWhatsAppChannel`). Template (`type: "template"`) é exclusivo da Meta.
+- `whatsapp-templates` — lista os templates **APROVADOS** da Meta (`GET /{WABA_ID}/message_templates`, com paginação). Marca como **não suportados** os que o v1 não envia (cabeçalho de mídia, header com variável, botão dinâmico, variáveis nomeadas, sem corpo). Chamada do navegador (**`verify_jwt`** padrão).
 - `meta-auth`, `meta-publish`, `ai-generate-post`, `ai-recommend-post`, `evolution-proxy`.
 - Config em `supabase/config.toml` (JWT off só nos webhooks).
 
 > [!info] Secrets da Meta (Supabase → Edge Functions → Secrets)
-> `META_WHATSAPP_ACCESS_TOKEN`, `META_WHATSAPP_PHONE_NUMBER_ID`, `META_APP_SECRET`, `META_WEBHOOK_VERIFY_TOKEN`.
+> `META_WHATSAPP_ACCESS_TOKEN`, `META_WHATSAPP_PHONE_NUMBER_ID`, `META_APP_SECRET`, `META_WEBHOOK_VERIFY_TOKEN`, **`META_WABA_ID`** (listar templates).
 
 ## Front-end — módulos-chave
 
@@ -54,8 +55,9 @@ date: 2026-07-09
 - `src/components/SharedUI.tsx` — TextField, **SelectField (dropdown customizado, realce na paleta)**, EntityForm, modais base.
 - `src/components/ConfirmDialog.tsx` — confirmação de exclusão reutilizável.
 - `src/components/IntegrationSection.tsx` — **seletor Z-API × Meta Cloud API** no `/perfil` (ativa um provider, desativa o outro); renderiza o QR (`WhatsAppIntegration.tsx`) ou o card de status da Meta.
+- `src/components/TemplatePicker.tsx` — seletor de **templates da Meta** no Inbox (preview + campos por variável); só oferece os suportados, os demais desabilitados com motivo.
 - `src/lib/products.ts` — catálogo de produtos, preço (setup/mensalidade), auto-detecção por palavra-chave, **`effectiveValue`** (valor imediato = valor gravado ou preço do produto).
-- `src/lib/crmService.ts` — CRUD (create/update/delete de contato, lead, oportunidade; sendInboxReply; snapshot; **`getIntegrationChannels`**, `updateIntegrationChannelStatus`).
+- `src/lib/crmService.ts` — CRUD (create/update/delete de contato, lead, oportunidade; sendInboxReply; snapshot; **`getIntegrationChannels`**, `updateIntegrationChannelStatus`; **`markInboxConversationRead`**, **`getApprovedWhatsAppTemplates`**, **`sendInboxTemplate`**).
 
 ## Fluxos importantes
 
