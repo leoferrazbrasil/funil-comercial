@@ -65,7 +65,8 @@ if (-not $SkipDenoCheck) {
     "--no-lock",
     "supabase/functions/whatsapp-inbound/index.ts",
     "supabase/functions/whatsapp-qr-inbound/index.ts",
-    "supabase/functions/whatsapp-send/index.ts"
+    "supabase/functions/whatsapp-send/index.ts",
+    "supabase/functions/whatsapp-templates/index.ts"
   )
 }
 
@@ -94,6 +95,17 @@ $deploySend = @(
   "whatsapp-send"
 ) + $deploySharedFlags
 Invoke-Checked $deploySend
+
+# whatsapp-templates: chamada do navegador com JWT do usuario -> mantem verify_jwt.
+$deployTemplates = @(
+  "npx",
+  "--yes",
+  "supabase",
+  "functions",
+  "deploy",
+  "whatsapp-templates"
+) + $deploySharedFlags
+Invoke-Checked $deployTemplates
 
 $deployQrInbound = @(
   "npx",

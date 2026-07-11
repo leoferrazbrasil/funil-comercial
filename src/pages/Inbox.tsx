@@ -12,6 +12,7 @@ import {
   Pencil,
   Plus,
   Send,
+  FileText,
   Search,
   ShieldCheck,
   Sparkles,
@@ -63,6 +64,8 @@ import {
   getCrmSnapshot,
   upsertProfile,
 } from "../lib/crmService";
+import { TemplatePicker } from "../components/TemplatePicker";
+import type { WhatsAppTemplate } from "../lib/crmService";
 import { getAllowedRoutes } from "../lib/accessControl";
 import { brandConfig } from "../lib/branding";
 import {
@@ -472,6 +475,8 @@ export default function InboxPage({
   onOpenModal,
   onSendReply,
   onMarkConversationRead,
+  onLoadTemplates,
+  onSendTemplate,
   onUpdateChannelStatus,
   onUpdateMessageStatus,
 }: {
@@ -488,6 +493,14 @@ export default function InboxPage({
   onOpenModal: (modal: ModalType) => void;
   onSendReply: (message: InboxMessage, reply: string) => Promise<void>;
   onMarkConversationRead: (messageIds: string[]) => Promise<void>;
+  onLoadTemplates: () => Promise<WhatsAppTemplate[]>;
+  onSendTemplate: (payload: {
+    phone: string;
+    contactId?: string | null;
+    leadId?: string | null;
+    renderedText: string;
+    template: { name: string; language: string; variables: string[] };
+  }) => Promise<void>;
   onUpdateChannelStatus: (
     channel: IntegrationChannel,
     status: IntegrationChannel["status"],
@@ -587,6 +600,7 @@ export default function InboxPage({
   const [dateFilter, setDateFilter] = useState<DateFilter>("tudo");
   const [typeFilter, setTypeFilter] = useState<TypeFilter>("todos");
   const [localSearch, setLocalSearch] = useState("");
+  const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
   // Mobile UI States: "list" | "chat" | "context"
@@ -672,6 +686,10 @@ export default function InboxPage({
   };
 
   const activeChannels = channels.filter((channel) => channel.status === "ativo");
+  // Templates são exclusivos da Meta Cloud API — o botão só aparece com Meta ativa.
+  const metaActive = activeChannels.some(
+    (c) => c.provider === "whatsapp" || c.provider === "whatsapp_cloud",
+  );
 
   const targetKey = target ? unifyPhone(target.phone) : null;
   const hasRealTargetConversation = targetKey
@@ -1032,6 +1050,16 @@ export default function InboxPage({
             </div>
           ) : (
             <form onSubmit={handleReplySubmit} className="flex items-end gap-2 lg:gap-3 max-w-4xl mx-auto">
+              {metaActive && (
+                <button
+                  type="button"
+                  onClick={() => setTemplatePickerOpen(true)}
+                  title="Enviar template aprovado (Meta)"
+                  className="shrink-0 h-[52px] w-[52px] rounded-2xl bg-white/5 border border-border flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/40 transition-all"
+                >
+                  <FileText size={20} />
+                </button>
+              )}
               <div className="flex-1 bg-card rounded-2xl border border-border overflow-hidden focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/50 transition-all shadow-inner">
                 <textarea
                   className="w-full bg-transparent px-4 py-3.5 text-sm resize-none outline-none min-h-[52px] max-h-[150px] text-foreground placeholder:text-muted-foreground/70"
@@ -1057,6 +1085,26 @@ export default function InboxPage({
             </form>
           )}
         </div>
+
+        <TemplatePicker
+          open={templatePickerOpen}
+          onClose={() => setTemplatePickerOpen(false)}
+          loadTemplates={onLoadTemplates}
+          contactName={selectedConversation?.displayName ?? ""}
+          onSend={async (template, variables, renderedText) => {
+            await onSendTemplate({
+              phone: sourcePhone || selectedConversation?.key || "",
+              contactId: conversationContactId ?? contactByPhone?.id ?? null,
+              leadId: conversationLeadId ?? leadByPhone?.id ?? null,
+              renderedText,
+              template: {
+                name: template.name,
+                language: template.language,
+                variables,
+              },
+            });
+          }}
+        />
       </div>
     );
   };

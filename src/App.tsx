@@ -61,7 +61,9 @@ import {
   deleteLead,
   deleteOpportunity,
   markInboxConversationRead,
+  getApprovedWhatsAppTemplates,
   sendInboxReply,
+  sendInboxTemplate,
   updateContact,
   updateIntegrationChannelStatus,
   updateInboxConversationLinks,
@@ -767,6 +769,23 @@ function AppContent() {
     }
   };
 
+  const handleSendInboxTemplate = async (payload: {
+    phone: string;
+    contactId?: string | null;
+    leadId?: string | null;
+    renderedText: string;
+    template: { name: string; language: string; variables: string[] };
+  }) => {
+    try {
+      await sendInboxTemplate(payload);
+      toast.success("Template enviado!");
+      reloadData();
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+      throw error;
+    }
+  };
+
   const handleSendInboxReply = async (
     message: InboxMessage,
     reply: string,
@@ -1057,6 +1076,8 @@ function AppContent() {
                   onOpenModal={openModal}
                   onSendReply={handleSendInboxReply}
                   onMarkConversationRead={handleMarkConversationRead}
+                  onLoadTemplates={getApprovedWhatsAppTemplates}
+                  onSendTemplate={handleSendInboxTemplate}
                   onUpdateChannelStatus={handleUpdateChannelStatus}
                   onUpdateMessageStatus={handleUpdateInboxStatus}
                 />

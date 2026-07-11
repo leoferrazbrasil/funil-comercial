@@ -433,6 +433,71 @@ export async function sendInboxReply(
   throw error ?? new Error(data?.error ?? "Nao foi possivel enviar a resposta.");
 }
 
+export type WhatsAppTemplate = {
+  name: string;
+  language: string;
+  category: string;
+  status: string;
+  bodyText: string;
+  variableCount: number;
+  // v1 só envia templates de corpo com variáveis numéricas. Os demais (cabeçalho
+  // de mídia, variável no header, botão dinâmico, variáveis nomeadas, sem corpo)
+  // vêm como supported=false + motivo, e o picker os exibe desabilitados.
+  supported: boolean;
+  unsupportedReason: string;
+};
+
+// supabase-js coloca a Response no `error.context` quando a function responde
+// não-2xx; extrai a mensagem de erro de lá (ou do corpo já parseado).
+async function extractFunctionError(error: unknown, data: any): Promise<string> {
+  if (data?.error) return String(data.error);
+  const ctx = (error as any)?.context;
+  if (ctx && typeof ctx.json === "function") {
+    try {
+      const body = await ctx.json();
+      if (body?.error) return String(body.error);
+    } catch {
+      /* corpo não-JSON — ignora */
+    }
+  }
+  return error instanceof Error ? error.message : "Operação de WhatsApp falhou.";
+}
+
+// Lista os templates APROVADOS da Meta (via Edge Function whatsapp-templates).
+export async function getApprovedWhatsAppTemplates(): Promise<WhatsAppTemplate[]> {
+  const supabase = requireSupabase();
+  const { data, error } = await supabase.functions.invoke("whatsapp-templates", {
+    method: "GET",
+  });
+  if (error) throw new Error(await extractFunctionError(error, data));
+  return (data?.templates as WhatsAppTemplate[]) ?? [];
+}
+
+// Envia um template aprovado (Meta Cloud API). Diferente do texto livre, NÃO tem
+// fallback local: se a Meta recusar, propaga o erro (o template precisa entregar).
+export async function sendInboxTemplate(payload: {
+  phone: string;
+  contactId?: string | null;
+  leadId?: string | null;
+  renderedText: string;
+  template: { name: string; language: string; variables: string[] };
+}) {
+  const supabase = requireSupabase();
+  const { data, error } = await supabase.functions.invoke("whatsapp-send", {
+    body: {
+      phone: payload.phone,
+      message: payload.renderedText,
+      contact_id: payload.contactId ?? null,
+      lead_id: payload.leadId ?? null,
+      template: payload.template,
+    },
+  });
+  if (error || data?.error || !data?.sent) {
+    throw new Error(await extractFunctionError(error, data));
+  }
+  return { mode: "template" as const };
+}
+
 // --- Deletions -------------------------------------------------------------
 // Hard delete, scoped to the owner by RLS. The schema uses ON DELETE SET NULL on
 // every FK (leads.contact_id, opportunities.lead_id, inbox_messages.contact_id/

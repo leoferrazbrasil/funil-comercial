@@ -9,6 +9,13 @@ type SendPayload = {
   source_message_id?: string | null;
   contact_id?: string | null;
   lead_id?: string | null;
+  // Quando presente, envia um TEMPLATE aprovado (Meta Cloud API) em vez de texto
+  // livre. `message` continua sendo o texto renderizado (para exibir/registrar).
+  template?: {
+    name: string;
+    language: string;
+    variables?: string[];
+  } | null;
 };
 
 const corsHeaders = {
@@ -175,6 +182,70 @@ async function sendMetaTextMessage(phoneNumberId: string, toPhone: string, messa
   };
 }
 
+async function sendMetaTemplateMessage(
+  phoneNumberId: string,
+  toPhone: string,
+  templateName: string,
+  languageCode: string,
+  variables: string[],
+) {
+  const accessToken =
+    Deno.env.get("META_WHATSAPP_ACCESS_TOKEN") ?? Deno.env.get("WHATSAPP_ACCESS_TOKEN");
+  const graphVersion = Deno.env.get("META_GRAPH_API_VERSION") ?? "v21.0";
+
+  if (!accessToken || !phoneNumberId) {
+    return { configured: false, response: null as JsonRecord | null };
+  }
+
+  // Variáveis do corpo ({{1}}, {{2}}, ...) viram parameters do componente "body".
+  const components = variables.length
+    ? [{ type: "body", parameters: variables.map((text) => ({ type: "text", text })) }]
+    : [];
+
+  const response = await fetch(
+    `https://graph.facebook.com/${graphVersion}/${phoneNumberId}/messages`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        messaging_product: "whatsapp",
+        recipient_type: "individual",
+        to: toPhone,
+        type: "template",
+        template: {
+          name: templateName,
+          language: { code: languageCode },
+          ...(components.length ? { components } : {}),
+        },
+      }),
+    },
+  );
+
+  const responseBody = (await response.json().catch(() => ({}))) as JsonRecord;
+  if (!response.ok) {
+    const errorCode = isRecord(responseBody.error) ? responseBody.error.code : "unknown";
+    const errorMessage = isRecord(responseBody.error) ? responseBody.error.message : "Desconhecido";
+
+    console.error(
+      JSON.stringify({
+        event: "whatsapp_send_meta_template_error",
+        status: response.status,
+        to_last4: toPhone.slice(-4),
+        template: templateName,
+        error_code: errorCode,
+        error_message: errorMessage,
+      }),
+    );
+
+    throw new Error(`Meta API Error [${errorCode}]: ${errorMessage}`);
+  }
+
+  return { configured: true, response: responseBody };
+}
+
 async function sendEvolutionTextMessage(instanceName: string, toPhone: string, message: string) {
   const evolutionUrl = Deno.env.get("EVOLUTION_API_URL");
   const evolutionKey = Deno.env.get("EVOLUTION_GLOBAL_API_KEY");
@@ -305,8 +376,38 @@ Deno.serve(async (request) => {
     }
 
     let messageId: string | null = null;
-    
-    if (channel.provider === "evolution_api") {
+    const isMetaChannel =
+      channel.provider === "whatsapp" || channel.provider === "whatsapp_cloud";
+
+    if (payload.template?.name) {
+      // Envio de TEMPLATE — exclusivo da Meta Cloud API.
+      if (!isMetaChannel) {
+        return jsonResponse(
+          { error: "Templates só estão disponíveis na integração Meta Cloud API." },
+          409,
+        );
+      }
+      const phoneNumberId =
+        metadataString(channel.metadata, ["phone_number_id", "phoneNumberId"]) ??
+        Deno.env.get("META_WHATSAPP_PHONE_NUMBER_ID") ??
+        Deno.env.get("WHATSAPP_PHONE_NUMBER_ID") ??
+        null;
+
+      const metaResult = await sendMetaTemplateMessage(
+        phoneNumberId ?? "",
+        phone,
+        payload.template.name,
+        payload.template.language,
+        payload.template.variables ?? [],
+      );
+      if (!metaResult.configured) {
+        return jsonResponse(
+          { error: "Meta Cloud API não configurada (token/phone_number_id ausentes)." },
+          409,
+        );
+      }
+      messageId = providerMessageId(metaResult.response);
+    } else if (channel.provider === "evolution_api") {
       const instanceName = metadataString(channel.metadata, ["instance_name", "instanceName"]);
       const evolutionResult = await sendEvolutionTextMessage(instanceName ?? "", phone, message);
       if (!evolutionResult.configured) {
