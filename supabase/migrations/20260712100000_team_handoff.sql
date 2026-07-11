@@ -20,8 +20,6 @@ create table if not exists public.conversation_assignments (
   updated_at timestamptz not null default now(),
   unique (owner_id, telefone)
 );
-create index if not exists conversation_assignments_owner_tel_idx
-  on public.conversation_assignments (owner_id, telefone);
 create index if not exists conversation_assignments_assigned_idx
   on public.conversation_assignments (assigned_to);
 
@@ -96,3 +94,48 @@ drop policy if exists "profiles_admin_reads_members" on public.profiles;
 create policy "profiles_admin_reads_members" on public.profiles
   for select
   using (auth.uid() = id or admin_id = auth.uid());
+
+-- 8) Trava a identidade da conversa: owner_id e telefone são imutáveis em
+--    qualquer UPDATE de inbox_messages (nenhuma operação legítima os altera).
+--    Impede que um vendedor atribuído reescreva esses campos e sequestre
+--    a mensagem/conversa para outra conta ou outro telefone.
+create or replace function public.inbox_messages_lock_identity()
+returns trigger language plpgsql as $$
+begin
+  if new.owner_id <> old.owner_id or new.telefone is distinct from old.telefone then
+    raise exception 'owner_id e telefone da mensagem sao imutaveis';
+  end if;
+  return new;
+end;
+$$;
+drop trigger if exists inbox_messages_lock_identity on public.inbox_messages;
+create trigger inbox_messages_lock_identity
+  before update on public.inbox_messages
+  for each row execute function public.inbox_messages_lock_identity();
+
+-- 9) Restaura o DELETE do dono (a policy antiga "inbox_messages_crud_own"
+--    era "for all" e cobria DELETE; a nova cobre apenas SELECT/UPDATE/INSERT).
+drop policy if exists "inbox_delete_own" on public.inbox_messages;
+create policy "inbox_delete_own" on public.inbox_messages
+  for delete using (auth.uid() = owner_id);
+
+-- 10) Defesa em profundidade: valida que assigned_to é de fato um vendedor
+--     do admin dono da conversa (ou o próprio admin), mesmo que a policy de
+--     "assignments_admin_all" já restrinja owner_id ao auth.uid() atual.
+create or replace function public.conversation_assignment_validate()
+returns trigger language plpgsql
+security definer set search_path = public as $$
+begin
+  if new.assigned_to <> new.owner_id and not exists (
+    select 1 from public.profiles p
+    where p.id = new.assigned_to and p.admin_id = new.owner_id
+  ) then
+    raise exception 'assigned_to deve ser um vendedor do admin dono da conversa';
+  end if;
+  return new;
+end;
+$$;
+drop trigger if exists conversation_assignment_validate on public.conversation_assignments;
+create trigger conversation_assignment_validate
+  before insert or update on public.conversation_assignments
+  for each row execute function public.conversation_assignment_validate();
