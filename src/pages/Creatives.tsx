@@ -241,20 +241,20 @@ export default function CreativesPage() {
         {/* ESTRATEGISTA IA CARD */}
         <div className="mb-12">
           {recState === "loading" && (
-            <div className="bg-card border border-white/5 rounded-2xl p-8 flex items-center justify-center gap-4 animate-pulse">
+            <div className="bg-card border border-foreground/5 rounded-2xl p-8 flex items-center justify-center gap-4 animate-pulse">
               <BrainCircuit className="text-primary animate-pulse" size={24} />
               <p className="text-muted-foreground font-medium">Analisando o grid do seu Instagram e montando estratégia de continuidade...</p>
             </div>
           )}
           
           {recState === "unauthorized" && (
-            <div className="bg-card border border-white/5 rounded-2xl p-6 flex items-center justify-between">
+            <div className="bg-card border border-foreground/5 rounded-2xl p-6 flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center text-muted-foreground">
+                <div className="w-12 h-12 bg-foreground/5 rounded-full flex items-center justify-center text-muted-foreground">
                   <Camera size={20} />
                 </div>
                 <div>
-                  <h3 className="font-bold text-white text-lg">Instagram não conectado</h3>
+                  <h3 className="font-bold text-foreground text-lg">Instagram não conectado</h3>
                   <p className="text-sm text-muted-foreground">Conecte sua conta para que a IA analise seu histórico e sugira o próximo post automaticamente.</p>
                 </div>
               </div>
@@ -270,24 +270,24 @@ export default function CreativesPage() {
                   <BrainCircuit size={24} />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                  <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
                     Estrategista de Social Media <Sparkles size={16} className="text-primary" />
                   </h2>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Baseado no seu último post: <span className="italic text-white/70">"{recommendation.last_post?.preview}"</span>
+                    Baseado no seu último post: <span className="italic text-foreground/70">"{recommendation.last_post?.preview}"</span>
                   </p>
                 </div>
               </div>
               
               <div className="grid md:grid-cols-2 gap-6 relative z-10">
-                <div className="bg-black/40 rounded-xl p-5 border border-white/5">
+                <div className="bg-foreground/10 rounded-xl p-5 border border-foreground/5">
                   <span className="text-[10px] font-bold uppercase tracking-widest text-primary block mb-2">Recomendação Estratégica</span>
-                  <p className="text-white font-medium mb-3">"{recommendation.recommendation?.reason}"</p>
+                  <p className="text-foreground font-medium mb-3">"{recommendation.recommendation?.reason}"</p>
                   
                   <div className="space-y-2 mt-4 text-sm">
-                    <div className="flex items-center gap-2"><Target size={14} className="text-muted-foreground" /><span className="text-muted-foreground">Objetivo sugerido:</span> <strong className="text-white">{recommendation.recommendation?.objective}</strong></div>
-                    <div className="flex items-center gap-2"><LayoutTemplate size={14} className="text-muted-foreground" /><span className="text-muted-foreground">Formato sugerido:</span> <strong className="text-white">{recommendation.recommendation?.format}</strong></div>
-                    <div className="flex items-center gap-2"><Type size={14} className="text-muted-foreground" /><span className="text-muted-foreground">Pilar sugerido:</span> <strong className="text-white">{recommendation.recommendation?.pilar}</strong></div>
+                    <div className="flex items-center gap-2"><Target size={14} className="text-muted-foreground" /><span className="text-muted-foreground">Objetivo sugerido:</span> <strong className="text-foreground">{recommendation.recommendation?.objective}</strong></div>
+                    <div className="flex items-center gap-2"><LayoutTemplate size={14} className="text-muted-foreground" /><span className="text-muted-foreground">Formato sugerido:</span> <strong className="text-foreground">{recommendation.recommendation?.format}</strong></div>
+                    <div className="flex items-center gap-2"><Type size={14} className="text-muted-foreground" /><span className="text-muted-foreground">Pilar sugerido:</span> <strong className="text-foreground">{recommendation.recommendation?.pilar}</strong></div>
                   </div>
                 </div>
                 
@@ -313,12 +313,12 @@ export default function CreativesPage() {
               <button 
                 key={obj.id} 
                 onClick={() => setObjective(obj.id)}
-                className={`flex flex-col items-start p-6 rounded-2xl border-2 transition-all text-left ${isActive ? 'border-primary bg-primary/10' : 'border-white/10 hover:border-white/20 bg-card hover:bg-card/80'}`}
+                className={`flex flex-col items-start p-6 rounded-2xl border-2 transition-all text-left ${isActive ? 'border-primary bg-primary/10' : 'border-foreground/10 hover:border-foreground/20 bg-card hover:bg-card/80'}`}
               >
-                <div className={`p-3 rounded-xl mb-4 ${isActive ? 'bg-primary text-black' : 'bg-white/5 text-muted-foreground'}`}>
+                <div className={`p-3 rounded-xl mb-4 ${isActive ? 'bg-primary text-black' : 'bg-foreground/5 text-muted-foreground'}`}>
                   <Icon size={24} />
                 </div>
-                <h3 className="font-bold text-lg text-white mb-2">{obj.name}</h3>
+                <h3 className="font-bold text-lg text-foreground mb-2">{obj.name}</h3>
                 <p className="text-sm text-muted-foreground">{obj.desc}</p>
               </button>
             )
@@ -331,15 +331,15 @@ export default function CreativesPage() {
             <button 
               key={p} 
               onClick={() => setPilar(p)}
-              className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all border ${pilar === p ? 'bg-primary text-black border-primary' : 'bg-transparent border-white/20 text-muted-foreground hover:border-white/40 hover:text-white'}`}
+              className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all border ${pilar === p ? 'bg-primary text-black border-primary' : 'bg-transparent border-foreground/20 text-muted-foreground hover:border-foreground/40 hover:text-foreground'}`}
             >
               {p}
             </button>
           ))}
         </div>
         
-        <div className="flex justify-end pt-8 border-t border-white/10">
-          <button onClick={() => setStep(2)} className="bg-white text-black px-8 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-white/90 transition-transform active:scale-95">
+        <div className="flex justify-end pt-8 border-t border-foreground/10">
+          <button onClick={() => setStep(2)} className="bg-foreground text-background px-8 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-foreground/90 transition-transform active:scale-95">
             Continuar Manualmente <ChevronRight size={20} />
           </button>
         </div>
@@ -350,14 +350,14 @@ export default function CreativesPage() {
   if (step === 2) {
     return (
       <div className="max-w-3xl mx-auto py-12 px-6 fade-in">
-        <button onClick={() => setStep(1)} className="text-muted-foreground hover:text-white flex items-center gap-2 mb-8 text-sm font-medium transition-colors">
+        <button onClick={() => setStep(1)} className="text-muted-foreground hover:text-foreground flex items-center gap-2 mb-8 text-sm font-medium transition-colors">
           <ArrowLeft size={16} /> Voltar para estratégia
         </button>
         
         <h1 className="text-3xl font-black mb-2 tracking-tight">Qual a sua ideia?</h1>
         <p className="text-muted-foreground mb-8 text-lg">Escreva um resumo do que você quer falar. A nossa IA cuidará do resto.</p>
         
-        <div className="bg-card border border-white/10 rounded-3xl p-2 mb-8 shadow-2xl relative overflow-hidden group">
+        <div className="bg-card border border-foreground/10 rounded-3xl p-2 mb-8 shadow-2xl relative overflow-hidden group">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity pointer-events-none"></div>
           <textarea 
             value={idea} 
@@ -403,21 +403,21 @@ export default function CreativesPage() {
     <div className="flex flex-col lg:flex-row h-[calc(100dvh-5rem)] lg:h-[calc(100vh-6rem)] overflow-hidden fade-in bg-[#0a0a0c]">
       
       {/* LEFT COLUMN: EDITOR */}
-      <div className={`w-full lg:w-[450px] xl:w-[500px] bg-card border-r border-white/5 flex flex-col ${activeTab !== "preview" ? "flex" : "hidden lg:flex"}`}>
+      <div className={`w-full lg:w-[450px] xl:w-[500px] bg-card border-r border-foreground/5 flex flex-col ${activeTab !== "preview" ? "flex" : "hidden lg:flex"}`}>
         
         {/* Header */}
-        <div className="p-6 border-b border-white/5 flex justify-between items-center bg-black/20 shrink-0">
+        <div className="p-6 border-b border-foreground/5 flex justify-between items-center bg-foreground/5 shrink-0">
           <div>
-            <button onClick={() => setStep(2)} className="text-xs text-muted-foreground hover:text-white mb-1 flex items-center gap-1"><ArrowLeft size={12}/> Nova Ideia</button>
-            <h1 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">Estúdio de Criação <Sparkles size={16} className="text-primary"/></h1>
+            <button onClick={() => setStep(2)} className="text-xs text-muted-foreground hover:text-foreground mb-1 flex items-center gap-1"><ArrowLeft size={12}/> Nova Ideia</button>
+            <h1 className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">Estúdio de Criação <Sparkles size={16} className="text-primary"/></h1>
           </div>
-          <button onClick={generateWithAI} className="p-3 bg-white/5 hover:bg-white/10 rounded-full transition-colors text-primary" title="Gerar Variação Completa com IA">
+          <button onClick={generateWithAI} className="p-3 bg-foreground/5 hover:bg-foreground/10 rounded-full transition-colors text-primary" title="Gerar Variação Completa com IA">
             <RefreshCw size={18} />
           </button>
         </div>
 
         {/* Mobile Tabs */}
-        <div className="flex lg:hidden border-b border-white/5 bg-black/40 shrink-0">
+        <div className="flex lg:hidden border-b border-foreground/5 bg-foreground/10 shrink-0">
           <button onClick={() => setActiveTab("content")} className={`flex-1 py-4 text-sm font-semibold ${activeTab === 'content' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}>Conteúdo</button>
           <button onClick={() => setActiveTab("design")} className={`flex-1 py-4 text-sm font-semibold ${activeTab === 'design' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}>Design</button>
           <button onClick={() => setActiveTab("preview")} className={`flex-1 py-4 text-sm font-semibold ${activeTab === 'preview' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}>Preview</button>
@@ -431,7 +431,7 @@ export default function CreativesPage() {
               {/* NOVO PAINEL DE COPY ESTRATÉGICA */}
               <div className="bg-gradient-to-b from-primary/10 to-transparent border border-primary/20 rounded-2xl p-5 flex flex-col gap-4 relative overflow-hidden">
                 {isRegenerating && (
-                  <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-20 flex items-center justify-center rounded-2xl">
+                  <div className="absolute inset-0 bg-foreground/10 backdrop-blur-sm z-20 flex items-center justify-center rounded-2xl">
                     <RefreshCw className="text-primary animate-spin" size={24} />
                   </div>
                 )}
@@ -441,14 +441,14 @@ export default function CreativesPage() {
                     <Sparkles size={14}/> Painel de Copy
                   </h3>
                   <div className="flex gap-2">
-                    <button onClick={regenerateCaption} disabled={isRegenerating} className="text-xs font-semibold text-muted-foreground hover:text-white flex items-center gap-1 transition-colors bg-white/5 px-2 py-1 rounded">
+                    <button onClick={regenerateCaption} disabled={isRegenerating} className="text-xs font-semibold text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors bg-foreground/5 px-2 py-1 rounded">
                       <RefreshCw size={12} className={isRegenerating ? "animate-spin" : ""} /> Regenerar IA
                     </button>
                   </div>
                 </div>
                 
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-semibold text-white/60 uppercase tracking-wider flex justify-between">
+                  <label className="text-xs font-semibold text-foreground/60 uppercase tracking-wider flex justify-between">
                     <span>Texto da Publicação</span>
                     <span className={`transition-colors ${isCaptionOverLimit ? 'text-red-400 font-bold' : 'text-muted-foreground'}`}>
                       {caption.length} / 350
@@ -458,7 +458,7 @@ export default function CreativesPage() {
                     value={caption} 
                     onChange={(e) => setCaption(e.target.value)} 
                     rows={4} 
-                    className={`w-full bg-black/40 border rounded-xl p-3 text-sm focus:border-primary/50 outline-none transition-colors resize-y text-white/90 ${isCaptionOverLimit ? 'border-red-500/50 focus:border-red-500' : 'border-white/10'}`} 
+                    className={`w-full bg-foreground/10 border rounded-xl p-3 text-sm focus:border-primary/50 outline-none transition-colors resize-y text-foreground/90 ${isCaptionOverLimit ? 'border-red-500/50 focus:border-red-500' : 'border-foreground/10'}`} 
                   />
                   {isCaptionOverLimit && (
                     <p className="text-[10px] text-red-400 flex items-center gap-1 mt-1">
@@ -468,13 +468,13 @@ export default function CreativesPage() {
                 </div>
 
                 <div className="flex flex-col gap-2 mt-2">
-                  <label className="text-xs font-semibold text-white/60 uppercase tracking-wider flex justify-between">
+                  <label className="text-xs font-semibold text-foreground/60 uppercase tracking-wider flex justify-between">
                     <span>Hashtags Estratégicas</span>
                     <span className="text-muted-foreground">{hashtags.length} / 5</span>
                   </label>
                   <div className="flex flex-wrap gap-2">
                     {hashtags.map((tag) => (
-                      <span key={tag} className="flex items-center gap-1 bg-white/10 text-white/90 text-xs px-2.5 py-1.5 rounded-full border border-white/10 group">
+                      <span key={tag} className="flex items-center gap-1 bg-foreground/10 text-foreground/90 text-xs px-2.5 py-1.5 rounded-full border border-foreground/10 group">
                         <Hash size={10} className="text-primary opacity-70" />
                         {tag}
                         <button onClick={() => removeHashtag(tag)} className="ml-1 opacity-50 hover:opacity-100 hover:text-red-400 transition-colors">
@@ -483,7 +483,7 @@ export default function CreativesPage() {
                       </span>
                     ))}
                     {hashtags.length < 5 && (
-                      <div className="flex items-center bg-black/40 border border-white/10 rounded-full px-2">
+                      <div className="flex items-center bg-foreground/10 border border-foreground/10 rounded-full px-2">
                         <Plus size={12} className="text-muted-foreground" />
                         <input 
                           type="text" 
@@ -491,7 +491,7 @@ export default function CreativesPage() {
                           onChange={(e) => setNewHashtag(e.target.value)}
                           onKeyDown={addHashtag}
                           placeholder="Adicionar..." 
-                          className="bg-transparent border-none outline-none text-xs w-20 px-1 py-1.5 text-white/90 placeholder:text-muted-foreground/50"
+                          className="bg-transparent border-none outline-none text-xs w-20 px-1 py-1.5 text-foreground/90 placeholder:text-muted-foreground/50"
                         />
                       </div>
                     )}
@@ -507,42 +507,42 @@ export default function CreativesPage() {
                 </button>
               </div>
 
-              <h3 className="text-[13px] font-black uppercase tracking-widest text-muted-foreground mt-4 pb-2 border-b border-white/10">Textos da Arte</h3>
+              <h3 className="text-[13px] font-black uppercase tracking-widest text-muted-foreground mt-4 pb-2 border-b border-foreground/10">Textos da Arte</h3>
               
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-semibold text-white/80">Headline</label>
-                <textarea value={headline} onChange={(e) => setHeadline(e.target.value)} rows={3} className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary/50 outline-none transition-colors resize-none text-white font-medium" />
+                <label className="text-sm font-semibold text-foreground/80">Headline</label>
+                <textarea value={headline} onChange={(e) => setHeadline(e.target.value)} rows={3} className="w-full bg-foreground/10 border border-foreground/10 rounded-xl p-3 text-sm focus:border-primary/50 outline-none transition-colors resize-none text-foreground font-medium" />
                 <p className="text-[10px] text-muted-foreground text-right mt-1">Use \n para quebrar linha</p>
               </div>
 
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-semibold text-white/80">Palavra em Destaque (Cor Primária)</label>
-                <input type="text" value={highlight} onChange={(e) => setHighlight(e.target.value)} className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary/50 outline-none transition-colors text-white font-medium" />
+                <label className="text-sm font-semibold text-foreground/80">Palavra em Destaque (Cor Primária)</label>
+                <input type="text" value={highlight} onChange={(e) => setHighlight(e.target.value)} className="w-full bg-foreground/10 border border-foreground/10 rounded-xl p-3 text-sm focus:border-primary/50 outline-none transition-colors text-foreground font-medium" />
               </div>
 
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-semibold text-white/80">Subheadline / Texto de Apoio</label>
-                <textarea value={subheadline} onChange={(e) => setSubheadline(e.target.value)} rows={2} className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary/50 outline-none transition-colors resize-none text-white/90" />
+                <label className="text-sm font-semibold text-foreground/80">Subheadline / Texto de Apoio</label>
+                <textarea value={subheadline} onChange={(e) => setSubheadline(e.target.value)} rows={2} className="w-full bg-foreground/10 border border-foreground/10 rounded-xl p-3 text-sm focus:border-primary/50 outline-none transition-colors resize-none text-foreground/90" />
               </div>
               
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-semibold text-white/80">Rodapé / Tags</label>
-                <input type="text" value={tags} onChange={(e) => setTags(e.target.value)} className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-primary/50 outline-none transition-colors text-white/90" />
+                <label className="text-sm font-semibold text-foreground/80">Rodapé / Tags</label>
+                <input type="text" value={tags} onChange={(e) => setTags(e.target.value)} className="w-full bg-foreground/10 border border-foreground/10 rounded-xl p-3 text-sm focus:border-primary/50 outline-none transition-colors text-foreground/90" />
               </div>
             </section>
           )}
 
           {(activeTab === "design" || window.innerWidth >= 1024) && (
-            <section className="flex flex-col gap-6 pt-6 border-t border-white/10">
+            <section className="flex flex-col gap-6 pt-6 border-t border-foreground/10">
               <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
                 <LayoutTemplate size={16}/> Design Base
               </h3>
               
               <div className="flex flex-col gap-3">
-                <label className="text-sm font-semibold text-white/80">Formato</label>
-                <div className="flex gap-2 p-1 bg-black/40 rounded-xl border border-white/5">
+                <label className="text-sm font-semibold text-foreground/80">Formato</label>
+                <div className="flex gap-2 p-1 bg-foreground/10 rounded-xl border border-foreground/5">
                   {FORMATS.map(f => (
-                    <button key={f.id} onClick={() => setFormat(f)} className={`flex-1 py-2.5 rounded-lg text-xs font-bold transition-all ${format.id === f.id ? 'bg-white/10 text-white shadow-sm' : 'text-muted-foreground hover:text-white'}`}>
+                    <button key={f.id} onClick={() => setFormat(f)} className={`flex-1 py-2.5 rounded-lg text-xs font-bold transition-all ${format.id === f.id ? 'bg-foreground/10 text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}>
                       {f.name}
                     </button>
                   ))}
@@ -550,8 +550,8 @@ export default function CreativesPage() {
               </div>
 
               <div className="flex flex-col gap-3">
-                <label className="text-sm font-semibold text-white/80">Template</label>
-                <select value={template} onChange={(e) => setTemplate(e.target.value)} className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm text-white focus:border-primary/50 outline-none transition-colors font-medium">
+                <label className="text-sm font-semibold text-foreground/80">Template</label>
+                <select value={template} onChange={(e) => setTemplate(e.target.value)} className="w-full bg-foreground/10 border border-foreground/10 rounded-xl p-3 text-sm text-foreground focus:border-primary/50 outline-none transition-colors font-medium">
                   {TEMPLATES.filter(t => t.format === format.id).map(t => (
                     <option key={t.id} value={t.id}>{t.name}</option>
                   ))}
@@ -559,10 +559,10 @@ export default function CreativesPage() {
               </div>
 
               <div className="flex flex-col gap-3">
-                <label className="text-sm font-semibold text-white/80">Tema</label>
+                <label className="text-sm font-semibold text-foreground/80">Tema</label>
                 <div className="flex gap-2">
-                  <button onClick={() => setTheme("dark")} className={`flex-1 py-3 rounded-xl text-xs font-bold transition-colors border ${theme === 'dark' ? 'bg-[#09090B] border-primary text-primary' : 'bg-white/5 border-transparent text-muted-foreground hover:bg-white/10 hover:text-white'}`}>Dark (Padrão)</button>
-                  <button onClick={() => setTheme("light")} className={`flex-1 py-3 rounded-xl text-xs font-bold transition-colors border ${theme === 'light' ? 'bg-[#FAF9F6] border-primary text-primary' : 'bg-white/5 border-transparent text-muted-foreground hover:bg-white/10 hover:text-white'}`}>Light</button>
+                  <button onClick={() => setTheme("dark")} className={`flex-1 py-3 rounded-xl text-xs font-bold transition-colors border ${theme === 'dark' ? 'bg-[#09090B] border-primary text-primary' : 'bg-foreground/5 border-transparent text-muted-foreground hover:bg-foreground/10 hover:text-foreground'}`}>Dark (Padrão)</button>
+                  <button onClick={() => setTheme("light")} className={`flex-1 py-3 rounded-xl text-xs font-bold transition-colors border ${theme === 'light' ? 'bg-[#FAF9F6] border-primary text-primary' : 'bg-foreground/5 border-transparent text-muted-foreground hover:bg-foreground/10 hover:text-foreground'}`}>Light</button>
                 </div>
               </div>
             </section>
@@ -579,14 +579,14 @@ export default function CreativesPage() {
         
         {/* Mobile back to edit */}
         <div className="lg:hidden absolute top-4 left-4 z-50">
-           <button onClick={() => setActiveTab("content")} className="px-4 py-2 bg-card rounded-lg text-sm font-semibold shadow-xl border border-white/10 flex items-center gap-2"><ArrowLeft size={16}/> Voltar</button>
+           <button onClick={() => setActiveTab("content")} className="px-4 py-2 bg-card rounded-lg text-sm font-semibold shadow-xl border border-foreground/10 flex items-center gap-2"><ArrowLeft size={16}/> Voltar</button>
         </div>
 
         <div className="absolute top-4 right-4 z-40 flex items-center gap-3">
           <button 
             onClick={handleExport} 
             disabled={isExporting}
-            className="flex items-center gap-2 bg-card border border-white/10 hover:bg-white/10 hover:border-white/20 text-white px-5 py-3 rounded-xl font-bold transition-all active:scale-95 disabled:opacity-50 shadow-xl"
+            className="flex items-center gap-2 bg-card border border-foreground/10 hover:bg-foreground/10 hover:border-foreground/20 text-foreground px-5 py-3 rounded-xl font-bold transition-all active:scale-95 disabled:opacity-50 shadow-xl"
           >
             {isExporting ? <RefreshCw className="animate-spin" size={18} /> : <Download size={18} />}
             <span className="hidden md:inline">Baixar Alta Qualidade</span>
