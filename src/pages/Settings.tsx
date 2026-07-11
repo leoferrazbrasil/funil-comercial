@@ -1,10 +1,26 @@
+import { useEffect, useState } from "react";
 import { Settings as SettingsIcon } from "lucide-react";
 import { IntegrationSection } from "../components/IntegrationSection";
+import { TeamSection } from "../components/TeamSection";
+import { getMyProfile } from "../lib/crmService";
+import type { Profile } from "../lib/types";
 
 // Página "Configurações": hub das integrações e ajustes do sistema. Hoje reúne
 // a integração de WhatsApp (Z-API × Meta), desvinculada do Perfil. Novas seções
 // entram como novos painéis abaixo — sem precisar de abas por enquanto (YAGNI).
 export default function SettingsPage() {
+  const [profile, setProfile] = useState<Profile | null>(null);
+
+  useEffect(() => {
+    getMyProfile()
+      .then(setProfile)
+      .catch((error) => console.error("[SettingsPage] load profile", error));
+  }, []);
+
+  // Admin = perfil que não é vendedor e não está vinculado a outro admin.
+  // Enquanto o perfil não carrega, a seção fica oculta (evita "flash" indevido).
+  const isAdmin = !!profile && profile.role !== "vendedor" && !profile.admin_id;
+
   return (
     <div className="page-stack max-w-3xl mx-auto w-full pb-20 md:pb-8">
       <div className="panel bg-card border border-white/5 rounded-3xl p-6 md:p-8 relative overflow-hidden">
@@ -28,6 +44,13 @@ export default function SettingsPage() {
       <div className="panel p-6">
         <IntegrationSection />
       </div>
+
+      {/* Seção: Equipe (apenas admin) */}
+      {isAdmin && (
+        <div className="panel p-6">
+          <TeamSection />
+        </div>
+      )}
     </div>
   );
 }
