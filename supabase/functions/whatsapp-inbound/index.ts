@@ -77,6 +77,8 @@ const describeError = (error: unknown): string => {
   return String(error);
 };
 
+// IMPORTANTE: manter idêntico ao normalizePhone da outra função (whatsapp-send/whatsapp-inbound).
+// O match de conversation_assignments.telefone e a RLS is_conversation_assignee dependem do MESMO formato.
 const normalizePhone = (value: string | null | undefined) => {
   const p = value?.replace("whatsapp:", "").replace(/\D/g, "") ?? "";
   if (!p) return "";

@@ -36,6 +36,8 @@ const jsonResponse = (body: unknown, status = 200) =>
 const isRecord = (value: unknown): value is JsonRecord =>
   Boolean(value) && typeof value === "object" && !Array.isArray(value);
 
+// IMPORTANTE: manter idêntico ao normalizePhone da outra função (whatsapp-send/whatsapp-inbound).
+// O match de conversation_assignments.telefone e a RLS is_conversation_assignee dependem do MESMO formato.
 const normalizePhone = (value: string | null | undefined) => {
   const p = value?.replace("whatsapp:", "").replace(/\D/g, "") ?? "";
   if (!p) return "";

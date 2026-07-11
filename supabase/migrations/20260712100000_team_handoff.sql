@@ -139,3 +139,27 @@ drop trigger if exists conversation_assignment_validate on public.conversation_a
 create trigger conversation_assignment_validate
   before insert or update on public.conversation_assignments
   for each row execute function public.conversation_assignment_validate();
+
+-- 11) Guarda: role/admin_id só podem ser alterados pelo service-role (backend).
+--     Um usuário autenticado (auth.uid() não nulo) não pode mudar o próprio
+--     papel nem se revincular a outro admin via API REST — colunas que são o
+--     eixo da autorização do handoff.
+create or replace function public.profiles_protect_role()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if auth.uid() is not null
+     and (new.role is distinct from old.role
+          or new.admin_id is distinct from old.admin_id) then
+    raise exception 'role e admin_id so podem ser alterados pelo administrador do sistema';
+  end if;
+  return new;
+end;
+$$;
+drop trigger if exists profiles_protect_role on public.profiles;
+create trigger profiles_protect_role
+  before update on public.profiles
+  for each row execute function public.profiles_protect_role();
