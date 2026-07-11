@@ -20,6 +20,7 @@ date: 2026-07-10
 
 ## ✅ Entregue recentemente
 
+- **Disparo de templates em massa (Ciclo 2)** — em `/contatos`, enviar um template aprovado para vários contatos de uma vez (`BulkTemplateDialog`), com variável por-destinatário (nome) ou fixa, seleção por checkbox e progresso. Ver [[03 - Changelog]].
 - **Templates da Meta no Inbox (Ciclo 1)** — enviar template aprovado 1 a 1 (`whatsapp-templates` + `TemplatePicker`); v1 seguro (só templates suportados; endurecido por revisão adversarial de 28 agentes). Ver [[03 - Changelog]].
 - **"Marcar como lida ao abrir"** no Inbox (não-lida literal, persistida no banco).
 - **Filtros da Inbox** — Data (Tudo/Hoje/7d/30d) + Tipo por estágio do funil (Contato **cadastrado no CRM** / Lead / Oportunidade), e correção das abas Abertas/Não Lidas/Todas. Ver [[03 - Changelog]].
@@ -32,11 +33,11 @@ date: 2026-07-10
 
 ## 🔜 Próximo (curto prazo)
 
-### Ciclo 2 — Disparo de templates em massa (prospecção)
-Selecionar vários contatos/leads e enviar o mesmo **template aprovado** de uma vez. Reaproveita todo o backend do Ciclo 1 (`whatsapp-templates` + envio de template no `whatsapp-send`). É o passo que operacionaliza a **prospecção ativa** dentro das regras da Meta (fora da janela de 24h).
+### Disparo em massa a partir de Leads
+Hoje o disparo de templates em massa está em `/contatos`. Estender para `/leads` (reaproveitando o `BulkTemplateDialog`), para prospectar quem já está qualificado.
 
-> [!info] Deploy do Ciclo 1
-> As Edge Functions `whatsapp-send` (atualizada) e `whatsapp-templates` (nova) já foram publicadas; o secret `META_WABA_ID` é obrigatório para a listagem de templates funcionar.
+> [!info] Deploy dos templates (Ciclos 1 e 2)
+> As Edge Functions `whatsapp-send` (atualizada) e `whatsapp-templates` (nova) já foram publicadas; o secret `META_WABA_ID` é obrigatório para a listagem funcionar. O **Ciclo 2 é 100% front-end** (sem deploy de função — já foi ao ar no push).
 
 ---
 

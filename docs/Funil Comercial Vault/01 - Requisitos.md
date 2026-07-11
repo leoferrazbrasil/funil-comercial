@@ -54,6 +54,7 @@ CRM comercial focado em **prospecção ativa** e atendimento por **WhatsApp**, c
 - Lista + Perfil 360º (drawer lateral). Criar, editar e **excluir** (com confirmação).
 - Campos: nome, telefone, e-mail, **Origem** (Meta Ads, Google Ads, Site, WhatsApp, Indicação, Prospecção Ativa) e **Potencial** (Frio, Morno, Quente) — via listas suspensas.
 - Botão **WhatsApp**: abre a conversa **dentro do painel** (`/inbox`) com aquele contato (existente ou rascunho).
+- **Disparar template em massa:** enviar um template aprovado da Meta para vários contatos de uma vez (`{{1}}` = nome de cada contato ou valor fixo; seleção por checkbox; envio sequencial com progresso). Prospecção ativa dentro das regras da Meta.
 
 ## 6. Leads (`/leads`)
 

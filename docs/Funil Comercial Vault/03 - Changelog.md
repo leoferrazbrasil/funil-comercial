@@ -11,7 +11,7 @@ tags:
 > [!note] Navegação
 > Histórico de mudanças, mais recente primeiro. Contexto do produto em [[01 - Requisitos]]; arquitetura em [[02 - Arquitetura e Design]]; índice em [[00 - Inicio]].
 
-## [2026-07-10] - Inbox: filtros, "não lida" literal e envio de templates da Meta
+## [2026-07-10] - Templates da Meta (Inbox 1 a 1 + disparo em massa), filtros e "não lida" literal
 
 ### Adicionado — Envio de templates aprovados da Meta pelo Inbox
 - Botão **📄 Template** no compositor (só com **canal Meta ativo**) abre um seletor dos templates **APROVADOS** da Meta, com preview e um campo por variável; envia via Graph API (`type: "template"`). Serve para **iniciar** conversa / fora da janela de 24h.
@@ -19,6 +19,9 @@ tags:
 
 > [!success] v1 endurecido por revisão adversarial (28 agentes, 7 achados corrigidos)
 > Só oferece templates que o CRM **consegue** enviar (corpo com variáveis numéricas). Cabeçalho de mídia, header com variável, botão dinâmico, variáveis nomeadas (`{{nome}}`) e templates sem corpo aparecem **desabilitados com o motivo** — evita envios que a Meta recusaria (erro `132000`). Sem prefill presunçoso de `{{1}}` (botão "usar nome do contato" sob demanda); trim consistente entre o texto gravado e o enviado; paginação para não perder aprovados após a 1ª página. `whatsapp-templates` adicionada ao `deno check`, script e CI de deploy.
+
+### Adicionado — Disparo de templates em massa (Ciclo 2, `/contatos`)
+- Botão **📣 Disparar template** abre o **`BulkTemplateDialog`**: escolhe um template aprovado, configura cada variável como **Nome do contato** (por destinatário) ou **Valor fixo** (comum a todos), seleciona os destinatários por checkbox (omite quem não tem telefone) e **envia 1 a 1** com barra de progresso e status por contato — continuando mesmo se um falhar, com pausa entre envios (rate limit). Opera sobre os contatos **filtrados** (respeita a busca). Reusa o backend do Ciclo 1 — **sem função nova e sem tocar no `App.tsx`**. Endurecido por revisão adversarial (20 agentes; 1 ajuste: limpar a lista ao reabrir).
 
 ### Adicionado — Filtros na lista de conversas + correção das abas
 - Filtros de **Data** (Tudo/Hoje/7d/30d, pela última mensagem) e **Tipo** por estágio exclusivo do funil: **Contato** (cadastrado no CRM), **Lead** (sem oportunidade), **Oportunidade**. Combinam com as abas e a busca.
