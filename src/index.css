@@ -80,3 +80,22 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
+
+/* Animações do wizard (Progressive Disclosure) — usadas na página /criativos.
+   Definidas aqui porque o projeto não tem o plugin tailwindcss-animate, então
+   os utilitários `animate-in` do restante do código não geram CSS. */
+@keyframes fcFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes fcReveal {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fc-fade-in { animation: fcFadeIn 0.4s ease both; }
+.fc-reveal { animation: fcReveal 0.45s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .fc-fade-in,
+  .fc-reveal { animation: none; }
+}

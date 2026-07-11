@@ -45,9 +45,34 @@ const CHECKLIST = [
   "Conversa com negócio local e profissional liberal?",
 ];
 
+// Barra compacta de uma etapa já concluída no fluxo manual — clicável para editar.
+function StepSummary({ index, label, value, onEdit }: { index: number; label: string; value: string; onEdit: () => void }) {
+  return (
+    <button
+      onClick={onEdit}
+      className="w-full group flex items-center justify-between gap-4 rounded-xl border border-foreground/10 bg-card px-5 py-4 text-left transition-colors hover:border-primary/40"
+    >
+      <div className="flex items-center gap-3 min-w-0">
+        <span className="w-7 h-7 shrink-0 rounded-full bg-primary/15 text-primary flex items-center justify-center">
+          <Check size={15} />
+        </span>
+        <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground shrink-0">Passo {index} · {label}</span>
+        <span className="font-semibold text-foreground truncate">{value}</span>
+      </div>
+      <span className="text-xs font-semibold text-muted-foreground group-hover:text-primary transition-colors shrink-0">Alterar</span>
+    </button>
+  );
+}
+
 export default function CreativesPage() {
-  // Wizard State
-  const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
+  // Wizard State (Progressive Disclosure)
+  // path   → escolha do caminho: Estrategista IA ou manual
+  // manual → construção guiada (Objetivo → Pilar → Ideia), revelada por etapas
+  // loading→ IA escrevendo a copy
+  // studio → editor + canvas
+  const [step, setStep] = useState<"path" | "manual" | "loading" | "studio">("path");
+  // Sub-etapa do fluxo manual: 1 = Objetivo · 2 = Pilar · 3 = Ideia/gerar.
+  const [manualStage, setManualStage] = useState<1 | 2 | 3>(1);
   const [objective, setObjective] = useState("educar");
   const [pilar, setPilar] = useState(PILARS[0].name);
   const [idea, setIdea] = useState("");
@@ -130,38 +155,26 @@ export default function CreativesPage() {
     return () => { isMounted = false; }
   }, []);
 
-  const acceptRecommendation = () => {
-    if (!recommendation) return;
-    const rec = recommendation.recommendation;
-    
-    // Auto-select Objective
-    const mappedObjective = OBJECTIVES.find(o => o.name.toLowerCase() === rec.objective?.toLowerCase());
-    if (mappedObjective) setObjective(mappedObjective.id);
-    else setObjective("educar");
-    
-    // Auto-select Pilar (compara pelo nome do pilar editorial).
-    const pilarExists = PILARS.find(p => p.name.toLowerCase() === rec.pilar?.toLowerCase());
-    setPilar(pilarExists ? pilarExists.name : PILARS[0].name);
-    
-    // Set Theme/Format if applicable (you can expand this logic)
-    if (rec.format === "Feed 4:5") setFormat(FORMATS[0]);
-    
-    // Prefill the idea and go to Step 2
-    setIdea(rec.theme || "");
-    setStep(2);
-  };
+  // Geração central. Aceita overrides para evitar ler estado "stale" quando a
+  // chamada acontece no mesmo tick de um setState (caso do "Aceitar Recomendação").
+  const runGeneration = async (opts?: { idea?: string; objective?: string; pilar?: string; formatId?: string }) => {
+    const ideaText = opts?.idea ?? idea;
+    if (!ideaText.trim()) return;
 
-  const generateWithAI = async () => {
-    if (!idea.trim()) return;
-    setStep(3);
-    
+    const body = {
+      objective: opts?.objective ?? objective,
+      pilar: opts?.pilar ?? pilar,
+      format: opts?.formatId ?? format.id,
+      idea: ideaText,
+    };
+
+    setStep("loading");
+
     try {
-      const { data, error } = await supabase.functions.invoke('ai-generate-post', {
-        body: { objective, pilar, format: format.id, idea }
-      });
-      
+      const { data, error } = await supabase.functions.invoke('ai-generate-post', { body });
+
       if (error || !data) throw new Error(error?.message || "Erro na geração");
-      
+
       // Update states with AI response
       if (data.headline) setHeadline(data.headline);
       if (data.subheadline) setSubheadline(data.subheadline);
@@ -170,13 +183,53 @@ export default function CreativesPage() {
       if (data.caption) setCaption(data.caption);
       if (data.hashtags) setHashtags(data.hashtags);
       if (data.recommended_template_id) setTemplate(data.recommended_template_id);
-      
-      setStep(4);
+
+      setStep("studio");
     } catch (error) {
       console.error(error);
       alert("Falha ao conectar com o serviço de IA. Preenchendo com exemplos de fallback.");
-      setTimeout(() => setStep(4), 1000);
+      setTimeout(() => setStep("studio"), 1000);
     }
+  };
+
+  const generateWithAI = () => runGeneration();
+
+  const acceptRecommendation = () => {
+    if (!recommendation) return;
+    const rec = recommendation.recommendation;
+
+    // Resolve os valores da recomendação para ids/nomes internos.
+    const mappedObjective = OBJECTIVES.find(o => o.name.toLowerCase() === rec.objective?.toLowerCase());
+    const objectiveId = mappedObjective ? mappedObjective.id : "educar";
+    const pilarExists = PILARS.find(p => p.name.toLowerCase() === rec.pilar?.toLowerCase());
+    const pilarName = pilarExists ? pilarExists.name : PILARS[0].name;
+    const ideaText = rec.theme || "";
+
+    // Reflete a escolha na UI (caso o usuário volte para o modo manual).
+    setObjective(objectiveId);
+    setPilar(pilarName);
+    setManualStage(3);
+    if (rec.format === "Feed 4:5") setFormat(FORMATS[0]);
+    setIdea(ideaText);
+
+    // Vai direto para a geração — sem passar pelo fluxo manual.
+    runGeneration({ objective: objectiveId, pilar: pilarName, idea: ideaText });
+  };
+
+  // Entra no fluxo manual sempre do zero (revela etapa por etapa).
+  const startManualFlow = () => {
+    setManualStage(1);
+    setStep("manual");
+  };
+
+  const selectObjective = (id: string) => {
+    setObjective(id);
+    setManualStage(prev => (prev < 2 ? 2 : prev));
+  };
+
+  const selectPilar = (name: string) => {
+    setPilar(name);
+    setManualStage(prev => (prev < 3 ? 3 : prev));
   };
 
   const regenerateCaption = async () => {
@@ -250,14 +303,14 @@ export default function CreativesPage() {
   // Render Steps
   // ----------------------------------------------------
   
-  if (step === 1) {
+  if (step === "path") {
     return (
-      <div className="max-w-4xl mx-auto py-12 px-6 fade-in">
-        <h1 className="text-3xl font-black mb-2 tracking-tight">Qual o objetivo do post?</h1>
-        <p className="text-muted-foreground mb-8 text-lg">Selecione o direcionamento estratégico da sua próxima publicação.</p>
-        
-        {/* ESTRATEGISTA IA CARD */}
-        <div className="mb-12">
+      <div className="max-w-3xl mx-auto py-12 px-6 fc-fade-in">
+        <h1 className="text-3xl font-black mb-2 tracking-tight">Vamos criar um post</h1>
+        <p className="text-muted-foreground mb-10 text-lg">Comece pela recomendação do estrategista de IA ou monte a peça manualmente, no seu ritmo.</p>
+
+        {/* ESTRATEGISTA IA — em destaque (Etapa 1: O Caminho) */}
+        <div>
           {recState === "loading" && (
             <div className="bg-card border border-foreground/5 rounded-2xl p-8 flex items-center justify-center gap-4 animate-pulse">
               <BrainCircuit className="text-primary animate-pulse" size={24} />
@@ -310,113 +363,185 @@ export default function CreativesPage() {
                 </div>
                 
                 <div className="flex flex-col justify-end">
-                  <button 
+                  <button
                     onClick={acceptRecommendation}
                     className="w-full bg-primary text-black font-bold py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-primary/90 transition-transform active:scale-95 shadow-lg"
                   >
-                    Aceitar Recomendação <ArrowLeft className="rotate-180" size={18} />
+                    Aceitar e gerar <Wand2 size={18} />
                   </button>
-                  <p className="text-xs text-center text-muted-foreground mt-3">Ou escolha o objetivo manualmente abaixo</p>
+                  <p className="text-xs text-center text-muted-foreground mt-3">A IA já escreve a copy e monta a arte para você</p>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {recState === "error" && (
+            <div className="bg-card border border-foreground/5 rounded-2xl p-6 flex items-center gap-4">
+              <div className="w-12 h-12 bg-foreground/5 rounded-full flex items-center justify-center text-muted-foreground shrink-0">
+                <BrainCircuit size={20} />
+              </div>
+              <div>
+                <h3 className="font-bold text-foreground text-lg">Estrategista indisponível no momento</h3>
+                <p className="text-sm text-muted-foreground">Não foi possível carregar a recomendação. Você pode criar a postagem manualmente abaixo.</p>
               </div>
             </div>
           )}
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6 mb-12">
-          {OBJECTIVES.map((obj) => {
-            const Icon = obj.icon;
-            const isActive = objective === obj.id;
-            return (
-              <button 
-                key={obj.id} 
-                onClick={() => setObjective(obj.id)}
-                className={`flex flex-col items-start p-6 rounded-2xl border-2 transition-all text-left ${isActive ? 'border-primary bg-primary/10' : 'border-foreground/10 hover:border-foreground/20 bg-card hover:bg-card/80'}`}
-              >
-                <div className={`p-3 rounded-xl mb-4 ${isActive ? 'bg-primary text-black' : 'bg-foreground/5 text-muted-foreground'}`}>
-                  <Icon size={24} />
-                </div>
-                <h3 className="font-bold text-lg text-foreground mb-2">{obj.name}</h3>
-                <p className="text-sm text-muted-foreground">{obj.desc}</p>
-              </button>
-            )
-          })}
+        {/* Divisor "OU" */}
+        <div className="flex items-center gap-4 my-8">
+          <div className="h-px flex-1 bg-foreground/10" />
+          <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">ou</span>
+          <div className="h-px flex-1 bg-foreground/10" />
         </div>
-        
-        <h2 className="text-xl font-bold mb-1">Escolha o pilar editorial:</h2>
-        <p className="text-sm text-muted-foreground mb-4">A âncora estratégica da peça (Brandbook · 04. Conteúdo &amp; Ativação → 4.1).</p>
-        <div className="flex flex-wrap gap-3 mb-4">
-          {PILARS.map(p => {
-            const isActive = pilar === p.name;
-            return (
-              <button
-                key={p.name}
-                onClick={() => setPilar(p.name)}
-                className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all border flex items-center gap-2 ${isActive ? 'bg-primary text-black border-primary' : 'bg-transparent border-foreground/20 text-muted-foreground hover:border-foreground/40 hover:text-foreground'}`}
-              >
-                {p.name}
-                <span className={`text-[10px] font-bold uppercase tracking-wider ${isActive ? 'text-black/60' : 'text-primary/70'}`}>{p.etapa}</span>
-              </button>
-            );
-          })}
-        </div>
-        {(() => {
-          const sel = PILARS.find(p => p.name === pilar);
-          return sel ? (
-            <div className="mb-12 rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-muted-foreground flex items-start gap-2">
-              <Sparkles size={15} className="text-primary shrink-0 mt-0.5" />
-              <span><strong className="text-foreground">CTA sugerido:</strong> {sel.cta}</span>
+
+        {/* Caminho manual */}
+        <button
+          onClick={startManualFlow}
+          className="w-full group bg-card border border-foreground/10 hover:border-primary/40 rounded-2xl p-6 flex items-center justify-between transition-all active:scale-[0.99]"
+        >
+          <div className="flex items-center gap-4 text-left">
+            <div className="w-12 h-12 rounded-xl bg-foreground/5 group-hover:bg-primary/10 flex items-center justify-center text-muted-foreground group-hover:text-primary transition-colors shrink-0">
+              <PenTool size={22} />
             </div>
-          ) : null;
-        })()}
-
-        <div className="flex justify-end pt-8 border-t border-foreground/10">
-          <button onClick={() => setStep(2)} className="bg-foreground text-background px-8 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-foreground/90 transition-transform active:scale-95">
-            Continuar Manualmente <ChevronRight size={20} />
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (step === 2) {
-    return (
-      <div className="max-w-3xl mx-auto py-12 px-6 fade-in">
-        <button onClick={() => setStep(1)} className="text-muted-foreground hover:text-foreground flex items-center gap-2 mb-8 text-sm font-medium transition-colors">
-          <ArrowLeft size={16} /> Voltar para estratégia
+            <div>
+              <h3 className="font-bold text-foreground text-lg">Criar postagem manualmente</h3>
+              <p className="text-sm text-muted-foreground">Escolha o objetivo, o pilar editorial e escreva a sua ideia — passo a passo.</p>
+            </div>
+          </div>
+          <ChevronRight className="text-muted-foreground group-hover:text-primary transition-colors shrink-0" size={22} />
         </button>
-        
-        <h1 className="text-3xl font-black mb-2 tracking-tight">Qual a sua ideia?</h1>
-        <p className="text-muted-foreground mb-8 text-lg">Escreva um resumo do que você quer falar. A nossa IA cuidará do resto.</p>
-        
-        <div className="bg-card border border-foreground/10 rounded-3xl p-2 mb-8 shadow-2xl relative overflow-hidden group">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity pointer-events-none"></div>
-          <textarea 
-            value={idea} 
-            onChange={e => setIdea(e.target.value)}
-            placeholder="Ex: Quero dar 3 dicas de como organizar leads pelo WhatsApp sem perder vendas..."
-            className="w-full bg-transparent border-none outline-none p-6 text-xl min-h-[200px] resize-none placeholder:text-muted-foreground/50 relative z-10"
-            autoFocus
-          />
-        </div>
-        
-        <div className="flex justify-end">
-          <button 
-            disabled={!idea.trim()}
-            onClick={generateWithAI} 
-            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white px-8 py-4 rounded-xl font-bold flex items-center gap-3 transition-all active:scale-95 disabled:opacity-50 disabled:grayscale shadow-[0_0_40px_-10px_rgba(236,72,153,0.5)]"
-          >
-            <Sparkles size={20} />
-            Gerar Post Mágico
-          </button>
+      </div>
+    );
+  }
+
+  if (step === "manual") {
+    const selectedPilar = PILARS.find(p => p.name === pilar);
+    const selectedObjective = OBJECTIVES.find(o => o.id === objective);
+
+    return (
+      <div className="max-w-3xl mx-auto py-12 px-6 fc-fade-in">
+        <button onClick={() => setStep("path")} className="text-muted-foreground hover:text-foreground flex items-center gap-2 mb-8 text-sm font-medium transition-colors">
+          <ArrowLeft size={16} /> Voltar para a estratégia
+        </button>
+
+        <h1 className="text-3xl font-black mb-2 tracking-tight">Montar a postagem</h1>
+        <p className="text-muted-foreground mb-10 text-lg">Um passo de cada vez. Cada escolha revela a próxima.</p>
+
+        <div className="flex flex-col gap-4">
+
+          {/* PASSO 1 — Objetivo */}
+          {manualStage === 1 ? (
+            <section className="fc-reveal">
+              <h2 className="text-xl font-bold mb-1">Passo 1: Qual o objetivo do seu post?</h2>
+              <p className="text-sm text-muted-foreground mb-5">Define a intenção da peça.</p>
+              <div className="grid md:grid-cols-3 gap-4">
+                {OBJECTIVES.map((obj) => {
+                  const Icon = obj.icon;
+                  const isActive = objective === obj.id;
+                  return (
+                    <button
+                      key={obj.id}
+                      onClick={() => selectObjective(obj.id)}
+                      className={`flex flex-col items-start p-6 rounded-2xl border-2 transition-all text-left active:scale-[0.98] ${isActive ? 'border-primary bg-primary/10' : 'border-foreground/10 hover:border-primary/50 bg-card hover:bg-card/80'}`}
+                    >
+                      <div className={`p-3 rounded-xl mb-4 ${isActive ? 'bg-primary text-black' : 'bg-foreground/5 text-muted-foreground'}`}>
+                        <Icon size={24} />
+                      </div>
+                      <h3 className="font-bold text-lg text-foreground mb-2">{obj.name}</h3>
+                      <p className="text-sm text-muted-foreground">{obj.desc}</p>
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+          ) : (
+            <StepSummary
+              index={1}
+              label="Objetivo"
+              value={selectedObjective?.name ?? ""}
+              onEdit={() => setManualStage(1)}
+            />
+          )}
+
+          {/* PASSO 2 — Pilar editorial */}
+          {manualStage >= 2 && (
+            manualStage === 2 ? (
+              <section className="fc-reveal">
+                <h2 className="text-xl font-bold mb-1">Passo 2: Escolha o pilar editorial</h2>
+                <p className="text-sm text-muted-foreground mb-5">A âncora estratégica da peça (Brandbook · 04. Conteúdo &amp; Ativação → 4.1).</p>
+                <div className="flex flex-wrap gap-3">
+                  {PILARS.map(p => {
+                    const isActive = pilar === p.name;
+                    return (
+                      <button
+                        key={p.name}
+                        onClick={() => selectPilar(p.name)}
+                        className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all border flex items-center gap-2 active:scale-95 ${isActive ? 'bg-primary text-black border-primary' : 'bg-transparent border-foreground/20 text-muted-foreground hover:border-primary/50 hover:text-foreground'}`}
+                      >
+                        {p.name}
+                        <span className={`text-[10px] font-bold uppercase tracking-wider ${isActive ? 'text-black/60' : 'text-primary/70'}`}>{p.etapa}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
+            ) : (
+              <StepSummary
+                index={2}
+                label="Pilar editorial"
+                value={pilar}
+                onEdit={() => setManualStage(2)}
+              />
+            )
+          )}
+
+          {/* PASSO 3 — CTA + Ideia + Gerar */}
+          {manualStage >= 3 && (
+            <section className="fc-reveal flex flex-col gap-5">
+              {selectedPilar && (
+                <div className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-muted-foreground flex items-start gap-2">
+                  <Sparkles size={15} className="text-primary shrink-0 mt-0.5" />
+                  <span><strong className="text-foreground">CTA sugerido:</strong> {selectedPilar.cta}</span>
+                </div>
+              )}
+
+              <div>
+                <h2 className="text-xl font-bold mb-1">Passo 3: Sobre o que é o post?</h2>
+                <p className="text-sm text-muted-foreground mb-4">Um resumo em uma ou duas frases. A IA escreve a copy e monta a arte a partir daqui.</p>
+                <div className="bg-card border border-foreground/10 rounded-2xl p-2 shadow-xl relative overflow-hidden group">
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity pointer-events-none"></div>
+                  <textarea
+                    value={idea}
+                    onChange={e => setIdea(e.target.value)}
+                    placeholder="Ex: 3 sinais de que o WhatsApp do negócio está perdendo venda por falta de organização..."
+                    className="w-full bg-transparent border-none outline-none p-4 text-lg min-h-[140px] resize-none placeholder:text-muted-foreground/50 relative z-10"
+                    autoFocus
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end">
+                <button
+                  disabled={!idea.trim()}
+                  onClick={generateWithAI}
+                  className="bg-primary text-black px-8 py-4 rounded-xl font-bold flex items-center gap-3 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:bg-primary/90"
+                >
+                  <Wand2 size={20} />
+                  Gerar Criativo
+                </button>
+              </div>
+            </section>
+          )}
+
         </div>
       </div>
     );
   }
 
-  if (step === 3) {
+  if (step === "loading") {
     return (
-      <div className="h-[calc(100vh-6rem)] flex flex-col items-center justify-center p-6 fade-in text-center">
+      <div className="h-[calc(100vh-6rem)] flex flex-col items-center justify-center p-6 fc-fade-in text-center">
         <div className="w-24 h-24 mb-8 relative flex items-center justify-center">
           <div className="absolute inset-0 border-4 border-primary/20 rounded-full"></div>
           <div className="absolute inset-0 border-4 border-primary rounded-full border-t-transparent animate-spin"></div>
@@ -440,7 +565,7 @@ export default function CreativesPage() {
         {/* Header */}
         <div className="p-6 border-b border-foreground/5 flex justify-between items-center bg-foreground/5 shrink-0">
           <div>
-            <button onClick={() => setStep(2)} className="text-xs text-muted-foreground hover:text-foreground mb-1 flex items-center gap-1"><ArrowLeft size={12}/> Nova Ideia</button>
+            <button onClick={() => { setManualStage(3); setStep("manual"); }} className="text-xs text-muted-foreground hover:text-foreground mb-1 flex items-center gap-1"><ArrowLeft size={12}/> Voltar ao roteiro</button>
             <h1 className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">Estúdio de Criação <Sparkles size={16} className="text-primary"/></h1>
           </div>
           <button onClick={generateWithAI} className="p-3 bg-foreground/5 hover:bg-foreground/10 rounded-full transition-colors text-primary" title="Gerar Variação Completa com IA">
