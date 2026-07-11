@@ -3,9 +3,9 @@ import type { Profile, Route as AppRoute } from "./types";
 export type CommercialRole = Profile["role"];
 
 const roleRoutes: Record<CommercialRole, Array<Exclude<AppRoute, "login">>> = {
-  diretor: ["dashboard", "inbox", "contatos", "leads", "funil", "criativos"],
-  gestor: ["dashboard", "inbox", "contatos", "leads", "funil", "criativos"],
-  vendedor: ["dashboard", "inbox", "contatos", "leads", "funil"],
+  diretor: ["dashboard", "inbox", "contatos", "leads", "funil", "campanhas", "criativos"],
+  gestor: ["dashboard", "inbox", "contatos", "leads", "funil", "campanhas", "criativos"],
+  vendedor: ["dashboard", "inbox", "contatos", "leads", "funil", "campanhas"],
 };
 
 export function getAllowedRoutes(role?: CommercialRole | null) {

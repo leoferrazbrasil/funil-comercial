@@ -103,6 +103,7 @@ import InboxPage from "./pages/Inbox";
 import ContactsPage from "./pages/Contacts";
 import LeadsPage from "./pages/Leads";
 import CreativesPage from "./pages/Creatives";
+import CampaignsPage from "./pages/Campaigns";
 import MetaOAuthCallback from "./pages/MetaOAuthCallback";
 import WhatsappPage from "./pages/Whatsapp";
 
@@ -1135,6 +1136,15 @@ function AppContent() {
               }
             />
             <Route path="/criativos" element={<CreativesPage />} />
+            <Route
+              path="/campanhas"
+              element={
+                <CampaignsPage
+                  contacts={snapshot.contacts}
+                  channels={snapshot.channels}
+                />
+              }
+            />
             <Route path="/whatsapp" element={<WhatsappPage />} />
             <Route path="/oauth/meta" element={<MetaOAuthCallback />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />

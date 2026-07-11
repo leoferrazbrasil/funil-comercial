@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   UsersRound,
   Palette,
+  Megaphone,
 } from "lucide-react";
 import type { OpportunityStage, Route as AppRoute } from "./types";
 
@@ -46,6 +47,12 @@ export const navigationItems: NavigationItem[] = [
     label: "Funil de vendas",
     icon: BriefcaseBusiness,
     description: "Oportunidades por etapa do pipeline.",
+  },
+  {
+    id: "campanhas",
+    label: "Campanhas",
+    icon: Megaphone,
+    description: "Disparo de templates para listas de contatos.",
   },
   {
     id: "criativos",
