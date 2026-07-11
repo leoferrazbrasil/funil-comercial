@@ -58,7 +58,8 @@ if (-not $SkipDenoCheck) {
     "supabase/functions/whatsapp-qr-inbound/index.ts",
     "supabase/functions/whatsapp-send/index.ts",
     "supabase/functions/whatsapp-templates/index.ts",
-    "supabase/functions/campaign-runner/index.ts"
+    "supabase/functions/campaign-runner/index.ts",
+    "supabase/functions/team-create-member/index.ts"
   )
 }
 
@@ -121,5 +122,16 @@ $deployQrInbound = @(
   "--no-verify-jwt"
 ) + $deploySharedFlags
 Invoke-Checked $deployQrInbound
+
+# team-create-member: admin cria vendedor via JWT -> mantém verify_jwt.
+$deployTeamCreateMember = @(
+  "npx",
+  "--yes",
+  "supabase",
+  "functions",
+  "deploy",
+  "team-create-member"
+) + $deploySharedFlags
+Invoke-Checked $deployTeamCreateMember
 
 Write-Host "Edge Functions publicadas no projeto $ProjectRef."

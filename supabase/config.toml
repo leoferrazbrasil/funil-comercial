@@ -26,3 +26,7 @@ verify_jwt = false
 # front (JWT do usuário). Autentica internamente.
 [functions.campaign-runner]
 verify_jwt = false
+
+# Admin cria vendedor: chamado pelo navegador com JWT do admin.
+[functions.team-create-member]
+verify_jwt = true

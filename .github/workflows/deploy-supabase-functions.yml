@@ -43,7 +43,7 @@ jobs:
         run: npm ci
 
       - name: Check Edge Functions
-        run: deno check --no-lock supabase/functions/whatsapp-inbound/index.ts supabase/functions/whatsapp-qr-inbound/index.ts supabase/functions/whatsapp-send/index.ts supabase/functions/whatsapp-templates/index.ts supabase/functions/campaign-runner/index.ts
+        run: deno check --no-lock supabase/functions/whatsapp-inbound/index.ts supabase/functions/whatsapp-qr-inbound/index.ts supabase/functions/whatsapp-send/index.ts supabase/functions/whatsapp-templates/index.ts supabase/functions/campaign-runner/index.ts supabase/functions/team-create-member/index.ts
 
       - name: Smoke test Edge Functions
         if: ${{ inputs.run_smoke }}
@@ -77,6 +77,7 @@ jobs:
           - `whatsapp-send`
           - `whatsapp-templates`
           - `campaign-runner`
+          - `team-create-member`
 
           Next checks:
           - Configure Meta webhook challenge against `whatsapp-inbound`.
