@@ -11,6 +11,18 @@ tags:
 > [!note] Navegação
 > Histórico de mudanças, mais recente primeiro. Contexto do produto em [[01 - Requisitos]]; arquitetura em [[02 - Arquitetura e Design]]; índice em [[00 - Inicio]].
 
+## [2026-07-11] - Campanhas Fase 2: persistência + agendamento (envio server-side)
+
+### Adicionado — Agendamento e histórico de campanhas
+- O disparo saiu do navegador e virou **server-side**: novas tabelas `campaigns` + `campaign_recipients` e a Edge Function **`campaign-runner`** que envia os templates pela Graph API. **Supabase Cron** (`pg_cron`+`pg_net`, secret `CAMPAIGN_RUNNER_SECRET`) aciona o runner a cada minuto nas campanhas vencidas.
+- Front (`/campanhas`): opção **Agendar** (data/hora) além de *enviar agora*; **Histórico** com status (agendada/enviando/concluída) + **cancelar** agendadas; "enviar agora" cria a campanha, aciona o runner e acompanha por **polling**. Sem tocar no `App.tsx` (owner vem da sessão).
+
+> [!success] Runner endurecido por revisão adversarial (25 agentes / 12 achados)
+> Claim atômico por destinatário + `provider_message_id` (idempotência — evita reenvio duplicado ao retomar); contadores por **agregação** (corretos com milhares); **retry** de erros transitórios (429/5xx) com limite; **abort** se a Meta não estiver configurada. **Segurança:** trigger força o owner do destinatário = owner da campanha (bloqueia injeção cross-tenant) + runner escopa por owner. Front: rollback de campanha órfã, feedback correto de cancelamento, polling com teto, "Voltar" travado após o envio.
+
+> [!warning] Passos de infra (manuais) para o agendamento funcionar
+> Aplicar a migração; criar o secret `CAMPAIGN_RUNNER_SECRET`; deployar `campaign-runner`; rodar `supabase/sql/campaign-cron.sql` (habilita `pg_cron`/`pg_net` + agenda o job). Spec: `docs/superpowers/specs/2026-07-11-campanhas-fase2-agendamento-design.md`.
+
 ## [2026-07-10] - Página de Campanhas, templates da Meta (Inbox + massa), filtros e "não lida" literal
 
 ### Adicionado — Página de Campanhas (Fase 1)

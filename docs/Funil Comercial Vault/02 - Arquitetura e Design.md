@@ -27,6 +27,7 @@ date: 2026-07-09
 - `leads` (owner_id, contact_id→contacts, nome, telefone, interesse, status, valor_estimado, origem).
 - `opportunities` (owner_id, lead_id→leads, titulo, etapa, valor, responsavel, proxima_acao, **produto**).
 - `pipeline_stages`, `inbox_messages` (owner_id, contact_id, lead_id, canal, provider, provider_message_id, telefone, mensagem, status, unread_count, direction, **metadata**), `integration_channels` (owner_id, provider, nome, numero, status, metadata).
+- **Campanhas:** `campaigns` (owner_id, nome, template, body_text, variables jsonb, scheduled_at, status, contadores) e `campaign_recipients` (campaign_id, owner_id, nome, telefone, contact_id, status pending/sending/sent/error, provider_message_id, attempts). Envio pelo `campaign-runner`; trigger garante `campaign_recipients.owner_id = campaigns.owner_id`.
 
 > [!success] Exclusão segura por design
 > **FKs com `ON DELETE SET NULL`** em `leads.contact_id`, `opportunities.lead_id`, `inbox_messages.contact_id/lead_id` → excluir contato/lead só **desvincula** (preserva o histórico). Reflete a regra em [[01 - Requisitos#9. Regras de negócio principais]].
@@ -41,6 +42,7 @@ date: 2026-07-09
 - `whatsapp-qr-inbound` — webhook de conexão/desconexão (`ConnectedCallback`) e Evolution. **`verify_jwt=false`**.
 - `whatsapp-send` — envio de **texto** e de **template** pela Z-API/Evolution/**Meta Cloud API** (Graph API `.../{phone_number_id}/messages`). Usa o canal `ativo` mais recente (`getActiveWhatsAppChannel`). Template (`type: "template"`) é exclusivo da Meta.
 - `whatsapp-templates` — lista os templates **APROVADOS** da Meta (`GET /{WABA_ID}/message_templates`, com paginação). Marca como **não suportados** os que o v1 não envia (cabeçalho de mídia, header com variável, botão dinâmico, variáveis nomeadas, sem corpo). Chamada do navegador (**`verify_jwt`** padrão).
+- `campaign-runner` — envia campanhas de template **server-side** (Graph API), resumível e idempotente (claim por destinatário + `provider_message_id`). Acionada pelo **Supabase Cron** (`CAMPAIGN_RUNNER_SECRET`) ou pelo front (JWT). **`verify_jwt=false`**.
 - `meta-auth`, `meta-publish`, `ai-generate-post`, `ai-recommend-post`, `evolution-proxy`.
 - Config em `supabase/config.toml` (JWT off só nos webhooks).
 

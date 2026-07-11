@@ -82,7 +82,7 @@ CRM comercial focado em **prospecção ativa** e atendimento por **WhatsApp**, c
 
 - Wizard de 3 etapas — **Configurar** (nome, canal Meta ativo, template aprovado, variáveis por *nome do contato* ou *valor fixo*, enviar agora), **Contatos** (do CRM por checkbox + busca **ou** importação de **CSV**), **Confirmação** (disparo 1 a 1 com progresso e status por destinatário; dedupe por telefone).
 - **Preview de iPhone** ao vivo, mostrando a mensagem do WhatsApp conforme a configuração.
-- Reusa o motor de templates da Meta; **enviar agora** (agendamento e múltiplas contas Meta são fases futuras — ver [[04 - Roadmap]]).
+- **Enviar agora** ou **Agendar** (data/hora): o envio é **server-side** (persiste a campanha; um agendador dispara no horário). **Histórico** com status (agendada/enviando/concluída) e **cancelar** agendadas. Múltiplas contas Meta é a Fase 3 — ver [[04 - Roadmap]].
 
 ## 8. Criativos (`/criativos`)
 

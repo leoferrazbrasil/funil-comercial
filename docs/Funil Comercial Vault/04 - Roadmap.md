@@ -20,6 +20,7 @@ date: 2026-07-10
 
 ## ✅ Entregue recentemente
 
+- **Campanhas Fase 2 — Agendamento** — envio **server-side** (tabelas `campaigns`/`campaign_recipients` + `campaign-runner` + Supabase Cron); agendar data/hora, histórico com status e cancelar. Ver [[03 - Changelog]].
 - **Página de Campanhas (Fase 1)** — menu `/campanhas` com wizard de 3 etapas (Configurar → Contatos → Confirmação) + preview iPhone; dispara templates para contatos do CRM ou lista **CSV**, enviando agora. Ver [[03 - Changelog]].
 - **Disparo de templates em massa (Ciclo 2)** — em `/contatos`, enviar um template aprovado para vários contatos de uma vez (`BulkTemplateDialog`), com variável por-destinatário (nome) ou fixa, seleção por checkbox e progresso. Ver [[03 - Changelog]].
 - **Templates da Meta no Inbox (Ciclo 1)** — enviar template aprovado 1 a 1 (`whatsapp-templates` + `TemplatePicker`); v1 seguro (só templates suportados; endurecido por revisão adversarial de 28 agentes). Ver [[03 - Changelog]].
@@ -34,10 +35,10 @@ date: 2026-07-10
 
 ## 🔜 Próximo (curto prazo)
 
-### Campanhas — Fase 2 (Agendamento)
-Persistir campanhas (tabela `campaigns`) + um agendador (Supabase cron / edge function) para **enviar depois** e ter **histórico** de campanhas com status. Backend novo. (Fase 3, mais adiante: **múltiplas contas Meta / escolha de dispositivo** — ligada à multi-instância.)
+### Campanhas — Fase 3 (múltiplas contas Meta / dispositivo)
+Escolher entre várias contas Meta/números no disparo (hoje usa a conta ativa) — ligada à **multi-instância**.
 
-_Menor:_ estender o disparo em massa também para `/leads` (reusa o `BulkTemplateDialog`).
+_Menores:_ disparo em massa também a partir de `/leads`; suporte a templates com mídia/botões (hoje desabilitados); mover o secret do cron para o **Vault**.
 
 > [!info] Deploy dos templates (Ciclos 1 e 2)
 > As Edge Functions `whatsapp-send` (atualizada) e `whatsapp-templates` (nova) já foram publicadas; o secret `META_WABA_ID` é obrigatório para a listagem funcionar. O **Ciclo 2 é 100% front-end** (sem deploy de função — já foi ao ar no push).
