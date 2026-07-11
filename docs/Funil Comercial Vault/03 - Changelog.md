@@ -11,6 +11,19 @@ tags:
 > [!note] Navegação
 > Histórico de mudanças, mais recente primeiro. Contexto do produto em [[01 - Requisitos]]; arquitetura em [[02 - Arquitetura e Design]]; índice em [[00 - Inicio]].
 
+## [2026-07-11] - Handoff de conversas entre usuários (time leve sobre o admin)
+
+### Adicionado — Transferência de conversas para vendedores
+- O CRM deixou de ser só single-user: o **admin** (dono do número/canal) cria **vendedores** ligados a ele e **transfere conversas** do Inbox. O vendedor vê e responde **apenas** as conversas atribuídas a ele, enviando pelo **canal do admin** em nome do time. Registros de CRM (contatos/leads) **não** são compartilhados (v1).
+- **Modelo leve** (dados seguem do admin, sem entidade "organização"): `profiles.admin_id`, tabela `conversation_assignments` (1 por conversa), `inbox_messages.sent_by`. RLS libera ao vendedor só a conversa atribuída (`is_conversation_assignee`).
+- **Nova Edge Function `team-create-member`** (service-role): admin cria o vendedor (email + senha provisória). Seção **Equipe** em Configurações. `whatsapp-send` passou a enviar pelo canal do **admin dono da conversa** (autoriza o vendedor atribuído, grava `sent_by`). Inbox ganhou **botão Transferir + selo "Atendendo" + filtro "Atribuídas a mim"**.
+
+> [!info] Construído por desenvolvimento orientado por subagentes (7 tasks)
+> Spec → plano → execução com um subagente implementador + revisor por task, e review final da branch inteira. Os reviews pegaram e corrigiram achados **reais de segurança** antes do merge: RLS de UPDATE deixava o vendedor "sequestrar" a mensagem reescrevendo `owner_id`/`telefone` (trigger de identidade imutável); `team-create-member` era **fail-open** sem profile (agora nega por padrão + evita usuário órfão); `upsertProfile` **resetava `role`** a cada login (removido do payload); vendedor podia injetar `contact_id`/`lead_id` na conta do admin (bloqueado); e a policy `profiles_update_own` deixava o vendedor **auto-escrever `role`/`admin_id`** via API (trigger `profiles_protect_role`).
+
+> [!warning] Ativação (ação do dono) — a feature entra em produção após:
+> 1. Aplicar a migração `supabase/migrations/20260712100000_team_handoff.sql` (SQL Editor). 2. Deployar `team-create-member` e `whatsapp-send` (e `whatsapp-inbound`, que ganhou o comentário do normalizePhone). Enquanto não aplicar, o Inbox degrada de forma silenciosa (sem UI de handoff) — nada quebra. Spec: `docs/superpowers/specs/2026-07-11-handoff-conversas-time-design.md`; plano: `docs/superpowers/plans/2026-07-11-handoff-conversas-time.md`.
+
 ## [2026-07-11] - Entrega de WhatsApp (diagnóstico + observabilidade), Configurações e UX
 
 ### Adicionado — Observabilidade de entrega (status da Meta + selinho no Inbox)

@@ -20,6 +20,7 @@ date: 2026-07-10
 
 ## ✅ Entregue recentemente
 
+- **Handoff de conversas (time)** — admin cria vendedores e transfere conversas; o vendedor vê/responde só as atribuídas, pelo canal do admin. Código pronto (7 tasks, endurecido por review). **Ativação pendente:** aplicar migração + deployar `team-create-member`/`whatsapp-send`. Ver [[03 - Changelog]].
 - **Observabilidade de entrega (WhatsApp)** — `whatsapp-inbound` processa os `statuses` da Meta; selinho por mensagem no Inbox (enviada/entregue/lida/falhou) + erro inline. Ver [[03 - Changelog]].
 - **Página Configurações** — hub de integrações (`/configuracoes` + engrenagem no header); integração de WhatsApp saiu do Perfil. Ver [[03 - Changelog]].
 - **Inteligência Comercial** — não sugere mais responder à própria saída; prioriza por não-lida/antiguidade/valor. Local, sem IA. Ver [[03 - Changelog]].
