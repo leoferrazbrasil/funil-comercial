@@ -31,9 +31,10 @@ Deno.serve(async (req) => {
     const admin = userData.user;
 
     // Só um admin (não-vendedor) pode criar membros.
-    const { data: adminProfile } = await supabase
+    const { data: adminProfile, error: profErr } = await supabase
       .from("profiles").select("role, admin_id").eq("id", admin.id).maybeSingle();
-    if (adminProfile?.role === "vendedor" || adminProfile?.admin_id) {
+    if (profErr) return json({ error: "Não foi possível validar suas permissões." }, 500);
+    if (!adminProfile || adminProfile.role === "vendedor" || adminProfile.admin_id) {
       return json({ error: "Apenas o administrador da conta pode criar vendedores." }, 403);
     }
 
@@ -64,7 +65,10 @@ Deno.serve(async (req) => {
       role: "vendedor",
       admin_id: admin.id,
     });
-    if (upErr) return json({ error: `Usuário criado, mas o perfil falhou: ${upErr.message}` }, 500);
+    if (upErr) {
+      await supabase.auth.admin.deleteUser(created.user.id).catch(() => {});
+      return json({ error: `Não foi possível criar o perfil do vendedor: ${upErr.message}` }, 500);
+    }
 
     return json({ ok: true, member: { id: created.user.id, email: emailNorm, nome: (nome ?? "").trim() || emailNorm } });
   } catch (e) {

@@ -105,12 +105,11 @@ const normalizePhone = (value: string | null | undefined) => {
 
 export async function upsertProfile(user: User) {
   const supabase = requireSupabase();
-  const profile: Omit<Profile, "created_at"> = {
+  const profile: Omit<Profile, "created_at" | "role"> = {
     id: user.id,
     nome: user.user_metadata?.nome ?? user.email?.split("@")[0] ?? null,
     email: user.email ?? null,
     telefone: user.user_metadata?.telefone ?? null,
-    role: "gestor",
   };
 
   const { error } = await supabase
