@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import Logo from '../components/Logo';
 import SocialMediaSection from '../components/SocialMediaSection';
 import AvatarGuidelinesSection from '../components/AvatarGuidelinesSection';
+import ContentGuidelinesSection from '../components/ContentGuidelinesSection';
 
 function ColorSwatch({ color, name, hex, description }: { color: string, name: string, hex: string, description: string }) {
   const [copied, setCopied] = useState(false);
@@ -49,6 +50,7 @@ const SECTIONS = [
   { id: 'tipografia', label: 'Tipografia' },
   { id: 'ui', label: 'UI & Componentes' },
   { id: 'tom-de-voz', label: 'Tom de Voz' },
+  { id: 'diretrizes-conteudo', label: '04. Conteúdo & Ativação' },
   { id: 'social-media', label: 'Guia Editorial (Social)' },
   { id: 'avatar-ia', label: 'Avatar & IA' },
 ];
@@ -587,6 +589,11 @@ export default function BrandbookPage() {
                 </ul>
               </div>
             </div>
+          </section>
+
+          {/* 04. DIRETRIZES DE CONTEÚDO & ATIVAÇÃO */}
+          <section id="diretrizes-conteudo" className="scroll-mt-24">
+            <ContentGuidelinesSection />
           </section>
 
           {/* SOCIAL MEDIA */}
