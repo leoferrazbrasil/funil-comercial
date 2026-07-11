@@ -11,6 +11,32 @@ tags:
 > [!note] Navegação
 > Histórico de mudanças, mais recente primeiro. Contexto do produto em [[01 - Requisitos]]; arquitetura em [[02 - Arquitetura e Design]]; índice em [[00 - Inicio]].
 
+## [2026-07-11] - Entrega de WhatsApp (diagnóstico + observabilidade), Configurações e UX
+
+### Adicionado — Observabilidade de entrega (status da Meta + selinho no Inbox)
+- O webhook **`whatsapp-inbound`** passou a processar os eventos **`statuses`** da Meta (antes descartados), casando pela **wamid** (`provider_message_id`). Migração adiciona **`delivery_status`** (sent/delivered/read/failed) e **`delivery_error`** em `inbox_messages`; `whatsapp-send` grava baseline `'sent'`. O **Inbox** mostra um **selinho por mensagem** (✓ enviada · ✓✓ entregue · ✓✓ azul lida · ⚠ falhou) com o **erro da Meta inline**. Antes, a não-entrega era caixa-preta.
+
+> [!success] A observabilidade revelou a causa real da não-entrega de templates
+> Erro **`[131042] Business eligibility payment issue`** — **pendência de PAGAMENTO** da conta WhatsApp Business, **não** limite de marketing nem bug de código. Padrão que fecha: **texto livre** (grátis, dentro da janela de 24h) entrega; **template** (cobrado, iniciado pela empresa) trava até o pagamento ser resolvido. Verificação da empresa está **aprovada** — o gargalo é o método de pagamento da WABA.
+
+### Corrigido — Envio de WhatsApp não mascara mais falha como "enviada"
+- Quando o canal ativo (Meta/Z-API/Evolution) estava **sem credencial de envio**, a `whatsapp-send` respondia 200 com fallback e o `crmService` gravava **localmente** → o painel dizia "enviada" sem nada sair. Agora retorna **erro 409** com mensagem clara e o Inbox mostra o erro real. **Causa no ambiente:** o secret **`META_WHATSAPP_ACCESS_TOKEN`** estava ausente (o webhook de recebimento não usa esse token — por isso o inbound seguia ok). Resolvido setando o token permanente (System User).
+
+### Adicionado — Página **Configurações** (hub de integrações)
+- Nova rota **`/configuracoes`** (`Settings.tsx`), acessada por um **ícone de engrenagem no header**. O módulo **Integração de WhatsApp** (`IntegrationSection`, Z-API × Meta) saiu do **Perfil** e virou a seção "Integrações" dessa página. Perfil ficou só com dados pessoais + segurança. Estrutura pronta para novas seções. Spec: `docs/superpowers/specs/2026-07-11-configuracoes-integracoes-design.md`.
+
+### Corrigido — Inteligência Comercial (Dashboard) mais confiável
+- O painel sugeria "Responder X" mostrando **mensagens que nós mesmos enviamos** (não filtrava direção). Agora `messageNeedsAction` exige **`direction === "inbound"`** e status não respondido. Priorização deixou de pegar "o primeiro da lista": **não-lidas primeiro**, depois a que **aguarda há mais tempo**; lead/oportunidade priorizam **maior valor**. **100% local (regras), sem IA e sem custo** — confirmado que a funcionalidade não usa API de IA.
+
+### Corrigido — Tela de carregamento com a identidade da marca-mãe
+- A `LoadingScreen` usava um selo legado "FC" (teal/verde) fora da paleta. Reescrita com o componente **`<Logo>`** + spinner na cor primary. Além disso, **rotas públicas renderizam antes do boot de autenticação** — o visitante que chega na home/`/crm` não vê mais a tela de carregamento. CSS órfão (`.brand-mark`/`.loading-state`) removido.
+
+> [!danger] Segurança — pendência de rotação
+> O `secrets.txt` estava **versionado no GitHub** (a entrada no `.gitignore` estava corrompida com bytes NULL). Foi **removido do versionamento** e o `.gitignore` corrigido, mas os segredos **já expostos no histórico** precisam ser **ROTACIONADOS**: token permanente da Meta e o **PAT do Supabase** (que apareceu em prints durante o deploy). Rotacionar + revogar os antigos.
+
+> [!info] Infra aplicada nesta sessão
+> O **403 da CLI do Supabase** era token de conta sem privilégio — resolvido com um PAT novo da conta dona. Deploys concluídos em produção (`juvwfxnlusrnvcarkrmc`): **`campaign-runner`**, **`whatsapp-inbound`** e **`whatsapp-send`**. Confirmado que há **dois projetos** — usar sempre `juvwfxnlusrnvcarkrmc` ("Funil Comercial Produção").
+
 ## [2026-07-11] - Reposicionamento do site: empresa de estrutura de vendas
 
 ### Mudado — funilcomercial.com vira a home da EMPRESA (CRM → `/crm`)

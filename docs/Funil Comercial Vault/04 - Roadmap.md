@@ -20,6 +20,10 @@ date: 2026-07-10
 
 ## ✅ Entregue recentemente
 
+- **Observabilidade de entrega (WhatsApp)** — `whatsapp-inbound` processa os `statuses` da Meta; selinho por mensagem no Inbox (enviada/entregue/lida/falhou) + erro inline. Ver [[03 - Changelog]].
+- **Página Configurações** — hub de integrações (`/configuracoes` + engrenagem no header); integração de WhatsApp saiu do Perfil. Ver [[03 - Changelog]].
+- **Inteligência Comercial** — não sugere mais responder à própria saída; prioriza por não-lida/antiguidade/valor. Local, sem IA. Ver [[03 - Changelog]].
+- **Tela de carregamento** com a identidade da marca + páginas públicas sem loader. Ver [[03 - Changelog]].
 - **Reposicionamento do site** — home = empresa de estrutura de vendas (Método Estrutura de Vendas, 4 camadas, tom negócio local); CRM movido para `/crm`. Ver [[03 - Changelog]].
 - **Campanhas Fase 2 — Agendamento** — envio **server-side** (tabelas `campaigns`/`campaign_recipients` + `campaign-runner` + Supabase Cron); agendar data/hora, histórico com status e cancelar. Ver [[03 - Changelog]].
 - **Página de Campanhas (Fase 1)** — menu `/campanhas` com wizard de 3 etapas (Configurar → Contatos → Confirmação) + preview iPhone; dispara templates para contatos do CRM ou lista **CSV**, enviando agora. Ver [[03 - Changelog]].
@@ -31,6 +35,19 @@ date: 2026-07-10
 - **Integração oficial Meta Cloud API** (webhook, envio, secrets) — **envio validado ponta a ponta (2026-07-09)** — + **páginas legais** públicas.
 - **Drawers acionáveis** (Origem real + Próxima Ação) em Oportunidade e Lead.
 - **Dashboard**: filtro temporal + Taxa de Conversão por valor.
+
+---
+
+## 🚧 Bloqueios ativos (ação do dono)
+
+> [!danger] Entrega de templates (Marketing) travada por pagamento
+> A Meta recusa os templates com **`[131042] Business eligibility payment issue`** — **pendência de pagamento** da conta WhatsApp Business. Sem resolver o método de pagamento da WABA, a **prospecção por template não entrega** (texto livre dentro da janela de 24h entrega normalmente). Verificação da empresa já está aprovada. Ver [[03 - Changelog]].
+
+> [!warning] Rotacionar segredos expostos
+> `secrets.txt` esteve no histórico do GitHub. **Rotacionar/revogar:** token permanente da Meta e **PAT do Supabase**. Atualizar o secret `META_WHATSAPP_ACCESS_TOKEN` com o novo token.
+
+> [!info] Campanhas — infra
+> Deploys de `campaign-runner`/`whatsapp-inbound`/`whatsapp-send` **concluídos**; migração do `delivery_status` aplicada. Confirmar se as **tabelas `campaigns`/`campaign_recipients`** foram criadas (SQL no [[03 - Changelog]]) para o "Disparar agora" funcionar.
 
 ---
 
