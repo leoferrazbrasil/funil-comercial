@@ -365,7 +365,26 @@ Deno.serve(async (request) => {
       return jsonResponse({ error: "Usuario nao autenticado." }, 401);
     }
 
-    const channel = await getActiveWhatsAppChannel(supabase, user.id);
+    // Dono da conversa: se o remetente é vendedor, é o admin dele; senão, ele mesmo.
+    const { data: senderProfile } = await supabase
+      .from("profiles").select("admin_id").eq("id", user.id).maybeSingle();
+    const conversationOwnerId = senderProfile?.admin_id ?? user.id;
+
+    // Vendedor só envia em conversa ATRIBUÍDA a ele.
+    if (senderProfile?.admin_id) {
+      const { data: assigned } = await supabase
+        .from("conversation_assignments")
+        .select("id")
+        .eq("owner_id", conversationOwnerId)
+        .eq("telefone", phone)
+        .eq("assigned_to", user.id)
+        .maybeSingle();
+      if (!assigned) {
+        return jsonResponse({ error: "Você não está atribuído a esta conversa." }, 403);
+      }
+    }
+
+    const channel = await getActiveWhatsAppChannel(supabase, conversationOwnerId);
     if (!channel) {
       return jsonResponse({
         ok: true,
@@ -462,7 +481,7 @@ Deno.serve(async (request) => {
 
     const sourceMessage = await getSourceMessage(
       supabase,
-      user.id,
+      conversationOwnerId,
       payload.source_message_id,
     );
     const sourcePhone = normalizePhone(sourceMessage?.telefone);
@@ -473,7 +492,8 @@ Deno.serve(async (request) => {
     const { data: inboxMessage, error: insertError } = await supabase
       .from("inbox_messages")
       .insert({
-        owner_id: user.id,
+        owner_id: conversationOwnerId,
+        sent_by: user.id,
         contact_id: payload.contact_id ?? sourceMessage?.contact_id ?? null,
         lead_id: payload.lead_id ?? sourceMessage?.lead_id ?? null,
         canal: "WhatsApp",
@@ -505,7 +525,7 @@ Deno.serve(async (request) => {
           unread_count: 0,
         })
         .eq("id", sourceMessage.id)
-        .eq("owner_id", user.id);
+        .eq("owner_id", conversationOwnerId);
 
       if (updateError) throw updateError;
     }
