@@ -989,10 +989,9 @@ function AppContent() {
     }
   };
 
-  if (isBooting) {
-    return <LoadingScreen label="Preparando sua experiência..." />;
-  }
-
+  // Rotas públicas (home da marca, /crm, legais, previews) NÃO dependem de sessão
+  // e por isso renderizam antes do boot de autenticação — assim o visitante que
+  // chega pela primeira vez vê a página imediatamente, sem a tela de carregamento.
   if (isPublicRoute) {
     return (
       <Routes>
@@ -1004,6 +1003,11 @@ function AppContent() {
         <Route path="/exclusao-de-dados" element={<DataDeletionPage />} />
       </Routes>
     );
+  }
+
+  // Rota privada: aguardamos a sessão resolver para não piscar o login.
+  if (isBooting) {
+    return <LoadingScreen label="Preparando sua experiência..." />;
   }
 
   if (!session || route === "login" || route === "cadastro") {
@@ -1904,12 +1908,14 @@ function SelectField({
 
 function LoadingScreen({ label }: { label: string }) {
   return (
-    <main className="loading-state">
-      <div className="brand-mark">
-        <span />
-        <strong>FC</strong>
+    <main className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center gap-6 font-sans">
+      <div className="animate-pulse">
+        <Logo variant="stacked" iconSize={56} />
       </div>
-      <p>{label}</p>
+      <p className="flex items-center gap-2.5 text-sm font-medium text-muted-foreground">
+        <span className="h-4 w-4 rounded-full border-2 border-primary border-r-transparent animate-spin" />
+        {label}
+      </p>
     </main>
   );
 }

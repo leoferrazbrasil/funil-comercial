@@ -66,6 +66,7 @@ import {
 import { getAllowedRoutes } from "../lib/accessControl";
 import { PRODUCTS } from "../lib/products";
 import { brandConfig } from "../lib/branding";
+import Logo from "./Logo";
 import {
   navigationItems,
   pipelineStages,
@@ -1130,12 +1131,11 @@ export function SelectField({
 
 export function LoadingScreen({ label }: { label: string }) {
   return (
-    <main className="loading-state animate-in fade-in duration-500">
-      <div className="brand-mark animate-pulse shadow-[0_0_40px_rgba(35,196,131,0.2)]">
-        <span />
-        <strong>FC</strong>
+    <main className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center gap-6 font-sans">
+      <div className="animate-pulse">
+        <Logo variant="stacked" iconSize={56} />
       </div>
-      <p className="flex items-center gap-3 text-sm font-medium text-muted-foreground mt-4">
+      <p className="flex items-center gap-2.5 text-sm font-medium text-muted-foreground">
         <Loader2 className="animate-spin text-primary" size={16} />
         {label}
       </p>
