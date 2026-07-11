@@ -1,5 +1,6 @@
 import { HeroPanel, PageIntro, MetricCard, Panel, ActionItem, TablePanel, EmptyState, Modal, ContactModal, LeadModal, OpportunityModal, MessageModal, ChannelModal, EntityForm, TextField, SelectField, LoadingScreen } from "../components/SharedUI";
 import { ConfirmDialog } from "../components/ConfirmDialog";
+import { BulkTemplateDialog } from "../components/BulkTemplateDialog";
 import type { Session } from "@supabase/supabase-js";
 import type { LucideIcon } from "lucide-react";
 import {
@@ -13,6 +14,7 @@ import {
   Pencil,
   Plus,
   Send,
+  Megaphone,
   Search,
   ShieldCheck,
   Sparkles,
@@ -430,6 +432,7 @@ export default function ContactsPage({
   const [activeTab, setActiveTab] = useState<"overview" | "commercial">("overview");
   const [contactToDelete, setContactToDelete] = useState<Contact | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [bulkOpen, setBulkOpen] = useState(false);
 
   const handleConfirmDelete = async () => {
     if (!contactToDelete) return;
@@ -761,12 +764,20 @@ export default function ContactsPage({
           </p>
         </div>
         
-        <button 
-          onClick={() => onOpenModal("contact")}
-          className="primary-button hidden sm:flex"
-        >
-          <Plus size={16} /> Novo Contato
-        </button>
+        <div className="hidden sm:flex items-center gap-2">
+          <button
+            onClick={() => setBulkOpen(true)}
+            className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-foreground hover:bg-white/10 transition-colors"
+          >
+            <Megaphone size={16} /> Disparar template
+          </button>
+          <button
+            onClick={() => onOpenModal("contact")}
+            className="primary-button"
+          >
+            <Plus size={16} /> Novo Contato
+          </button>
+        </div>
         
         {/* Mobile FAB */}
         <button 
@@ -781,6 +792,12 @@ export default function ContactsPage({
         {renderDataGrid()}
         {renderProfileDrawer()}
       </div>
+
+      <BulkTemplateDialog
+        open={bulkOpen}
+        onClose={() => setBulkOpen(false)}
+        contacts={filteredContacts}
+      />
 
       <ConfirmDialog
         open={Boolean(contactToDelete)}
