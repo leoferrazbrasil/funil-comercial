@@ -432,7 +432,9 @@ export async function sendInboxReply(
     return registerLocalInboxReply(ownerId, message, trimmedReply, senderName);
   }
 
-  throw error ?? new Error(data?.error ?? "Nao foi possivel enviar a resposta.");
+  // Canal ativo mas o envio real falhou (ex.: Meta sem token): propaga a mensagem
+  // de erro da função para o usuário, em vez de registrar localmente como "enviado".
+  throw new Error(await extractFunctionError(error, data));
 }
 
 export type WhatsAppTemplate = {

@@ -411,12 +411,15 @@ Deno.serve(async (request) => {
       const instanceName = metadataString(channel.metadata, ["instance_name", "instanceName"]);
       const evolutionResult = await sendEvolutionTextMessage(instanceName ?? "", phone, message);
       if (!evolutionResult.configured) {
-        return jsonResponse({
-          ok: true,
-          sent: false,
-          fallback_allowed: true,
-          reason: "evolution_send_not_configured",
-        });
+        // Canal ATIVO mas sem credenciais de envio: é um erro real, não um
+        // "enviado" silencioso. Mascarar como local esconde a não-entrega.
+        return jsonResponse(
+          {
+            error:
+              "Evolution API está ativa mas não configurada para envio (defina EVOLUTION_API_URL, EVOLUTION_GLOBAL_API_KEY e o instance_name do canal).",
+          },
+          409,
+        );
       }
       messageId = asString((evolutionResult.response?.key as JsonRecord)?.id);
     } else if (channel.provider === "z-api") {
@@ -425,12 +428,14 @@ Deno.serve(async (request) => {
       
       const zapiResult = await sendZApiTextMessage(instanceId ?? "", token ?? "", phone, message);
       if (!zapiResult.configured) {
-        return jsonResponse({
-          ok: true,
-          sent: false,
-          fallback_allowed: true,
-          reason: "zapi_send_not_configured",
-        });
+        // Canal ATIVO mas sem credenciais de envio: erro real (ver acima).
+        return jsonResponse(
+          {
+            error:
+              "Z-API está ativa mas não configurada para envio (instance_id/token do canal ausentes).",
+          },
+          409,
+        );
       }
       messageId = asString(zapiResult.response?.messageId);
     } else {
@@ -442,12 +447,15 @@ Deno.serve(async (request) => {
 
       const metaResult = await sendMetaTextMessage(phoneNumberId ?? "", phone, message);
       if (!metaResult.configured) {
-        return jsonResponse({
-          ok: true,
-          sent: false,
-          fallback_allowed: true,
-          reason: "meta_send_not_configured",
-        });
+        // Canal Meta ATIVO mas sem credencial de envio: erro real, não um
+        // "enviado" silencioso que mascara a não-entrega (ver branches acima).
+        return jsonResponse(
+          {
+            error:
+              "Meta Cloud API está ativa mas não configurada para envio. Defina o secret META_WHATSAPP_ACCESS_TOKEN (e o Phone Number ID) nas Edge Functions.",
+          },
+          409,
+        );
       }
       messageId = providerMessageId(metaResult.response);
     }
