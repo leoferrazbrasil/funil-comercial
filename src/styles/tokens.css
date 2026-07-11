@@ -37,39 +37,45 @@
   --fc-duration-fast: 150ms;
   --fc-duration-normal: 240ms;
 
-  /* Semantic tokens - light */
-  --fc-bg: var(--fc-color-paper-50);
-  --fc-surface: #ffffff;
-  --fc-surface-2: var(--fc-color-paper-25);
-  --fc-surface-raised: rgba(255, 255, 255, 0.92);
-  --fc-line: var(--fc-color-paper-200);
-  --fc-line-strong: #c5d1dc;
-  --fc-text: var(--fc-color-navy-900);
-  --fc-muted: var(--fc-color-slate-600);
+  /* Semantic tokens - light
+     Calibrados para uma leitura suave: nada de branco puro sobre fundo claro,
+     texto em "ink" azulado dessaturado (em vez de navy saturado #041d57, que
+     dava contraste agressivo), bordas/sombras mais leves e glow do fundo
+     reduzido. Mantém WCAG AA (texto ≥ 9:1, muted ≥ 5:1 sobre as superfícies). */
+  --fc-bg: #eef1f4;
+  --fc-surface: #fbfcfd;
+  --fc-surface-2: #f4f7f9;
+  --fc-surface-raised: rgba(251, 252, 253, 0.9);
+  --fc-line: #dfe6ec;
+  --fc-line-strong: #ccd6df;
+  --fc-text: #2a3a55;
+  --fc-muted: #55677c;
   --fc-quiet: var(--fc-color-slate-400);
   --fc-accent: var(--fc-color-teal-600);
   --fc-accent-strong: var(--fc-color-teal-500);
-  --fc-accent-soft: rgba(1, 187, 182, 0.13);
+  --fc-accent-soft: rgba(1, 187, 182, 0.1);
   --fc-warning: var(--fc-color-amber-500);
-  --fc-warning-soft: rgba(245, 158, 11, 0.14);
+  --fc-warning-soft: rgba(245, 158, 11, 0.12);
   --fc-danger: var(--fc-color-red-500);
-  --fc-danger-soft: #fee2e2;
+  --fc-danger-soft: #fdeaea;
   --fc-danger-text: var(--fc-color-red-800);
   --fc-info: var(--fc-color-blue-500);
-  --fc-on-primary: var(--fc-color-ink-950);
-  --fc-shadow-panel: 0 14px 36px rgba(4, 29, 87, 0.08);
-  --fc-shadow-card: 0 18px 48px rgba(4, 29, 87, 0.1);
-  --fc-focus-ring: 0 0 0 4px rgba(1, 187, 182, 0.18);
+  /* Alinhado ao primary-foreground do Tailwind (218 34% 22%): mesmo ink nos
+     botões âmbar das duas paletas. No dark segue ink-950 (override abaixo). */
+  --fc-on-primary: #25334b;
+  --fc-shadow-panel: 0 10px 28px rgba(42, 58, 85, 0.06);
+  --fc-shadow-card: 0 14px 36px rgba(42, 58, 85, 0.08);
+  --fc-focus-ring: 0 0 0 4px rgba(1, 187, 182, 0.14);
   --fc-body-bg:
-    radial-gradient(circle at 72% 16%, rgba(1, 187, 182, 0.1), transparent 32rem),
-    radial-gradient(circle at 16% 86%, rgba(4, 29, 87, 0.05), transparent 32rem),
+    radial-gradient(circle at 72% 16%, rgba(1, 187, 182, 0.05), transparent 32rem),
+    radial-gradient(circle at 16% 86%, rgba(42, 58, 85, 0.03), transparent 32rem),
     var(--fc-bg);
 
   /* Component tokens */
   --fc-panel-bg: linear-gradient(180deg, var(--fc-surface-raised), var(--fc-surface));
   --fc-panel-border: var(--fc-line);
-  --fc-topbar-bg: rgba(255, 255, 255, 0.82);
-  --fc-sidebar-bg: rgba(255, 255, 255, 0.9);
+  --fc-topbar-bg: rgba(249, 251, 252, 0.85);
+  --fc-sidebar-bg: rgba(250, 252, 253, 0.92);
   --fc-input-bg: var(--fc-surface);
   --fc-input-border: var(--fc-line);
   --fc-button-primary-bg: linear-gradient(90deg, var(--fc-warning), var(--fc-color-amber-300));
@@ -126,6 +132,9 @@
   --fc-on-primary: var(--fc-color-ink-950);
   --fc-shadow-panel: 0 12px 32px rgba(0, 0, 0, 0.5);
   --fc-shadow-card: 0 18px 48px rgba(0, 0, 0, 0.32);
+  /* Pinado: o light reduziu o ring do :root p/ 0.14; sem este override o dark
+     herdaria o valor mais fraco (vazamento). Mantém o dark como sempre foi. */
+  --fc-focus-ring: 0 0 0 4px rgba(1, 187, 182, 0.18);
   --fc-body-bg: var(--fc-bg);
   --fc-panel-bg: linear-gradient(180deg, rgba(18, 18, 18, 0.98), rgba(10, 10, 10, 0.98));
   --fc-topbar-bg: rgba(16, 16, 16, 0.88);

@@ -3,24 +3,28 @@
 @tailwind utilities;
 
 @layer base {
+  /* Paleta clara SUAVIZADA — mantida em sincronia com src/styles/tokens.css
+     (mesmos hex, em HSL): fundo #eef1f4, cartões #fbfcfd (nada de branco puro),
+     texto ink dessaturado #2a3a55 (em vez do navy saturado, que dava contraste
+     agressivo) e bordas mais leves. O dark permanece como estava. */
   :root {
-    --background: 206 33% 96%;
-    --foreground: 222 91% 18%;
+    --background: 210 21% 95%;
+    --foreground: 218 34% 25%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222 91% 18%;
+    --card: 210 33% 99%;
+    --card-foreground: 218 34% 25%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 91% 18%;
+    --popover: 210 33% 99%;
+    --popover-foreground: 218 34% 25%;
 
     --primary: 43 96% 56%;
-    --primary-foreground: 222 91% 18%;
+    --primary-foreground: 218 34% 22%;
 
-    --secondary: 210 24% 87%;
-    --secondary-foreground: 222 91% 18%;
+    --secondary: 208 26% 90%;
+    --secondary-foreground: 218 34% 25%;
 
-    --muted: 210 24% 87%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 208 26% 90%;
+    --muted-foreground: 212 19% 41%;
 
     --accent: 178 98% 37%;
     --accent-foreground: 0 0% 100%;
@@ -28,8 +32,8 @@
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 210 24% 87%;
-    --input: 210 24% 87%;
+    --border: 208 26% 90%;
+    --input: 208 26% 90%;
     --ring: 43 96% 56%;
 
     --radius: 0.5rem;
