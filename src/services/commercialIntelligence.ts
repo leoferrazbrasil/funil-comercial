@@ -23,7 +23,13 @@ export function formatPriority(priority: CommercialPriority) {
 }
 
 function messageNeedsAction(message: InboxMessage) {
-  return message.unread_count > 0 || message.status !== "Resolvido";
+  // Só mensagens RECEBIDAS ainda não respondidas/resolvidas. Sem o filtro de
+  // direção, o painel sugeria "responder" às mensagens que nós mesmos enviamos.
+  if (message.direction !== "inbound") return false;
+  return (
+    message.unread_count > 0 ||
+    (message.status !== "Resolvido" && message.status !== "Respondido")
+  );
 }
 
 function leadIsActive(lead: Lead) {
@@ -37,7 +43,15 @@ function opportunityIsOpen(opportunity: Opportunity) {
 export function buildCommercialRecommendations(
   snapshot: CrmSnapshot,
 ): CommercialRecommendation[] {
-  const pendingMessages = snapshot.messages.filter(messageNeedsAction);
+  // Não-lidas primeiro; entre iguais, a que aguarda há mais tempo (mais antiga).
+  const pendingMessages = snapshot.messages
+    .filter(messageNeedsAction)
+    .sort((a, b) => {
+      const unreadDiff =
+        (b.unread_count > 0 ? 1 : 0) - (a.unread_count > 0 ? 1 : 0);
+      if (unreadDiff !== 0) return unreadDiff;
+      return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+    });
   const activeLeads = snapshot.leads.filter(leadIsActive);
   const openOpportunities = snapshot.opportunities.filter(opportunityIsOpen);
   const recommendations: CommercialRecommendation[] = [];
@@ -54,9 +68,12 @@ export function buildCommercialRecommendations(
     });
   }
 
-  const leadWithoutOpportunity = activeLeads.find(
-    (lead) => !snapshot.opportunities.some((item) => item.lead_id === lead.id),
-  );
+  // Entre leads sem oportunidade, prioriza o de maior valor estimado.
+  const leadWithoutOpportunity = [...activeLeads]
+    .sort((a, b) => b.valor_estimado - a.valor_estimado)
+    .find(
+      (lead) => !snapshot.opportunities.some((item) => item.lead_id === lead.id),
+    );
   if (leadWithoutOpportunity) {
     recommendations.push({
       id: `lead-${leadWithoutOpportunity.id}`,
@@ -68,9 +85,10 @@ export function buildCommercialRecommendations(
     });
   }
 
-  const opportunityWithoutAction = openOpportunities.find(
-    (opportunity) => !opportunity.proxima_acao?.trim(),
-  );
+  // Entre oportunidades sem próxima ação, prioriza a de maior valor.
+  const opportunityWithoutAction = [...openOpportunities]
+    .sort((a, b) => b.valor - a.valor)
+    .find((opportunity) => !opportunity.proxima_acao?.trim());
   if (opportunityWithoutAction) {
     recommendations.push({
       id: `opportunity-${opportunityWithoutAction.id}`,
