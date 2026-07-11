@@ -21,6 +21,7 @@ import {
   Moon,
   Sun,
   X,
+  Settings as SettingsIcon,
 } from "lucide-react";
 import type { FormEvent, ReactNode } from "react";
 import { Toaster, toast } from "react-hot-toast";
@@ -50,6 +51,7 @@ import SignUpScreen from "./pages/SignUp";
 import LoginScreen from "./pages/Login";
 import PipelinePage from "./pages/Pipeline";
 import ProfilePage from "./pages/Profile";
+import SettingsPage from "./pages/Settings";
 import Logo from "./components/Logo";
 import {
   convertContactToLead,
@@ -1063,6 +1065,7 @@ function AppContent() {
                 />
               }
             />
+            <Route path="/configuracoes" element={<SettingsPage />} />
             <Route
               path="/dashboard"
               element={<Dashboard snapshot={snapshot} onOpenModal={openModal} />}
@@ -1315,7 +1318,15 @@ function Header({
         <button className="icon-button" aria-label="Notificações">
           <Bell size={18} />
         </button>
-        <button 
+        <button
+          className="icon-button"
+          aria-label="Configurações"
+          title="Configurações"
+          onClick={() => onNavigate?.("configuracoes")}
+        >
+          <SettingsIcon size={18} />
+        </button>
+        <button
           className="user-chip border border-transparent hover:border-primary/50 transition-colors p-0 overflow-hidden" 
           title={profileName}
           onClick={() => onNavigate?.("perfil")}
