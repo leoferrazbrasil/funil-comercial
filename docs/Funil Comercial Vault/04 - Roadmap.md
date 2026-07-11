@@ -20,6 +20,7 @@ date: 2026-07-10
 
 ## ✅ Entregue recentemente
 
+- **Reposicionamento do site** — home = empresa de estrutura de vendas (Método Estrutura de Vendas, 4 camadas, tom negócio local); CRM movido para `/crm`. Ver [[03 - Changelog]].
 - **Campanhas Fase 2 — Agendamento** — envio **server-side** (tabelas `campaigns`/`campaign_recipients` + `campaign-runner` + Supabase Cron); agendar data/hora, histórico com status e cancelar. Ver [[03 - Changelog]].
 - **Página de Campanhas (Fase 1)** — menu `/campanhas` com wizard de 3 etapas (Configurar → Contatos → Confirmação) + preview iPhone; dispara templates para contatos do CRM ou lista **CSV**, enviando agora. Ver [[03 - Changelog]].
 - **Disparo de templates em massa (Ciclo 2)** — em `/contatos`, enviar um template aprovado para vários contatos de uma vez (`BulkTemplateDialog`), com variável por-destinatário (nome) ou fixa, seleção por checkbox e progresso. Ver [[03 - Changelog]].

@@ -11,6 +11,13 @@ tags:
 > [!note] Navegação
 > Histórico de mudanças, mais recente primeiro. Contexto do produto em [[01 - Requisitos]]; arquitetura em [[02 - Arquitetura e Design]]; índice em [[00 - Inicio]].
 
+## [2026-07-11] - Reposicionamento do site: empresa de estrutura de vendas
+
+### Mudado — funilcomercial.com vira a home da EMPRESA (CRM → `/crm`)
+- **Posicionamento:** "Não somos mais uma agência. Montamos a sua estrutura de vendas." Público: **negócio local** (liberais, autônomos, prestadores). Método nomeado: **Método Estrutura de Vendas** — 4 camadas (01 Presença: Site+GMN · 02 Aquisição: tráfego · 03 Conversão: CRM+WhatsApp · 04 Escala: IA+rotina); o cliente entra pela camada que precisa.
+- **Home nova** (`Landing.tsx`): hero, visual das camadas, dores locais, método, esteira de serviços (CTA de WhatsApp **por serviço**, número oficial Meta `5551996737359`), segmentos, 3 passos, fundador, FAQ. **Preços não publicados** — valores fechados no diagnóstico (decisão do dono). A antiga landing do CRM virou **`/crm`** (`CrmLanding.tsx`, rota pública). SEO/OG atualizados.
+- **Correções da revisão adversarial (parcial — limite de sessão):** removido claim falso "criptografia de ponta a ponta" (FAQ do `/crm` e Login → TLS + repouso + isolamento por conta); corrigido **mojibake `NegociaÃ§Ã£o`** em `isClosingStage` (5 arquivos — o estágio Negociação nunca casava); tráfego explicita "verba à parte".
+
 ## [2026-07-11] - Campanhas Fase 2: persistência + agendamento (envio server-side)
 
 ### Adicionado — Agendamento e histórico de campanhas
