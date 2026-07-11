@@ -366,20 +366,21 @@ Deno.serve(async (request) => {
     }
 
     // Dono da conversa: se o remetente é vendedor, é o admin dele; senão, ele mesmo.
-    const { data: senderProfile } = await supabase
+    const { data: senderProfile, error: senderErr } = await supabase
       .from("profiles").select("admin_id").eq("id", user.id).maybeSingle();
+    if (senderErr) return jsonResponse({ error: "Não foi possível validar seu acesso." }, 500);
     const conversationOwnerId = senderProfile?.admin_id ?? user.id;
 
     // Vendedor só envia em conversa ATRIBUÍDA a ele.
     if (senderProfile?.admin_id) {
-      const { data: assigned } = await supabase
+      const { data: assigned, error: assignedErr } = await supabase
         .from("conversation_assignments")
         .select("id")
         .eq("owner_id", conversationOwnerId)
         .eq("telefone", phone)
         .eq("assigned_to", user.id)
         .maybeSingle();
-      if (!assigned) {
+      if (assignedErr || !assigned) {
         return jsonResponse({ error: "Você não está atribuído a esta conversa." }, 403);
       }
     }
@@ -494,8 +495,14 @@ Deno.serve(async (request) => {
       .insert({
         owner_id: conversationOwnerId,
         sent_by: user.id,
-        contact_id: payload.contact_id ?? sourceMessage?.contact_id ?? null,
-        lead_id: payload.lead_id ?? sourceMessage?.lead_id ?? null,
+        // Vendedor não gerencia vínculos de CRM do admin: usa apenas o que já
+        // está na conversa de origem, nunca valores arbitrários do cliente.
+        contact_id: (senderProfile?.admin_id
+          ? sourceMessage?.contact_id
+          : (payload.contact_id ?? sourceMessage?.contact_id)) ?? null,
+        lead_id: (senderProfile?.admin_id
+          ? sourceMessage?.lead_id
+          : (payload.lead_id ?? sourceMessage?.lead_id)) ?? null,
         canal: "WhatsApp",
         provider: channel.provider,
         provider_message_id: messageId,
