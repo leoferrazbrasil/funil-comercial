@@ -27,12 +27,13 @@ import {
   Check,
   CheckCheck,
   AlertTriangle,
+  UserPlus,
 } from "lucide-react";
 import type { FormEvent, ReactNode } from "react";
 import { Toaster, toast } from "react-hot-toast";
 import { DndContext, useDraggable, useDroppable } from "@dnd-kit/core";
 import { IMaskInput } from "react-imask";
-import { useEffect, useMemo, useState, useRef } from "react";
+import { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import {
   BrowserRouter,
   Routes,
@@ -66,6 +67,10 @@ import {
   ensureDefaultStages,
   getCrmSnapshot,
   upsertProfile,
+  getMyProfile,
+  getTeamMembers,
+  getConversationAssignments,
+  assignConversation,
 } from "../lib/crmService";
 import { TemplatePicker } from "../components/TemplatePicker";
 import type { WhatsAppTemplate } from "../lib/crmService";
@@ -83,13 +88,16 @@ import {
 import { isSupabaseConfigured, supabase } from "../lib/supabase";
 import type {
   Contact,
+  ConversationAssignment,
   CrmSnapshot,
   InboxMessage,
   IntegrationChannel,
   Lead,
   Opportunity,
   OpportunityStage,
+  Profile,
   Route as AppRoute,
+  TeamMember,
 } from "../lib/types";
 
 type ModalType = "contact" | "lead" | "opportunity" | "message" | "channel";
@@ -635,6 +643,16 @@ export default function InboxPage({
   const [localSearch, setLocalSearch] = useState("");
   const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Handoff (time): perfil próprio, vendedores do time (só admin) e mapa de
+  // atribuições por telefone. Carregados uma vez; atribuições recarregam após
+  // transferir uma conversa.
+  const [myProfile, setMyProfile] = useState<Profile | null>(null);
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [assignments, setAssignments] = useState<ConversationAssignment[]>([]);
+  const [onlyMine, setOnlyMine] = useState(false);
+  const [transferMenuOpen, setTransferMenuOpen] = useState(false);
+  const [assigning, setAssigning] = useState(false);
   
   // Mobile UI States: "list" | "chat" | "context"
   const [mobileView, setMobileView] = useState<"list" | "chat" | "context">("list");
@@ -664,6 +682,68 @@ export default function InboxPage({
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [conversations, selectedKey]);
 
+  // Handoff: carrega perfil próprio + atribuições sempre; time de vendedores
+  // só quando o usuário logado é admin (role !== "vendedor" e sem admin_id).
+  const reloadAssignments = useCallback(async () => {
+    try {
+      setAssignments(await getConversationAssignments());
+    } catch (error) {
+      console.error("[Inbox] load assignments", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const profile = await getMyProfile();
+        setMyProfile(profile);
+        const isAdminUser = Boolean(
+          profile && profile.role !== "vendedor" && !profile.admin_id,
+        );
+        if (isAdminUser) {
+          setTeamMembers(await getTeamMembers());
+        }
+      } catch (error) {
+        console.error("[Inbox] load profile/team", error);
+      }
+    })();
+    reloadAssignments();
+  }, [reloadAssignments]);
+
+  // Fecha o menu de transferência ao trocar de conversa.
+  useEffect(() => {
+    setTransferMenuOpen(false);
+  }, [selectedKey]);
+
+  // Handoff: sou admin (dono do time) se tenho perfil, não sou vendedor e não
+  // tenho admin_id (vendedores sempre apontam pro admin dono da conta).
+  const isAdmin = Boolean(
+    myProfile && myProfile.role !== "vendedor" && !myProfile.admin_id,
+  );
+
+  // Mapa telefone (unificado) -> atribuição, para casar com `conv.key` (que já
+  // é `unifyPhone`). `conversation_assignments.telefone` é gravado cru, então
+  // unificamos aqui do mesmo jeito que as conversas são agrupadas.
+  const assignmentByKey = useMemo(() => {
+    const map = new Map<string, ConversationAssignment>();
+    for (const assignment of assignments) {
+      const key = unifyPhone(assignment.telefone) || assignment.telefone;
+      map.set(key, assignment);
+    }
+    return map;
+  }, [assignments]);
+
+  // Nome do responsável por id: inclui o time (visão do admin) e o próprio
+  // perfil (para o vendedor conseguir ver seu próprio nome no selo).
+  const membersById = useMemo(() => {
+    const map = new Map<string, { nome: string | null; email: string | null }>();
+    for (const member of teamMembers) map.set(member.id, member);
+    if (myProfile) map.set(myProfile.id, myProfile);
+    return map;
+  }, [teamMembers, myProfile]);
+
+  const showAssignedFilter = isAdmin ? teamMembers.length > 0 : Boolean(myProfile);
+
   const displayedConversations = useMemo(() => {
     const dateCutoff = dateFilterCutoff(dateFilter);
     return conversations.filter(conv => {
@@ -673,6 +753,12 @@ export default function InboxPage({
 
       // Filtro de Tipo (estágio exclusivo do funil)
       if (typeFilter !== "todos" && conv.stage !== typeFilter) return false;
+
+      // Filtro "Atribuídas a mim"
+      if (onlyMine) {
+        const assignment = assignmentByKey.get(conv.key);
+        if (!assignment || assignment.assigned_to !== myProfile?.id) return false;
+      }
 
       // Filtro de Data (pela data da última mensagem da conversa)
       if (dateCutoff !== null && new Date(conv.latest.created_at).getTime() < dateCutoff) {
@@ -691,7 +777,7 @@ export default function InboxPage({
       }
       return true;
     });
-  }, [conversations, filterTab, localSearch, typeFilter, dateFilter]);
+  }, [conversations, filterTab, localSearch, typeFilter, dateFilter, onlyMine, assignmentByKey, myProfile]);
 
   // Selection Logic — auto-select the first conversation on desktop, BUT never
   // when a specific conversation was requested via ?to= (Contacts "WhatsApp"
@@ -807,6 +893,37 @@ export default function InboxPage({
     : linkedContact
       ? `Contato: ${linkedContact.nome}`
       : "Sem registro comercial";
+
+  // Handoff: quem está atendendo a conversa selecionada (se houver atribuição).
+  const selectedAssignment = selectedConversation
+    ? assignmentByKey.get(selectedConversation.key)
+    : undefined;
+  const selectedAssigneeName = selectedAssignment
+    ? membersById.get(selectedAssignment.assigned_to)?.nome ||
+      membersById.get(selectedAssignment.assigned_to)?.email ||
+      "Vendedor"
+    : null;
+
+  // Botão "Transferir": só admin, só se há vendedores no time, e só numa
+  // conversa real (o rascunho de conversa nova ainda não tem owner_id).
+  const canTransfer = isAdmin && teamMembers.length > 0 && Boolean(selected?.owner_id);
+
+  const handleAssign = async (member: TeamMember) => {
+    const ownerId = selected?.owner_id;
+    if (!ownerId || !sourcePhone) return;
+    setAssigning(true);
+    try {
+      await assignConversation(ownerId, sourcePhone, member.id);
+      await reloadAssignments();
+      toast.success("Conversa transferida para " + (member.nome || member.email || "vendedor"));
+      setTransferMenuOpen(false);
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    } finally {
+      setAssigning(false);
+    }
+  };
+
   useEffect(() => {
     setReplyText("");
   }, [selectedConversation?.key]);
@@ -873,12 +990,12 @@ export default function InboxPage({
           />
         </div>
 
-        {/* Filtros: Data + Tipo (combinam com as abas acima) */}
+        {/* Filtros: Data + Tipo + Time (combinam com as abas acima) */}
         <div className="space-y-1.5">
-          {(dateFilter !== "tudo" || typeFilter !== "todos") && (
+          {(dateFilter !== "tudo" || typeFilter !== "todos" || onlyMine) && (
             <div className="flex justify-end">
               <button
-                onClick={() => { setDateFilter("tudo"); setTypeFilter("todos"); }}
+                onClick={() => { setDateFilter("tudo"); setTypeFilter("todos"); setOnlyMine(false); }}
                 className="text-[10px] font-medium text-muted-foreground hover:text-primary transition-colors"
               >
                 Limpar filtros
@@ -913,6 +1030,19 @@ export default function InboxPage({
               ))}
             </div>
           </div>
+          {showAssignedFilter && (
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground w-9 shrink-0">Time</span>
+              <div className="flex gap-1 flex-1">
+                <button
+                  onClick={() => setOnlyMine((v) => !v)}
+                  className={`flex-1 py-1 text-[11px] font-medium rounded-lg border transition-colors ${onlyMine ? "bg-primary/15 border-primary/40 text-primary" : "bg-white/5 border-white/10 text-muted-foreground hover:text-foreground hover:bg-white/10"}`}
+                >
+                  Atribuídas a mim
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -937,6 +1067,12 @@ export default function InboxPage({
             {displayedConversationsWithDraft.map((conv) => {
               const isSelected = selectedKey === conv.key;
               const hasUnread = conv.unreadCount > 0;
+              const assignment = assignmentByKey.get(conv.key);
+              const assigneeName = assignment
+                ? membersById.get(assignment.assigned_to)?.nome ||
+                  membersById.get(assignment.assigned_to)?.email ||
+                  "vendedor"
+                : null;
               return (
                 <button
                   key={conv.key}
@@ -964,6 +1100,11 @@ export default function InboxPage({
                     <p className={`text-xs line-clamp-1 ${hasUnread ? 'text-foreground/80 font-medium' : 'text-muted-foreground'}`}>
                       {conv.latest.mensagem}
                     </p>
+                    {assigneeName && (
+                      <span className="inline-flex items-center gap-1 mt-1.5 text-[10px] font-medium text-primary/90 bg-primary/10 border border-primary/20 rounded-full px-2 py-0.5">
+                        <UserPlus size={10} /> Atendendo: {assigneeName}
+                      </span>
+                    )}
                   </div>
                 </button>
               );
@@ -1008,19 +1149,52 @@ export default function InboxPage({
                 <p className="text-[11px] text-muted-foreground flex items-center gap-1.5 truncate mt-0.5">
                   <span className="w-2 h-2 rounded-full bg-green-500 inline-block shrink-0 shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
                   <span className="truncate font-medium">{selected?.status ?? "Atendimento"} • {sourceMessage?.canal}</span>
+                  {selectedAssigneeName && (
+                    <span className="truncate font-medium text-primary">• Atendendo: {selectedAssigneeName}</span>
+                  )}
                 </p>
               </div>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-2">
-            <button 
+            {canTransfer && (
+              <div className="relative hidden sm:block">
+                <button
+                  type="button"
+                  onClick={() => setTransferMenuOpen((v) => !v)}
+                  disabled={assigning}
+                  className="px-4 py-2 rounded-xl bg-primary/10 text-primary font-bold text-xs hover:bg-primary/20 transition-all flex items-center gap-1.5 border border-primary/20 disabled:opacity-50"
+                >
+                  <UserPlus size={16} /> Transferir
+                </button>
+                {transferMenuOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-56 max-h-72 overflow-y-auto bg-card border border-border rounded-xl shadow-xl z-50 py-1.5">
+                    {teamMembers.map((member) => (
+                      <button
+                        key={member.id}
+                        type="button"
+                        onClick={() => handleAssign(member)}
+                        disabled={assigning}
+                        className={`w-full text-left px-3.5 py-2 text-xs font-medium transition-colors flex items-center justify-between gap-2 hover:bg-white/10 disabled:opacity-50 ${selectedAssignment?.assigned_to === member.id ? "text-primary" : "text-foreground"}`}
+                      >
+                        <span className="truncate">{member.nome || member.email}</span>
+                        {selectedAssignment?.assigned_to === member.id && (
+                          <CheckCircle2 size={14} className="shrink-0" />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+            <button
               onClick={() => sourceMessage && onUpdateMessageStatus(sourceMessage, "Resolvido", 0)}
               className="px-4 py-2 rounded-xl bg-green-500/10 text-green-500 font-bold text-xs hover:bg-green-500/20 transition-all hidden sm:flex items-center gap-1.5 border border-green-500/20"
             >
               <CheckCircle2 size={16} /> Resolver
             </button>
-            <button 
+            <button
               onClick={() => setMobileView("context")}
               className="lg:hidden p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-foreground bg-white/5 hover:bg-white/10 transition-colors"
             >
