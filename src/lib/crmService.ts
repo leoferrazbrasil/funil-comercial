@@ -1,6 +1,8 @@
 import type { User } from "@supabase/supabase-js";
 import { requireSupabase } from "./supabase";
 import type {
+  Campaign,
+  CampaignVariable,
   Contact,
   CrmSnapshot,
   InboxMessage,
@@ -496,6 +498,105 @@ export async function sendInboxTemplate(payload: {
     throw new Error(await extractFunctionError(error, data));
   }
   return { mode: "template" as const };
+}
+
+// --- Campanhas (Fase 2) ----------------------------------------------------
+
+export async function createCampaign(payload: {
+  nome: string;
+  templateName: string;
+  templateLanguage: string;
+  bodyText: string;
+  variables: CampaignVariable[];
+  scheduledAt: string; // ISO
+  recipients: Array<{ nome: string; telefone: string; contactId: string | null }>;
+}): Promise<Campaign> {
+  const supabase = requireSupabase();
+  const { data: userData } = await supabase.auth.getUser();
+  const ownerId = userData.user?.id;
+  if (!ownerId) throw new Error("Usuário não autenticado.");
+
+  const { data: campaign, error } = await supabase
+    .from("campaigns")
+    .insert({
+      owner_id: ownerId,
+      nome: payload.nome.trim(),
+      template_name: payload.templateName,
+      template_language: payload.templateLanguage,
+      body_text: payload.bodyText,
+      variables: payload.variables,
+      scheduled_at: payload.scheduledAt,
+      status: "scheduled",
+      total: payload.recipients.length,
+    })
+    .select()
+    .single();
+  if (error) throw error;
+
+  if (payload.recipients.length > 0) {
+    const rows = payload.recipients.map((r) => ({
+      campaign_id: (campaign as Campaign).id,
+      owner_id: ownerId,
+      nome: r.nome || "Contato",
+      telefone: r.telefone,
+      contact_id: r.contactId,
+      status: "pending",
+    }));
+    const { error: recErr } = await supabase.from("campaign_recipients").insert(rows);
+    if (recErr) {
+      // Rollback: remove a campanha órfã (sem destinatários) para não virar um
+      // registro fantasma "Falhou 0/0" no histórico.
+      await supabase.from("campaigns").delete().eq("id", (campaign as Campaign).id);
+      throw recErr;
+    }
+  }
+
+  return campaign as Campaign;
+}
+
+export async function getCampaigns(): Promise<Campaign[]> {
+  const supabase = requireSupabase();
+  const { data, error } = await supabase
+    .from("campaigns")
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data as Campaign[]) ?? [];
+}
+
+export async function getCampaign(id: string): Promise<Campaign | null> {
+  const supabase = requireSupabase();
+  const { data, error } = await supabase
+    .from("campaigns")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+  if (error) throw error;
+  return (data as Campaign | null) ?? null;
+}
+
+// Retorna true se realmente cancelou (a campanha ainda estava agendada); false
+// se o envio já havia começado (o cron flipou para 'sending') — não interrompe.
+export async function cancelCampaign(id: string): Promise<boolean> {
+  const supabase = requireSupabase();
+  const { data, error } = await supabase
+    .from("campaigns")
+    .update({ status: "canceled" })
+    .eq("id", id)
+    .eq("status", "scheduled")
+    .select("id");
+  if (error) throw error;
+  return (data?.length ?? 0) > 0;
+}
+
+// Dispara o processamento das PRÓPRIAS campanhas due imediatamente (usado no
+// "enviar agora", sem esperar o tick do cron). Usa o JWT do usuário logado.
+export async function runOwnCampaigns(): Promise<void> {
+  const supabase = requireSupabase();
+  const { data, error } = await supabase.functions.invoke("campaign-runner", {
+    body: { scope: "own" },
+  });
+  if (error) throw new Error(await extractFunctionError(error, data));
 }
 
 // --- Deletions -------------------------------------------------------------

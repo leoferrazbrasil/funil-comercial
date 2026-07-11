@@ -97,3 +97,31 @@ export type CrmSnapshot = {
   messages: InboxMessage[]
   channels: IntegrationChannel[]
 }
+
+export type CampaignStatus =
+  | 'scheduled'
+  | 'sending'
+  | 'done'
+  | 'failed'
+  | 'canceled'
+
+export type CampaignVariable = { mode: 'name' | 'fixed'; value: string }
+
+export type Campaign = {
+  id: string
+  owner_id: string
+  nome: string
+  template_name: string
+  template_language: string
+  body_text: string
+  variables: CampaignVariable[]
+  scheduled_at: string
+  status: CampaignStatus
+  total: number
+  sent: number
+  failed: number
+  started_at: string | null
+  finished_at: string | null
+  created_at: string
+  updated_at: string
+}

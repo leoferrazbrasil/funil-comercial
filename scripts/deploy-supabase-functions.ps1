@@ -48,15 +48,6 @@ $project = $projects | Where-Object { $_.ref -eq $ProjectRef } | Select-Object -
 if (-not $project) {
   throw "Token Supabase atual nao tem acesso ao projeto $ProjectRef."
 }
-if ($LASTEXITCODE -ne 0) {
-  throw "Nao foi possivel listar projetos Supabase com o token atual."
-}
-
-$projects = $projectsJson | ConvertFrom-Json
-$project = $projects | Where-Object { $_.ref -eq $ProjectRef } | Select-Object -First 1
-if (-not $project) {
-  throw "Token Supabase atual nao tem acesso ao projeto $ProjectRef."
-}
 
 if (-not $SkipDenoCheck) {
   Invoke-Checked @(
@@ -66,7 +57,8 @@ if (-not $SkipDenoCheck) {
     "supabase/functions/whatsapp-inbound/index.ts",
     "supabase/functions/whatsapp-qr-inbound/index.ts",
     "supabase/functions/whatsapp-send/index.ts",
-    "supabase/functions/whatsapp-templates/index.ts"
+    "supabase/functions/whatsapp-templates/index.ts",
+    "supabase/functions/campaign-runner/index.ts"
   )
 }
 
@@ -106,6 +98,18 @@ $deployTemplates = @(
   "whatsapp-templates"
 ) + $deploySharedFlags
 Invoke-Checked $deployTemplates
+
+# campaign-runner: autentica internamente (cron secret / JWT) -> verify_jwt off.
+$deployCampaignRunner = @(
+  "npx",
+  "--yes",
+  "supabase",
+  "functions",
+  "deploy",
+  "campaign-runner",
+  "--no-verify-jwt"
+) + $deploySharedFlags
+Invoke-Checked $deployCampaignRunner
 
 $deployQrInbound = @(
   "npx",

@@ -21,3 +21,8 @@ verify_jwt = false
 # Inbound message webhook (Z-API on-message-received / Meta Cloud API).
 [functions.whatsapp-inbound]
 verify_jwt = false
+
+# Runner de campanhas: chamado pelo Supabase Cron (x-campaign-secret) e pelo
+# front (JWT do usuário). Autentica internamente.
+[functions.campaign-runner]
+verify_jwt = false
