@@ -74,6 +74,9 @@ export type InboxMessage = {
   status: string
   unread_count: number
   direction: 'inbound' | 'outbound'
+  // Status de entrega (mensagens de saída via Meta), atualizado pelo webhook.
+  delivery_status?: 'sent' | 'delivered' | 'read' | 'failed' | null
+  delivery_error?: string | null
   created_at: string
 }
 

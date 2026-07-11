@@ -24,6 +24,9 @@ import {
   Sun,
   X,
   Smartphone,
+  Check,
+  CheckCheck,
+  AlertTriangle,
 } from "lucide-react";
 import type { FormEvent, ReactNode } from "react";
 import { Toaster, toast } from "react-hot-toast";
@@ -143,6 +146,36 @@ const formatRelativeDate = (dateString: string) => {
     return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
   }
 };
+
+// Selinho de entrega da mensagem de saída (atualizado pelo webhook de status da
+// Meta). `null` = sem status ainda (ex.: envio local/manual) → não mostra nada.
+function DeliveryBadge({
+  status,
+  error,
+}: {
+  status?: InboxMessage["delivery_status"];
+  error?: string | null;
+}) {
+  if (!status) return null;
+  if (status === "failed") {
+    return (
+      <span
+        className="inline-flex items-center gap-0.5 text-red-500"
+        title={error ?? "Falha na entrega"}
+      >
+        <AlertTriangle size={12} /> Falhou
+      </span>
+    );
+  }
+  if (status === "read") {
+    return <CheckCheck size={13} className="text-sky-400" aria-label="Lida" />;
+  }
+  if (status === "delivered") {
+    return <CheckCheck size={13} aria-label="Entregue" />;
+  }
+  // sent
+  return <Check size={13} aria-label="Enviada" />;
+}
 
 const normalizeSearch = (value: string) =>
   value
@@ -1006,21 +1039,32 @@ export default function InboxPage({
           
           {selectedConversation.messages.map((message, index) => {
             const isInbound = message.direction === "inbound";
+            const failed = !isInbound && message.delivery_status === "failed";
             // Check if previous message is from same sender to group them (optional enhancement, skipping complex logic for now)
             return (
               <div key={message.id} className={`flex flex-col max-w-[85%] lg:max-w-[75%] ${isInbound ? 'self-start' : 'self-end'} group`}>
-                <div 
+                <div
                   className={`px-4 py-3 text-[15px] leading-relaxed shadow-sm ${
-                    isInbound 
-                      ? 'bg-card text-card-foreground rounded-2xl rounded-tl-sm border border-border' 
-                      : 'bg-primary text-primary-foreground rounded-2xl rounded-tr-sm'
+                    isInbound
+                      ? 'bg-card text-card-foreground rounded-2xl rounded-tl-sm border border-border'
+                      : failed
+                        ? 'bg-primary/60 text-primary-foreground rounded-2xl rounded-tr-sm ring-1 ring-red-500/50'
+                        : 'bg-primary text-primary-foreground rounded-2xl rounded-tr-sm'
                   }`}
                 >
                   {message.mensagem}
                 </div>
-                <div className={`text-[10px] font-medium text-muted-foreground mt-1.5 opacity-70 group-hover:opacity-100 transition-opacity ${isInbound ? 'text-left ml-1' : 'text-right mr-1'}`}>
-                  {formatRelativeDate(message.created_at)}
+                <div className={`text-[10px] font-medium mt-1.5 opacity-70 group-hover:opacity-100 transition-opacity ${isInbound ? 'text-left ml-1 text-muted-foreground' : 'text-right mr-1 flex items-center justify-end gap-1.5 text-muted-foreground'}`}>
+                  <span>{formatRelativeDate(message.created_at)}</span>
+                  {!isInbound && (
+                    <DeliveryBadge status={message.delivery_status} error={message.delivery_error} />
+                  )}
                 </div>
+                {failed && message.delivery_error && (
+                  <div className="text-[10px] text-red-500 mt-1 mr-1 text-right leading-snug">
+                    {message.delivery_error}
+                  </div>
+                )}
               </div>
             );
           })}

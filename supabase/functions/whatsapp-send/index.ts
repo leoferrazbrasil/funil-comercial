@@ -488,6 +488,9 @@ Deno.serve(async (request) => {
         status: "Resposta enviada",
         unread_count: 0,
         direction: "outbound",
+        // Baseline de entrega: se houve wamid (envio real à Meta), começa em
+        // 'sent'; o webhook de status atualiza para delivered/read/failed.
+        delivery_status: messageId ? "sent" : null,
       })
       .select()
       .single();

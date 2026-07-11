@@ -269,6 +269,95 @@ function extractWhatsAppCloudMessages(payload: JsonRecord): NormalizedInboundMes
   return inboundMessages;
 }
 
+// --- Status de entrega (Meta Cloud API) -----------------------------------
+// A Meta envia, no mesmo webhook, eventos `statuses` com o ciclo de vida da
+// mensagem enviada: sent -> delivered -> read, ou failed (com código de erro).
+// Casamos pela wamid (== provider_message_id gravado no envio).
+type DeliveryStatusEvent = {
+  providerMessageId: string;
+  status: string; // sent | delivered | read | failed
+  recipientPhone: string | null;
+  errorCode: number | null;
+  errorTitle: string | null;
+  errorMessage: string | null;
+};
+
+function extractDeliveryStatuses(payload: JsonRecord): DeliveryStatusEvent[] {
+  const entries = getNestedArray(payload, "entry");
+  if (payload.object !== "whatsapp_business_account" || entries.length === 0) {
+    return [];
+  }
+
+  const statuses: DeliveryStatusEvent[] = [];
+
+  for (const entry of entries) {
+    if (!isRecord(entry)) continue;
+
+    for (const change of getNestedArray(entry, "changes")) {
+      if (!isRecord(change)) continue;
+
+      const value = getNestedRecord(change, "value");
+      if (!value) continue;
+
+      for (const rawStatus of getNestedArray(value, "statuses")) {
+        if (!isRecord(rawStatus)) continue;
+
+        const id = asString(rawStatus.id);
+        const status = asString(rawStatus.status);
+        if (!id || !status) continue;
+
+        const firstError = getNestedArray(rawStatus, "errors").find(isRecord);
+        const errorData = firstError ? getNestedRecord(firstError, "error_data") : null;
+
+        statuses.push({
+          providerMessageId: id,
+          status,
+          recipientPhone: normalizePhone(asString(rawStatus.recipient_id)),
+          errorCode:
+            firstError && typeof firstError.code === "number" ? firstError.code : null,
+          errorTitle: firstError ? asString(firstError.title) : null,
+          errorMessage: firstError
+            ? asString(firstError.message) ?? asString(errorData?.details)
+            : null,
+        });
+      }
+    }
+  }
+
+  return statuses;
+}
+
+// Ranking dos estados: read/failed são finais. Só avançamos — nunca rebaixamos
+// (eventos podem chegar fora de ordem).
+async function applyDeliveryStatus(
+  supabase: SupabaseClientAny,
+  ev: DeliveryStatusEvent,
+) {
+  const errorText =
+    ev.status === "failed"
+      ? [ev.errorCode ? `[${ev.errorCode}]` : null, ev.errorTitle, ev.errorMessage]
+          .filter(Boolean)
+          .join(" ") || "Falha na entrega (sem detalhe da Meta)."
+      : null;
+
+  let query = supabase
+    .from("inbox_messages")
+    .update({ delivery_status: ev.status, delivery_error: errorText })
+    .eq("provider_message_id", ev.providerMessageId);
+
+  if (ev.status === "sent") {
+    query = query.is("delivery_status", null);
+  } else if (ev.status === "delivered") {
+    // Atualiza se ainda não há estado final. Inclui o caso NULL explicitamente
+    // (em SQL, `NULL NOT IN (...)` é NULL, o que excluiria a linha).
+    query = query.or("delivery_status.is.null,delivery_status.not.in.(read,failed)");
+  }
+  // read / failed: sobrescrevem sempre (estados finais).
+
+  const { error } = await query;
+  if (error) throw error;
+}
+
 // Z-API callback types that are NOT chat messages (delivery/read receipts,
 // presence, connection). They carry no body and must be ignored gracefully —
 // NOT treated as "missing body" errors (which caused 500s + webhook retries).
@@ -700,12 +789,49 @@ Deno.serve(async (request) => {
       }));
     }
 
-    const inboundMessages = getInboundMessages(payload);
-    if (inboundMessages.length === 0) {
-      return jsonResponse({ ok: true, ignored: true, reason: "no_inbound_messages" });
+    const supabase = getSupabaseClient();
+
+    // Eventos de STATUS de entrega da Meta (sent/delivered/read/failed). Antes
+    // eram descartados — agora casamos pela wamid e gravamos na mensagem, para o
+    // Inbox mostrar por que uma mensagem não chegou (código de erro da Meta).
+    const statusEvents = extractDeliveryStatuses(payload);
+    let statusesApplied = 0;
+    for (const ev of statusEvents) {
+      try {
+        await applyDeliveryStatus(supabase, ev);
+        statusesApplied += 1;
+        if (ev.status === "failed") {
+          console.error(
+            JSON.stringify({
+              event: "whatsapp_delivery_failed",
+              to_last4: ev.recipientPhone?.slice(-4) ?? null,
+              wamid_tail: ev.providerMessageId.slice(-10),
+              error_code: ev.errorCode,
+              error_title: ev.errorTitle,
+              error_message: ev.errorMessage,
+            }),
+          );
+        }
+      } catch (error) {
+        console.error(
+          JSON.stringify({
+            event: "whatsapp_delivery_status_error",
+            reason: describeError(error),
+            wamid_tail: ev.providerMessageId.slice(-10),
+          }),
+        );
+      }
     }
 
-    const supabase = getSupabaseClient();
+    const inboundMessages = getInboundMessages(payload);
+    if (inboundMessages.length === 0) {
+      return jsonResponse({
+        ok: true,
+        ignored: statusEvents.length === 0,
+        statuses: statusesApplied,
+        reason: statusEvents.length ? "status_only" : "no_inbound_messages",
+      });
+    }
     const results: ProcessedMessage[] = [];
     let failed = 0;
     // Process each message in isolation: one bad event must not fail the whole
