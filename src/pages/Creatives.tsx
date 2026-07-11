@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import * as htmlToImage from "html-to-image";
-import { Download, LayoutTemplate, Type, Wand2, RefreshCw, Share2, Target, PenTool, Lightbulb, ChevronRight, ArrowLeft, Sparkles, Copy, Check, Camera, BrainCircuit, Hash, X, Plus } from "lucide-react";
+import { Download, LayoutTemplate, Type, Wand2, RefreshCw, Share2, Target, PenTool, Lightbulb, ChevronRight, ArrowLeft, Sparkles, Copy, Check, Camera, BrainCircuit, Hash, X, Plus, ListChecks } from "lucide-react";
 import Logo from "../components/Logo";
 import PublishModal from "../components/PublishModal";
 import { supabase } from "../lib/supabase";
@@ -13,24 +13,43 @@ const FORMATS = [
 ];
 
 const TEMPLATES = [
-  { id: "t1", name: "Posicionamento", format: "4:5" },
-  { id: "t4", name: "Lista / Passo a Passo", format: "4:5" },
+  { id: "t1", name: "Posicionamento / Dor", format: "4:5" },
+  { id: "t4", name: "Lista / 4 Camadas", format: "4:5" },
   { id: "t12", name: "Prova Social", format: "4:5" },
 ];
 
+// Objetivo = intenção da peça, realinhado à Linha Editorial (Brandbook 04).
+// Os ids são mantidos (usados pelo body das Edge Functions de IA); só a cópia
+// migrou do posicionamento antigo (B2B/SaaS) para "estrutura de vendas".
 const OBJECTIVES = [
-  { id: "educar", name: "Educar", icon: Lightbulb, desc: "Ensinar algo novo ou resolver uma dúvida" },
-  { id: "vender", name: "Vender", icon: Target, desc: "Oferta direta, desconto ou foco em conversão" },
-  { id: "posicionar", name: "Posicionar", icon: PenTool, desc: "Mostrar autoridade e opinião forte" },
+  { id: "educar", name: "Educar", icon: Lightbulb, desc: "Explicar uma camada do método: Presença, Aquisição, Conversão ou Escala." },
+  { id: "vender", name: "Converter", icon: Target, desc: "Levar ao diagnóstico no WhatsApp a partir de uma dor concreta." },
+  { id: "posicionar", name: "Autoridade", icon: PenTool, desc: "Bastidor real e a própria estrutura em ação — sem teatro." },
 ];
 
-const PILARS = ["CRM", "WhatsApp", "Gestão Comercial", "Funil de Vendas", "Automação", "IA", "Produtividade"];
+// Pilares da Linha Editorial (Brandbook 04 → 4.1). O pilar é a âncora estratégica
+// de cada peça; carrega a etapa do funil e o CTA sugerido.
+const PILARS = [
+  { name: "Diagnóstico da Dor", etapa: "Atração", cta: "Peça um diagnóstico gratuito no WhatsApp." },
+  { name: "Método das 4 Camadas", etapa: "Educação", cta: "Descubra qual camada está travando as vendas." },
+  { name: "Bastidores & Autoridade", etapa: "Conexão", cta: "Veja como aplicar essa estrutura no seu negócio." },
+  { name: "Prova Social por Segmento", etapa: "Conversão", cta: "Solicite uma análise do seu segmento." },
+];
+
+// Checklist de aprovação (Brandbook 04 → 4.2) — consulta rápida antes de publicar.
+const CHECKLIST = [
+  "Fala de uma dor real ou de uma camada do método?",
+  "Texto direto, sem jargão e sem enrolação?",
+  "Tem um CTA claro (diagnóstico, WhatsApp ou próximo passo)?",
+  "Reforça estrutura de vendas, não marketing genérico?",
+  "Conversa com negócio local e profissional liberal?",
+];
 
 export default function CreativesPage() {
   // Wizard State
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [objective, setObjective] = useState("educar");
-  const [pilar, setPilar] = useState("CRM");
+  const [pilar, setPilar] = useState(PILARS[0].name);
   const [idea, setIdea] = useState("");
   
   // Editor State
@@ -40,12 +59,12 @@ export default function CreativesPage() {
   const [theme, setTheme] = useState<"dark" | "light">("dark");
   
   // Creative Content State
-  const [headline, setHeadline] = useState("COMO ORGANIZAR\\nSEUS LEADS EM\\nUM SÓ LUGAR.");
-  const [subheadline, setSubheadline] = useState("Aprenda a estruturar o CRM da sua empresa do zero.");
-  const [highlight, setHighlight] = useState("LEADS");
-  const [tags, setTags] = useState("CRM + PRODUTIVIDADE");
-  const [caption, setCaption] = useState("Ter controle sobre os seus leads é o primeiro passo para aumentar as vendas. Sem um CRM estruturado, dinheiro fica na mesa. Salve este post para aplicar na sua operação!");
-  const [hashtags, setHashtags] = useState<string[]>(["gestaocomercial", "crm", "vendas", "produtividade"]);
+  const [headline, setHeadline] = useState("SEU CONCORRENTE\\nNÃO É MELHOR.\\nELE SÓ TEM ESTRUTURA.");
+  const [subheadline, setSubheadline] = useState("Presença, aquisição, conversão e escala funcionando juntas — do Google ao WhatsApp.");
+  const [highlight, setHighlight] = useState("ESTRUTURA");
+  const [tags, setTags] = useState("ESTRUTURA DE VENDAS");
+  const [caption, setCaption] = useState("Você é bom no que faz. Mas o cliente precisa te encontrar, confiar e comprar — e isso é estrutura, não sorte. Presença no Google, anúncios que trazem gente e WhatsApp organizado, funcionando juntos. Quer um diagnóstico gratuito da estrutura de vendas do seu negócio? Chama no WhatsApp.");
+  const [hashtags, setHashtags] = useState<string[]>(["estruturadevendas", "negociolocal", "funilcomercial", "googlemeunegocio"]);
   
   // UI State
   const [isExporting, setIsExporting] = useState(false);
@@ -120,10 +139,9 @@ export default function CreativesPage() {
     if (mappedObjective) setObjective(mappedObjective.id);
     else setObjective("educar");
     
-    // Auto-select Pilar
-    const pilarExists = PILARS.find(p => p.toLowerCase() === rec.pilar?.toLowerCase());
-    if (pilarExists) setPilar(pilarExists);
-    else setPilar(PILARS[0]);
+    // Auto-select Pilar (compara pelo nome do pilar editorial).
+    const pilarExists = PILARS.find(p => p.name.toLowerCase() === rec.pilar?.toLowerCase());
+    setPilar(pilarExists ? pilarExists.name : PILARS[0].name);
     
     // Set Theme/Format if applicable (you can expand this logic)
     if (rec.format === "Feed 4:5") setFormat(FORMATS[0]);
@@ -325,19 +343,33 @@ export default function CreativesPage() {
           })}
         </div>
         
-        <h2 className="text-xl font-bold mb-4">Escolha um pilar editorial:</h2>
-        <div className="flex flex-wrap gap-3 mb-12">
-          {PILARS.map(p => (
-            <button 
-              key={p} 
-              onClick={() => setPilar(p)}
-              className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all border ${pilar === p ? 'bg-primary text-black border-primary' : 'bg-transparent border-foreground/20 text-muted-foreground hover:border-foreground/40 hover:text-foreground'}`}
-            >
-              {p}
-            </button>
-          ))}
+        <h2 className="text-xl font-bold mb-1">Escolha o pilar editorial:</h2>
+        <p className="text-sm text-muted-foreground mb-4">A âncora estratégica da peça (Brandbook · 04. Conteúdo &amp; Ativação → 4.1).</p>
+        <div className="flex flex-wrap gap-3 mb-4">
+          {PILARS.map(p => {
+            const isActive = pilar === p.name;
+            return (
+              <button
+                key={p.name}
+                onClick={() => setPilar(p.name)}
+                className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all border flex items-center gap-2 ${isActive ? 'bg-primary text-black border-primary' : 'bg-transparent border-foreground/20 text-muted-foreground hover:border-foreground/40 hover:text-foreground'}`}
+              >
+                {p.name}
+                <span className={`text-[10px] font-bold uppercase tracking-wider ${isActive ? 'text-black/60' : 'text-primary/70'}`}>{p.etapa}</span>
+              </button>
+            );
+          })}
         </div>
-        
+        {(() => {
+          const sel = PILARS.find(p => p.name === pilar);
+          return sel ? (
+            <div className="mb-12 rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-muted-foreground flex items-start gap-2">
+              <Sparkles size={15} className="text-primary shrink-0 mt-0.5" />
+              <span><strong className="text-foreground">CTA sugerido:</strong> {sel.cta}</span>
+            </div>
+          ) : null;
+        })()}
+
         <div className="flex justify-end pt-8 border-t border-foreground/10">
           <button onClick={() => setStep(2)} className="bg-foreground text-background px-8 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-foreground/90 transition-transform active:scale-95">
             Continuar Manualmente <ChevronRight size={20} />
@@ -528,6 +560,23 @@ export default function CreativesPage() {
               <div className="flex flex-col gap-2">
                 <label className="text-sm font-semibold text-foreground/80">Rodapé / Tags</label>
                 <input type="text" value={tags} onChange={(e) => setTags(e.target.value)} className="w-full bg-foreground/10 border border-foreground/10 rounded-xl p-3 text-sm focus:border-primary/50 outline-none transition-colors text-foreground/90" />
+              </div>
+
+              {/* Checklist editorial (Brandbook 04 · 4.2) — consulta antes de publicar */}
+              <div className="rounded-2xl border border-foreground/10 bg-foreground/5 p-5 flex flex-col gap-3 mt-2">
+                <h3 className="text-[13px] font-black uppercase tracking-widest text-primary flex items-center gap-2">
+                  <ListChecks size={14} /> Antes de publicar
+                </h3>
+                <ul className="flex flex-col gap-2">
+                  {CHECKLIST.map((item) => (
+                    <li key={item} className="flex items-start gap-2 text-xs text-muted-foreground">
+                      <Check size={14} className="text-primary shrink-0 mt-0.5" /> {item}
+                    </li>
+                  ))}
+                </ul>
+                <p className="text-[11px] text-red-400 flex items-start gap-1.5 border-t border-foreground/10 pt-3">
+                  <X size={13} className="shrink-0 mt-0.5" /> Nunca publique com dado inventado, promessa exagerada ou prova social não validada.
+                </p>
               </div>
             </section>
           )}
