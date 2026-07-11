@@ -69,7 +69,14 @@ export default function ProfilePage({ profile, onProfileUpdated }: ProfilePagePr
       toast.success("Foto de perfil atualizada!");
       onProfileUpdated();
     } catch (error: any) {
-      toast.error("Erro ao fazer upload da imagem. O bucket 'avatars' pode não estar configurado.");
+      // Erro honesto: mostra a causa real em vez de sempre culpar o bucket.
+      const raw = String(error?.message ?? error ?? "");
+      const isBucket = /bucket/i.test(raw) || /not found/i.test(raw);
+      toast.error(
+        isBucket
+          ? "Erro no upload: o bucket 'avatars' pode não estar configurado."
+          : `Não foi possível salvar a foto: ${raw || "erro desconhecido"}.`,
+      );
       console.error(error);
     } finally {
       setIsUploading(false);
