@@ -1,5 +1,6 @@
 import type { PillarId } from "./editorialPillars"
 import type { AggregatorLink } from "./aggregators"
+import type { CustomThemeInput } from "./aggregatorThemes"
 
 export type Route = 'login' | 'cadastro' | 'dashboard' | 'inbox' | 'contatos' | 'leads' | 'funil' | 'campanhas' | 'perfil' | 'configuracoes' | 'criativos' | 'roteiro' | 'agregadores' | 'brandbook'
 
@@ -14,6 +15,7 @@ export type Aggregator = {
   footer: string | null
   footer_highlight: string | null
   theme: string
+  theme_custom: CustomThemeInput | null
   links: AggregatorLink[]
   published: boolean
   created_at: string

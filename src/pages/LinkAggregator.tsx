@@ -2,7 +2,7 @@ import { useEffect, useState, type CSSProperties } from "react";
 import { useParams } from "react-router-dom";
 import { getAggregator, type AggregatorConfig, type AggregatorLink, type AggregatorLinkIcon } from "../lib/aggregators";
 import { getAggregatorBySlug } from "../lib/crmService";
-import { getTheme } from "../lib/aggregatorThemes";
+import { resolveAggregatorTheme, type CustomThemeInput } from "../lib/aggregatorThemes";
 import { AGG_CSS } from "../lib/aggregatorHtml";
 import type { Aggregator } from "../lib/types";
 
@@ -14,6 +14,7 @@ type RenderConfig = {
   footer?: string;
   footerHighlight?: string;
   theme?: string;
+  themeCustom?: CustomThemeInput | null;
   links: AggregatorLink[];
 };
 
@@ -36,6 +37,7 @@ const fromDb = (a: Aggregator): RenderConfig => ({
   footer: a.footer ?? undefined,
   footerHighlight: a.footer_highlight ?? undefined,
   theme: a.theme,
+  themeCustom: a.theme_custom ?? undefined,
   links: a.links ?? [],
 });
 
@@ -114,7 +116,7 @@ export default function LinkAggregatorPage() {
   }, [slug]);
 
   const config = state.config;
-  const theme = getTheme(config?.theme);
+  const theme = resolveAggregatorTheme(config?.theme, config?.themeCustom);
 
   return (
     <>

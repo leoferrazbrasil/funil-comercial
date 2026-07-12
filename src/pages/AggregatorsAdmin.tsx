@@ -8,14 +8,15 @@ import { supabase } from "../lib/supabase";
 import {
   getMyAggregators, createAggregator, updateAggregator, deleteAggregator, isAggregatorSlugAvailable,
 } from "../lib/crmService";
-import { AGGREGATOR_THEMES } from "../lib/aggregatorThemes";
+import { AGGREGATOR_THEMES, type CustomThemeInput } from "../lib/aggregatorThemes";
 import { renderBioHtml } from "../lib/aggregatorHtml";
 import { AGGREGATORS, type AggregatorLink, type AggregatorLinkIcon } from "../lib/aggregators";
 import type { Aggregator } from "../lib/types";
 
 type Draft = {
   slug: string; name: string; tagline: string; avatar_url: string; status: string;
-  footer: string; footer_highlight: string; theme: string; links: AggregatorLink[]; published: boolean;
+  footer: string; footer_highlight: string; theme: string; theme_custom: CustomThemeInput | null;
+  links: AggregatorLink[]; published: boolean;
 };
 
 const MAX_LINKS = 5;
@@ -23,19 +24,21 @@ const ICONS: AggregatorLinkIcon[] = ["whatsapp", "globe", "link"];
 
 const blankDraft = (): Draft => ({
   slug: "", name: "", tagline: "", avatar_url: "", status: "", footer: "", footer_highlight: "",
-  theme: "funil", links: [{ variant: "primary", icon: "whatsapp", label: "", sublabel: "", href: "" }], published: true,
+  theme: "funil", theme_custom: null, links: [{ variant: "primary", icon: "whatsapp", label: "", sublabel: "", href: "" }], published: true,
 });
 
 const draftFromRow = (a: Aggregator): Draft => ({
   slug: a.slug, name: a.name, tagline: a.tagline ?? "", avatar_url: a.avatar_url ?? "", status: a.status ?? "",
-  footer: a.footer ?? "", footer_highlight: a.footer_highlight ?? "", theme: a.theme, links: a.links ?? [], published: a.published,
+  footer: a.footer ?? "", footer_highlight: a.footer_highlight ?? "", theme: a.theme, theme_custom: a.theme_custom ?? null,
+  links: a.links ?? [], published: a.published,
 });
 
 const draftFromStaticFc = (): Draft => {
   const c = AGGREGATORS.funilcomercial;
   return {
     slug: c.slug, name: c.name, tagline: c.tagline ?? "", avatar_url: c.avatarUrl ?? "", status: c.status ?? "",
-    footer: c.footer ?? "", footer_highlight: c.footerHighlight ?? "", theme: c.theme ?? "funil", links: [...c.links], published: true,
+    footer: c.footer ?? "", footer_highlight: c.footerHighlight ?? "", theme: c.theme ?? "funil", theme_custom: null,
+    links: [...c.links], published: true,
   };
 };
 
@@ -52,6 +55,41 @@ export default function AggregatorsAdminPage() {
   const [editing, setEditing] = useState<{ id?: string; draft: Draft } | null>(null);
   const [slugStatus, setSlugStatus] = useState<"idle" | "checking" | "ok" | "taken" | "invalid">("idle");
   const [copied, setCopied] = useState<string | null>(null);
+  const [siteUrl, setSiteUrl] = useState("");
+  const [extracting, setExtracting] = useState(false);
+
+  // Extrai identidade (nome, cores, logo) do site do cliente via Edge Function
+  // bio-extract (server-side; o navegador não lê o site por CORS). Preenche tudo.
+  const extractFromSite = async () => {
+    const url = siteUrl.trim();
+    if (!url || !supabase) return;
+    setExtracting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("bio-extract", { body: { url } });
+      if (error || !data || data.error) throw new Error(error?.message || data?.error || "Falha na extração");
+      setEditing((cur) =>
+        cur
+          ? {
+              ...cur,
+              draft: {
+                ...cur.draft,
+                name: data.name || cur.draft.name,
+                avatar_url: data.logoUrl || cur.draft.avatar_url,
+                theme: data.accent ? "custom" : cur.draft.theme,
+                theme_custom: data.accent
+                  ? { accent: data.accent, bg: data.bg || undefined, text: data.text || undefined }
+                  : cur.draft.theme_custom,
+              },
+            }
+          : cur,
+      );
+      toast.success("Identidade extraída do site! Revise e gere o /bio.");
+    } catch {
+      toast.error("Não consegui extrair do site. Confira o link (ou preencha manualmente).");
+    } finally {
+      setExtracting(false);
+    }
+  };
 
   useEffect(() => {
     supabase?.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
@@ -73,7 +111,8 @@ export default function AggregatorsAdminPage() {
         slug: d.slug.trim(), name: d.name.trim(), tagline: d.tagline.trim(),
         avatar_url: d.avatar_url.trim() || null, status: d.status.trim() || null,
         footer: d.footer.trim() || null, footer_highlight: d.footer_highlight.trim() || null,
-        theme: d.theme, links: d.links.filter((l) => l.href.trim() && l.label.trim()), published: d.published,
+        theme: d.theme, theme_custom: d.theme_custom,
+        links: d.links.filter((l) => l.href.trim() && l.label.trim()), published: d.published,
       };
       if (editing!.id) await updateAggregator(editing!.id, input);
       else await createAggregator(userId!, input);
@@ -183,6 +222,7 @@ export default function AggregatorsAdminPage() {
       footer: d.footer.trim() || undefined,
       footerHighlight: d.footer_highlight.trim() || undefined,
       theme: d.theme,
+      themeCustom: d.theme_custom,
       links: d.links.filter((l) => l.href.trim() && l.label.trim()),
     });
     const blob = new Blob([html], { type: "text/html;charset=utf-8" });
@@ -216,6 +256,18 @@ export default function AggregatorsAdminPage() {
       <h1 className="text-2xl font-black tracking-tight mb-6">{editing.id ? "Editar agregador" : "Novo agregador"}</h1>
 
       <div className="flex flex-col gap-5">
+        {/* Auto-preenche nome, cores e logo a partir do site pronto do cliente */}
+        <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4">
+          <label className={label}>Gerar a partir do site do cliente</label>
+          <p className="text-xs text-muted-foreground mt-1 mb-3">Cole o link do site pronto do cliente — puxamos <strong className="text-foreground">nome, cores e logo</strong> automaticamente.</p>
+          <div className="flex gap-2">
+            <input className={field} value={siteUrl} onChange={(e) => setSiteUrl(e.target.value)} placeholder="https://clinicaaurora.com.br" />
+            <button onClick={extractFromSite} disabled={extracting || !siteUrl.trim()} className="bg-primary text-black px-5 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-primary/90 transition-all active:scale-95 disabled:opacity-50 shrink-0">
+              <Sparkles size={16} /> {extracting ? "Extraindo…" : "Extrair"}
+            </button>
+          </div>
+        </div>
+
         <div className="grid sm:grid-cols-2 gap-4">
           <div className="flex flex-col gap-2">
             <label className={label}>Nome</label>
@@ -272,6 +324,15 @@ export default function AggregatorsAdminPage() {
                 <span className="text-[11px] font-semibold text-foreground/80 leading-tight block">{t.name}</span>
               </button>
             ))}
+            {d.theme === "custom" && d.theme_custom && (
+              <div className="rounded-xl border-2 border-primary p-3 text-left">
+                <div className="flex gap-1.5 mb-2">
+                  <span className="w-5 h-5 rounded-full border border-foreground/10" style={{ background: d.theme_custom.bg || "#0a0b0d" }} />
+                  <span className="w-5 h-5 rounded-full" style={{ background: d.theme_custom.accent }} />
+                </div>
+                <span className="text-[11px] font-semibold text-foreground/80 leading-tight block">Do site (extraído)</span>
+              </div>
+            )}
           </div>
         </div>
 

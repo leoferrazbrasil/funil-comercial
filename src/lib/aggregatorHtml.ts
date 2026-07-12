@@ -3,7 +3,7 @@
 // Sem dependência de runtime: CSS/ícones inline, dados e tema embutidos.
 // O CSS (.agg-*) é a fonte única, compartilhado com a página React LinkAggregator.
 
-import { getTheme } from "./aggregatorThemes";
+import { resolveAggregatorTheme, type CustomThemeInput } from "./aggregatorThemes";
 import type { AggregatorLink, AggregatorLinkIcon } from "./aggregators";
 
 export const AGG_CSS = `
@@ -93,6 +93,7 @@ export type BioData = {
   footer?: string;
   footerHighlight?: string;
   theme?: string;
+  themeCustom?: CustomThemeInput | null;
   links: AggregatorLink[];
 };
 
@@ -132,7 +133,7 @@ const footerHtml = (footer: string, highlight?: string): string => {
 
 // Documento HTML completo e autocontido para instalar como /bio/index.html.
 export function renderBioHtml(data: BioData): string {
-  const theme = getTheme(data.theme);
+  const theme = resolveAggregatorTheme(data.theme, data.themeCustom);
   const styleVars = Object.entries(theme.vars).map(([k, v]) => `${k}:${v}`).join(";");
   const mark = data.avatarUrl ? `<img src="${escAttr(data.avatarUrl)}" alt="${esc(data.name)}">` : funnelSvg();
   const validLinks = data.links.filter((l) => l.href.trim() && l.label.trim());
