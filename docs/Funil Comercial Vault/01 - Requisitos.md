@@ -99,7 +99,8 @@ Plataforma da **Funil Comercial** (empresa de estrutura de vendas). Seu **núcle
 ## 8.2. Agregadores de Links (público `/l/:slug` + admin `/agregadores`)
 
 - Página **pública** estilo "linktree" (premium): marca, tagline, selo de status e até **5 botões** (CTA + secundários), com **tema por cliente** (4 presets). O **Funil Comercial** é `/l/funilcomercial` (bio do Instagram).
-- **Produto multi-tenant:** admin **`/agregadores`** (diretor/gestor) cria/edita agregadores — cada cliente = **um registro** (tabela `aggregators`, RLS dono + leitura pública dos publicados). A página pública lê do banco com **fallback estático** (`aggregators.ts`) para a bio do FC. Rascunho × no ar. Ver [[03 - Changelog]].
+- **Produto multi-tenant:** admin **`/agregadores`** (diretor/gestor) cria/edita agregadores — cada cliente = **um registro** (tabela `aggregators`, RLS dono + leitura pública dos publicados). A página pública lê do banco com **fallback estático** (`aggregators.ts`) para a bio do FC. Rascunho × no ar.
+- **Entrega ao cliente = `/bio` estático:** o admin gera (**"Gerar /bio"**) um `index.html` autocontido para instalar no diretório do **site do próprio cliente** (`cliente.com.br/bio`); o `/l/:slug` da FC serve de **pré-visualização**. Ver [[03 - Changelog]].
 
 ## 9. Regras de negócio principais
 

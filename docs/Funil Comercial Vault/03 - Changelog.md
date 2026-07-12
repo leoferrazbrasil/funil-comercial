@@ -22,6 +22,9 @@ tags:
 - **Admin `/agregadores`** (menu próprio, diretor/gestor): lista + editor (slug com checagem de disponibilidade, tagline, avatar, status, **tema**, até **5 links** reordenáveis, **rascunho × no ar**) + "importar modelo Funil Comercial". Cada cliente = **um registro no banco** pela tela (sem código).
 - **Temas por cliente:** 4 presets curados em `src/lib/aggregatorThemes.ts` (CSS vars `--agg-*`). A página pública passou a **ler do banco** por slug, com **fallback estático** (a bio do FC nunca quebra) e a copy do FC editável (registro `funilcomercial` no banco tem precedência). **Ativação:** aplicar a migração `aggregators`. Spec: `docs/superpowers/specs/2026-07-12-agregadores-multitenant-design.md`.
 
+### Mudado — Entrega ao cliente vira `/bio` estático (gerador)
+- Definido o modelo real: o agregador do cliente é um **`/bio` estático autocontido** instalado no **diretório do site do próprio cliente** (domínio dele: `cliente.com.br/bio`) — os sites são **builds avulsos**, então **não** faz sentido servir por `funilcomercial.com/l/slug`. O admin `/agregadores` ganhou **"Gerar /bio"**: baixa um `index.html` com CSS/ícones/tema/dados **inline** (`src/lib/aggregatorHtml.ts`, que também virou a fonte única do CSS `.agg-*`). O `/l/:slug` fica como **pré-visualização** + bio da própria FC. **Ideia futura:** gerar o conteúdo/paleta a partir do **link do site do cliente** (extração de identidade — precisa de extrator server-side, ver [[04 - Roadmap]]).
+
 ## [2026-07-12] - Conteúdo editorial, Roteiro, base de conhecimento, marca & paleta
 
 ### Adicionado — Roteiro Editorial (`/roteiro`)
