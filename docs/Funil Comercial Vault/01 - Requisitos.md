@@ -96,6 +96,11 @@ Plataforma da **Funil Comercial** (empresa de estrutura de vendas). Seu **núcle
 - **Deep-link** para o estúdio: "Gerar →" abre `/criativos` com o pilar e o tema pré-preenchidos.
 - Persistência por dono (tabela `editorial_queue`, RLS `auth.uid() = owner_id`). Acesso: **diretor/gestor**. Sem datas/calendário na v1 (evolução para calendário mensal no [[04 - Roadmap]]).
 
+## 8.2. Agregador de Links (`/l/:slug`)
+
+- Página **pública** estilo "linktree" (dark premium): marca, tagline, selo de status e até 2 botões (CTA + secundário). O **Funil Comercial** é a config `/l/funilcomercial` (bio do Instagram: WhatsApp diagnóstico + site).
+- **Config-driven** (`src/lib/aggregators.ts`): cada cliente/uso é um objeto de config — base do **produto** de agregador. Estilos escopados, independentes do tema do app. Ver [[03 - Changelog]].
+
 ## 9. Regras de negócio principais
 
 - **Vínculos:** lead→contato, oportunidade→lead, mensagens→contato/lead (por `contact_id`/`lead_id`).

@@ -11,6 +11,12 @@ tags:
 > [!note] Navegação
 > Histórico de mudanças, mais recente primeiro. Contexto do produto em [[01 - Requisitos]]; arquitetura em [[02 - Arquitetura e Design]]; índice em [[00 - Inicio]].
 
+## [2026-07-12] - Agregador de links (`/l/:slug`) — bio do Instagram / produto
+
+### Adicionado — Página de agregador estilo "linktree"
+- Nova rota **pública `/l/:slug`** (agregador de links) — o **Funil Comercial** é a primeira config (`/l/funilcomercial`), usada na **bio do Instagram**: **Diagnóstico no WhatsApp** (CTA ouro, `wa.me/5551996737359` com mensagem pronta) + **Site**. Visual **dark premium** aprovado por mockup: marca-funil em ouro, selo "Disponível para diagnóstico" com ponto esmeralda pulsante, rodapé das 4 camadas.
+- **Config-driven para virar produto:** `src/lib/aggregators.ts` (tipos + configs por slug) + `src/pages/LinkAggregator.tsx` (estilos escopados `.agg-*`, dark hardcoded — não herda o `data-theme` do app). Adicionar um cliente = **um novo objeto de config**, sem código novo. `App.tsx` ganhou a rota + `/l/` no gate público (`isPublicPath`). Spec: `docs/superpowers/specs/2026-07-12-agregador-links-design.md`. Multi-tenant (DB/admin no CRM) fica para o futuro.
+
 ## [2026-07-12] - Conteúdo editorial, Roteiro, base de conhecimento, marca & paleta
 
 ### Adicionado — Roteiro Editorial (`/roteiro`)
