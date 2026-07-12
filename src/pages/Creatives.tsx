@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import * as htmlToImage from "html-to-image";
-import { Download, LayoutTemplate, Type, Wand2, RefreshCw, Share2, Target, PenTool, Lightbulb, ChevronRight, ArrowLeft, Sparkles, Copy, Check, Camera, BrainCircuit, Hash, X, Plus, ListChecks } from "lucide-react";
+import { Download, LayoutTemplate, Type, Wand2, RefreshCw, Share2, Target, PenTool, Lightbulb, Star, ChevronRight, ArrowLeft, Sparkles, Copy, Check, Camera, BrainCircuit, Hash, X, Plus, ListChecks } from "lucide-react";
 import Logo from "../components/Logo";
 import PublishModal from "../components/PublishModal";
 import { supabase } from "../lib/supabase";
@@ -18,22 +18,32 @@ const TEMPLATES = [
   { id: "t12", name: "Prova Social", format: "4:5" },
 ];
 
-// Objetivo = intenção da peça, realinhado à Linha Editorial (Brandbook 04).
-// Os ids são mantidos (usados pelo body das Edge Functions de IA); só a cópia
-// migrou do posicionamento antigo (B2B/SaaS) para "estrutura de vendas".
-const OBJECTIVES = [
-  { id: "educar", name: "Educar", icon: Lightbulb, desc: "Explicar uma camada do método: Presença, Aquisição, Conversão ou Escala." },
-  { id: "vender", name: "Converter", icon: Target, desc: "Levar ao diagnóstico no WhatsApp a partir de uma dor concreta." },
-  { id: "posicionar", name: "Autoridade", icon: PenTool, desc: "Bastidor real e a própria estrutura em ação — sem teatro." },
-];
-
-// Pilares da Linha Editorial (Brandbook 04 → 4.1). O pilar é a âncora estratégica
-// de cada peça; carrega a etapa do funil e o CTA sugerido.
+// Pilar editorial = eixo ÚNICO da peça (Brandbook 04 → 4.1). No Brandbook, cada
+// pilar já carrega UM objetivo (relação 1:1), a etapa do funil e o CTA sugerido —
+// por isso o wizard escolhe o pilar e deriva o objetivo dele, em vez de tratá-los
+// como dois passos independentes (o que permitiria combinações fora da doutrina).
+// `objetivoId` vai no body das Edge Functions de IA (Fase B).
 const PILARS = [
-  { name: "Diagnóstico da Dor", etapa: "Atração", cta: "Peça um diagnóstico gratuito no WhatsApp." },
-  { name: "Método das 4 Camadas", etapa: "Educação", cta: "Descubra qual camada está travando as vendas." },
-  { name: "Bastidores & Autoridade", etapa: "Conexão", cta: "Veja como aplicar essa estrutura no seu negócio." },
-  { name: "Prova Social por Segmento", etapa: "Conversão", cta: "Solicite uma análise do seu segmento." },
+  {
+    name: "Diagnóstico da Dor", etapa: "Atração", objetivoId: "atrair", objetivo: "Atrair", icon: Target,
+    desc: "Agita uma dor operacional real para atrair quem sente o caos, mas ainda não sabe nomeá-lo.",
+    cta: "Peça um diagnóstico gratuito no WhatsApp.",
+  },
+  {
+    name: "Método das 4 Camadas", etapa: "Educação", objetivoId: "educar", objetivo: "Educar", icon: Lightbulb,
+    desc: "Explica uma camada do método: Presença, Aquisição, Conversão ou Escala.",
+    cta: "Descubra qual camada está travando as vendas.",
+  },
+  {
+    name: "Bastidores & Autoridade", etapa: "Conexão", objetivoId: "posicionar", objetivo: "Autoridade", icon: PenTool,
+    desc: "Mostra a própria estrutura em ação — bastidor real, sem teatro.",
+    cta: "Veja como aplicar essa estrutura no seu negócio.",
+  },
+  {
+    name: "Prova Social por Segmento", etapa: "Conversão", objetivoId: "vender", objetivo: "Converter", icon: Star,
+    desc: "Prova por segmento (antes/depois, diagnóstico) para converter a intenção.",
+    cta: "Solicite uma análise do seu segmento.",
+  },
 ];
 
 // Checklist de aprovação (Brandbook 04 → 4.2) — consulta rápida antes de publicar.
@@ -71,9 +81,10 @@ export default function CreativesPage() {
   // loading→ IA escrevendo a copy
   // studio → editor + canvas
   const [step, setStep] = useState<"path" | "manual" | "loading" | "studio">("path");
-  // Sub-etapa do fluxo manual: 1 = Objetivo · 2 = Pilar · 3 = Ideia/gerar.
-  const [manualStage, setManualStage] = useState<1 | 2 | 3>(1);
-  const [objective, setObjective] = useState("educar");
+  // Sub-etapa do fluxo manual: 1 = Pilar (traz objetivo/etapa/CTA) · 2 = Ideia/gerar.
+  const [manualStage, setManualStage] = useState<1 | 2>(1);
+  // Objetivo é derivado do pilar (1:1). Mantido em estado só para o body da IA.
+  const [objective, setObjective] = useState(PILARS[0].objetivoId);
   const [pilar, setPilar] = useState(PILARS[0].name);
   const [idea, setIdea] = useState("");
   
@@ -198,22 +209,19 @@ export default function CreativesPage() {
     if (!recommendation) return;
     const rec = recommendation.recommendation;
 
-    // Resolve os valores da recomendação para ids/nomes internos.
-    const mappedObjective = OBJECTIVES.find(o => o.name.toLowerCase() === rec.objective?.toLowerCase());
-    const objectiveId = mappedObjective ? mappedObjective.id : "educar";
-    const pilarExists = PILARS.find(p => p.name.toLowerCase() === rec.pilar?.toLowerCase());
-    const pilarName = pilarExists ? pilarExists.name : PILARS[0].name;
+    // Objetivo e pilar são 1:1 no Brandbook — resolvemos o pilar e derivamos o objetivo dele.
+    const pilarMatch = PILARS.find(p => p.name.toLowerCase() === rec.pilar?.toLowerCase()) ?? PILARS[0];
     const ideaText = rec.theme || "";
 
     // Reflete a escolha na UI (caso o usuário volte para o modo manual).
-    setObjective(objectiveId);
-    setPilar(pilarName);
-    setManualStage(3);
+    setPilar(pilarMatch.name);
+    setObjective(pilarMatch.objetivoId);
+    setManualStage(2);
     if (rec.format === "Feed 4:5") setFormat(FORMATS[0]);
     setIdea(ideaText);
 
     // Vai direto para a geração — sem passar pelo fluxo manual.
-    runGeneration({ objective: objectiveId, pilar: pilarName, idea: ideaText });
+    runGeneration({ objective: pilarMatch.objetivoId, pilar: pilarMatch.name, idea: ideaText });
   };
 
   // Entra no fluxo manual sempre do zero (revela etapa por etapa).
@@ -222,14 +230,12 @@ export default function CreativesPage() {
     setStep("manual");
   };
 
-  const selectObjective = (id: string) => {
-    setObjective(id);
-    setManualStage(prev => (prev < 2 ? 2 : prev));
-  };
-
+  // Seleciona o pilar e deriva o objetivo (1:1) — avança para a etapa da ideia.
   const selectPilar = (name: string) => {
+    const p = PILARS.find(x => x.name === name);
     setPilar(name);
-    setManualStage(prev => (prev < 3 ? 3 : prev));
+    if (p) setObjective(p.objetivoId);
+    setManualStage(2);
   };
 
   const regenerateCaption = async () => {
@@ -417,7 +423,6 @@ export default function CreativesPage() {
 
   if (step === "manual") {
     const selectedPilar = PILARS.find(p => p.name === pilar);
-    const selectedObjective = OBJECTIVES.find(o => o.id === objective);
 
     return (
       <div className="max-w-3xl mx-auto py-12 px-6 fc-fade-in">
@@ -430,26 +435,30 @@ export default function CreativesPage() {
 
         <div className="flex flex-col gap-4">
 
-          {/* PASSO 1 — Objetivo */}
+          {/* PASSO 1 — Pilar editorial (eixo único: já traz objetivo, etapa e CTA — Brandbook 4.1) */}
           {manualStage === 1 ? (
             <section className="fc-reveal">
-              <h2 className="text-xl font-bold mb-1">Passo 1: Qual o objetivo do seu post?</h2>
-              <p className="text-sm text-muted-foreground mb-5">Define a intenção da peça.</p>
-              <div className="grid md:grid-cols-3 gap-4">
-                {OBJECTIVES.map((obj) => {
-                  const Icon = obj.icon;
-                  const isActive = objective === obj.id;
+              <h2 className="text-xl font-bold mb-1">Passo 1: Escolha o pilar editorial</h2>
+              <p className="text-sm text-muted-foreground mb-5">Cada pilar já define o objetivo, a etapa do funil e o CTA (Brandbook · 04. Conteúdo &amp; Ativação → 4.1).</p>
+              <div className="grid md:grid-cols-2 gap-4">
+                {PILARS.map((p) => {
+                  const Icon = p.icon;
+                  const isActive = pilar === p.name;
                   return (
                     <button
-                      key={obj.id}
-                      onClick={() => selectObjective(obj.id)}
-                      className={`flex flex-col items-start p-6 rounded-2xl border-2 transition-all text-left active:scale-[0.98] ${isActive ? 'border-primary bg-primary/10' : 'border-foreground/10 hover:border-primary/50 bg-card hover:bg-card/80'}`}
+                      key={p.name}
+                      onClick={() => selectPilar(p.name)}
+                      className={`flex flex-col items-start p-5 rounded-2xl border-2 transition-all text-left active:scale-[0.98] ${isActive ? 'border-primary bg-primary/10' : 'border-foreground/10 hover:border-primary/50 bg-card hover:bg-card/80'}`}
                     >
                       <div className={`p-3 rounded-xl mb-4 ${isActive ? 'bg-primary text-black' : 'bg-foreground/5 text-muted-foreground'}`}>
-                        <Icon size={24} />
+                        <Icon size={22} />
                       </div>
-                      <h3 className="font-bold text-lg text-foreground mb-2">{obj.name}</h3>
-                      <p className="text-sm text-muted-foreground">{obj.desc}</p>
+                      <h3 className="font-bold text-lg text-foreground mb-2">{p.name}</h3>
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        <span className="text-[10px] font-bold uppercase tracking-wider bg-primary/15 text-primary px-2 py-0.5 rounded-full">{p.objetivo}</span>
+                        <span className="text-[10px] font-bold uppercase tracking-wider bg-foreground/10 text-muted-foreground px-2 py-0.5 rounded-full">{p.etapa}</span>
+                      </div>
+                      <p className="text-sm text-muted-foreground">{p.desc}</p>
                     </button>
                   );
                 })}
@@ -458,46 +467,14 @@ export default function CreativesPage() {
           ) : (
             <StepSummary
               index={1}
-              label="Objetivo"
-              value={selectedObjective?.name ?? ""}
+              label="Pilar"
+              value={selectedPilar ? `${selectedPilar.name} · ${selectedPilar.objetivo}` : pilar}
               onEdit={() => setManualStage(1)}
             />
           )}
 
-          {/* PASSO 2 — Pilar editorial */}
+          {/* PASSO 2 — CTA + Ideia + Gerar */}
           {manualStage >= 2 && (
-            manualStage === 2 ? (
-              <section className="fc-reveal">
-                <h2 className="text-xl font-bold mb-1">Passo 2: Escolha o pilar editorial</h2>
-                <p className="text-sm text-muted-foreground mb-5">A âncora estratégica da peça (Brandbook · 04. Conteúdo &amp; Ativação → 4.1).</p>
-                <div className="flex flex-wrap gap-3">
-                  {PILARS.map(p => {
-                    const isActive = pilar === p.name;
-                    return (
-                      <button
-                        key={p.name}
-                        onClick={() => selectPilar(p.name)}
-                        className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all border flex items-center gap-2 active:scale-95 ${isActive ? 'bg-primary text-black border-primary' : 'bg-transparent border-foreground/20 text-muted-foreground hover:border-primary/50 hover:text-foreground'}`}
-                      >
-                        {p.name}
-                        <span className={`text-[10px] font-bold uppercase tracking-wider ${isActive ? 'text-black/60' : 'text-primary/70'}`}>{p.etapa}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </section>
-            ) : (
-              <StepSummary
-                index={2}
-                label="Pilar editorial"
-                value={pilar}
-                onEdit={() => setManualStage(2)}
-              />
-            )
-          )}
-
-          {/* PASSO 3 — CTA + Ideia + Gerar */}
-          {manualStage >= 3 && (
             <section className="fc-reveal flex flex-col gap-5">
               {selectedPilar && (
                 <div className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-muted-foreground flex items-start gap-2">
@@ -507,7 +484,7 @@ export default function CreativesPage() {
               )}
 
               <div>
-                <h2 className="text-xl font-bold mb-1">Passo 3: Sobre o que é o post?</h2>
+                <h2 className="text-xl font-bold mb-1">Passo 2: Sobre o que é o post?</h2>
                 <p className="text-sm text-muted-foreground mb-4">Um resumo em uma ou duas frases. É o ponto de partida do criativo — você monta e ajusta tudo no editor a seguir.</p>
                 <div className="bg-card border border-foreground/10 rounded-2xl p-2 shadow-xl relative overflow-hidden group">
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity pointer-events-none"></div>
@@ -565,7 +542,7 @@ export default function CreativesPage() {
         {/* Header */}
         <div className="p-6 border-b border-foreground/5 flex justify-between items-center bg-foreground/5 shrink-0">
           <div>
-            <button onClick={() => { setManualStage(3); setStep("manual"); }} className="text-xs text-muted-foreground hover:text-foreground mb-1 flex items-center gap-1"><ArrowLeft size={12}/> Voltar ao roteiro</button>
+            <button onClick={() => { setManualStage(2); setStep("manual"); }} className="text-xs text-muted-foreground hover:text-foreground mb-1 flex items-center gap-1"><ArrowLeft size={12}/> Voltar ao roteiro</button>
             <h1 className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">Estúdio de Criação <Sparkles size={16} className="text-primary"/></h1>
           </div>
           <button onClick={generateWithAI} className="p-3 bg-foreground/5 hover:bg-foreground/10 rounded-full transition-colors text-primary" title="Gerar Variação Completa com IA">
