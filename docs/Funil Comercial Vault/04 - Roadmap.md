@@ -20,6 +20,7 @@ date: 2026-07-10
 
 ## ✅ Entregue recentemente
 
+- **Roteiro Editorial (`/roteiro`) — v1** — fila sequencial de próximos posts seguindo a rotação de pilares da **4.2** ("próximo sugerido", tema, status A fazer/Gerado/Publicado) + **deep-link** para o `/criativos` (abre no Passo 2 com pilar e tema). Puro Postgres + front-end (sem Edge Function). Pilares agora num **registro compartilhado** (`src/lib/editorialPillars.ts`). Spec: [`2026-07-11-roteiro-editorial-design.md`](../superpowers/specs/2026-07-11-roteiro-editorial-design.md). **Ativação pendente:** aplicar a migração `editorial_queue` (colar SQL). Ver [[03 - Changelog]].
 - **Estúdio de Criativos — Fase A (taxonomia editorial)** — `/criativos` deixou de gerar conteúdo do posicionamento antigo (B2B/SaaS/CRM). Pilares, objetivos, defaults, CTAs por pilar e um checklist "Antes de publicar" foram realinhados à **[[Linha_Editorial_Funil_Comercial|Linha Editorial]]** e ao Brandbook 04. Canvas da arte preservado. Só front-end (sem deploy). Ver [[03 - Changelog]].
 - **Brandbook 04 — Diretrizes de Conteúdo & Ativação** — pilares editoriais + matriz 5W2H + checklist publicados em `/brandbook` (`ContentGuidelinesSection`). Fonte de verdade da doutrina de conteúdo. Ver [[03 - Changelog]].
 - **Handoff de conversas (time)** — admin cria vendedores e transfere conversas; o vendedor vê/responde só as atribuídas, pelo canal do admin. Código pronto (7 tasks, endurecido por review). **Ativação pendente:** aplicar migração + deployar `team-create-member`/`whatsapp-send`. Ver [[03 - Changelog]].
@@ -79,18 +80,21 @@ _Fase C (opcional):_ templates de arte por pilar editorial.
 
 ## 🧭 Futuro (planejado, sem data)
 
-### Planner / Calendário Editorial
-**Objetivo:** um módulo de planejamento que distribui os pilares editoriais **no tempo**, conforme a **4.2 Matriz 5W2H → "When"** — resolvendo a orquestração da sequência estratégica que o `/criativos` (peça isolada) não faz.
+### Planner / Calendário Editorial (evolução do Roteiro)
+> [!success] v1 entregue como Roteiro sequencial
+> A **fila sequencial** (rotação de pilares, sem datas) já foi entregue em `/roteiro` — ver "Entregue recentemente". O que resta aqui é a **evolução para calendário mensal**.
 
-**Por quê:** o estúdio de criativos gera **um post de cada vez**, sem noção de ordem. A 4.2 prescreve uma **cadência semanal** de pilares (progressão atrair → conectar → educar → provar → converter); hoje nada guia o usuário nessa rotação. (Ver [[Diretrizes_Publicacao_5W2H]].)
+**Objetivo:** evoluir o Roteiro para um **calendário mensal** que distribui os pilares **em datas**, conforme a **4.2 Matriz 5W2H → "When"** (cadência Seg→Sex, Feed 3–4×/sem, fechar o mês até o dia 20).
 
-**Semente de spec (da 4.2):**
+**Por quê:** a v1 (Roteiro) resolve a **ordem** (o que vem depois do quê), mas não amarra a **datas** nem à frequência semanal. O calendário completa o "When" da 4.2. (Ver [[Diretrizes_Publicacao_5W2H]].)
+
+**Semente de spec (da 4.2), sobre o Roteiro já existente:**
 - Cadência semanal: Seg **Diagnóstico da Dor** → Ter **Bastidores & Autoridade** → Qua **Método das 4 Camadas** → Qui **Prova Social** → Sex **Conversão / CTA direto**.
 - Frequência: Feed **3–4×/semana**, Stories diários; **fechar o calendário do mês seguinte até o dia 20**.
-- Cada dia do calendário **abre o estúdio já com o pilar** pré-selecionado (reaproveita o wizard atual).
-- Integra com o **Estrategista IA** (recomendador de continuidade) quando a **Fase B** sair — o planner define a rota; a IA sugere o próximo item dela.
+- Cada dia do calendário **abre o estúdio já com o pilar** (o deep-link `/criativos?pilar=&tema=` já existe, entregue no Roteiro).
+- Integra com o **Estrategista IA** (recomendador de continuidade) quando a **Fase B** sair — o planner define a rota; a IA sugere o próximo item dela. (A `editorial_queue` já está pronta para a IA ler.)
 
-**Escopo:** feature nova, pede **brainstorming → spec → plano próprios** (não é ajuste no `/criativos`). Relaciona-se com **Criativos Fase B** (prompts da IA de continuidade).
+**Escopo:** evolução do Roteiro (reaproveita tabela, registro de pilares e deep-link). Relaciona-se com **Criativos Fase B** (prompts da IA de continuidade).
 
 ### Multi-instância de WhatsApp
 Conectar **vários números ao mesmo tempo** e rotear inbound/outbound por instância. **Muda o modelo atual** (hoje é **1 canal ativo por dono**) — alto impacto de produto. Depende da infra de Evolution abaixo.
