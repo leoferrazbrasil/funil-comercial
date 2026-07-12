@@ -34,7 +34,7 @@ const draftFromRow = (a: Aggregator): Draft => ({
 });
 
 const draftFromStaticFc = (): Draft => {
-  const c = AGGREGATORS.funilcomercial;
+  const c = AGGREGATORS.bio;
   return {
     slug: c.slug, name: c.name, tagline: c.tagline ?? "", avatar_url: c.avatarUrl ?? "", status: c.status ?? "",
     footer: c.footer ?? "", footer_highlight: c.footerHighlight ?? "", theme: c.theme ?? "funil", theme_custom: null,
@@ -102,7 +102,7 @@ export default function AggregatorsAdminPage() {
   });
 
   const invalidate = () => queryClient.invalidateQueries({ queryKey: ["aggregators", userId] });
-  const hasFc = list.some((a) => a.slug === "funilcomercial");
+  const hasFc = list.some((a) => a.slug === "bio");
 
   const saveMutation = useMutation({
     mutationFn: async () => {

@@ -30,8 +30,8 @@ export type AggregatorConfig = {
 };
 
 export const AGGREGATORS: Record<string, AggregatorConfig> = {
-  funilcomercial: {
-    slug: "funilcomercial",
+  bio: {
+    slug: "bio",
     name: "Funil Comercial",
     theme: "funil",
     tagline: "Estrutura de vendas para negócio local.",
