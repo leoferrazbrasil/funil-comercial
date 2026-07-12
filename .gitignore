@@ -29,3 +29,9 @@ secrets.txt
 .env
 .env.*
 .codex-preview.pid
+
+# Graphify (opcional) — artefatos gerados por `/graphify .`, regeneráveis
+graph.html
+graph.json
+GRAPH_REPORT.md
+.graphify/

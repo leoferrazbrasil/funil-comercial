@@ -11,7 +11,7 @@ date: 2026-07-09
 # 🏛️ Arquitetura e Design
 
 > [!abstract] Sobre esta nota
-> Estado atual da arquitetura (atualizado em 2026-07-09). Para o "o que faz" por página, ver [[01 - Requisitos]]. Índice em [[00 - Inicio]].
+> Visão geral da arquitetura. Aprofundamentos: backend em [[05 - API e Edge Functions]], tema/estilo em [[06 - Design System]], catálogo de UI em [[07 - Componentes]]. Para o "o que faz" por página, ver [[01 - Requisitos]]. Índice em [[00 - Inicio]].
 
 ## Stack
 
