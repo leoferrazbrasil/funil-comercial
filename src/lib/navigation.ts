@@ -8,6 +8,7 @@ import {
   Palette,
   Megaphone,
   CalendarClock,
+  Link2,
 } from "lucide-react";
 import type { OpportunityStage, Route as AppRoute } from "./types";
 
@@ -66,6 +67,12 @@ export const navigationItems: NavigationItem[] = [
     label: "Roteiro",
     icon: CalendarClock,
     description: "Sequência de posts seguindo a doutrina editorial.",
+  },
+  {
+    id: "agregadores",
+    label: "Agregadores",
+    icon: Link2,
+    description: "Páginas de links (bio) por cliente — produto.",
   },
 ];
 

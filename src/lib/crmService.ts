@@ -1,6 +1,7 @@
 import type { User } from "@supabase/supabase-js";
 import { requireSupabase } from "./supabase";
 import type {
+  Aggregator,
   Campaign,
   CampaignVariable,
   ConversationAssignment,
@@ -929,5 +930,69 @@ export async function deleteEditorialQueueItem(id: string): Promise<void> {
   const supabase = requireSupabase();
   const { error } = await supabase.from("editorial_queue").delete().eq("id", id);
   if (error) throw error;
+}
+
+// ---------------------------------------------------------------------------
+// Agregadores de links (produto multi-tenant). Leitura pública dos publicados
+// pela página /l/:slug; o dono gere os seus. owner_id sempre da sessão.
+// ---------------------------------------------------------------------------
+
+export type AggregatorInput = Omit<Aggregator, "id" | "owner_id" | "created_at" | "updated_at">;
+
+export async function getMyAggregators(ownerId: string): Promise<Aggregator[]> {
+  const supabase = requireSupabase();
+  const { data, error } = await supabase
+    .from("aggregators")
+    .select("*")
+    .eq("owner_id", ownerId)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as Aggregator[];
+}
+
+// Público: usado pela página /l/:slug. A RLS só devolve publicados.
+export async function getAggregatorBySlug(slug: string): Promise<Aggregator | null> {
+  const supabase = requireSupabase();
+  const { data, error } = await supabase
+    .from("aggregators")
+    .select("*")
+    .eq("slug", slug)
+    .eq("published", true)
+    .maybeSingle();
+  if (error) throw error;
+  return (data as Aggregator) ?? null;
+}
+
+export async function createAggregator(ownerId: string, input: AggregatorInput): Promise<Aggregator> {
+  const supabase = requireSupabase();
+  const { data, error } = await supabase
+    .from("aggregators")
+    .insert({ ...input, owner_id: ownerId })
+    .select()
+    .single();
+  if (error) throw error;
+  return data as Aggregator;
+}
+
+export async function updateAggregator(id: string, patch: Partial<AggregatorInput>): Promise<void> {
+  const supabase = requireSupabase();
+  const { error } = await supabase.from("aggregators").update(patch).eq("id", id);
+  if (error) throw error;
+}
+
+export async function deleteAggregator(id: string): Promise<void> {
+  const supabase = requireSupabase();
+  const { error } = await supabase.from("aggregators").delete().eq("id", id);
+  if (error) throw error;
+}
+
+// Best-effort: a RLS só deixa ver os próprios + publicados; o UNIQUE do banco é o
+// guarda real (o insert/update falha em conflito e a UI mostra a mensagem).
+export async function isAggregatorSlugAvailable(slug: string, exceptId?: string): Promise<boolean> {
+  const supabase = requireSupabase();
+  const { data, error } = await supabase.from("aggregators").select("id").eq("slug", slug);
+  if (error) throw error;
+  const rows = (data ?? []) as { id: string }[];
+  return rows.every((r) => r.id === exceptId);
 }
 

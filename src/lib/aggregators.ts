@@ -14,6 +14,8 @@ export type AggregatorLink = {
 export type AggregatorConfig = {
   slug: string;
   name: string;
+  /** id do preset de tema (ver aggregatorThemes.ts); default "funil". */
+  theme?: string;
   tagline?: string;
   /** Foto do perfil; sem ela, usa a marca-funil padrão (ouro). */
   avatarUrl?: string;
@@ -31,6 +33,7 @@ export const AGGREGATORS: Record<string, AggregatorConfig> = {
   funilcomercial: {
     slug: "funilcomercial",
     name: "Funil Comercial",
+    theme: "funil",
     tagline: "Estrutura de vendas para negócio local.",
     status: "Disponível para diagnóstico",
     footer: "Presença · Aquisição · Conversão · Escala",

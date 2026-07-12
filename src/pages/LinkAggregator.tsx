@@ -1,26 +1,25 @@
+import { useEffect, useState, type CSSProperties } from "react";
 import { useParams } from "react-router-dom";
-import { getAggregator, type AggregatorLink, type AggregatorLinkIcon } from "../lib/aggregators";
+import { getAggregator, type AggregatorConfig, type AggregatorLink, type AggregatorLinkIcon } from "../lib/aggregators";
+import { getAggregatorBySlug } from "../lib/crmService";
+import { getTheme } from "../lib/aggregatorThemes";
+import type { Aggregator } from "../lib/types";
 
-// Estilos escopados (.agg-*) com cores dark hardcoded: a página é um "committed
-// dark premium" — não herda o data-theme do app (é um destino de bio, sempre dark).
+// Estilos escopados (.agg-*) dirigidos por CSS vars --agg-* (setadas pelo tema no
+// container). A página é "committed premium": não herda o data-theme do app; a
+// aparência vem do preset de tema do agregador.
 const CSS = `
 .agg-stage {
-  min-height: 100dvh;
-  display: grid;
-  place-items: center;
-  padding: 40px 20px;
-  background: #060606;
-  color: #f6f7f8;
+  min-height: 100dvh; display: grid; place-items: center; padding: 40px 20px;
+  background: var(--agg-bg); color: var(--agg-text);
   font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  position: relative;
-  overflow: hidden;
+  -webkit-font-smoothing: antialiased; position: relative; overflow: hidden;
 }
 .agg-glow {
   position: absolute; inset: 0; pointer-events: none;
   background:
-    radial-gradient(60% 42% at 50% -8%, rgba(245,180,23,0.16), transparent 70%),
-    radial-gradient(48% 40% at 50% 108%, rgba(52,211,153,0.10), transparent 70%);
+    radial-gradient(60% 42% at 50% -8%, var(--agg-glow-a), transparent 70%),
+    radial-gradient(48% 40% at 50% 108%, var(--agg-glow-b), transparent 70%);
 }
 .agg-card {
   position: relative; width: 100%; max-width: 420px; text-align: center;
@@ -29,25 +28,19 @@ const CSS = `
 }
 .agg-mark {
   width: 76px; height: 76px; border-radius: 22px; display: grid; place-items: center;
-  background: linear-gradient(160deg, rgba(245,180,23,0.14), rgba(245,180,23,0.03));
-  border: 1px solid rgba(245,180,23,0.22);
-  box-shadow: 0 14px 40px -18px rgba(245,180,23,0.5);
-  margin-bottom: 22px; overflow: hidden;
+  background: var(--agg-surface); border: 1px solid var(--agg-line-strong);
+  box-shadow: 0 14px 40px -18px var(--agg-accent-shadow); margin-bottom: 22px; overflow: hidden;
 }
 .agg-mark svg { width: 38px; height: 38px; display: block; }
 .agg-mark img { width: 100%; height: 100%; object-fit: cover; }
 .agg-name { margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.02em; text-wrap: balance; }
-.agg-tagline { margin: 8px 0 0; color: #9aa1ad; font-size: 15px; line-height: 1.5; max-width: 30ch; }
+.agg-tagline { margin: 8px 0 0; color: var(--agg-muted); font-size: 15px; line-height: 1.5; max-width: 30ch; }
 .agg-status {
   display: inline-flex; align-items: center; gap: 8px; margin: 18px 0 26px;
-  font-size: 12.5px; font-weight: 600; color: #d6dbe1;
-  padding: 6px 12px; border: 1px solid rgba(255,255,255,0.10); border-radius: 999px;
-  background: rgba(255,255,255,0.035);
+  font-size: 12.5px; font-weight: 600; color: var(--agg-text);
+  padding: 6px 12px; border: 1px solid var(--agg-line); border-radius: 999px; background: var(--agg-surface);
 }
-.agg-dot {
-  width: 8px; height: 8px; border-radius: 50%; background: #34d399;
-  box-shadow: 0 0 0 0 rgba(52,211,153,0.55); animation: agg-pulse 2s ease-out infinite;
-}
+.agg-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--agg-status); animation: agg-pulse 2s ease-out infinite; }
 .agg-links { width: 100%; display: flex; flex-direction: column; gap: 14px; }
 .agg-btn {
   display: flex; align-items: center; gap: 14px; width: 100%; padding: 0 18px; height: 62px;
@@ -62,33 +55,71 @@ const CSS = `
 .agg-btn .agg-arrow { flex: 0 0 auto; opacity: 0.55; transition: transform .18s ease, opacity .18s ease; }
 .agg-btn:hover .agg-arrow { transform: translateX(3px); opacity: 0.9; }
 .agg-btn-primary {
-  background: linear-gradient(135deg, #ffd35a, #f5b417); color: #17130a;
-  box-shadow: 0 16px 34px -14px rgba(245,180,23,0.6); animation-delay: .08s;
+  background: linear-gradient(135deg, var(--agg-accent-2), var(--agg-accent)); color: var(--agg-accent-text);
+  box-shadow: 0 16px 34px -14px var(--agg-accent-shadow); animation-delay: .08s;
 }
-.agg-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 22px 44px -14px rgba(245,180,23,0.72); }
+.agg-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 22px 44px -14px var(--agg-accent-shadow); }
 .agg-btn-secondary {
-  background: rgba(255,255,255,0.035); border: 1px solid rgba(255,255,255,0.16);
-  color: #f6f7f8; animation-delay: .16s;
+  background: var(--agg-surface); border: 1px solid var(--agg-line-strong); color: var(--agg-text); animation-delay: .16s;
 }
-.agg-btn-secondary:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.32); background: rgba(255,255,255,0.06); }
+.agg-btn-secondary:hover { transform: translateY(-2px); border-color: var(--agg-muted); }
 .agg-method {
   margin-top: 30px; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase;
-  color: #6a7078; font-weight: 600; animation: agg-rise 0.6s cubic-bezier(0.16,1,0.3,1) .24s both;
+  color: var(--agg-method); font-weight: 600; animation: agg-rise 0.6s cubic-bezier(0.16,1,0.3,1) .24s both;
 }
-.agg-method b { color: #f5b417; font-weight: 700; }
-.agg-btn:focus-visible { outline: 2px solid #ffd35a; outline-offset: 3px; }
-.agg-nf { color: #9aa1ad; font-size: 15px; }
-.agg-nf a { color: #f5b417; font-weight: 700; }
+.agg-method b { color: var(--agg-method-hi); font-weight: 700; }
+.agg-btn:focus-visible { outline: 2px solid var(--agg-focus); outline-offset: 3px; }
+.agg-nf { color: var(--agg-muted); font-size: 15px; }
+.agg-nf a { color: var(--agg-accent); font-weight: 700; }
+.agg-spinner {
+  width: 26px; height: 26px; border-radius: 50%;
+  border: 3px solid var(--agg-line-strong); border-top-color: var(--agg-accent);
+  animation: agg-spin .8s linear infinite;
+}
 @keyframes agg-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes agg-spin { to { transform: rotate(360deg); } }
 @keyframes agg-pulse {
-  0% { box-shadow: 0 0 0 0 rgba(52,211,153,0.5); }
-  70% { box-shadow: 0 0 0 7px rgba(52,211,153,0); }
-  100% { box-shadow: 0 0 0 0 rgba(52,211,153,0); }
+  0% { box-shadow: 0 0 0 0 var(--agg-status-soft); }
+  70% { box-shadow: 0 0 0 7px rgba(0,0,0,0); }
+  100% { box-shadow: 0 0 0 0 rgba(0,0,0,0); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .agg-card, .agg-btn, .agg-method, .agg-dot { animation: none; }
+  .agg-card, .agg-btn, .agg-method, .agg-dot, .agg-spinner { animation: none; }
 }
 `;
+
+type RenderConfig = {
+  name: string;
+  tagline?: string;
+  avatarUrl?: string;
+  status?: string;
+  footer?: string;
+  footerHighlight?: string;
+  theme?: string;
+  links: AggregatorLink[];
+};
+
+const fromStatic = (c: AggregatorConfig): RenderConfig => ({
+  name: c.name,
+  tagline: c.tagline,
+  avatarUrl: c.avatarUrl,
+  status: c.status,
+  footer: c.footer,
+  footerHighlight: c.footerHighlight,
+  theme: c.theme,
+  links: c.links,
+});
+
+const fromDb = (a: Aggregator): RenderConfig => ({
+  name: a.name,
+  tagline: a.tagline || undefined,
+  avatarUrl: a.avatar_url ?? undefined,
+  status: a.status ?? undefined,
+  footer: a.footer ?? undefined,
+  footerHighlight: a.footer_highlight ?? undefined,
+  theme: a.theme,
+  links: a.links ?? [],
+});
 
 function LinkIcon({ icon }: { icon?: AggregatorLinkIcon }) {
   if (icon === "whatsapp") {
@@ -117,15 +148,8 @@ function LinkIcon({ icon }: { icon?: AggregatorLinkIcon }) {
 function LinkButton({ link }: { link: AggregatorLink }) {
   const isPrimary = link.variant === "primary";
   return (
-    <a
-      className={`agg-btn ${isPrimary ? "agg-btn-primary" : "agg-btn-secondary"}`}
-      href={link.href}
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <span className="agg-ic">
-        <LinkIcon icon={link.icon} />
-      </span>
+    <a className={`agg-btn ${isPrimary ? "agg-btn-primary" : "agg-btn-secondary"}`} href={link.href} target="_blank" rel="noopener noreferrer">
+      <span className="agg-ic"><LinkIcon icon={link.icon} /></span>
       <span className="agg-txt">
         {link.label}
         {link.sublabel ? <small>{link.sublabel}</small> : null}
@@ -143,25 +167,46 @@ function renderFooter(footer?: string, highlight?: string) {
   if (!footer) return null;
   if (!highlight || !footer.includes(highlight)) return footer;
   const [before, after] = footer.split(highlight);
-  return (
-    <>
-      {before}
-      <b>{highlight}</b>
-      {after}
-    </>
-  );
+  return (<>{before}<b>{highlight}</b>{after}</>);
 }
 
 export default function LinkAggregatorPage() {
   const { slug } = useParams();
-  const config = getAggregator(slug);
+  const [state, setState] = useState<{ status: "loading" | "ready" | "notfound"; config?: RenderConfig }>({ status: "loading" });
+
+  useEffect(() => {
+    let mounted = true;
+    setState({ status: "loading" });
+    (async () => {
+      let cfg: RenderConfig | undefined;
+      // 1) Banco (publicados). 2) Fallback estático (ex.: bio do Funil Comercial).
+      try {
+        const row = slug ? await getAggregatorBySlug(slug) : null;
+        if (row) cfg = fromDb(row);
+      } catch (err) {
+        console.error("Falha ao buscar agregador; usando fallback estático.", err);
+      }
+      if (!cfg) {
+        const stat = getAggregator(slug);
+        if (stat) cfg = fromStatic(stat);
+      }
+      if (mounted) setState(cfg ? { status: "ready", config: cfg } : { status: "notfound" });
+    })();
+    return () => { mounted = false; };
+  }, [slug]);
+
+  const config = state.config;
+  const theme = getTheme(config?.theme);
 
   return (
     <>
       <style>{CSS}</style>
-      <main className="agg-stage">
+      <main className="agg-stage" style={theme.vars as unknown as CSSProperties}>
         <div className="agg-glow" />
-        {config ? (
+
+        {state.status === "loading" ? (
+          <div className="agg-spinner" role="status" aria-label="Carregando" />
+        ) : state.status === "ready" && config ? (
           <section className="agg-card">
             <div className="agg-mark" aria-hidden={!config.avatarUrl}>
               {config.avatarUrl ? (
@@ -170,8 +215,8 @@ export default function LinkAggregatorPage() {
                 <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
                   <defs>
                     <linearGradient id="aggFunnel" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
-                      <stop stopColor="#ffd35a" />
-                      <stop offset="1" stopColor="#f5b417" />
+                      <stop stopColor="var(--agg-funnel-1)" />
+                      <stop offset="1" stopColor="var(--agg-funnel-2)" />
                     </linearGradient>
                   </defs>
                   <path d="M7 9.5 H41 L28.5 26 V37 L19.5 41.5 V26 Z" fill="url(#aggFunnel)" />
@@ -181,20 +226,15 @@ export default function LinkAggregatorPage() {
 
             <h1 className="agg-name">{config.name}</h1>
             {config.tagline ? <p className="agg-tagline">{config.tagline}</p> : null}
-
-            {config.status ? (
-              <div className="agg-status"><span className="agg-dot" /> {config.status}</div>
-            ) : null}
+            {config.status ? <div className="agg-status"><span className="agg-dot" /> {config.status}</div> : null}
 
             <nav className="agg-links" aria-label="Links">
-              {config.links.map((link) => (
-                <LinkButton key={link.href} link={link} />
+              {config.links.map((link, i) => (
+                <LinkButton key={`${link.href}-${i}`} link={link} />
               ))}
             </nav>
 
-            {config.footer ? (
-              <p className="agg-method">{renderFooter(config.footer, config.footerHighlight)}</p>
-            ) : null}
+            {config.footer ? <p className="agg-method">{renderFooter(config.footer, config.footerHighlight)}</p> : null}
           </section>
         ) : (
           <section className="agg-card">

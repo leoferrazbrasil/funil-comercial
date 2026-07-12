@@ -1,6 +1,24 @@
 import type { PillarId } from "./editorialPillars"
+import type { AggregatorLink } from "./aggregators"
 
-export type Route = 'login' | 'cadastro' | 'dashboard' | 'inbox' | 'contatos' | 'leads' | 'funil' | 'campanhas' | 'perfil' | 'configuracoes' | 'criativos' | 'roteiro' | 'brandbook'
+export type Route = 'login' | 'cadastro' | 'dashboard' | 'inbox' | 'contatos' | 'leads' | 'funil' | 'campanhas' | 'perfil' | 'configuracoes' | 'criativos' | 'roteiro' | 'agregadores' | 'brandbook'
+
+export type Aggregator = {
+  id: string
+  owner_id: string
+  slug: string
+  name: string
+  tagline: string
+  avatar_url: string | null
+  status: string | null
+  footer: string | null
+  footer_highlight: string | null
+  theme: string
+  links: AggregatorLink[]
+  published: boolean
+  created_at: string
+  updated_at: string
+}
 
 export type LeadStatus = 'novo' | 'em_atendimento' | 'qualificado' | 'convertido' | 'perdido'
 

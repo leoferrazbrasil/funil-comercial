@@ -53,6 +53,7 @@ import PipelinePage from "./pages/Pipeline";
 import ProfilePage from "./pages/Profile";
 import SettingsPage from "./pages/Settings";
 import EditorialPlannerPage from "./pages/EditorialPlanner";
+import AggregatorsAdminPage from "./pages/AggregatorsAdmin";
 import Logo from "./components/Logo";
 import {
   convertContactToLead,
@@ -1154,6 +1155,7 @@ function AppContent() {
             />
             <Route path="/criativos" element={<CreativesPage />} />
             <Route path="/roteiro" element={<EditorialPlannerPage />} />
+            <Route path="/agregadores" element={<AggregatorsAdminPage />} />
             <Route
               path="/campanhas"
               element={
