@@ -43,6 +43,9 @@ const WHATSAPP_NUMBER = "5551996737359";
 const WHATSAPP_MESSAGE =
   "Olá! Quero um diagnóstico gratuito da estrutura de vendas do meu negócio.";
 const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`;
+const WHATSAPP_INFO_MESSAGE =
+  "Olá! Quero mais informações sobre a estrutura de vendas para o meu negócio.";
+const whatsappInfoLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_INFO_MESSAGE)}`;
 
 // As 4 camadas do Método Estrutura de Vendas.
 const METHOD_LAYERS = [
@@ -188,9 +191,6 @@ export default function LandingPage() {
           </nav>
 
           <div className="hidden md:flex items-center gap-4">
-            <Link to="/login" className="text-sm font-semibold hover:text-primary transition-colors">
-              Entrar
-            </Link>
             <a href={whatsappLink} target="_blank" rel="noreferrer" className="flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-all active:scale-95 shadow-[0_0_24px_rgba(245,158,11,0.2)] dark:shadow-[0_0_24px_rgba(245,158,11,0.1)]">
               Diagnóstico gratuito
               <MoveRight size={16} />
@@ -198,9 +198,6 @@ export default function LandingPage() {
           </div>
 
           <div className="flex md:hidden items-center gap-4">
-            <Link to="/login" className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors">
-              Entrar
-            </Link>
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="text-muted-foreground hover:text-foreground transition-colors p-2 -mr-2"
@@ -630,6 +627,23 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+
+      {/* Botão flutuante de WhatsApp — mais informações */}
+      <a
+        href={whatsappInfoLink}
+        target="_blank"
+        rel="noreferrer"
+        aria-label="Fale conosco no WhatsApp"
+        className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-50 flex items-center gap-2.5 rounded-full bg-[#25D366] pl-3 pr-3 sm:pr-5 py-3 text-white font-semibold shadow-[0_10px_30px_-6px_rgba(37,211,102,0.6)] hover:bg-[#1ebe5b] transition-all active:scale-95"
+      >
+        <span className="relative flex h-7 w-7 items-center justify-center">
+          <span className="absolute inline-flex h-full w-full rounded-full bg-white/30 opacity-70 motion-safe:animate-ping" />
+          <svg viewBox="0 0 24 24" fill="currentColor" className="h-7 w-7 relative">
+            <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.9-4.45 9.9-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm5.8 14.13c-.24.68-1.42 1.32-1.95 1.36-.5.04-.95.23-3.2-.67-2.7-1.07-4.42-3.83-4.55-4.01-.13-.18-1.1-1.46-1.1-2.78 0-1.32.69-1.97.94-2.24.24-.27.53-.33.7-.33.18 0 .35 0 .5.01.16.01.38-.06.6.46.24.55.8 1.9.87 2.04.07.13.12.29.02.47-.09.18-.14.29-.27.45-.13.16-.28.35-.4.47-.13.13-.27.28-.12.54.16.27.7 1.15 1.5 1.86 1.03.92 1.9 1.2 2.17 1.34.27.13.42.11.58-.07.16-.18.67-.78.85-1.05.18-.27.35-.22.6-.13.24.09 1.55.73 1.82.86.27.13.44.2.5.31.07.11.07.63-.17 1.32Z" />
+          </svg>
+        </span>
+        <span className="hidden sm:inline text-sm">Mais informações</span>
+      </a>
     </div>
   );
 }
