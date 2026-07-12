@@ -12,7 +12,7 @@ cssclasses:
 
 # 🎯 Funil Comercial — Knowledge Base
 
-Bem-vindo ao cofre do projeto **Funil Comercial** — o CRM de prospecção ativa e atendimento por WhatsApp.
+Bem-vindo ao cofre da **plataforma da Funil Comercial** — a **empresa** de estrutura de vendas para negócios locais. O **CRM** (prospecção ativa + atendimento por WhatsApp) é um **produto** da casa, a camada de Conversão do método — não a empresa inteira.
 
 > [!info] Como navegar
 > Comece pelo que procura:
@@ -42,7 +42,8 @@ Bem-vindo ao cofre do projeto **Funil Comercial** — o CRM de prospecção ativ
 ## ⚡ Fatos rápidos
 
 > [!abstract] Snapshot do projeto
-> - **Produto:** CRM comercial (prospecção ativa + WhatsApp).
+> - **Empresa:** Funil Comercial — estrutura de vendas para negócios locais (4 camadas).
+> - **Software:** o **CRM** (camada de Conversão: WhatsApp, contatos, leads, funil) + Criativos, Roteiro e Campanhas. A empresa ≠ o CRM.
 > - **Stack:** React 19 + Vite 8 + TypeScript · Supabase (Postgres/RLS/Realtime/Edge Functions).
 > - **Deploy:** Hostinger, automático via push na branch `main` do GitHub.
 > - **Supabase:** projeto `juvwfxnlusrnvcarkrmc`.

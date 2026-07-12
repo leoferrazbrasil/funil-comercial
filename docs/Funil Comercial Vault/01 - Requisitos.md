@@ -15,7 +15,7 @@ date: 2026-07-09
 
 ## 1. Visão geral
 
-CRM comercial focado em **prospecção ativa** e atendimento por **WhatsApp**, cobrindo o ciclo: encontrar/receber contatos → qualificar em leads → negociar no funil → fechar (Ganho/Perdido), com métricas de operação e receita (única e recorrente/MRR).
+Plataforma da **Funil Comercial** (empresa de estrutura de vendas). Seu **núcleo é o CRM** — o software da camada de Conversão — focado em **prospecção ativa** e atendimento por **WhatsApp**, cobrindo o ciclo: encontrar/receber contatos → qualificar em leads → negociar no funil → fechar (Ganho/Perdido), com métricas de operação e receita (única e recorrente/MRR). Além do CRM, a plataforma inclui site institucional, Brandbook, Criativos, Roteiro e Campanhas.
 
 - **Multiusuário / multi-tenant:** cada usuário (dono) enxerga apenas seus próprios dados (RLS por `owner_id`).
 - **Papéis:** `diretor`, `gestor`, `vendedor` (controle de rotas por papel em `accessControl`).

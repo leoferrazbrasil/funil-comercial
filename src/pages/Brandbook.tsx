@@ -158,21 +158,40 @@ export default function BrandbookPage() {
           <section id="visao-geral" className="scroll-mt-24 space-y-8">
             <div>
               <h2 className="text-3xl font-bold mb-2">Visão Geral</h2>
-              <p className="text-muted-foreground">O propósito que movimenta nossa comunicação B2B.</p>
+              <p className="text-muted-foreground">Quem somos, o que vendemos e a distinção entre a marca-mãe e o produto.</p>
             </div>
-            
+
             <div className="grid gap-6 sm:grid-cols-2">
               <div className="rounded-2xl border border-white/5 bg-card/30 p-8">
                 <h3 className="text-lg font-bold text-primary mb-3">Nosso Propósito</h3>
                 <p className="text-sm leading-relaxed text-muted-foreground">
-                  Simplificar o caos das operações comerciais B2B, entregando clareza visual, processos definidos e aumento direto na taxa de conversão das equipes.
+                  Montar a <strong className="text-foreground">estrutura de vendas</strong> de negócios locais — presença, aquisição, conversão e escala funcionando juntas — para o cliente ser encontrado, atendido e acompanhado até fechar. Não somos "mais uma agência".
                 </p>
               </div>
               <div className="rounded-2xl border border-white/5 bg-card/30 p-8">
                 <h3 className="text-lg font-bold text-primary mb-3">Personalidade</h3>
                 <p className="text-sm leading-relaxed text-muted-foreground">
-                  Direta, profissional e focada em resultados. Não usamos jargões desnecessários. Nós falamos a língua do fechamento e da eficiência operacional.
+                  Direta, pragmática e estrutural. Falamos como consultor que resolve, não como influencer — sem jargão de marketing. A língua é a de estrutura, processo e fechamento.
                 </p>
+              </div>
+            </div>
+
+            {/* Marca-mãe × Produto — a distinção central do posicionamento */}
+            <div className="rounded-2xl border border-primary/20 bg-primary/5 p-8">
+              <h3 className="text-lg font-bold text-foreground mb-5">Marca-mãe × Produto</h3>
+              <div className="grid gap-6 sm:grid-cols-2">
+                <div>
+                  <span className="text-[11px] font-bold uppercase tracking-widest text-primary">A empresa</span>
+                  <p className="text-sm leading-relaxed text-muted-foreground mt-2">
+                    <strong className="text-foreground">Funil Comercial</strong> é a <strong className="text-foreground">empresa de estrutura de vendas</strong> para negócios locais. Entrega o método completo das <strong className="text-foreground">4 camadas</strong>: Presença (site, Google), Aquisição (tráfego), Conversão e Escala.
+                  </p>
+                </div>
+                <div>
+                  <span className="text-[11px] font-bold uppercase tracking-widest text-primary">O software</span>
+                  <p className="text-sm leading-relaxed text-muted-foreground mt-2">
+                    O <strong className="text-foreground">CRM</strong> (Funil Comercial CRM) é o nosso <strong className="text-foreground">software próprio</strong> — a camada de <strong className="text-foreground">Conversão</strong> do método (WhatsApp, contatos, leads e funil). É um <strong className="text-foreground">produto da casa</strong>, não a empresa inteira. Vive em <span className="text-foreground">funilcomercial.com/crm</span>.
+                  </p>
+                </div>
               </div>
             </div>
           </section>
@@ -193,7 +212,7 @@ export default function BrandbookPage() {
                   </div>
                   <h3 className="text-xl font-bold text-foreground mb-3">Segmento de Atuação</h3>
                   <p className="text-sm leading-relaxed text-muted-foreground flex-1">
-                    Tecnologia para Gestão Comercial B2B e Vendas. O Funil Comercial atua no mercado de SaaS (Software as a Service) voltado para CRM, automação de vendas, gestão centralizada de leads e atendimento digital de alta performance.
+                    Estrutura de vendas para negócios locais. O Funil Comercial monta presença digital, aquisição, conversão e escala funcionando juntas — do Google ao WhatsApp. O <strong className="text-foreground">CRM próprio</strong> é a camada de Conversão desse método, não a oferta inteira.
                   </p>
                 </div>
                 
@@ -203,7 +222,7 @@ export default function BrandbookPage() {
                   </div>
                   <h3 className="text-xl font-bold text-foreground mb-3">Objetivo de Uso</h3>
                   <p className="text-sm leading-relaxed text-muted-foreground flex-1">
-                    Centralização, Controle e Escala. O Funil Comercial existe para centralizar toda a jornada de vendas, desde o primeiro contato do lead até o fechamento da oportunidade, substituindo planilhas soltas e conversas dispersas por um fluxo de trabalho rastreável e previsível.
+                    Ser encontrado, atrair e fechar — todos os dias. A empresa entrega a estrutura completa; o CRM organiza a Conversão: do primeiro contato no WhatsApp ao fechamento da oportunidade, substituindo planilhas soltas e conversas dispersas por um fluxo rastreável e previsível.
                   </p>
                 </div>
               </div>
@@ -218,19 +237,19 @@ export default function BrandbookPage() {
                   <ul className="space-y-3 text-sm text-muted-foreground">
                     <li className="flex items-start gap-2">
                       <CheckCircle2 size={16} className="text-primary shrink-0 mt-0.5" />
-                      Empresas com operação comercial ativa e times de vendas.
+                      Donos de negócios locais, profissionais liberais e autônomos.
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle2 size={16} className="text-primary shrink-0 mt-0.5" />
-                      Negócios que recebem leads e vendem pelo WhatsApp.
+                      Quem recebe leads e vende pelo WhatsApp.
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle2 size={16} className="text-primary shrink-0 mt-0.5" />
-                      Gestores comerciais e prestadores de serviço.
+                      Quem depende de indicação e precisa aparecer melhor no Google.
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle2 size={16} className="text-primary shrink-0 mt-0.5" />
-                      PMEs em processo de estruturação comercial que desejam previsibilidade.
+                      Negócios em estruturação comercial que querem previsibilidade.
                     </li>
                   </ul>
                 </div>
@@ -241,7 +260,7 @@ export default function BrandbookPage() {
                   </div>
                   <h3 className="text-xl font-bold text-foreground mb-4">Segmentos de Clientes</h3>
                   <div className="flex flex-wrap gap-2">
-                    {['Consultorias', 'Agências', 'Prestadores de Serviço', 'Imobiliárias', 'Clínicas', 'Escolas e Cursos', 'Negócios Locais', 'Empresas B2B', 'Operações Digitais'].map((badge) => (
+                    {['Médicos e Clínicas', 'Advogados', 'Contadores', 'Estética e Beleza', 'Arquitetos e Engenheiros', 'Prestadores de Serviço', 'Comércio Local', 'Negócios Locais', 'Autônomos'].map((badge) => (
                       <span key={badge} className="px-3 py-1.5 rounded-lg border border-white/5 bg-white/5 text-xs font-medium text-foreground">
                         {badge}
                       </span>
@@ -585,7 +604,7 @@ export default function BrandbookPage() {
                 <ul className="space-y-3 text-sm text-muted-foreground">
                    <li>Evite gerúndios excessivos ("Estamos preparando seu dashboard...").</li>
                    <li>Não use linguagem excessivamente técnica (ex: "Falha de DB" → "Não foi possível carregar").</li>
-                   <li>Evite gírias informais ("Mano", "Partiu"). Mantenha a postura B2B.</li>
+                   <li>Evite gírias informais ("Mano", "Partiu"). Mantenha a postura profissional e consultiva.</li>
                 </ul>
               </div>
             </div>

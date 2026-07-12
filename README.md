@@ -1,6 +1,6 @@
 # Funil Comercial
 
-CRM comercial posicionado como **empresa de estrutura de vendas para negócios locais**. SPA React 19 + Supabase, em produção em [funilcomercial.com](https://funilcomercial.com).
+**Funil Comercial** é a **empresa** de estrutura de vendas para negócios locais; o **CRM** é o nosso software (a camada de Conversão). Este repositório é a **plataforma** da empresa — site, Brandbook e o app (CRM + Criativos/Roteiro/Campanhas). SPA React 19 + Supabase, em produção em [funilcomercial.com](https://funilcomercial.com).
 
 > **📍 Para agentes e contribuidores — comece pelo [`CLAUDE.md`](./CLAUDE.md).**
 > Ele é o mapa conciso e atual do projeto (stack, rotas, dados, Edge Functions, design system e gotchas). Este README cobre só o setup operacional; a **fonte de verdade** é o `CLAUDE.md` + o cofre em [`docs/Funil Comercial Vault/`](./docs/Funil%20Comercial%20Vault/) (notas 00–07). O conteúdo abaixo deste bloco pode conter trechos legados — na dúvida, o `CLAUDE.md` prevalece.

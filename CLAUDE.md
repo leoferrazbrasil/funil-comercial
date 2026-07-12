@@ -4,7 +4,7 @@ Mapa conciso para agentes. Profundidade fica no **cofre** (`docs/Funil Comercial
 
 ## O que é
 
-CRM comercial posicionado como **empresa de estrutura de vendas para negócios locais** (não "agência de marketing"). SPA React + Supabase. Deploy automático no push da `main` (Hostinger builda `dist/`).
+**Funil Comercial** é a **empresa** de estrutura de vendas para negócios locais (não "agência de marketing") — entrega presença, aquisição, conversão e escala (4 camadas). Este repo é a **plataforma** da empresa: site institucional + Brandbook + o **CRM** (o software próprio, a camada de **Conversão**) + ferramentas (Criativos, Roteiro, Campanhas). Ou seja: **Funil Comercial = a empresa; o CRM = um produto/software dela** — não confundir. SPA React 19 + Supabase; deploy automático no push da `main` (Hostinger builda `dist/`).
 
 ## Stack
 
