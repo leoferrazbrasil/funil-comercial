@@ -53,7 +53,7 @@ A arte gerada no estúdio (`Creatives.tsx`, templates `Template1/4/12`) tem **te
 
 ## Cores da marca (institucional)
 
-Preto `#000000` (base/autoridade) · Ouro/Amarelo `#FFD700` (destaque/CTA) · Grafite `#111111` (fundos técnicos) · Branco (respiro). No app, o **primary** é o âmbar (`43 96% 56%`) e o **accent** é o teal. Detalhe da doutrina de cor no Brandbook.
+Preto `#000000` (base/autoridade) · Ouro/Amarelo `#FFD700` (destaque/CTA) · Grafite `#111111` (fundos técnicos) · Branco (respiro). No app, o **primary** é o âmbar (`43 96% 56%`) e o **accent** é o **verde-esmeralda** (`--fc-color-emerald-*`, ~`#059669`/`#34d399`) — crescimento/confiança/resultado. O accent **era teal-ciano** (herança do posicionamento SaaS) e foi trocado ao realinhar a marca ao público de negócios locais (autoridade do preto + prosperidade do ouro + crescimento do verde). Detalhe da doutrina de cor no Brandbook.
 
 ## Onde ficam os tokens
 
