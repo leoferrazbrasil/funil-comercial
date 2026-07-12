@@ -1,0 +1,5 @@
+Lara, um trabalho tão completo como o seu (com comunidade VIP, InBody, etc) precisa de uma vitrine impecável.
+
+No site atual, quem entra no celular pode se perder antes de clicar no botão de agendamento. Na versão que eu criei, a arquitetura é desenhada especificamente pra converter curiosos em pacientes no seu funil.
+
+O que achou do novo visual? Tenho certeza que aumentaria sua taxa de agendamentos diários.
