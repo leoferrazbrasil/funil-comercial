@@ -99,3 +99,9 @@
   .fc-fade-in,
   .fc-reveal { animation: none; }
 }
+
+/* Cor de sucesso/confirmação (checkmarks) — verde-esmeralda theme-aware:
+   emerald-600 no claro (contraste) e emerald-400 no escuro (vivacidade).
+   Usada em elementos semânticos de sucesso; o CTA continua ouro (primary). */
+.fc-success { color: #059669; }
+[data-theme="dark"] .fc-success { color: #34d399; }

@@ -286,7 +286,7 @@ export default function LandingPage() {
                         </div>
                         <p className="text-xs sm:text-sm text-muted-foreground">{layer.entrega}</p>
                       </div>
-                      <CheckCircle2 size={18} className="text-primary/50 shrink-0 hidden sm:block" />
+                      <CheckCircle2 size={18} className="fc-success opacity-50 shrink-0 hidden sm:block" />
                     </div>
                   );
                 })}
@@ -369,7 +369,7 @@ export default function LandingPage() {
                     <h3 className="text-xl md:text-2xl font-bold mb-3">{layer.pergunta}</h3>
                     <p className="text-muted-foreground leading-relaxed mb-4">{layer.descricao}</p>
                     <p className="text-sm font-semibold text-foreground flex items-center gap-2">
-                      <CheckCircle2 size={16} className="text-primary shrink-0" /> {layer.entrega}
+                      <CheckCircle2 size={16} className="fc-success shrink-0" /> {layer.entrega}
                     </p>
                   </div>
                 );
@@ -521,7 +521,7 @@ export default function LandingPage() {
                     { titulo: "Você fala com quem faz", texto: "Atendimento direto com o fundador — sem gerente de conta, sem fila." },
                   ].map((item) => (
                     <div key={item.titulo} className="flex gap-4">
-                      <CheckCircle2 size={22} className="text-primary shrink-0 mt-0.5" />
+                      <CheckCircle2 size={22} className="fc-success shrink-0 mt-0.5" />
                       <div>
                         <p className="font-bold">{item.titulo}</p>
                         <p className="text-muted-foreground text-sm">{item.texto}</p>

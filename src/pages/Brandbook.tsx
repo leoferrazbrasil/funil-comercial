@@ -236,19 +236,19 @@ export default function BrandbookPage() {
                   <h3 className="text-xl font-bold text-foreground mb-4">Principais Clientes Atendidos</h3>
                   <ul className="space-y-3 text-sm text-muted-foreground">
                     <li className="flex items-start gap-2">
-                      <CheckCircle2 size={16} className="text-primary shrink-0 mt-0.5" />
+                      <CheckCircle2 size={16} className="fc-success shrink-0 mt-0.5" />
                       Donos de negócios locais, profissionais liberais e autônomos.
                     </li>
                     <li className="flex items-start gap-2">
-                      <CheckCircle2 size={16} className="text-primary shrink-0 mt-0.5" />
+                      <CheckCircle2 size={16} className="fc-success shrink-0 mt-0.5" />
                       Quem recebe leads e vende pelo WhatsApp.
                     </li>
                     <li className="flex items-start gap-2">
-                      <CheckCircle2 size={16} className="text-primary shrink-0 mt-0.5" />
+                      <CheckCircle2 size={16} className="fc-success shrink-0 mt-0.5" />
                       Quem depende de indicação e precisa aparecer melhor no Google.
                     </li>
                     <li className="flex items-start gap-2">
-                      <CheckCircle2 size={16} className="text-primary shrink-0 mt-0.5" />
+                      <CheckCircle2 size={16} className="fc-success shrink-0 mt-0.5" />
                       Negócios em estruturação comercial que querem previsibilidade.
                     </li>
                   </ul>
@@ -585,7 +585,7 @@ export default function BrandbookPage() {
             
             <div className="grid gap-6 sm:grid-cols-2">
               <div className="rounded-2xl border border-white/5 bg-card p-6">
-                <div className="flex items-center gap-2 text-green-500 mb-4">
+                <div className="flex items-center gap-2 fc-success mb-4">
                    <CheckCircle2 size={18} />
                    <h3 className="font-bold">Como devemos falar</h3>
                 </div>
