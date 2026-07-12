@@ -1,15 +1,9 @@
 # Funil Comercial
 
-Prototipo navegavel do Funil Comercial para validacao inicial do MVP em outro dominio e repositorio.
+CRM comercial posicionado como **empresa de estrutura de vendas para negócios locais**. SPA React 19 + Supabase, em produção em [funilcomercial.com](https://funilcomercial.com).
 
-## Telas incluidas
-
-- Login
-- Dashboard
-- Inbox com contexto de WhatsApp
-- Contatos
-- Leads
-- Funil de vendas
+> **📍 Para agentes e contribuidores — comece pelo [`CLAUDE.md`](./CLAUDE.md).**
+> Ele é o mapa conciso e atual do projeto (stack, rotas, dados, Edge Functions, design system e gotchas). Este README cobre só o setup operacional; a **fonte de verdade** é o `CLAUDE.md` + o cofre em [`docs/Funil Comercial Vault/`](./docs/Funil%20Comercial%20Vault/) (notas 00–07). O conteúdo abaixo deste bloco pode conter trechos legados — na dúvida, o `CLAUDE.md` prevalece.
 
 ## Execucao local
 
@@ -50,7 +44,7 @@ npm run build
 O projeto esta configurado com `base: "/"` para ser publicado no diretorio raiz:
 
 ```text
-https://leonardobrasil.com.br/
+https://funilcomercial.com/
 ```
 
 ## Deploy
