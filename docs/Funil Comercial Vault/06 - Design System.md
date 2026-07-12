@@ -55,6 +55,8 @@ A arte gerada no estúdio (`Creatives.tsx`, templates `Template1/4/12`) tem **te
 
 Preto `#000000` (base/autoridade) · Ouro/Amarelo `#FFD700` (destaque/CTA) · Grafite `#111111` (fundos técnicos) · Branco (respiro). No app, o **primary** é o âmbar (`43 96% 56%`) e o **accent** é o **verde-esmeralda** (`--fc-color-emerald-*`, ~`#059669`/`#34d399`) — crescimento/confiança/resultado. O accent **era teal-ciano** (herança do posicionamento SaaS) e foi trocado ao realinhar a marca ao público de negócios locais (autoridade do preto + prosperidade do ouro + crescimento do verde). Detalhe da doutrina de cor no Brandbook.
 
+Para **elementos semânticos de sucesso** (checkmarks de confirmação, ✓), use a classe **`.fc-success`** (em `index.css`) — verde-esmeralda **theme-aware**: `emerald-600` no claro (contraste) e `emerald-400` no escuro (vivacidade). Preferir isso a `text-emerald-*` fixo ou `dark:text-*` (o `dark:` do Tailwind aqui responde ao `prefers-color-scheme`, não ao `data-theme` do app). O **CTA continua ouro** (`primary`) — verde é "positivo/você ganha", ouro é "aja/converta".
+
 ## Onde ficam os tokens
 
 - `src/styles/tokens.css` — primitivos (`--fc-color-*`, radius, space) + semânticos light/dark + aliases de compatibilidade para o `styles.css`.

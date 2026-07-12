@@ -86,9 +86,15 @@ Plataforma da **Funil Comercial** (empresa de estrutura de vendas). Seu **núcle
 
 ## 8. Criativos (`/criativos`)
 
-- Wizard de 4 etapas (Estratégia, Ideia, IA, Estúdio).
-- Geração de post com IA (`ai-generate-post`, fallback OpenAI/Gemini) e **Estrategista IA** (`ai-recommend-post`) conectado ao Instagram (Meta Graph) para continuidade editorial.
-- Copy com limite de caracteres e gestão de hashtags (até 5, foco vendas/B2B).
+- **Wizard guiado (Progressive Disclosure):** *O Caminho* (Estrategista IA em destaque **ou** criar manualmente) → fluxo **manual** (escolher o **pilar editorial**, que já traz objetivo/etapa/CTA — 1:1 do Brandbook 4.1 — depois a ideia) → **Estúdio** de edição + canvas.
+- Geração de post com IA (`ai-generate-post`, fallback OpenAI/Gemini) e **Estrategista IA** (`ai-recommend-post`) conectado ao Instagram (Meta Graph) para continuidade editorial. *(Prompts da IA no posicionamento novo = **Fase B**, pendente de deploy — ver [[04 - Roadmap]].)*
+- Copy com limite de caracteres, gestão de hashtags (até 5) e **checklist "Antes de publicar"** — tudo alinhado à **Linha Editorial** (Brandbook 04). Pilares em `src/lib/editorialPillars.ts` (compartilhados com o Roteiro).
+
+## 8.1. Roteiro Editorial (`/roteiro`)
+
+- **Fila sequencial** de próximos posts seguindo a rotação de pilares da Matriz 5W2H (Brandbook 04 → 4.2): **"próximo sugerido"** (calculado a partir do último item), campo de **tema** e **status** em 3 estados (A fazer → Gerado → Publicado).
+- **Deep-link** para o estúdio: "Gerar →" abre `/criativos` com o pilar e o tema pré-preenchidos.
+- Persistência por dono (tabela `editorial_queue`, RLS `auth.uid() = owner_id`). Acesso: **diretor/gestor**. Sem datas/calendário na v1 (evolução para calendário mensal no [[04 - Roadmap]]).
 
 ## 9. Regras de negócio principais
 

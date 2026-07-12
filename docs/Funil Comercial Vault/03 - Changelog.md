@@ -11,6 +11,32 @@ tags:
 > [!note] Navegação
 > Histórico de mudanças, mais recente primeiro. Contexto do produto em [[01 - Requisitos]]; arquitetura em [[02 - Arquitetura e Design]]; índice em [[00 - Inicio]].
 
+## [2026-07-12] - Conteúdo editorial, Roteiro, base de conhecimento, marca & paleta
+
+### Adicionado — Roteiro Editorial (`/roteiro`)
+- Nova página que orquestra a **sequência** de posts (que o `/criativos`, peça isolada, não faz): uma **fila persistida** seguindo a rotação de pilares da 4.2 ("próximo sugerido", tema, status A fazer/Gerado/Publicado) + **deep-link** para o estúdio (`/criativos?pilar=&tema=` cai no passo da ideia). Puro Postgres + front-end (tabela `editorial_queue`, RLS por dono) — sem Edge Function. Registro único de pilares em `src/lib/editorialPillars.ts` (compartilhado com o estúdio). Acesso: diretor/gestor. **Ativação:** aplicar a migração `editorial_queue`. Spec/plano em `docs/superpowers/`. Ver [[01 - Requisitos#8.1. Roteiro Editorial (`/roteiro`)]].
+
+### Mudado — Estúdio de Criativos alinhado ao Brandbook 04 (Fase A) + wizard reescrito
+- **Taxonomia editorial (Fase A):** o `/criativos` deixou de gerar do posicionamento antigo (B2B/SaaS/CRM). Pilares, objetivos, defaults, CTAs e um checklist "Antes de publicar" realinhados à [[Linha_Editorial_Funil_Comercial|Linha Editorial]] / Brandbook 04.
+- **Objetivo × Pilar fundidos (1:1):** como a 4.1 amarra objetivo e pilar, o wizard passou a escolher **o pilar** (que já traz objetivo, etapa e CTA), eliminando combinações fora da doutrina e completando o objetivo "Atrair" que faltava.
+- **Wizard (Progressive Disclosure):** a tela deixou de mostrar tudo de uma vez. Fluxo guiado — **O Caminho** (Estrategista IA em destaque + "OU" + criar manual) → **manual** (pilar → ideia, revelando etapa a etapa, com barras-resumo editáveis) → **estúdio**. Animações reais (`fc-fade-in`/`fc-reveal`; o projeto não tem `tailwindcss-animate`, então os `animate-in` eram no-ops).
+- **Microcópia honesta:** removidas promessas que não procedem (a IA está offline/Fase B e a arte é template) — "a IA escreve/monta a arte" virou cópia verdadeira agora **e** depois da Fase B.
+
+### Adicionado — Brandbook: 04. Diretrizes de Conteúdo & Ativação
+- Publicados no `/brandbook` os **pilares editoriais (4.1)**, a **Matriz 5W2H (4.2)** e o **checklist** (`ContentGuidelinesSection`). Fonte de verdade da doutrina de conteúdo. Fontes: [[Linha_Editorial_Funil_Comercial]] e [[Diretrizes_Publicacao_5W2H]].
+
+### Mudado — Posicionamento: Funil Comercial é a EMPRESA, o CRM é o SOFTWARE
+- Firmada a distinção **marca-mãe × produto**: "Funil Comercial" = **empresa** de estrutura de vendas (4 camadas); o **CRM** = um **produto/software** dela (camada de Conversão). No Brandbook, a **Visão Geral** ganhou o bloco "Marca-mãe × Produto" e a **Atuação de Mercado** saiu do "SaaS/CRM B2B" para estrutura de vendas (clientes/segmentos → público local: médicos, advogados, contadores, comércio local…). A base de conhecimento (CLAUDE.md, README, cofre) passou a chamar o projeto de **"plataforma"**, não "um CRM".
+- **Área logada** passou a se identificar como **"Funil Comercial CRM"** (`brandConfig.appName` na topbar); a marca-mãe segue "Funil Comercial" nos contextos institucionais (Brandbook, home, `/crm`, rodapés, legais).
+
+### Mudado — Paleta: accent teal-ciano → verde-esmeralda (psicologia do novo público)
+- Reavaliada para o novo ICP (negócios locais/liberais): mantém **preto/grafite** (autoridade) e **ouro/âmbar** (CTA/prosperidade) e troca o **accent teal** (frio/SaaS, resíduo do posicionamento antigo) por **verde-esmeralda** (crescimento/confiança/resultado). `tokens.css` (primitivas + `--fc-accent`/`--fc-focus-ring`, light+dark) — o shell legado herda via token, sem editar `styles.css`.
+- O verde foi levado às **páginas públicas** só nos **elementos semânticos de sucesso** (✓ das 4 camadas/diferenciais na home; "Clientes Atendidos" e "Como devemos falar" no Brandbook), com o **CTA mantido em ouro**. Classe **`fc-success`** theme-aware (emerald-600 no claro, emerald-400 no escuro).
+- Contexto anterior (mesma frente): o **tema claro** foi suavizado (paleta menos agressiva, `tokens.css` e `index.css` sincronizados) e ~12 arquivos migraram do idioma dark hardcoded (`white/N`) para tokens theme-aware (`foreground/N`, `border-border`).
+
+### Adicionado — Base de conhecimento para agentes
+- **`CLAUDE.md`** (raiz, auto-carregado): mapa conciso (stack, rotas, dados, edge functions, design system, gotchas de deploy/WIP). O cofre ganhou **[[05 - API e Edge Functions]]**, **[[06 - Design System]]** e **[[07 - Componentes]]**, fechando as lacunas de API/design-system/componentes. O `README.md` aponta para o `CLAUDE.md` (deixou de se descrever como "protótipo"). Graphify documentado como opcional (o `.gitignore` ignora seus artefatos). *(Memória persistente do agente — usuário, preferências, posicionamento — vive fora do repo.)*
+
 ## [2026-07-11] - Handoff de conversas entre usuários (time leve sobre o admin)
 
 ### Adicionado — Transferência de conversas para vendedores
