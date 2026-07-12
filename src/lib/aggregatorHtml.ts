@@ -115,8 +115,10 @@ const iconSvg = (icon?: AggregatorLinkIcon): string => {
 
 const ARROW_SVG = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>`;
 
+// Marca oficial do Funil Comercial: funil de 3 barras (topo → meio → haste),
+// na cor de accent do tema (ouro na bio da FC).
 const funnelSvg = (): string =>
-  `<svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><defs><linearGradient id="aggFunnel" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse"><stop stop-color="var(--agg-funnel-1)"/><stop offset="1" stop-color="var(--agg-funnel-2)"/></linearGradient></defs><path d="M7 9.5 H41 L28.5 26 V37 L19.5 41.5 V26 Z" fill="url(#aggFunnel)"/></svg>`;
+  `<svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><rect x="4" y="6" width="40" height="10" rx="4" fill="var(--agg-accent)" opacity="0.3"/><rect x="12" y="20" width="24" height="10" rx="4" fill="var(--agg-accent)" opacity="0.6"/><rect x="20" y="34" width="8" height="10" rx="4" fill="var(--agg-accent)"/></svg>`;
 
 const linkHtml = (l: AggregatorLink): string => `
       <a class="agg-btn agg-btn-${l.variant === "primary" ? "primary" : "secondary"}" href="${escAttr(l.href)}" target="_blank" rel="noopener noreferrer">

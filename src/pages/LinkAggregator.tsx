@@ -133,13 +133,9 @@ export default function LinkAggregatorPage() {
                 <img src={config.avatarUrl} alt={config.name} />
               ) : (
                 <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
-                  <defs>
-                    <linearGradient id="aggFunnel" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
-                      <stop stopColor="var(--agg-funnel-1)" />
-                      <stop offset="1" stopColor="var(--agg-funnel-2)" />
-                    </linearGradient>
-                  </defs>
-                  <path d="M7 9.5 H41 L28.5 26 V37 L19.5 41.5 V26 Z" fill="url(#aggFunnel)" />
+                  <rect x="4" y="6" width="40" height="10" rx="4" fill="var(--agg-accent)" opacity="0.3" />
+                  <rect x="12" y="20" width="24" height="10" rx="4" fill="var(--agg-accent)" opacity="0.6" />
+                  <rect x="20" y="34" width="8" height="10" rx="4" fill="var(--agg-accent)" />
                 </svg>
               )}
             </div>
