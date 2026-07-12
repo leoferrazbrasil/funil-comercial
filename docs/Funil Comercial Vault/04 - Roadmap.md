@@ -79,6 +79,19 @@ _Fase C (opcional):_ templates de arte por pilar editorial.
 
 ## 🧭 Futuro (planejado, sem data)
 
+### Planner / Calendário Editorial
+**Objetivo:** um módulo de planejamento que distribui os pilares editoriais **no tempo**, conforme a **4.2 Matriz 5W2H → "When"** — resolvendo a orquestração da sequência estratégica que o `/criativos` (peça isolada) não faz.
+
+**Por quê:** o estúdio de criativos gera **um post de cada vez**, sem noção de ordem. A 4.2 prescreve uma **cadência semanal** de pilares (progressão atrair → conectar → educar → provar → converter); hoje nada guia o usuário nessa rotação. (Ver [[Diretrizes_Publicacao_5W2H]].)
+
+**Semente de spec (da 4.2):**
+- Cadência semanal: Seg **Diagnóstico da Dor** → Ter **Bastidores & Autoridade** → Qua **Método das 4 Camadas** → Qui **Prova Social** → Sex **Conversão / CTA direto**.
+- Frequência: Feed **3–4×/semana**, Stories diários; **fechar o calendário do mês seguinte até o dia 20**.
+- Cada dia do calendário **abre o estúdio já com o pilar** pré-selecionado (reaproveita o wizard atual).
+- Integra com o **Estrategista IA** (recomendador de continuidade) quando a **Fase B** sair — o planner define a rota; a IA sugere o próximo item dela.
+
+**Escopo:** feature nova, pede **brainstorming → spec → plano próprios** (não é ajuste no `/criativos`). Relaciona-se com **Criativos Fase B** (prompts da IA de continuidade).
+
 ### Multi-instância de WhatsApp
 Conectar **vários números ao mesmo tempo** e rotear inbound/outbound por instância. **Muda o modelo atual** (hoje é **1 canal ativo por dono**) — alto impacto de produto. Depende da infra de Evolution abaixo.
 
