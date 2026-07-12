@@ -1,9 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import * as htmlToImage from "html-to-image";
-import { Download, LayoutTemplate, Type, Wand2, RefreshCw, Share2, Target, PenTool, Lightbulb, Star, ChevronRight, ArrowLeft, Sparkles, Copy, Check, Camera, BrainCircuit, Hash, X, Plus, ListChecks } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
+import { Download, LayoutTemplate, Type, Wand2, RefreshCw, Share2, Target, PenTool, ChevronRight, ArrowLeft, Sparkles, Copy, Check, Camera, BrainCircuit, Hash, X, Plus, ListChecks } from "lucide-react";
 import Logo from "../components/Logo";
 import PublishModal from "../components/PublishModal";
 import { supabase } from "../lib/supabase";
+import { EDITORIAL_PILLARS as PILARS, getPillarById } from "../lib/editorialPillars";
 
 // 1. Definition of Templates and Formats
 const FORMATS = [
@@ -18,33 +20,8 @@ const TEMPLATES = [
   { id: "t12", name: "Prova Social", format: "4:5" },
 ];
 
-// Pilar editorial = eixo ÚNICO da peça (Brandbook 04 → 4.1). No Brandbook, cada
-// pilar já carrega UM objetivo (relação 1:1), a etapa do funil e o CTA sugerido —
-// por isso o wizard escolhe o pilar e deriva o objetivo dele, em vez de tratá-los
-// como dois passos independentes (o que permitiria combinações fora da doutrina).
-// `objetivoId` vai no body das Edge Functions de IA (Fase B).
-const PILARS = [
-  {
-    name: "Diagnóstico da Dor", etapa: "Atração", objetivoId: "atrair", objetivo: "Atrair", icon: Target,
-    desc: "Agita uma dor operacional real para atrair quem sente o caos, mas ainda não sabe nomeá-lo.",
-    cta: "Peça um diagnóstico gratuito no WhatsApp.",
-  },
-  {
-    name: "Método das 4 Camadas", etapa: "Educação", objetivoId: "educar", objetivo: "Educar", icon: Lightbulb,
-    desc: "Explica uma camada do método: Presença, Aquisição, Conversão ou Escala.",
-    cta: "Descubra qual camada está travando as vendas.",
-  },
-  {
-    name: "Bastidores & Autoridade", etapa: "Conexão", objetivoId: "posicionar", objetivo: "Autoridade", icon: PenTool,
-    desc: "Mostra a própria estrutura em ação — bastidor real, sem teatro.",
-    cta: "Veja como aplicar essa estrutura no seu negócio.",
-  },
-  {
-    name: "Prova Social por Segmento", etapa: "Conversão", objetivoId: "vender", objetivo: "Converter", icon: Star,
-    desc: "Prova por segmento (antes/depois, diagnóstico) para converter a intenção.",
-    cta: "Solicite uma análise do seu segmento.",
-  },
-];
+// Os pilares editoriais agora vivem em src/lib/editorialPillars.ts (registro
+// compartilhado com o Roteiro /roteiro), importado acima como `PILARS`.
 
 // Checklist de aprovação (Brandbook 04 → 4.2) — consulta rápida antes de publicar.
 const CHECKLIST = [
@@ -115,6 +92,23 @@ export default function CreativesPage() {
   const [recommendation, setRecommendation] = useState<any>(null);
   
   const canvasRef = useRef<HTMLDivElement>(null);
+
+  // Deep-link vindo do Roteiro (/roteiro): ?pilar=<slug>&tema=<...> cai direto no
+  // Passo 2 (ideia) com o pilar já escolhido e o tema preenchido.
+  const [searchParams, setSearchParams] = useSearchParams();
+  useEffect(() => {
+    const slug = searchParams.get("pilar");
+    if (!slug) return;
+    const p = getPillarById(slug);
+    if (!p) return;
+    setPilar(p.name);
+    setObjective(p.objetivoId);
+    setIdea(searchParams.get("tema") ?? "");
+    setManualStage(2);
+    setStep("manual");
+    setSearchParams({}, { replace: true }); // evita re-disparo no refresh
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     let isMounted = true;

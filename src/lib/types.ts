@@ -1,6 +1,20 @@
-export type Route = 'login' | 'cadastro' | 'dashboard' | 'inbox' | 'contatos' | 'leads' | 'funil' | 'campanhas' | 'perfil' | 'configuracoes' | 'criativos' | 'brandbook'
+import type { PillarId } from "./editorialPillars"
+
+export type Route = 'login' | 'cadastro' | 'dashboard' | 'inbox' | 'contatos' | 'leads' | 'funil' | 'campanhas' | 'perfil' | 'configuracoes' | 'criativos' | 'roteiro' | 'brandbook'
 
 export type LeadStatus = 'novo' | 'em_atendimento' | 'qualificado' | 'convertido' | 'perdido'
+
+export type EditorialQueueStatus = 'a_fazer' | 'gerado' | 'publicado'
+
+export type EditorialQueueItem = {
+  id: string
+  owner_id: string
+  pilar: PillarId
+  tema: string
+  status: EditorialQueueStatus
+  created_at: string
+  updated_at: string
+}
 
 export type OpportunityStage =
   | 'Novo'

@@ -7,6 +7,7 @@ import {
   UsersRound,
   Palette,
   Megaphone,
+  CalendarClock,
 } from "lucide-react";
 import type { OpportunityStage, Route as AppRoute } from "./types";
 
@@ -59,6 +60,12 @@ export const navigationItems: NavigationItem[] = [
     label: "Criativos",
     icon: Palette,
     description: "Gerador de artes para Social Media.",
+  },
+  {
+    id: "roteiro",
+    label: "Roteiro",
+    icon: CalendarClock,
+    description: "Sequência de posts seguindo a doutrina editorial.",
   },
 ];
 

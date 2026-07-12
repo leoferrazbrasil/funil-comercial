@@ -6,6 +6,8 @@ import type {
   ConversationAssignment,
   Contact,
   CrmSnapshot,
+  EditorialQueueItem,
+  EditorialQueueStatus,
   InboxMessage,
   IntegrationChannel,
   Lead,
@@ -879,5 +881,53 @@ export async function getMyProfile(): Promise<Profile | null> {
     .from("profiles").select("*").eq("id", id).maybeSingle();
   if (error) throw error;
   return (data as Profile) ?? null;
+}
+
+// ---------------------------------------------------------------------------
+// Roteiro Editorial (/roteiro): fila sequencial de próximos posts.
+// owner_id vem sempre da sessão; a RLS (auth.uid() = owner_id) barra conta alheia.
+// ---------------------------------------------------------------------------
+
+export async function getEditorialQueue(ownerId: string): Promise<EditorialQueueItem[]> {
+  const supabase = requireSupabase();
+  const { data, error } = await supabase
+    .from("editorial_queue")
+    .select("*")
+    .eq("owner_id", ownerId)
+    .order("created_at", { ascending: true });
+  if (error) throw error;
+  return (data ?? []) as EditorialQueueItem[];
+}
+
+export async function addEditorialQueueItem(
+  ownerId: string,
+  input: { pilar: string; tema: string },
+): Promise<EditorialQueueItem> {
+  const supabase = requireSupabase();
+  const { data, error } = await supabase
+    .from("editorial_queue")
+    .insert({ owner_id: ownerId, pilar: input.pilar, tema: input.tema })
+    .select()
+    .single();
+  if (error) throw error;
+  return data as EditorialQueueItem;
+}
+
+export async function updateEditorialQueueItemStatus(
+  id: string,
+  status: EditorialQueueStatus,
+): Promise<void> {
+  const supabase = requireSupabase();
+  const { error } = await supabase
+    .from("editorial_queue")
+    .update({ status })
+    .eq("id", id);
+  if (error) throw error;
+}
+
+export async function deleteEditorialQueueItem(id: string): Promise<void> {
+  const supabase = requireSupabase();
+  const { error } = await supabase.from("editorial_queue").delete().eq("id", id);
+  if (error) throw error;
 }
 
