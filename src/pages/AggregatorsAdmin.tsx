@@ -2,13 +2,14 @@ import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 import {
-  Plus, Trash2, ArrowUp, ArrowDown, ExternalLink, Copy, Check, X, Eye, EyeOff, ArrowLeft, Sparkles,
+  Plus, Trash2, ArrowUp, ArrowDown, ExternalLink, Copy, Check, X, Eye, EyeOff, ArrowLeft, Sparkles, Download,
 } from "lucide-react";
 import { supabase } from "../lib/supabase";
 import {
   getMyAggregators, createAggregator, updateAggregator, deleteAggregator, isAggregatorSlugAvailable,
 } from "../lib/crmService";
 import { AGGREGATOR_THEMES } from "../lib/aggregatorThemes";
+import { renderBioHtml } from "../lib/aggregatorHtml";
 import { AGGREGATORS, type AggregatorLink, type AggregatorLinkIcon } from "../lib/aggregators";
 import type { Aggregator } from "../lib/types";
 
@@ -102,7 +103,7 @@ export default function AggregatorsAdminPage() {
         <div className="flex items-start justify-between gap-4 mb-2">
           <div>
             <h1 className="text-3xl font-black tracking-tight">Agregadores</h1>
-            <p className="text-muted-foreground text-lg mt-1">Páginas de links (bio) por cliente — cada uma em <code className="text-foreground">/l/&lt;slug&gt;</code>.</p>
+            <p className="text-muted-foreground text-lg mt-1">Monte a bio de cada cliente e <strong className="text-foreground">gere um <code>/bio</code> estático</strong> para instalar no site (domínio) dele. O <code>/l/&lt;slug&gt;</code> serve de pré-visualização.</p>
           </div>
           <button onClick={() => openEditor({ draft: blankDraft() })} className="bg-primary text-black px-5 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-primary/90 transition-all active:scale-95 shrink-0">
             <Plus size={18} /> Novo
@@ -169,6 +170,29 @@ export default function AggregatorsAdminPage() {
   const addLink = () => {
     if (d.links.length >= MAX_LINKS) return;
     setD({ links: [...d.links, { variant: "secondary", icon: "link", label: "", sublabel: "", href: "" }] });
+  };
+
+  // Gera o /bio estático (autocontido) e baixa como index.html para instalar no
+  // diretório do site do cliente (ex.: clinicaaurora.com.br/bio/index.html).
+  const generateBio = () => {
+    const html = renderBioHtml({
+      name: d.name.trim() || "Agregador",
+      tagline: d.tagline.trim() || undefined,
+      avatarUrl: d.avatar_url.trim() || undefined,
+      status: d.status.trim() || undefined,
+      footer: d.footer.trim() || undefined,
+      footerHighlight: d.footer_highlight.trim() || undefined,
+      theme: d.theme,
+      links: d.links.filter((l) => l.href.trim() && l.label.trim()),
+    });
+    const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "index.html";
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("/bio gerado! Instale como /bio/index.html no site do cliente.");
   };
 
   const checkSlug = async () => {
@@ -303,8 +327,11 @@ export default function AggregatorsAdminPage() {
           <button onClick={() => saveMutation.mutate()} disabled={!canSave} className="bg-primary text-black px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-primary/90 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
             <Check size={18} /> {saveMutation.isPending ? "Salvando…" : "Salvar"}
           </button>
+          <button onClick={generateBio} disabled={!d.name.trim()} className="bg-foreground/10 hover:bg-foreground/15 text-foreground px-5 py-3 rounded-xl font-bold flex items-center gap-2 transition-all active:scale-95 disabled:opacity-50" title="Baixa o /bio estático para instalar no site do cliente">
+            <Download size={18} /> Gerar /bio
+          </button>
           {editing.id && (
-            <a href={`/l/${d.slug}`} target="_blank" rel="noopener noreferrer" className="text-sm font-semibold text-muted-foreground hover:text-foreground flex items-center gap-1"><ExternalLink size={15} /> Ver página</a>
+            <a href={`/l/${d.slug}`} target="_blank" rel="noopener noreferrer" className="text-sm font-semibold text-muted-foreground hover:text-foreground flex items-center gap-1"><ExternalLink size={15} /> Pré-visualizar</a>
           )}
         </div>
       </div>
