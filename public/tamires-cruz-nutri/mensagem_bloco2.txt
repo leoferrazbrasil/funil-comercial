@@ -1,0 +1,7 @@
+Dra. Tamires, você atende várias frentes importantes (bariátrica, alergias, diabetes). Quando a família do paciente entra no site, precisa achar o botão de agendamento de forma super rápida!
+
+O que acontece no formato atual é que a página tem muita leitura e os botões não chamam tanta atenção no celular.
+
+Com a versão nova que criei, aplicamos um visual moderno que puxa o paciente direto pra iniciar a conversa com você.
+
+O que achou do design? Se quiser, já aplicamos pro seu domínio atual.
