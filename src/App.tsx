@@ -110,6 +110,7 @@ import CreativesPage from "./pages/Creatives";
 import CampaignsPage from "./pages/Campaigns";
 import MetaOAuthCallback from "./pages/MetaOAuthCallback";
 import WhatsappPage from "./pages/Whatsapp";
+import LinkAggregatorPage from "./pages/LinkAggregator";
 
 type ModalType = "contact" | "lead" | "opportunity" | "message" | "channel";
 type EditingTarget =
@@ -131,6 +132,10 @@ const PUBLIC_PATHS = [
   "/termos",
   "/exclusao-de-dados",
 ];
+
+// Rota pública exata OU um agregador de links (/l/:slug — bio do Instagram / produto).
+const isPublicPath = (pathname: string) =>
+  PUBLIC_PATHS.includes(pathname) || pathname.startsWith("/l/");
 
 const stages: OpportunityStage[] = pipelineStages;
 const leadStatuses: Array<{ label: string; value: Lead["status"] }> = [
@@ -401,7 +406,7 @@ function AppContent() {
   const location = useLocation();
   const navigate = useNavigate();
   const route = (location.pathname === "/" ? "dashboard" : location.pathname.slice(1)) as AppRoute;
-  const isPublicRoute = PUBLIC_PATHS.includes(location.pathname);
+  const isPublicRoute = isPublicPath(location.pathname);
   const [session, setSession] = useState<Session | null>(null);
   const [query, setQuery] = useState("");
   const [modal, setModal] = useState<ModalType | null>(null);
@@ -457,7 +462,7 @@ function AppContent() {
       if (!nextSession) {
         queryClient.removeQueries({ queryKey: ["crmSnapshot"] });
         const path = window.location.pathname;
-        if (!PUBLIC_PATHS.includes(path) && path !== "/cadastro" && path !== "/login") {
+        if (!isPublicPath(path) && path !== "/cadastro" && path !== "/login") {
           navigate("/login");
         }
       }
@@ -1004,6 +1009,7 @@ function AppContent() {
         <Route path="/privacidade" element={<PrivacyPage />} />
         <Route path="/termos" element={<TermsPage />} />
         <Route path="/exclusao-de-dados" element={<DataDeletionPage />} />
+        <Route path="/l/:slug" element={<LinkAggregatorPage />} />
       </Routes>
     );
   }
