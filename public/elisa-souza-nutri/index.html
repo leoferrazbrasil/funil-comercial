@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elisa Souza | Clínica de Nutrição Premium em Balneário Camboriú</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* CSS RESET & VARIABLES */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-light: #F6F8FA;
+            --bg-white: #FFFFFF;
+            --primary: #1C3D5A;
+            --primary-light: #2C5274;
+            --accent: #C5A059;
+            --accent-hover: #A3803D;
+            --text-dark: #1F2D3D;
+            --text-muted: #5A6B7C;
+            --font-serif: 'Cormorant Garamond', serif;
+            --font-sans: 'Inter', sans-serif;
+            --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            --shadow: 0 15px 35px rgba(28, 61, 90, 0.05);
+            --shadow-hover: 0 25px 50px rgba(28, 61, 90, 0.1);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, .serif-font {
+            font-family: var(--font-serif);
+            font-weight: 700;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* HEADER & NAVIGATION */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(246, 248, 250, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(28, 61, 90, 0.05);
+            transition: var(--transition);
+        }
+
+        .nav-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 90px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-symbol {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-family: var(--font-serif);
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            border: 1px solid var(--accent);
+        }
+
+        .logo-text {
+            font-family: var(--font-serif);
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: 1.5px;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 500;
+            font-size: 14px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--accent);
+            transition: var(--transition);
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .nav-link:hover {
+            color: var(--accent);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 28px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 14px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-decoration: none;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--bg-light);
+            border: 1px solid var(--primary);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent);
+            border-color: var(--accent);
+            color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(197, 160, 89, 0.2);
+        }
+
+        .btn-accent {
+            background-color: var(--accent);
+            color: var(--primary);
+            border: 1px solid var(--accent);
+        }
+
+        .btn-accent:hover {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            color: var(--bg-light);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(28, 61, 90, 0.15);
+        }
+
+        /* HERO SECTION */
+        .hero {
+            padding: 190px 0 120px;
+            position: relative;
+            background: radial-gradient(circle at 80% 20%, rgba(197, 160, 89, 0.08) 0%, transparent 50%);
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(28, 61, 90, 0.04);
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin-bottom: 24px;
+            border: 1px solid rgba(28, 61, 90, 0.06);
+        }
+
+        .hero-badge svg {
+            width: 14px;
+            height: 14px;
+            fill: var(--accent);
+        }
+
+        .hero-title {
+            font-size: 64px;
+            line-height: 1.1;
+            color: var(--primary);
+            margin-bottom: 24px;
+        }
+
+        .hero-title em {
+            font-style: italic;
+            color: var(--accent);
+            font-weight: 400;
+        }
+
+        .hero-description {
+            font-size: 18px;
+            color: var(--text-muted);
+            margin-bottom: 40px;
+            max-width: 500px;
+        }
+
+        .hero-ctas {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .hero-image-wrapper {
+            position: relative;
+            height: 520px;
+        }
+
+        .hero-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 40px 40px 100px 40px;
+            box-shadow: var(--shadow-hover);
+        }
+
+        .hero-image-card {
+            position: absolute;
+            bottom: 30px;
+            left: -30px;
+            background: var(--bg-white);
+            padding: 24px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-hover);
+            border: 1px solid rgba(28, 61, 90, 0.05);
+            max-width: 240px;
+        }
+
+        .hero-image-card-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 6px;
+        }
+
+        .hero-image-card-stars {
+            display: flex;
+            gap: 4px;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+
+        .hero-image-card-desc {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* METRICS SECTION */
+        .metrics {
+            background: var(--primary);
+            color: var(--bg-light);
+            padding: 60px 0;
+            border-radius: 40px;
+            margin-top: -40px;
+            position: relative;
+            z-index: 10;
+            box-shadow: var(--shadow);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 40px;
+            text-align: center;
+        }
+
+        .metric-item h3 {
+            font-size: 48px;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+
+        .metric-item p {
+            font-size: 14px;
+            color: rgba(246, 248, 250, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 500;
+        }
+
+        /* SECTION HEADER */
+        .section-header {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 64px;
+        }
+
+        .section-kicker {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 12px;
+        }
+
+        .section-title {
+            font-size: 46px;
+            color: var(--primary);
+            line-height: 1.2;
+        }
+
+        /* SERVICES SECTION */
+        .services {
+            padding: 120px 0;
+            background: var(--bg-white);
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        .service-card {
+            background: var(--bg-light);
+            border-radius: 30px;
+            padding: 40px;
+            transition: var(--transition);
+            border: 1px solid rgba(28, 61, 90, 0.03);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .service-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-hover);
+            border-color: rgba(197, 160, 89, 0.2);
+            background: var(--bg-white);
+        }
+
+        .service-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 20px;
+            background: rgba(197, 160, 89, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            color: var(--accent);
+            transition: var(--transition);
+        }
+
+        .service-card:hover .service-icon {
+            background: var(--primary);
+            color: var(--accent);
+        }
+
+        .service-card h3 {
+            font-size: 28px;
+            color: var(--primary);
+            margin-bottom: 16px;
+        }
+
+        .service-card p {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            flex-grow: 1;
+        }
+
+        .service-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            transition: var(--transition);
+        }
+
+        .service-link svg {
+            width: 16px;
+            height: 16px;
+            transition: var(--transition);
+        }
+
+        .service-card:hover .service-link {
+            color: var(--accent);
+        }
+
+        .service-card:hover .service-link svg {
+            transform: translateX(4px);
+        }
+
+        /* CLINIC SPACE SECTION */
+        .space {
+            padding: 120px 0;
+            background: var(--bg-light);
+        }
+
+        .space-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 80px;
+            align-items: center;
+        }
+
+        .space-images {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .space-img-large {
+            grid-column: span 2;
+            height: 300px;
+            width: 100%;
+            object-fit: cover;
+            border-radius: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .space-img-small {
+            height: 180px;
+            width: 100%;
+            object-fit: cover;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .space-content h2 {
+            font-size: 46px;
+            color: var(--primary);
+            margin-bottom: 24px;
+            line-height: 1.2;
+        }
+
+        .space-content p {
+            font-size: 16px;
+            color: var(--text-muted);
+            margin-bottom: 32px;
+        }
+
+        .space-info-block {
+            background: var(--bg-white);
+            padding: 30px;
+            border-radius: 20px;
+            border-left: 4px solid var(--accent);
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .space-info-block h4 {
+            font-size: 18px;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .space-info-block p {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 0;
+        }
+
+        /* TEAM SECTION */
+        .team {
+            padding: 120px 0;
+            background: var(--bg-white);
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+        }
+
+        .team-card {
+            background: var(--bg-light);
+            border-radius: 24px;
+            overflow: hidden;
+            border: 1px solid rgba(28, 61, 90, 0.04);
+            transition: var(--transition);
+        }
+
+        .team-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-hover);
+            border-color: rgba(197, 160, 89, 0.2);
+        }
+
+        .team-img-placeholder {
+            width: 100%;
+            height: 250px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-family: var(--font-serif);
+            font-size: 40px;
+            font-weight: 700;
+        }
+
+        .team-info {
+            padding: 24px;
+            text-align: center;
+        }
+
+        .team-info h4 {
+            font-size: 18px;
+            color: var(--primary);
+            margin-bottom: 6px;
+        }
+
+        .team-info p {
+            font-size: 13px;
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .team-info span {
+            font-size: 11px;
+            color: var(--text-muted);
+            display: block;
+        }
+
+        /* TESTIMONIALS SECTION */
+        .testimonials {
+            padding: 120px 0;
+            background: var(--bg-light);
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        .testimonial-card {
+            background: var(--bg-white);
+            border-radius: 30px;
+            padding: 40px;
+            border: 1px solid rgba(28, 61, 90, 0.03);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            box-shadow: var(--shadow);
+        }
+
+        .testimonial-stars {
+            display: flex;
+            gap: 4px;
+            color: var(--accent);
+            margin-bottom: 24px;
+        }
+
+        .testimonial-text {
+            font-family: var(--font-serif);
+            font-size: 20px;
+            font-style: italic;
+            color: var(--primary);
+            margin-bottom: 30px;
+            line-height: 1.4;
+            flex-grow: 1;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border-top: 1px solid rgba(28, 61, 90, 0.06);
+            padding-top: 20px;
+        }
+
+        .author-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .author-info h4 {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .author-info p {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* INFO & LOCATION SECTION */
+        .info-section {
+            padding: 120px 0;
+            background: var(--bg-white);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 60px;
+            align-items: stretch;
+        }
+
+        .info-card {
+            background: var(--primary);
+            color: var(--bg-light);
+            padding: 60px;
+            border-radius: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .info-card h2 {
+            font-size: 40px;
+            color: var(--accent);
+            margin-bottom: 30px;
+        }
+
+        .info-details {
+            margin-bottom: 40px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .info-item-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(197, 160, 89, 0.1);
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            border: 1px solid rgba(197, 160, 89, 0.2);
+        }
+
+        .info-item-content h4 {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent);
+            margin-bottom: 4px;
+        }
+
+        .info-item-content p {
+            font-size: 15px;
+            color: rgba(246, 248, 250, 0.8);
+        }
+
+        .map-card {
+            background: var(--bg-light);
+            border-radius: 40px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(28, 61, 90, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .map-container {
+            width: 100%;
+            height: 380px;
+            background: #e5e3df;
+            position: relative;
+        }
+
+        .map-placeholder-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .map-info-footer {
+            padding: 30px 40px;
+            background: var(--bg-light);
+        }
+
+        .map-info-footer h3 {
+            font-size: 20px;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .map-info-footer p {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* FOOTER */
+        footer {
+            background: var(--primary);
+            color: var(--bg-light);
+            padding: 80px 0 40px;
+            border-top: 1px solid rgba(246, 248, 250, 0.05);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr;
+            gap: 60px;
+            margin-bottom: 60px;
+        }
+
+        .footer-brand p {
+            font-size: 14px;
+            color: rgba(246, 248, 250, 0.6);
+            margin-top: 20px;
+            max-width: 320px;
+        }
+
+        .footer-links-title {
+            font-size: 16px;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 24px;
+            font-weight: 700;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            text-decoration: none;
+            color: rgba(246, 248, 250, 0.7);
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+            padding-left: 4px;
+        }
+
+        .footer-socials {
+            display: flex;
+            gap: 16px;
+        }
+
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(246, 248, 250, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--bg-light);
+            text-decoration: none;
+            transition: var(--transition);
+            border: 1px solid rgba(246, 248, 250, 0.08);
+        }
+
+        .social-icon:hover {
+            background: var(--accent);
+            color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(246, 248, 250, 0.08);
+            padding-top: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: rgba(246, 248, 250, 0.5);
+        }
+
+        /* RESPONSIVE DESIGN */
+        @media (max-width: 1024px) {
+            .hero-grid, .services-grid, .space-grid, .testimonials-grid, .info-grid, .team-grid {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .hero {
+                padding: 140px 0 80px;
+                text-align: center;
+            }
+
+            .hero-badge, .hero-description {
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .hero-ctas {
+                justify-content: center;
+            }
+
+            .hero-image-wrapper {
+                height: 400px;
+                max-width: 500px;
+                margin: 0 auto;
+            }
+
+            .hero-image-card {
+                left: 10px;
+            }
+
+            .space-images {
+                order: 2;
+            }
+
+            .space-content {
+                order: 1;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 24px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .hero-title {
+                font-size: 40px;
+            }
+
+            .hero-ctas {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .hero-ctas .btn {
+                width: 100%;
+            }
+
+            .nav-menu {
+                display: none;
+            }
+
+            .section-title {
+                font-size: 32px;
+            }
+
+            .info-card {
+                padding: 30px;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER & NAVIGATION -->
+    <header>
+        <div class="container">
+            <div class="nav-wrapper">
+                <a href="#" class="logo">
+                    <div class="logo-symbol">SC</div>
+                    <span class="logo-text">Elisa Souza</span>
+                </a>
+                <nav class="nav-menu">
+                    <a href="#servicos" class="nav-link">Especialidades</a>
+                    <a href="#sobre" class="nav-link">Clínica</a>
+                    <a href="#equipe" class="nav-link">Corpo Clínico</a>
+                    <a href="#depoimentos" class="nav-link">Histórias</a>
+                    <a href="#contato" class="nav-link">Contato</a>
+                    <a href="https://wa.me/5519982500420" class="btn btn-primary" target="_blank">Agendar</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-grid">
+                <div class="hero-info">
+                    <div class="hero-badge">
+                        <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        Nota 5.0 no Google Maps
+                    </div>
+                    <h1 class="hero-title">Mais de 12 anos transformando <em>sorrisos</em></h1>
+                    <p class="hero-description">
+                        Especialidades odontológicos de alta qualidade com preço acessível no Centro de Campinas. Cuidamos da sua saúde e bem-estar com carinho, ética e responsabilidade.
+                    </p>
+                    <div class="hero-ctas">
+                        <a href="https://wa.me/5519982500420" class="btn btn-accent" target="_blank">Agendar Avaliação</a>
+                        <a href="#servicos" class="btn btn-primary">Ver Especialidades</a>
+                    </div>
+                </div>
+                <div class="hero-image-wrapper">
+                    <img src="https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&q=80&w=800" alt="Equipe Elisa Souza" class="hero-image">
+                    <div class="hero-image-card">
+                        <div class="hero-image-card-title">Excelente Avaliação</div>
+                        <div class="hero-image-card-stars">
+                            <span style="font-size: 14px;">★</span>
+                            <span style="font-size: 14px;">★</span>
+                            <span style="font-size: 14px;">★</span>
+                            <span style="font-size: 14px;">★</span>
+                            <span style="font-size: 14px;">★</span>
+                        </div>
+                        <div class="hero-image-card-desc">Cuidado integral e atenção focada na satisfação do paciente.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- METRICS SECTION -->
+    <section class="container">
+        <div class="metrics">
+            <div class="metrics-grid">
+                <div class="metric-item">
+                    <h3>12</h3>
+                    <p>Anos de Experiência</p>
+                </div>
+                <div class="metric-item">
+                    <h3>18k+</h3>
+                    <p>Pacientes Felizes</p>
+                </div>
+                <div class="metric-item">
+                    <h3>13</h3>
+                    <p>Certificações Técnicas</p>
+                </div>
+                <div class="metric-item">
+                    <h3>9</h3>
+                    <p>Membros na Equipe</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SERVICES SECTION -->
+    <section id="servicos" class="services">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-kicker">Especialidades</span>
+                <h2 class="section-title">Especialidades odontológicas completas para você</h2>
+            </div>
+            <div class="services-grid">
+                <!-- Card 1 -->
+                <div class="service-card">
+                    <div class="service-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    </div>
+                    <h3>Ortodontia</h3>
+                    <p>Alinhamento de dentes e correção da mordida. Aparelhos fixos, removíveis, autoligados, convencionais e opções estéticas transparentes em porcelana.</p>
+                    <a href="https://wa.me/5519982500420?text=Olá,%20gostaria%20de%20saber%20mais%20sobre%20Ortodontia" class="service-link" target="_blank">
+                        Consultar
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </a>
+                </div>
+                <!-- Card 2 -->
+                <div class="service-card">
+                    <div class="service-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                    </div>
+                    <h3>Implante Dentário</h3>
+                    <p>Estruturas de titânio para substituição de dentes perdidos, devolvendo de maneira perfeita a mastigação e a harmonia estética do sorriso. Unitários e protocolo.</p>
+                    <a href="https://wa.me/5519982500420?text=Olá,%20gostaria%20de%20saber%20mais%20sobre%20Bioimpedância" class="service-link" target="_blank">
+                        Consultar
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </a>
+                </div>
+                <!-- Card 3 -->
+                <div class="service-card">
+                    <div class="service-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    </div>
+                    <h3>Clareamento</h3>
+                    <p>Saúde mais branco e radiante sem desgaste dental. Técnicas avançadas realizadas em consultório a laser e de forma prática através de moldeiras personalizadas.</p>
+                    <a href="https://wa.me/5519982500420?text=Olá,%20gostaria%20de%20saber%20mais%20sobre%20Clareamento" class="service-link" target="_blank">
+                        Consultar
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </a>
+                </div>
+                <!-- Card 4 -->
+                <div class="service-card">
+                    <div class="service-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                    </div>
+                    <h3>Endodontia</h3>
+                    <p>Tratamento de canal especializado. Limpeza e desinfecção da raiz do dente de forma indolor e com alta tecnologia para salvar a estrutura do dente.</p>
+                    <a href="https://wa.me/5519982500420?text=Olá,%20gostaria%20de%20saber%20mais%20sobre%20Canal" class="service-link" target="_blank">
+                        Consultar
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </a>
+                </div>
+                <!-- Card 5 -->
+                <div class="service-card">
+                    <div class="service-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2.5 3.19-2.5 5.5h20c0-2.31-1-4.24-2.5-5.5M12 13a5 5 0 1 0 0-10 5 5 0 0 0 0 10z"/></svg>
+                    </div>
+                    <h3>Prótese Dentária</h3>
+                    <p>Reabilitações funcionais e estéticas completas. Próteses removíveis (dentaduras, pontes, provisórias) e próteses fixas permanentes (coroas, jaquetas, pivôs).</p>
+                    <a href="https://wa.me/5519982500420?text=Olá,%20gostaria%20de%20saber%20mais%20sobre%20Próteses" class="service-link" target="_blank">
+                        Consultar
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </a>
+                </div>
+                <!-- Card 6 -->
+                <div class="service-card">
+                    <div class="service-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-9h9M12 13H3m9 0V3"/></svg>
+                    </div>
+                    <h3>Cirurgias e Urgências</h3>
+                    <p>Extração do dente do siso, cirurgia de gengiva, enxertos e atendimentos emergenciais imediatos para alívio de dor e fraturas bucais.</p>
+                    <a href="https://wa.me/5519982500420?text=Olá,%20tenho%20uma%20Urgência" class="service-link" target="_blank">
+                        Consultar
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CLINIC SPACE SECTION -->
+    <section id="sobre" class="space">
+        <div class="container">
+            <div class="space-grid">
+                <div class="space-images">
+                    <img src="https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=800" alt="Consultório Elisa Souza" class="space-img-large">
+                    <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=80&w=400" alt="Atendimento" class="space-img-small">
+                    <img src="https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=400" alt="Estrutura" class="space-img-small">
+                </div>
+                <div class="space-content">
+                    <span class="section-kicker">A Clínica</span>
+                    <h2>Nossa Missão, Visão e Valores para você</h2>
+                    <div class="space-info-block">
+                        <h4>Nossa Missão</h4>
+                        <p>Cuidar do seu sorriso com carinho, tecnologia e excelência, oferecendo um atendimento humanizado que valoriza sua saúde e bem-estar em todas as etapas.</p>
+                    </div>
+                    <div class="space-info-block">
+                        <h4>Nossa Visão</h4>
+                        <p>Estar entre as clínicas mais confiáveis e queridas de Campinas, unindo tradição e inovação para transformar completamente a experiência odontológica.</p>
+                    </div>
+                    <div class="space-info-block">
+                        <h4>Nossos Valores</h4>
+                        <p>Atendimento ético com amor e profundo respeito. Acreditamos em sorrisos verdadeiros, relações de confiança duradouras e evolução técnica constante.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TEAM SECTION -->
+    <section id="equipe" class="team">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-kicker">Membros</span>
+                <h2 class="section-title">Nosso experiente Corpo Clínico</h2>
+            </div>
+            <div class="team-grid">
+                <!-- Nutricionista 1 -->
+                <div class="team-card">
+                    <div class="team-img-placeholder">CR</div>
+                    <div class="team-info">
+                        <h4>Dr. César Reis</h4>
+                        <p>Clínico Geral</p>
+                        <span>Graduado pela Universidade Pitágoras Poços de Caldas MG</span>
+                        <span>CROSP 158395</span>
+                    </div>
+                </div>
+                <!-- Nutricionista 2 -->
+                <div class="team-card">
+                    <div class="team-img-placeholder">RR</div>
+                    <div class="team-info">
+                        <h4>Dr. Rafael Rosas</h4>
+                        <p>Bioimpedância e Canal</p>
+                        <span>Graduado pela PUC Campinas com especialização em Radiologia</span>
+                        <span>CROSP 109185</span>
+                    </div>
+                </div>
+                <!-- Nutricionista 3 -->
+                <div class="team-card">
+                    <div class="team-img-placeholder">LS</div>
+                    <div class="team-info">
+                        <h4>Dra. Letícia Souza</h4>
+                        <p>Ortodontia</p>
+                        <span>Graduada pela Unifenas com especialização em Ortodontia</span>
+                        <span>CROSP 145752</span>
+                    </div>
+                </div>
+                <!-- Nutricionista 4 -->
+                <div class="team-card">
+                    <div class="team-img-placeholder">DN</div>
+                    <div class="team-info">
+                        <h4>Dra. Natielly</h4>
+                        <p>Endodontia</p>
+                        <span>Graduada pela Unifenas com especialização em Canal</span>
+                        <span>CROSP 148954</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TESTIMONIALS SECTION -->
+    <section id="depoimentos" class="testimonials">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-kicker">Depoimentos</span>
+                <h2 class="section-title">Histórias de sucesso de nossos pacientes</h2>
+            </div>
+            <div class="testimonials-grid">
+                <!-- Depoimento 1 -->
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">
+                        <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+                    </div>
+                    <p class="testimonial-text">
+                        "Adorei o tratamento. Coloquei meu aparelho com a Dra. Letícia Souza e já senti a transformação no meu sorriso logo no começo de todo o processo."
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">DA</div>
+                        <div class="author-info">
+                            <h4>Diego Alves</h4>
+                            <p>Paciente de Ortodontia</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Depoimento 2 -->
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">
+                        <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+                    </div>
+                    <p class="testimonial-text">
+                        "Fiz uma extração do meu dente do siso com a equipe da clínica e foi tudo super tranquilo e indolor. Recomendo muito o consultório pelo profissionalismo."
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">RV</div>
+                        <div class="author-info">
+                            <h4>Renato Vilalobos</h4>
+                            <p>Paciente de Cirurgia</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Depoimento 3 -->
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">
+                        <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+                    </div>
+                    <p class="testimonial-text">
+                        "Só tenho a agradecer o carinho e o ótimo atendimento na clínica. Todo mês vou fazer a manutenção do meu aparelho e já recomendei para a família inteira."
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">MC</div>
+                        <div class="author-info">
+                            <h4>Mara Cardoso</h4>
+                            <p>Paciente de Ortodontia</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- INFO & LOCATION SECTION -->
+    <section id="contato" class="info-section">
+        <div class="container">
+            <div class="info-grid">
+                <div class="info-card">
+                    <h2>Fale Conosco, tire suas dúvidas</h2>
+                    <div class="info-details">
+                        <!-- Endereço -->
+                        <div class="info-item">
+                            <div class="info-item-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                            </div>
+                            <div class="info-item-content">
+                                <h4>Endereço</h4>
+                                <p>Rua 13 de Maio, 416, Sobreloja<br>Centro, Campinas - SP</p>
+                            </div>
+                        </div>
+                        <!-- Atendimento -->
+                        <div class="info-item">
+                            <div class="info-item-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                            </div>
+                            <div class="info-item-content">
+                                <h4>Horário de Atendimento</h4>
+                                <p>Segunda a Sexta das 9h às 18h<br>Sábado das 8h30 às 14h</p>
+                            </div>
+                        </div>
+                        <!-- Contato -->
+                        <div class="info-item">
+                            <div class="info-item-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                            </div>
+                            <div class="info-item-content">
+                                <h4>Telefone & WhatsApp</h4>
+                                <p>(19) 3232-2555<br>(19) 98250-0420</p>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="https://wa.me/5519982500420" class="btn btn-accent" target="_blank">Falar com nossa equipe</a>
+                </div>
+                <div class="map-card">
+                    <div class="map-container">
+                        <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&q=80&w=600" alt="Mapa Campinas" class="map-placeholder-img">
+                    </div>
+                    <div class="map-info-footer">
+                        <h3>Localização no Centro</h3>
+                        <p>Clínica com fácil acesso, situada na tradicional Rua 13 de Maio, oferecendo infraestrutura moderna para toda a região de Campinas.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="#" class="logo" style="margin-bottom: 20px;">
+                        <div class="logo-symbol" style="color: var(--accent); border-color: var(--accent);">SC</div>
+                        <span class="logo-text" style="color: var(--bg-light);">Elisa Souza</span>
+                    </a>
+                    <p>Nutrição de qualidade com ética, respeito e preço acessível a todas as classes sociais em Campinas.</p>
+                </div>
+                <div>
+                    <h4 class="footer-links-title">Especialidades</h4>
+                    <ul class="footer-links">
+                        <li><a href="#servicos">Ortodontia</a></li>
+                        <li><a href="#servicos">Implante Dentário</a></li>
+                        <li><a href="#servicos">Clareamento</a></li>
+                        <li><a href="#servicos">Endodontia</a></li>
+                        <li><a href="#servicos">Prótese Dentária</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="footer-links-title">Acompanhe-nos</h4>
+                    <div class="footer-socials">
+                        <a href="https://www.instagram.com/sorrisodecampinas/" class="social-icon" target="_blank">IG</a>
+                        <a href="https://www.facebook.com/sorrisodecampinas/" class="social-icon" target="_blank">FB</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Elisa Souza. Todos os direitos reservados.</p>
+                <p>Desenvolvido por Funil Comercial</p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
