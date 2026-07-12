@@ -1,5 +1,10 @@
 export const brandConfig = {
+  // Marca-mãe (empresa) — usada em contextos institucionais (Brandbook, rodapés,
+  // páginas legais, home).
   name: "Funil Comercial",
+  // Identidade do SOFTWARE (área logada) — o produto é o "Funil Comercial CRM"
+  // (a camada de Conversão). Usada na topbar do app.
+  appName: "Funil Comercial CRM",
   category: "Operação comercial",
   logoPath: "/logo.png",
   login: {

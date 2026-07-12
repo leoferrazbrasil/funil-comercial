@@ -1294,7 +1294,7 @@ function Header({
   return (
     <header className="topbar">
       <div>
-        <p className="eyebrow">{brandConfig.name}</p>
+        <p className="eyebrow">{brandConfig.appName}</p>
         <h1>{title}</h1>
       </div>
       <div className="topbar-actions">
