@@ -15,7 +15,12 @@ tags:
 
 ### Adicionado — Página de agregador estilo "linktree"
 - Nova rota **pública `/l/:slug`** (agregador de links) — o **Funil Comercial** é a primeira config (`/l/funilcomercial`), usada na **bio do Instagram**: **Diagnóstico no WhatsApp** (CTA ouro, `wa.me/5551996737359` com mensagem pronta) + **Site**. Visual **dark premium** aprovado por mockup: marca-funil em ouro, selo "Disponível para diagnóstico" com ponto esmeralda pulsante, rodapé das 4 camadas.
-- **Config-driven para virar produto:** `src/lib/aggregators.ts` (tipos + configs por slug) + `src/pages/LinkAggregator.tsx` (estilos escopados `.agg-*`, dark hardcoded — não herda o `data-theme` do app). Adicionar um cliente = **um novo objeto de config**, sem código novo. `App.tsx` ganhou a rota + `/l/` no gate público (`isPublicPath`). Spec: `docs/superpowers/specs/2026-07-12-agregador-links-design.md`. Multi-tenant (DB/admin no CRM) fica para o futuro.
+- **Config-driven:** `src/lib/aggregators.ts` (tipos + configs por slug) + `src/pages/LinkAggregator.tsx`. `App.tsx` ganhou a rota + `/l/` no gate público (`isPublicPath`). Spec: `docs/superpowers/specs/2026-07-12-agregador-links-design.md`.
+
+### Adicionado — Agregador virou produto multi-tenant (admin + temas)
+- Nova tabela **`aggregators`** (RLS: **dono CRUD do seu + leitura pública dos `published`** — é o que deixa o visitante anônimo abrir `/l/:slug`; rascunhos não vazam). Sem Edge Function.
+- **Admin `/agregadores`** (menu próprio, diretor/gestor): lista + editor (slug com checagem de disponibilidade, tagline, avatar, status, **tema**, até **5 links** reordenáveis, **rascunho × no ar**) + "importar modelo Funil Comercial". Cada cliente = **um registro no banco** pela tela (sem código).
+- **Temas por cliente:** 4 presets curados em `src/lib/aggregatorThemes.ts` (CSS vars `--agg-*`). A página pública passou a **ler do banco** por slug, com **fallback estático** (a bio do FC nunca quebra) e a copy do FC editável (registro `funilcomercial` no banco tem precedência). **Ativação:** aplicar a migração `aggregators`. Spec: `docs/superpowers/specs/2026-07-12-agregadores-multitenant-design.md`.
 
 ## [2026-07-12] - Conteúdo editorial, Roteiro, base de conhecimento, marca & paleta
 

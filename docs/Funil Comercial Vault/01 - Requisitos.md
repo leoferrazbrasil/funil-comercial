@@ -96,10 +96,10 @@ Plataforma da **Funil Comercial** (empresa de estrutura de vendas). Seu **núcle
 - **Deep-link** para o estúdio: "Gerar →" abre `/criativos` com o pilar e o tema pré-preenchidos.
 - Persistência por dono (tabela `editorial_queue`, RLS `auth.uid() = owner_id`). Acesso: **diretor/gestor**. Sem datas/calendário na v1 (evolução para calendário mensal no [[04 - Roadmap]]).
 
-## 8.2. Agregador de Links (`/l/:slug`)
+## 8.2. Agregadores de Links (público `/l/:slug` + admin `/agregadores`)
 
-- Página **pública** estilo "linktree" (dark premium): marca, tagline, selo de status e até 2 botões (CTA + secundário). O **Funil Comercial** é a config `/l/funilcomercial` (bio do Instagram: WhatsApp diagnóstico + site).
-- **Config-driven** (`src/lib/aggregators.ts`): cada cliente/uso é um objeto de config — base do **produto** de agregador. Estilos escopados, independentes do tema do app. Ver [[03 - Changelog]].
+- Página **pública** estilo "linktree" (premium): marca, tagline, selo de status e até **5 botões** (CTA + secundários), com **tema por cliente** (4 presets). O **Funil Comercial** é `/l/funilcomercial` (bio do Instagram).
+- **Produto multi-tenant:** admin **`/agregadores`** (diretor/gestor) cria/edita agregadores — cada cliente = **um registro** (tabela `aggregators`, RLS dono + leitura pública dos publicados). A página pública lê do banco com **fallback estático** (`aggregators.ts`) para a bio do FC. Rascunho × no ar. Ver [[03 - Changelog]].
 
 ## 9. Regras de negócio principais
 
