@@ -13,6 +13,10 @@ tags:
 
 ## [2026-07-12] - Estúdio de Criativos: temas prontos no Passo 2 (fim da "página em branco")
 
+### Corrigido — o tema escolhido chega ao estúdio mesmo com a IA offline
+- **Bug:** o "Gerar Criativo" dependia 100% da Edge Function `ai-generate-post`; com a IA offline (Fase B) o `invoke` falhava, caía no `catch` e abria o estúdio com os **defaults hardcoded** (`SEU CONCORRENTE NÃO É MELHOR…`) — **descartando o tema escolhido** no Passo 2.
+- **Correção:** a peça agora é composta **localmente a partir do tema + pilar** (headline = tema, subheadline/legenda = tema + CTA do pilar, template `t1`), de forma **determinística e sem inventar dado**; o estúdio **sempre reflete a escolha**. A IA, quando online, apenas **refina por cima** (ignorando o mock de "sem API Keys"). Mesmo tratamento no "Regenerar IA". Só front-end (`Creatives.tsx`).
+
 ### Mudado — Passo 2 apresenta o conteúdo, em vez de pedir
 - O gargalo universal de "o que postar" foi atacado: o **Passo 2** do estúdio deixou de pedir um resumo/assunto e passou a **apresentar os "temas recorrentes" do pilar** (Brandbook 04 · Linha Editorial 4.1) como **conteúdo pronto para escolher** — seguindo a sequência estratégica da 4.2 via o pilar do Passo 1. Clicar num tema preenche a base; o campo de texto virou **opcional** (ajustar/escrever). `editorialPillars.ts` ganhou `temas: string[]` por pilar (fonte única, também disponível ao Roteiro). Só front-end.
 
