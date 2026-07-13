@@ -112,6 +112,7 @@ import CampaignsPage from "./pages/Campaigns";
 import MetaOAuthCallback from "./pages/MetaOAuthCallback";
 import WhatsappPage from "./pages/Whatsapp";
 import LinkAggregatorPage from "./pages/LinkAggregator";
+import ResetPasswordPage from "./pages/ResetPassword";
 
 type ModalType = "contact" | "lead" | "opportunity" | "message" | "channel";
 type EditingTarget =
@@ -132,6 +133,7 @@ const PUBLIC_PATHS = [
   "/privacidade",
   "/termos",
   "/exclusao-de-dados",
+  "/redefinir-senha",
 ];
 
 // Rota pública exata OU um agregador de links (/l/:slug — bio do Instagram / produto).
@@ -1019,6 +1021,7 @@ function AppContent() {
         <Route path="/privacidade" element={<PrivacyPage />} />
         <Route path="/termos" element={<TermsPage />} />
         <Route path="/exclusao-de-dados" element={<DataDeletionPage />} />
+        <Route path="/redefinir-senha" element={<ResetPasswordPage />} />
         <Route path="/l/:slug" element={<LinkAggregatorPage />} />
       </Routes>
     );

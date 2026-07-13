@@ -28,6 +28,13 @@ tags:
 ### Adicionado — botão "Desconectar" no modal de publicação
 - No modal **Publicar Arte** (`/criativos`), a "Conta Conectada" só tinha **Reconectar**; agora tem **Desconectar** — remove a integração do Instagram (`social_integrations`, RLS por dono) e volta ao estado "conectar", permitindo vincular **outra conta**. Estado de loading/`disabled` durante a operação. Só front-end (`PublishModal.tsx`).
 
+## [2026-07-13] - Reset de senha funcional (ponta a ponta)
+
+### Adicionado — "Esqueci minha senha" + página de redefinição
+- O link morto virou fluxo real: no **Login**, "Esqueci minha senha" abre um modo inline que pede o e-mail e dispara `supabase.auth.resetPasswordForEmail(email, { redirectTo: origin + '/redefinir-senha' })` (mensagem genérica, não revela se o e-mail existe).
+- Nova página pública **`/redefinir-senha`** (`ResetPassword.tsx`): o Supabase cria a sessão de recuperação ao abrir o link; a página valida nova senha + confirmação → `updateUser({ password })` → encerra a sessão e volta ao `/login`. Trata link expirado/inválido com mensagem clara. Rota adicionada a `PUBLIC_PATHS` e ao bloco público (renderiza antes do gate de sessão).
+- **Config do dono (obrigatória p/ o link não cair em localhost):** no Supabase → Authentication → URL Configuration, **Site URL** = `https://funilcomercial.com` e adicionar `https://funilcomercial.com/redefinir-senha` em **Redirect URLs**. Sem isso, o Supabase ignora o `redirectTo`. Arquivos: `Login.tsx`, `ResetPassword.tsx`, `App.tsx`.
+
 ## [2026-07-13] - Permissões por área (comercial × marketing) + papel admin
 
 ### Mudado — reestrutura do modelo de papéis

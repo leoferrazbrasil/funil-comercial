@@ -1,6 +1,6 @@
 import type { Session } from "@supabase/supabase-js";
 import type { LucideIcon } from "lucide-react";
-import { Bell, CheckCircle2, CircleDollarSign, Clock3, LogOut, MessageCircle, MoveRight, Pencil, Plus, Send, Search, ShieldCheck, Sparkles, Target, TrendingUp, UsersRound, RotateCcw, Moon, Sun, X, Eye, EyeOff, Database } from "lucide-react";
+import { Bell, CheckCircle2, CircleDollarSign, Clock3, LogOut, MessageCircle, MoveRight, Pencil, Plus, Send, Search, ShieldCheck, Sparkles, Target, TrendingUp, UsersRound, RotateCcw, Moon, Sun, X, Eye, EyeOff, Database, ArrowLeft } from "lucide-react";
 import type { FormEvent, ReactNode } from "react";
 import { Toaster, toast } from "react-hot-toast";
 import { DndContext, useDraggable, useDroppable } from "@dnd-kit/core";
@@ -346,6 +346,13 @@ export default function LoginScreen({
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
+  // Fluxo "esqueci minha senha": alterna o card do login para pedir o e-mail e
+  // dispara o envio do link de redefinição (Supabase). Volta ao login pelo "Voltar".
+  const [view, setView] = useState<"login" | "forgot">("login");
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetError, setResetError] = useState<string | null>(null);
+  const [resetSent, setResetSent] = useState(false);
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
@@ -359,6 +366,34 @@ export default function LoginScreen({
       mode,
     );
     setIsSubmitting(false);
+  };
+
+  const openForgot = () => {
+    setView("forgot");
+    setResetSent(false);
+    setResetError(null);
+  };
+
+  const handleForgotSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!supabase) return;
+    const email = getFormValue(new FormData(event.currentTarget), "reset-email");
+    if (!email) return;
+    setResetLoading(true);
+    setResetError(null);
+    // redirectTo usa a origem atual → em produção, https://funilcomercial.com.
+    // (O domínio precisa estar nas "Redirect URLs" do Supabase, senão ele cai no
+    //  Site URL — daí o link ir para localhost. Ver README/pendências.)
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/redefinir-senha`,
+    });
+    setResetLoading(false);
+    if (error) {
+      setResetError(error.message);
+      return;
+    }
+    // Mensagem genérica (não revela se o e-mail existe).
+    setResetSent(true);
   };
 
   return (
@@ -415,9 +450,76 @@ export default function LoginScreen({
           <Logo iconSize={40} />
         </div>
 
-        <form 
-          className="w-full max-w-[420px] space-y-6 bg-card p-6 sm:p-8 md:p-10 rounded-3xl border border-border shadow-[0_18px_48px_rgba(4,29,87,0.1)] dark:shadow-[0_18px_48px_rgba(0,0,0,0.32)]" 
-          aria-label="Entrar na plataforma" 
+        {view === "forgot" && (
+          <form
+            className="w-full max-w-[420px] space-y-6 bg-card p-6 sm:p-8 md:p-10 rounded-3xl border border-border shadow-[0_18px_48px_rgba(4,29,87,0.1)] dark:shadow-[0_18px_48px_rgba(0,0,0,0.32)]"
+            aria-label="Redefinir senha"
+            onSubmit={handleForgotSubmit}
+          >
+            <button
+              type="button"
+              onClick={() => setView("login")}
+              className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
+            >
+              <ArrowLeft size={16} /> Voltar ao login
+            </button>
+
+            <div>
+              <p className="text-xs font-bold tracking-wider text-primary uppercase mb-3">Recuperar acesso</p>
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground mb-3">Esqueceu a senha?</h2>
+              <p className="text-sm text-muted-foreground">
+                Informe seu e-mail e enviaremos um link para você criar uma nova senha.
+              </p>
+            </div>
+
+            {resetSent ? (
+              <div className="p-4 rounded-xl bg-green-500/10 border border-green-500/20 flex gap-3" role="status">
+                <CheckCircle2 size={18} className="text-green-500 shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-green-600 dark:text-green-400">Link enviado</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Se existir uma conta com esse e-mail, o link de redefinição chega em instantes. Confira também o spam.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <>
+                {resetError && (
+                  <div className="p-4 rounded-xl bg-destructive/10 border border-destructive/20" role="alert">
+                    <p className="text-xs text-destructive/80">{resetError}</p>
+                  </div>
+                )}
+                <div className="space-y-2">
+                  <label htmlFor="reset-email" className="text-sm font-semibold text-foreground">E-mail da conta</label>
+                  <input
+                    id="reset-email"
+                    name="reset-email"
+                    type="email"
+                    required
+                    autoComplete="email"
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    placeholder="voce@empresa.com.br"
+                    className="flex h-12 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={!isSupabaseConfigured || resetLoading}
+                  className="flex w-full items-center justify-center gap-2 h-12 px-4 bg-primary text-primary-foreground font-semibold rounded-xl hover:bg-primary/90 transition-all active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
+                >
+                  {resetLoading ? "Enviando..." : "Enviar link de redefinição"}
+                  <MoveRight size={18} />
+                </button>
+              </>
+            )}
+          </form>
+        )}
+
+        {view === "login" && (
+        <form
+          className="w-full max-w-[420px] space-y-6 bg-card p-6 sm:p-8 md:p-10 rounded-3xl border border-border shadow-[0_18px_48px_rgba(4,29,87,0.1)] dark:shadow-[0_18px_48px_rgba(0,0,0,0.32)]"
+          aria-label="Entrar na plataforma"
           onSubmit={handleSubmit}
         >
           <div className="mb-6 sm:mb-8">
@@ -468,9 +570,9 @@ export default function LoginScreen({
                 <label htmlFor="password" className="text-sm font-semibold text-foreground">
                   Senha
                 </label>
-                <a href="#" className="text-sm font-medium text-primary hover:text-primary/80 transition-colors">
+                <button type="button" onClick={openForgot} className="text-sm font-medium text-primary hover:text-primary/80 transition-colors">
                   Esqueci minha senha
-                </a>
+                </button>
               </div>
               <div className="relative">
                 <input 
@@ -530,7 +632,8 @@ export default function LoginScreen({
             </p>
           </div>
         </form>
-        
+        )}
+
         <p className="mt-8 mb-10 md:mb-0 text-xs text-muted-foreground/60">
           Conexão criptografada (TLS) e dados isolados por conta.
         </p>
