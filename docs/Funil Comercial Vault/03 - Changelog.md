@@ -11,6 +11,12 @@ tags:
 > [!note] Navegação
 > Histórico de mudanças, mais recente primeiro. Contexto do produto em [[01 - Requisitos]]; arquitetura em [[02 - Arquitetura e Design]]; índice em [[00 - Inicio]].
 
+## [2026-07-12] - Funil: botões Ganho/Perdido do painel de oportunidade
+
+### Corrigido — ação rápida Ganho/Perdido não funcionava
+- **Bug:** no painel **Oportunidade** (`/funil`), os botões **Ganho** e **Perdido** não tinham `onClick` — nada acontecia ao clicar.
+- **Correção:** `handleSetOutcome` marca a etapa (`updateOpportunityStage`) com **update otimista** (mesmo padrão do drag, via `queryClient.setQueriesData(["crmSnapshot"])`) + `toast` + estado de loading/`disabled`; em erro, `invalidateQueries` recarrega. O painel reflete na hora ("Oportunidade finalizada como …"). Só front-end (`Pipeline.tsx`), sem tocar no `App.tsx`.
+
 ## [2026-07-12] - Estúdio de Criativos: área segura por formato no canvas
 
 ### Adicionado — faixa central segura (crop-safe) por formato

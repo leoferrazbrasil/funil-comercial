@@ -589,6 +589,34 @@ export default function PipelinePage({
   const [selectedOppId, setSelectedOppId] = useState<string | null>(null);
   const [opportunityToDelete, setOpportunityToDelete] = useState<Opportunity | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [outcomeLoading, setOutcomeLoading] = useState<"Ganho" | "Perdido" | null>(null);
+  const queryClient = useQueryClient();
+
+  // Marca a oportunidade como Ganho/Perdido (ação rápida do painel). Atualiza a UI
+  // de forma otimista (mesmo padrão do drag) e persiste; em erro, recarrega os dados.
+  const handleSetOutcome = async (opportunity: Opportunity, outcome: "Ganho" | "Perdido") => {
+    if (outcomeLoading) return;
+    setOutcomeLoading(outcome);
+    queryClient.setQueriesData({ queryKey: ["crmSnapshot"] }, (prev: any) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        opportunities: prev.opportunities.map((opp: any) =>
+          opp.id === opportunity.id ? { ...opp, etapa: outcome } : opp,
+        ),
+      };
+    });
+    try {
+      await updateOpportunityStage(opportunity.id, outcome);
+      toast.success(outcome === "Ganho" ? "Oportunidade marcada como Ganho 🎉" : "Oportunidade marcada como Perdido");
+    } catch (error) {
+      console.error(error);
+      toast.error("Erro ao atualizar a oportunidade");
+      queryClient.invalidateQueries({ queryKey: ["crmSnapshot"] });
+    } finally {
+      setOutcomeLoading(null);
+    }
+  };
 
   const handleConfirmDelete = async () => {
     if (!opportunityToDelete) return;
@@ -691,15 +719,21 @@ export default function PipelinePage({
             {/* Quick Actions (Win/Loss) */}
             {isOpenOpportunity(selectedOpp) ? (
               <div className="flex gap-3">
-                <button 
-                  className="flex-1 py-3 px-4 rounded-xl bg-green-500/10 hover:bg-green-500/20 text-green-500 border border-green-500/20 font-bold text-sm transition-all flex items-center justify-center gap-2"
+                <button
+                  type="button"
+                  onClick={() => handleSetOutcome(selectedOpp, "Ganho")}
+                  disabled={outcomeLoading !== null}
+                  className="flex-1 py-3 px-4 rounded-xl bg-green-500/10 hover:bg-green-500/20 text-green-500 border border-green-500/20 font-bold text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <CheckCircle2 size={16} /> Ganho
+                  {outcomeLoading === "Ganho" ? <RotateCcw size={16} className="animate-spin" /> : <CheckCircle2 size={16} />} Ganho
                 </button>
-                <button 
-                  className="flex-1 py-3 px-4 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 font-bold text-sm transition-all flex items-center justify-center gap-2"
+                <button
+                  type="button"
+                  onClick={() => handleSetOutcome(selectedOpp, "Perdido")}
+                  disabled={outcomeLoading !== null}
+                  className="flex-1 py-3 px-4 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 font-bold text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <X size={16} /> Perdido
+                  {outcomeLoading === "Perdido" ? <RotateCcw size={16} className="animate-spin" /> : <X size={16} />} Perdido
                 </button>
               </div>
             ) : (
