@@ -32,7 +32,10 @@ tags:
 - **Correção:** a peça agora é composta **localmente a partir do tema + pilar** (headline = tema, subheadline/legenda = tema + CTA do pilar, template `t1`), de forma **determinística e sem inventar dado**; o estúdio **sempre reflete a escolha**. A IA, quando online, apenas **refina por cima** (ignorando o mock de "sem API Keys"). Mesmo tratamento no "Regenerar IA". Só front-end (`Creatives.tsx`).
 
 ### Mudado — Passo 2 apresenta o conteúdo, em vez de pedir
-- O gargalo universal de "o que postar" foi atacado: o **Passo 2** do estúdio deixou de pedir um resumo/assunto e passou a **apresentar os "temas recorrentes" do pilar** (Brandbook 04 · Linha Editorial 4.1) como **conteúdo pronto para escolher** — seguindo a sequência estratégica da 4.2 via o pilar do Passo 1. Clicar num tema preenche a base; o campo de texto virou **opcional** (ajustar/escrever). `editorialPillars.ts` ganhou `temas: string[]` por pilar (fonte única, também disponível ao Roteiro). Só front-end.
+- O gargalo universal de "o que postar" foi atacado: o **Passo 2** do estúdio deixou de pedir um resumo/assunto e passou a **apresentar os "temas recorrentes" do pilar** (Brandbook 04 · Linha Editorial 4.1) como **conteúdo pronto para escolher** — seguindo a sequência estratégica da 4.2 via o pilar do Passo 1. Clicar num tema preenche a base; o campo de texto virou **opcional** (ajustar/escrever). `editorialPillars.ts` ganhou `temas` por pilar (fonte única, também disponível ao Roteiro). Só front-end.
+
+### Corrigido — subheadline repetida entre os temas do mesmo pilar
+- **Bug:** todos os temas de um pilar geravam a **mesma subheadline** (o CTA do pilar, único). **Correção:** cada tema virou `{ titulo, apoio }` (`EditorialTheme`) — o **`titulo`** é o gancho (headline) e o **`apoio`** é um texto de apoio **próprio de cada tema** (subheadline distinta). O card do Passo 2 agora mostra título + apoio; o caption compõe título + apoio + CTA (sem duplicar). Só front-end.
 
 ## [2026-07-12] - Agregador de links (`/l/:slug`) — bio do Instagram / produto
 

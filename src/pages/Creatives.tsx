@@ -80,15 +80,21 @@ type CreativeContent = {
 function buildLocalCreative(pilarName: string, ideaText: string): CreativeContent {
   const p = PILARS.find((x) => x.name === pilarName);
   const tema = ideaText.trim();
+  // Texto de apoio PRÓPRIO do tema escolhido (subheadline distinta por tema).
+  // Se o usuário escreveu um tema livre (sem match), cai no CTA do pilar.
+  const apoio = p?.temas.find((t) => t.titulo === tema)?.apoio ?? p?.cta ?? "";
   // Palavra final do tema (sem pontuação) vira o destaque em cor primária.
   const words = tema.replace(/[.!?,;:]+$/, "").split(/\s+/);
   const highlight = (words[words.length - 1] || "").toUpperCase();
+  const captionParts = [tema, apoio];
+  if (p?.cta && p.cta !== apoio) captionParts.push(p.cta);
+  const caption = captionParts.filter(Boolean).join(" ");
   return {
     headline: tema.toUpperCase(),
-    subheadline: p?.cta ?? "",
+    subheadline: apoio,
     highlight,
     tags: "ESTRUTURA DE VENDAS",
-    caption: p ? `${tema} ${p.cta}` : tema,
+    caption,
     hashtags: ["estruturadevendas", "negociolocal", "funilcomercial"],
     template: "t1",
   };
@@ -572,17 +578,20 @@ export default function CreativesPage() {
                 {/* Temas prontos do pilar — "o conteúdo a postar", eliminando a página em branco */}
                 <div className="flex flex-col gap-2.5">
                   {selectedPilar?.temas.map((t) => {
-                    const active = idea.trim() === t;
+                    const active = idea.trim() === t.titulo;
                     return (
                       <button
-                        key={t}
-                        onClick={() => setIdea(t)}
+                        key={t.titulo}
+                        onClick={() => setIdea(t.titulo)}
                         className={`text-left rounded-xl border p-4 transition-all flex items-start gap-3 active:scale-[0.99] ${active ? 'border-primary bg-primary/10' : 'border-foreground/10 bg-card hover:border-primary/40'}`}
                       >
                         <span className={`mt-0.5 w-5 h-5 rounded-full border flex items-center justify-center shrink-0 ${active ? 'bg-primary border-primary text-black' : 'border-foreground/25 text-transparent'}`}>
                           <Check size={13} />
                         </span>
-                        <span className="text-sm text-foreground leading-snug">{t}</span>
+                        <span className="flex flex-col gap-1 min-w-0">
+                          <span className="text-sm text-foreground font-medium leading-snug">{t.titulo}</span>
+                          <span className="text-xs text-muted-foreground leading-snug">{t.apoio}</span>
+                        </span>
                       </button>
                     );
                   })}
