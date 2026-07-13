@@ -28,6 +28,13 @@ tags:
 ### Adicionado — botão "Desconectar" no modal de publicação
 - No modal **Publicar Arte** (`/criativos`), a "Conta Conectada" só tinha **Reconectar**; agora tem **Desconectar** — remove a integração do Instagram (`social_integrations`, RLS por dono) e volta ao estado "conectar", permitindo vincular **outra conta**. Estado de loading/`disabled` durante a operação. Só front-end (`PublishModal.tsx`).
 
+## [2026-07-13] - Telefone: preservar o 9º dígito (envio Meta + exibição)
+
+### Corrigido — número salvo/enviado sem o 9 → template não entregava
+- **Causa raiz:** `normalizePhone` (crmService **e** edge functions) **removia o 9º dígito** de números BR de 13 díg (formato "legado"). O contato era salvo sem o 9, exibido errado, e o **envio pela Meta ia sem o 9** → a Cloud API não entregava no 1º contato.
+- **`whatsapp-send`:** o campo `to` da Meta passa a ser **reconstruído COM o 9** (`withNinthDigit`) — o telefone gravado e o agrupamento seguem normalizados. **Requer deploy da função.**
+- **`crmService.normalizePhone`:** **não remove mais o 9** — o contato guarda o número REAL (com DDI + 9). A remoção do 9 vira só chave de **comparação** (`phoneMatchKey` no App / `unifyPhone` no Inbox), então o match contato↔conversa continua tolerante a com/sem 9 (sem duplicar). Front auto-deploy. Arquivos: `whatsapp-send`, `crmService.ts`, `App.tsx`.
+
 ## [2026-07-13] - Estúdio de Peças (`/pecas`): gerador de peças de marca
 
 ### Adicionado — hub de peças para presença social

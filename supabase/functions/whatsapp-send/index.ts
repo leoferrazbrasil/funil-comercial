@@ -52,6 +52,12 @@ const normalizePhone = (value: string | null | undefined) => {
   return unified;
 };
 
+// A Meta Cloud API entrega no Brasil com o 9º dígito. Como o normalizePhone remove
+// o 9 (formato de agrupamento/RLS), reconstruímos o número DISCÁVEL (com o 9) só
+// para o campo `to` da Meta — o telefone gravado e o agrupamento seguem normalizados.
+const withNinthDigit = (p: string) =>
+  p.length === 12 && p.startsWith("55") ? p.slice(0, 4) + "9" + p.slice(4) : p;
+
 const asString = (value: unknown) =>
   typeof value === "string" && value.trim() ? value.trim() : null;
 
@@ -417,7 +423,7 @@ Deno.serve(async (request) => {
 
       const metaResult = await sendMetaTemplateMessage(
         phoneNumberId ?? "",
-        phone,
+        withNinthDigit(phone),
         payload.template.name,
         payload.template.language,
         payload.template.variables ?? [],
@@ -467,7 +473,7 @@ Deno.serve(async (request) => {
         Deno.env.get("WHATSAPP_PHONE_NUMBER_ID") ??
         null;
 
-      const metaResult = await sendMetaTextMessage(phoneNumberId ?? "", phone, message);
+      const metaResult = await sendMetaTextMessage(phoneNumberId ?? "", withNinthDigit(phone), message);
       if (!metaResult.configured) {
         // Canal Meta ATIVO mas sem credencial de envio: erro real, não um
         // "enviado" silencioso que mascara a não-entrega (ver branches acima).

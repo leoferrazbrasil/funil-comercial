@@ -112,6 +112,9 @@ type IntegrationChannelPayload = {
   status?: IntegrationChannel["status"];
 };
 
+// Guarda o número REAL (com DDI 55 e o 9º dígito). NÃO removemos o 9 aqui — isso só
+// serve para AGRUPAMENTO/comparação (ver phoneMatchKey no App e unifyPhone no Inbox).
+// Remover o 9 do valor gravado quebrava o envio pela Meta e exibia o número errado.
 const normalizePhone = (value: string | null | undefined) => {
   const p = value?.replace(/\D/g, "") ?? "";
   if (!p) return "";
@@ -119,9 +122,6 @@ const normalizePhone = (value: string | null | undefined) => {
   while (unified.startsWith("0")) unified = unified.substring(1);
   if (unified.length === 10 || unified.length === 11) {
     unified = "55" + unified;
-  }
-  if (unified.startsWith("55") && unified.length === 13 && unified[4] === "9") {
-    return unified.slice(0, 4) + unified.slice(5);
   }
   return unified;
 };

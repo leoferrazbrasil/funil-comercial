@@ -175,6 +175,18 @@ const normalizeSearch = (value: string) =>
 
 const normalizePhone = (value: string) => value.replace(/\D/g, "");
 
+// Chave de COMPARAÇÃO de telefone (não de armazenamento): unifica com/sem o 9º
+// dígito e com/sem DDI 55, para casar contatos independentemente do formato salvo
+// (o contato guarda o número real com o 9; mensagens/wa_id podem vir sem o 9).
+const phoneMatchKey = (value: string | null | undefined) => {
+  let p = normalizePhone(value ?? "");
+  if (!p) return "";
+  while (p.startsWith("0")) p = p.substring(1);
+  if (p.length === 10 || p.length === 11) p = "55" + p;
+  if (p.startsWith("55") && p.length === 13 && p[4] === "9") return p.slice(0, 4) + p.slice(5);
+  return p;
+};
+
 const formatProviderName = (provider: string) => {
   const normalized = provider.trim().toLowerCase();
   if (normalized === "whatsapp") return "WhatsApp";
@@ -662,15 +674,15 @@ function AppContent() {
 
   const ownerId = session?.user.id;
   const findContactByPhone = (phone: string) => {
-    const normalizedPhone = normalizePhone(phone);
+    const key = phoneMatchKey(phone);
     return snapshot.contacts.find(
-      (contact) => normalizePhone(contact.telefone) === normalizedPhone,
+      (contact) => phoneMatchKey(contact.telefone) === key,
     );
   };
   const findLeadByPhone = (phone: string) => {
-    const normalizedPhone = normalizePhone(phone);
+    const key = phoneMatchKey(phone);
     return snapshot.leads.find(
-      (lead) => normalizePhone(lead.telefone) === normalizedPhone,
+      (lead) => phoneMatchKey(lead.telefone) === key,
     );
   };
   const findOpportunityByLeadId = (leadId?: string | null) =>
