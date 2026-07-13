@@ -32,6 +32,42 @@ const CHECKLIST = [
   "Conversa com negócio local e profissional liberal?",
 ];
 
+// Trecho da copy de teste que a Edge Function devolve quando não há API Keys no
+// backend — serve de sentinela para NÃO sobrescrever a peça com mock (Fase B).
+const MOCK_CAPTION_PREFIX = "Atenção: Esta é uma copy de teste";
+
+type CreativeContent = {
+  headline: string;
+  subheadline: string;
+  highlight: string;
+  tags: string;
+  caption: string;
+  hashtags: string[];
+  template: string;
+};
+
+// Fallback DETERMINÍSTICO: enquanto a IA está offline (Fase B), o estúdio ainda
+// reflete o tema escolhido no Passo 2 — a peça é composta a partir do tema + do
+// pilar (CTA), sem inventar dado. Quando a IA entra, ela sobrescreve com copy
+// mais rica. Usa sempre o template "t1" (Impacto), que só depende de
+// headline/subheadline/tags — t4 e t12 exigem dados estruturados que não temos aqui.
+function buildLocalCreative(pilarName: string, ideaText: string): CreativeContent {
+  const p = PILARS.find((x) => x.name === pilarName);
+  const tema = ideaText.trim();
+  // Palavra final do tema (sem pontuação) vira o destaque em cor primária.
+  const words = tema.replace(/[.!?,;:]+$/, "").split(/\s+/);
+  const highlight = (words[words.length - 1] || "").toUpperCase();
+  return {
+    headline: tema.toUpperCase(),
+    subheadline: p?.cta ?? "",
+    highlight,
+    tags: "ESTRUTURA DE VENDAS",
+    caption: p ? `${tema} ${p.cta}` : tema,
+    hashtags: ["estruturadevendas", "negociolocal", "funilcomercial"],
+    template: "t1",
+  };
+}
+
 // Barra compacta de uma etapa já concluída no fluxo manual — clicável para editar.
 function StepSummary({ index, label, value, onEdit }: { index: number; label: string; value: string; onEdit: () => void }) {
   return (
@@ -160,15 +196,31 @@ export default function CreativesPage() {
     return () => { isMounted = false; }
   }, []);
 
+  // Aplica um conteúdo completo aos estados do editor de uma vez.
+  const applyCreative = (c: CreativeContent) => {
+    setHeadline(c.headline);
+    setSubheadline(c.subheadline);
+    setHighlight(c.highlight);
+    setTags(c.tags);
+    setCaption(c.caption);
+    setHashtags(c.hashtags);
+    setTemplate(c.template);
+  };
+
   // Geração central. Aceita overrides para evitar ler estado "stale" quando a
   // chamada acontece no mesmo tick de um setState (caso do "Aceitar Recomendação").
   const runGeneration = async (opts?: { idea?: string; objective?: string; pilar?: string; formatId?: string }) => {
     const ideaText = opts?.idea ?? idea;
     if (!ideaText.trim()) return;
+    const pilarName = opts?.pilar ?? pilar;
+
+    // Baseline determinístico a partir do tema escolhido: garante que a peça no
+    // estúdio SEMPRE reflete a escolha do usuário, mesmo com a IA offline (Fase B).
+    applyCreative(buildLocalCreative(pilarName, ideaText));
 
     const body = {
       objective: opts?.objective ?? objective,
-      pilar: opts?.pilar ?? pilar,
+      pilar: pilarName,
       format: opts?.formatId ?? format.id,
       idea: ideaText,
     };
@@ -178,23 +230,24 @@ export default function CreativesPage() {
     try {
       const { data, error } = await supabase.functions.invoke('ai-generate-post', { body });
 
-      if (error || !data) throw new Error(error?.message || "Erro na geração");
-
-      // Update states with AI response
-      if (data.headline) setHeadline(data.headline);
-      if (data.subheadline) setSubheadline(data.subheadline);
-      if (data.highlight_word) setHighlight(data.highlight_word);
-      if (data.footer_tags) setTags(data.footer_tags);
-      if (data.caption) setCaption(data.caption);
-      if (data.hashtags) setHashtags(data.hashtags);
-      if (data.recommended_template_id) setTemplate(data.recommended_template_id);
-
-      setStep("studio");
-    } catch (error) {
-      console.error(error);
-      alert("Falha ao conectar com o serviço de IA. Preenchendo com exemplos de fallback.");
-      setTimeout(() => setStep("studio"), 1000);
+      // Só sobrescreve o baseline se a IA respondeu de verdade (não é erro nem o
+      // mock de "sem API Keys") — assim a peça nunca perde o tema escolhido.
+      const isMock = typeof data?.caption === "string" && data.caption.startsWith(MOCK_CAPTION_PREFIX);
+      if (!error && data && !data.error && !isMock) {
+        if (data.headline) setHeadline(data.headline);
+        if (data.subheadline) setSubheadline(data.subheadline);
+        if (data.highlight_word) setHighlight(data.highlight_word);
+        if (data.footer_tags) setTags(data.footer_tags);
+        if (data.caption) setCaption(data.caption);
+        if (data.hashtags) setHashtags(data.hashtags);
+        if (data.recommended_template_id) setTemplate(data.recommended_template_id);
+      }
+    } catch (err) {
+      // IA offline: o baseline do tema já está aplicado — seguimos para o estúdio.
+      console.error(err);
     }
+
+    setStep("studio");
   };
 
   const generateWithAI = () => runGeneration();
@@ -235,15 +288,24 @@ export default function CreativesPage() {
   const regenerateCaption = async () => {
     if (!idea.trim()) return;
     setIsRegenerating(true);
+    const local = buildLocalCreative(pilar, idea);
     try {
       const { data, error } = await supabase.functions.invoke('ai-generate-post', {
         body: { objective, pilar, format: format.id, idea }
       });
-      if (error || !data) throw new Error(error?.message || "Erro na geração");
-      if (data.caption) setCaption(data.caption);
-      if (data.hashtags) setHashtags(data.hashtags);
+      const isMock = typeof data?.caption === "string" && data.caption.startsWith(MOCK_CAPTION_PREFIX);
+      if (!error && data && !data.error && !isMock) {
+        if (data.caption) setCaption(data.caption);
+        if (data.hashtags) setHashtags(data.hashtags);
+      } else {
+        // IA offline: recompõe a legenda a partir do tema (sem inventar dado).
+        setCaption(local.caption);
+        setHashtags(local.hashtags);
+      }
     } catch (error) {
       console.error(error);
+      setCaption(local.caption);
+      setHashtags(local.hashtags);
     } finally {
       setIsRegenerating(false);
     }
