@@ -64,8 +64,10 @@ serve(async (req) => {
 
     const imageUrl = publicUrlData.publicUrl
 
-    // 3. Create Container — Instagram Graph API (login pelo Instagram usa graph.instagram.com)
-    const createContainerUrl = `https://graph.instagram.com/v21.0/${instagramAccountId}/media?image_url=${encodeURIComponent(imageUrl)}&caption=${encodeURIComponent(caption)}&access_token=${accessToken}`
+    // 3. Create Container — Instagram Graph API (login pelo Instagram: graph.instagram.com).
+    //    Usamos "me" (o token resolve para a conta certa): o user_id do token é
+    //    app-scoped e não suporta a edge /media diretamente.
+    const createContainerUrl = `https://graph.instagram.com/v21.0/me/media?image_url=${encodeURIComponent(imageUrl)}&caption=${encodeURIComponent(caption)}&access_token=${accessToken}`
 
     const containerRes = await fetch(createContainerUrl, { method: 'POST' })
     const containerData = await containerRes.json()
@@ -77,7 +79,7 @@ serve(async (req) => {
     const creationId = containerData.id
 
     // 4. Publish Container
-    const publishUrl = `https://graph.instagram.com/v21.0/${instagramAccountId}/media_publish?creation_id=${creationId}&access_token=${accessToken}`
+    const publishUrl = `https://graph.instagram.com/v21.0/me/media_publish?creation_id=${creationId}&access_token=${accessToken}`
     
     const publishRes = await fetch(publishUrl, { method: 'POST' })
     const publishData = await publishRes.json()
