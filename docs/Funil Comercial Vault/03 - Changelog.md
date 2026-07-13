@@ -11,6 +11,11 @@ tags:
 > [!note] Navegação
 > Histórico de mudanças, mais recente primeiro. Contexto do produto em [[01 - Requisitos]]; arquitetura em [[02 - Arquitetura e Design]]; índice em [[00 - Inicio]].
 
+## [2026-07-12] - Publicar Arte: desconectar a conta do Instagram
+
+### Adicionado — botão "Desconectar" no modal de publicação
+- No modal **Publicar Arte** (`/criativos`), a "Conta Conectada" só tinha **Reconectar**; agora tem **Desconectar** — remove a integração do Instagram (`social_integrations`, RLS por dono) e volta ao estado "conectar", permitindo vincular **outra conta**. Estado de loading/`disabled` durante a operação. Só front-end (`PublishModal.tsx`).
+
 ## [2026-07-12] - Funil: botões Ganho/Perdido do painel de oportunidade
 
 ### Corrigido — ação rápida Ganho/Perdido não funcionava

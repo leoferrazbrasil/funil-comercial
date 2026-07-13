@@ -19,6 +19,7 @@ export default function PublishModal({ isOpen, onClose, imageUrl, defaultCaption
   const [isConnected, setIsConnected] = useState(false);
   const [instagramAccountId, setInstagramAccountId] = useState<string | null>(null);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
+  const [isDisconnecting, setIsDisconnecting] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -59,6 +60,30 @@ export default function PublishModal({ isOpen, onClose, imageUrl, defaultCaption
       setIsConnected(false);
     } finally {
       setIsLoadingAuth(false);
+    }
+  };
+
+  // Desconecta a conta atual (remove a integração do Instagram — RLS escopa por dono).
+  // Volta ao estado "não conectado" para o usuário vincular OUTRA conta.
+  const handleDisconnect = async () => {
+    if (!supabase || isDisconnecting) return;
+    setIsDisconnecting(true);
+    setErrorMessage("");
+    try {
+      const { error } = await supabase
+        .from('social_integrations')
+        .delete()
+        .eq('platform', 'instagram');
+      if (error) throw error;
+      setIsConnected(false);
+      setInstagramAccountId(null);
+      setStatus("idle");
+    } catch (err: any) {
+      console.error("Erro ao desconectar", err);
+      setErrorMessage("Não foi possível desconectar a conta. Tente novamente.");
+      setStatus("error");
+    } finally {
+      setIsDisconnecting(false);
     }
   };
 
@@ -178,7 +203,12 @@ export default function PublishModal({ isOpen, onClose, imageUrl, defaultCaption
                      <div className="text-xs text-green-400 flex items-center gap-1"><CheckCircle2 size={12}/> Pronta para publicar</div>
                    </div>
                  </div>
-                 <button onClick={handleLogin} className="text-xs font-semibold text-primary hover:underline">Reconectar</button>
+                 <div className="flex flex-col items-end gap-1.5">
+                   <button onClick={handleLogin} disabled={isDisconnecting} className="text-xs font-semibold text-primary hover:underline disabled:opacity-50">Reconectar</button>
+                   <button onClick={handleDisconnect} disabled={isDisconnecting} className="text-xs font-semibold text-red-400 hover:underline disabled:opacity-50 flex items-center gap-1">
+                     {isDisconnecting && <RefreshCw size={11} className="animate-spin" />} Desconectar
+                   </button>
+                 </div>
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center bg-white/5 rounded-xl p-6 border border-white/10 text-center gap-4">
