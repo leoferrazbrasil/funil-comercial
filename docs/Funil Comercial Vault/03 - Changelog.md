@@ -11,6 +11,11 @@ tags:
 > [!note] Navegação
 > Histórico de mudanças, mais recente primeiro. Contexto do produto em [[01 - Requisitos]]; arquitetura em [[02 - Arquitetura e Design]]; índice em [[00 - Inicio]].
 
+## [2026-07-12] - Estúdio de Criativos: temas prontos no Passo 2 (fim da "página em branco")
+
+### Mudado — Passo 2 apresenta o conteúdo, em vez de pedir
+- O gargalo universal de "o que postar" foi atacado: o **Passo 2** do estúdio deixou de pedir um resumo/assunto e passou a **apresentar os "temas recorrentes" do pilar** (Brandbook 04 · Linha Editorial 4.1) como **conteúdo pronto para escolher** — seguindo a sequência estratégica da 4.2 via o pilar do Passo 1. Clicar num tema preenche a base; o campo de texto virou **opcional** (ajustar/escrever). `editorialPillars.ts` ganhou `temas: string[]` por pilar (fonte única, também disponível ao Roteiro). Só front-end.
+
 ## [2026-07-12] - Agregador de links (`/l/:slug`) — bio do Instagram / produto
 
 ### Adicionado — Página de agregador estilo "linktree"

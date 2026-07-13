@@ -86,7 +86,7 @@ Plataforma da **Funil Comercial** (empresa de estrutura de vendas). Seu **núcle
 
 ## 8. Criativos (`/criativos`)
 
-- **Wizard guiado (Progressive Disclosure):** *O Caminho* (Estrategista IA em destaque **ou** criar manualmente) → fluxo **manual** (escolher o **pilar editorial**, que já traz objetivo/etapa/CTA — 1:1 do Brandbook 4.1 — depois a ideia) → **Estúdio** de edição + canvas.
+- **Wizard guiado (Progressive Disclosure):** *O Caminho* (Estrategista IA em destaque **ou** criar manualmente) → fluxo **manual** (escolher o **pilar editorial**, que já traz objetivo/etapa/CTA — 1:1 do Brandbook 4.1 — depois **escolher um tema pronto** do pilar: os *temas recorrentes* da Linha Editorial, sem "página em branco"; o campo de texto vira opcional) → **Estúdio** de edição + canvas.
 - Geração de post com IA (`ai-generate-post`, fallback OpenAI/Gemini) e **Estrategista IA** (`ai-recommend-post`) conectado ao Instagram (Meta Graph) para continuidade editorial. *(Prompts da IA no posicionamento novo = **Fase B**, pendente de deploy — ver [[04 - Roadmap]].)*
 - Copy com limite de caracteres, gestão de hashtags (até 5) e **checklist "Antes de publicar"** — tudo alinhado à **Linha Editorial** (Brandbook 04). Pilares em `src/lib/editorialPillars.ts` (compartilhados com o Roteiro).
 
