@@ -20,6 +20,20 @@ const TEMPLATES = [
   { id: "t12", name: "Prova Social", format: "4:5" },
 ];
 
+// Área segura por formato (px na resolução real). Textos, títulos, logos e CTAs
+// ficam DENTRO desta faixa central; só elementos decorativos (pontos, brilho)
+// sangram até a borda. Evita que a UI do Instagram corte/cubra o essencial.
+type SafeInset = { top: number; right: number; bottom: number; left: number };
+const SAFE_AREA: Record<string, SafeInset> = {
+  // Padrão ideal do feed vertical: faixa central 1012 × 1230 (respiro 34 lados / 60 topo-base).
+  "4:5": { top: 60, right: 34, bottom: 60, left: 34 },
+  // Não especificado — respiro confortável e simétrico.
+  "1:1": { top: 48, right: 48, bottom: 48, left: 48 },
+  // Reels/Stories: 200px de topo livres (nome do perfil) + base reservada à legenda/áudio/ações.
+  "9:16": { top: 200, right: 40, bottom: 250, left: 40 },
+};
+const getSafeInset = (formatId: string): SafeInset => SAFE_AREA[formatId] ?? SAFE_AREA["4:5"];
+
 // Os pilares editoriais agora vivem em src/lib/editorialPillars.ts (registro
 // compartilhado com o Roteiro /roteiro), importado acima como `PILARS`.
 
@@ -835,9 +849,9 @@ export default function CreativesPage() {
                 className={`relative overflow-hidden ${theme === 'dark' ? 'bg-[#09090B]' : 'bg-[#FAF9F6]'}`} 
                 style={{ width: format.width, height: format.height }}
               >
-                {template === 't1' && <Template1 theme={theme} headline={headline} subheadline={subheadline} highlight={highlight} tags={tags} />}
-                {template === 't4' && <Template4 theme={theme} headline={headline} subheadline={subheadline} />}
-                {template === 't12' && <Template12 theme={theme} subheadline={subheadline} headline={headline} />}
+                {template === 't1' && <Template1 theme={theme} headline={headline} subheadline={subheadline} highlight={highlight} tags={tags} inset={getSafeInset(format.id)} />}
+                {template === 't4' && <Template4 theme={theme} headline={headline} subheadline={subheadline} inset={getSafeInset(format.id)} />}
+                {template === 't12' && <Template12 theme={theme} subheadline={subheadline} headline={headline} inset={getSafeInset(format.id)} />}
               </div>
            </div>
         </div>
@@ -862,9 +876,22 @@ const Dots = () => (
   <div className="absolute inset-0 opacity-[0.05] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, currentColor 2px, transparent 2px)', backgroundSize: '24px 24px' }}></div>
 );
 
-function Template1({ theme, headline, highlight, subheadline, tags }: any) {
+// Faixa central segura: todo conteúdo crítico (texto, logo, CTA) vive aqui dentro,
+// afastado das bordas conforme SAFE_AREA[formato]. Decorativos ficam fora, no root.
+function SafeFrame({ inset, className = "", children }: { inset: SafeInset; className?: string; children: React.ReactNode }) {
+  return (
+    <div
+      className={`absolute flex z-10 ${className}`}
+      style={{ top: inset.top, right: inset.right, bottom: inset.bottom, left: inset.left }}
+    >
+      {children}
+    </div>
+  );
+}
+
+function Template1({ theme, headline, highlight, subheadline, tags, inset }: any) {
   const isDark = theme === 'dark';
-  
+
   const formattedHeadline = headline.split('\\n').map((line: string, i: number) => {
     if (highlight && line.includes(highlight)) {
       const parts = line.split(highlight);
@@ -878,76 +905,80 @@ function Template1({ theme, headline, highlight, subheadline, tags }: any) {
   });
 
   return (
-    <div className={`w-full h-full flex flex-col p-24 relative ${isDark ? 'text-white' : 'text-[#121214]'}`}>
+    <div className={`w-full h-full relative overflow-hidden ${isDark ? 'text-white' : 'text-[#121214]'}`}>
       <Dots />
       <div className={`absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/20 to-transparent blur-[100px]`}></div>
-      
-      <div className="flex justify-center mb-16 z-10">
-        <Logo iconSize={96} variant="icon-only" theme={isDark ? 'default' : 'monochrome-black'} />
-      </div>
-      
-      <div className="mt-auto mb-32 z-10 px-8">
-        <h1 className="text-[110px] font-black leading-[0.95] tracking-tight uppercase">
-          {formattedHeadline}
-        </h1>
-        <p className={`text-[36px] mt-12 max-w-[80%] leading-relaxed font-medium ${isDark ? 'text-white/60' : 'text-black/60'}`}>
-          {subheadline}
-        </p>
-      </div>
-      
-      <div className="absolute bottom-16 left-0 w-full flex justify-center gap-6 text-[24px] text-primary font-bold tracking-[0.2em] z-10">
-        {tags.split('+').map((tag: string, i: number, arr: any) => (
-          <React.Fragment key={i}>
-            <span>{tag.trim()}</span>
-            {i < arr.length - 1 && <span className="opacity-50">+</span>}
-          </React.Fragment>
-        ))}
-      </div>
+
+      <SafeFrame inset={inset} className="flex-col">
+        <div className="flex justify-center mb-16">
+          <Logo iconSize={96} variant="icon-only" theme={isDark ? 'default' : 'monochrome-black'} />
+        </div>
+
+        <div className="mt-auto">
+          <h1 className="text-[110px] font-black leading-[0.95] tracking-tight uppercase">
+            {formattedHeadline}
+          </h1>
+          <p className={`text-[36px] mt-12 max-w-[80%] leading-relaxed font-medium ${isDark ? 'text-white/60' : 'text-black/60'}`}>
+            {subheadline}
+          </p>
+          <div className="mt-16 w-full flex justify-center gap-6 text-[24px] text-primary font-bold tracking-[0.2em]">
+            {tags.split('+').map((tag: string, i: number, arr: any) => (
+              <React.Fragment key={i}>
+                <span>{tag.trim()}</span>
+                {i < arr.length - 1 && <span className="opacity-50">+</span>}
+              </React.Fragment>
+            ))}
+          </div>
+        </div>
+      </SafeFrame>
     </div>
   );
 }
 
-function Template4({ theme, headline, subheadline }: any) {
+function Template4({ theme, headline, subheadline, inset }: any) {
   const isDark = theme === 'dark';
   const lines = (subheadline||'').split('\\n').filter((l: string) => l.trim().length > 0);
 
   return (
-    <div className={`w-full h-full flex flex-col p-24 relative ${isDark ? 'bg-[#09090B] text-white' : 'bg-[#FAF9F6] text-[#121214]'}`}>
+    <div className={`w-full h-full relative overflow-hidden ${isDark ? 'bg-[#09090B] text-white' : 'bg-[#FAF9F6] text-[#121214]'}`}>
       <Dots />
-      <div className="flex justify-between items-center mb-24 z-10">
-        <Logo iconSize={64} theme={isDark ? 'default' : 'monochrome-black'} />
-        <span className="text-[32px] font-bold opacity-40 uppercase tracking-widest">PASSO A PASSO</span>
-      </div>
-      <h1 className="text-[96px] font-black leading-[0.95] mb-24 uppercase z-10">
-        {(headline||'').split('\\n').map((l: string, i: number) => <span key={i} className="block">{l}</span>)}
-      </h1>
-      
-      <div className="space-y-12 flex-1 z-10">
-        {lines.map((line: string, i: number) => {
-          const [title, desc] = line.split('|');
-          return (
-            <div key={i} className={`flex gap-12 items-start border-t pt-12 ${isDark ? 'border-white/10' : 'border-black/10'}`}>
-              <span className="text-[64px] font-black text-primary leading-none">{i + 1}.</span>
-              <div className="flex-1 mt-2">
-                <div className="text-[48px] font-bold mb-4 leading-none">{title?.trim()}</div>
-                {desc && <div className={`text-[32px] leading-tight font-medium ${isDark ? 'text-white/60' : 'text-black/60'}`}>{desc.trim()}</div>}
+      <SafeFrame inset={inset} className="flex-col">
+        <div className="flex justify-between items-center mb-24">
+          <Logo iconSize={64} theme={isDark ? 'default' : 'monochrome-black'} />
+          <span className="text-[32px] font-bold opacity-40 uppercase tracking-widest">PASSO A PASSO</span>
+        </div>
+        <h1 className="text-[96px] font-black leading-[0.95] mb-24 uppercase">
+          {(headline||'').split('\\n').map((l: string, i: number) => <span key={i} className="block">{l}</span>)}
+        </h1>
+
+        <div className="space-y-12 flex-1">
+          {lines.map((line: string, i: number) => {
+            const [title, desc] = line.split('|');
+            return (
+              <div key={i} className={`flex gap-12 items-start border-t pt-12 ${isDark ? 'border-white/10' : 'border-black/10'}`}>
+                <span className="text-[64px] font-black text-primary leading-none">{i + 1}.</span>
+                <div className="flex-1 mt-2">
+                  <div className="text-[48px] font-bold mb-4 leading-none">{title?.trim()}</div>
+                  {desc && <div className={`text-[32px] leading-tight font-medium ${isDark ? 'text-white/60' : 'text-black/60'}`}>{desc.trim()}</div>}
+                </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      </SafeFrame>
     </div>
   );
 }
 
-function Template12({ theme, subheadline, headline }: any) {
+function Template12({ theme, subheadline, headline, inset }: any) {
   const isDark = theme === 'dark';
-  
+
   return (
-    <div className={`w-full h-full flex items-center justify-center p-16 relative ${isDark ? 'bg-[#09090B]' : 'bg-[#FAF9F6]'}`}>
+    <div className={`w-full h-full relative overflow-hidden ${isDark ? 'bg-[#09090B]' : 'bg-[#FAF9F6]'}`}>
       <Dots />
       <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent"></div>
-      
+
+      <SafeFrame inset={inset} className="items-center justify-center">
       <div className={`w-full max-w-[800px] backdrop-blur-xl border rounded-[48px] p-24 shadow-2xl relative z-10 ${isDark ? 'bg-white/5 border-white/20' : 'bg-black/5 border-black/10'}`}>
         <div className="flex text-primary mb-12 gap-3">
           {[1,2,3,4,5].map(i => (
@@ -969,6 +1000,7 @@ function Template12({ theme, subheadline, headline }: any) {
           </div>
         </div>
       </div>
+      </SafeFrame>
     </div>
   );
 }
