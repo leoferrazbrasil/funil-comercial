@@ -11,6 +11,15 @@ tags:
 > [!note] Navegação
 > Histórico de mudanças, mais recente primeiro. Contexto do produto em [[01 - Requisitos]]; arquitetura em [[02 - Arquitetura e Design]]; índice em [[00 - Inicio]].
 
+## [2026-07-12] - Estúdio de Criativos: área segura por formato no canvas
+
+### Adicionado — faixa central segura (crop-safe) por formato
+- O canvas ganhou `SAFE_AREA` (por formato) + componente `<SafeFrame>`: **texto, logo e CTA** ficam numa **faixa central**, afastados das bordas; só **decorativos** (pontos, brilho) sangram até a borda. Evita que a UI do Instagram **corte/cubra** elementos críticos.
+  - **4:5 (1080×1350, padrão ideal):** respiro 34px laterais / 60px topo-base → área central **1012×1230**.
+  - **9:16 (1080×1920):** **200px** de topo livres (nome do perfil) + **~250px** de base reservados à legenda/áudio/ações (*valor-base — a instrução do dono para a margem inferior veio cortada; ajustável em `SAFE_AREA`*).
+  - **1:1 (1080×1080):** respiro simétrico de 48px (não especificado).
+- Os 3 templates (`t1`/`t4`/`t12`) foram reestruturados para posicionar o conteúdo **dentro do `SafeFrame`**. Só front-end (`Creatives.tsx`).
+
 ## [2026-07-12] - Estúdio de Criativos: temas prontos no Passo 2 (fim da "página em branco")
 
 ### Corrigido — o tema escolhido chega ao estúdio mesmo com a IA offline

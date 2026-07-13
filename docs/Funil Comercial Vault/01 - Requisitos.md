@@ -89,6 +89,8 @@ Plataforma da **Funil Comercial** (empresa de estrutura de vendas). Seu **núcle
 - **Wizard guiado (Progressive Disclosure):** *O Caminho* (Estrategista IA em destaque **ou** criar manualmente) → fluxo **manual** (escolher o **pilar editorial**, que já traz objetivo/etapa/CTA — 1:1 do Brandbook 4.1 — depois **escolher um tema pronto** do pilar: os *temas recorrentes* da Linha Editorial, sem "página em branco"; o campo de texto vira opcional) → **Estúdio** de edição + canvas.
 - Geração de post com IA (`ai-generate-post`, fallback OpenAI/Gemini) e **Estrategista IA** (`ai-recommend-post`) conectado ao Instagram (Meta Graph) para continuidade editorial. *(Prompts da IA no posicionamento novo = **Fase B**, pendente de deploy — ver [[04 - Roadmap]].)*
 - Copy com limite de caracteres, gestão de hashtags (até 5) e **checklist "Antes de publicar"** — tudo alinhado à **Linha Editorial** (Brandbook 04). Pilares em `src/lib/editorialPillars.ts` (compartilhados com o Roteiro).
+- **Robustez com IA offline (Fase B):** o "Gerar Criativo" **compõe a peça localmente a partir do tema + pilar** (headline = tema, legenda = tema + CTA, template `t1`) — o estúdio **sempre reflete o tema escolhido**, sem depender da Edge Function. A IA, quando online, apenas **refina por cima** (ignorando o mock de "sem API Keys").
+- **Área segura por formato (canvas, `SAFE_AREA`/`<SafeFrame>`):** textos, logos e CTAs ficam na faixa central; só decorativos sangram até a borda. **4:5 (1080×1350, padrão ideal):** respiro 34px laterais / 60px topo-base → área central **1012×1230**. **9:16 (1080×1920):** **200px** de topo livres (nome do perfil) + base reservada (base ~250px, ajustável) à legenda/áudio/ações. **1:1:** respiro simétrico 48px.
 
 ## 8.1. Roteiro Editorial (`/roteiro`)
 
