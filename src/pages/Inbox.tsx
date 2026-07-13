@@ -220,6 +220,13 @@ const unifyPhone = (phone: string | null | undefined) => {
   return p;
 };
 
+// Reconstrói o 9º dígito para EXIBIÇÃO. As mensagens são gravadas SEM o 9 (formato
+// de agrupamento/RLS), mas o número real do contato tem o 9 — então exibimos com ele.
+const displayPhone = (value?: string | null) => {
+  const p = (value ?? "").replace(/\D/g, "");
+  return p.length === 12 && p.startsWith("55") ? p.slice(0, 4) + "9" + p.slice(4) : p;
+};
+
 const formatProviderName = (provider: string) => {
   const normalized = provider.trim().toLowerCase();
   if (normalized === "whatsapp") return "WhatsApp";
@@ -868,10 +875,10 @@ export default function InboxPage({
       ?.lead_id ?? null;
       
   const contactByPhone = contacts.find(
-    (contact) => normalizePhone(contact.telefone) === normalizePhone(sourcePhone),
+    (contact) => unifyPhone(contact.telefone) === unifyPhone(sourcePhone),
   );
   const leadByPhone = leads.find(
-    (lead) => normalizePhone(lead.telefone) === normalizePhone(sourcePhone),
+    (lead) => unifyPhone(lead.telefone) === unifyPhone(sourcePhone),
   );
   
   const linkedContact = contacts.find((contact) => contact.id === conversationContactId) ?? contactByPhone;
@@ -1105,7 +1112,7 @@ export default function InboxPage({
                   <div className="flex-1 min-w-0 mt-0.5">
                     <div className="flex items-center justify-between mb-1.5">
                       <strong className={`text-sm truncate ${hasUnread ? 'text-foreground font-bold' : 'text-foreground/90 font-medium'}`}>
-                        {conv.displayName} ({conv.latest.telefone})
+                        {conv.displayName} ({displayPhone(conv.latest.telefone)})
                       </strong>
                       <span className={`text-[11px] shrink-0 ml-2 font-medium ${hasUnread ? 'text-primary' : 'text-muted-foreground'}`}>
                         {formatRelativeDate(conv.latest.created_at)}
