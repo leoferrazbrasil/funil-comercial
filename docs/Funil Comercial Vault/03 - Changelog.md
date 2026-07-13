@@ -28,6 +28,13 @@ tags:
 ### Adicionado — botão "Desconectar" no modal de publicação
 - No modal **Publicar Arte** (`/criativos`), a "Conta Conectada" só tinha **Reconectar**; agora tem **Desconectar** — remove a integração do Instagram (`social_integrations`, RLS por dono) e volta ao estado "conectar", permitindo vincular **outra conta**. Estado de loading/`disabled` durante a operação. Só front-end (`PublishModal.tsx`).
 
+## [2026-07-13] - Estúdio de Peças (`/pecas`): gerador de peças de marca
+
+### Adicionado — hub de peças para presença social
+- Nova página **`/pecas`** (área **marketing** → só admin): um **hub** com **7 peças** de marca (Facebook Capa 820×360, Foto de perfil 1:1 1080×1080, LinkedIn Capa 1584×396, WhatsApp Business 640×640, YouTube Banner 2560×1440, X/Twitter 1500×500, Story Destaque 1080×1920) — cada uma abre um **gerador**.
+- **Gerador:** canvas em **px exato** (escalado só para caber) · **guias** de área segura (ouro) e zona da foto de perfil (vermelho) que **só aparecem na tela, nunca no PNG** (ficam fora do `canvasRef`) · botões **Baixar PNG exato (1×)**, **Baixar 2×** e **Ocultar guias** · observações por peça. Export via `html-to-image` (mesmo padrão do `/criativos`).
+- **Marca:** funil de 3 barras (ouro) + "Funil Comercial" + tagline "Estrutura de vendas para negócios locais", fundo grafite; foto de perfil = ícone centralizado, seguro p/ recorte circular. Registro único em `socialPieces.ts`; página `PieceStudio.tsx`. Revisado por workflow adversarial (0 defeitos confirmados). Arquivos: `socialPieces.ts`, `PieceStudio.tsx`, `navigation.ts`, `accessControl.ts`, `types.ts`, `App.tsx`.
+
 ## [2026-07-13] - Publicar no IG: migração para login DIRETO pelo Instagram
 
 ### Mudado — abandona o login via Facebook (Página/Business) → Instagram Login

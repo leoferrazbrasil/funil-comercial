@@ -2,7 +2,7 @@ import type { PillarId } from "./editorialPillars"
 import type { AggregatorLink } from "./aggregators"
 import type { CustomThemeInput } from "./aggregatorThemes"
 
-export type Route = 'login' | 'cadastro' | 'dashboard' | 'inbox' | 'contatos' | 'leads' | 'funil' | 'campanhas' | 'perfil' | 'configuracoes' | 'criativos' | 'roteiro' | 'agregadores' | 'brandbook'
+export type Route = 'login' | 'cadastro' | 'dashboard' | 'inbox' | 'contatos' | 'leads' | 'funil' | 'campanhas' | 'perfil' | 'configuracoes' | 'criativos' | 'roteiro' | 'agregadores' | 'pecas' | 'brandbook'
 
 export type Aggregator = {
   id: string

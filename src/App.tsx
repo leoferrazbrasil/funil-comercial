@@ -54,6 +54,7 @@ import ProfilePage from "./pages/Profile";
 import SettingsPage from "./pages/Settings";
 import EditorialPlannerPage from "./pages/EditorialPlanner";
 import AggregatorsAdminPage from "./pages/AggregatorsAdmin";
+import PieceStudioPage from "./pages/PieceStudio";
 import Logo from "./components/Logo";
 import {
   convertContactToLead,
@@ -1228,6 +1229,7 @@ function AppContent() {
             <Route path="/criativos" element={guardRoute("criativos", <CreativesPage />)} />
             <Route path="/roteiro" element={guardRoute("roteiro", <EditorialPlannerPage />)} />
             <Route path="/agregadores" element={guardRoute("agregadores", <AggregatorsAdminPage />)} />
+            <Route path="/pecas" element={guardRoute("pecas", <PieceStudioPage />)} />
             <Route
               path="/campanhas"
               element={guardRoute(

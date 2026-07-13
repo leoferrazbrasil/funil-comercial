@@ -15,7 +15,7 @@ Mapa conciso para agentes. Profundidade fica no **cofre** (`docs/Funil Comercial
 
 ## Rotas (`src/App.tsx`)
 
-- **Privadas:** `/dashboard` `/inbox` `/contatos` `/leads` `/funil` `/campanhas` `/criativos` `/roteiro` `/agregadores` `/perfil` `/configuracoes`. **Acesso por ÁREA** em `src/lib/accessControl.ts`: **comercial** (dashboard/inbox/contatos/leads/funil) vs **marketing** (campanhas/criativos/roteiro/agregadores). Papéis: **admin** = tudo (operador técnico, ex-`diretor`); **gestor**/**vendedor** = só comercial. Bloqueio em 2 camadas: menu (`visibleNavItems`) + `guardRoute` nas rotas (URL direta → `/dashboard`).
+- **Privadas:** `/dashboard` `/inbox` `/contatos` `/leads` `/funil` `/campanhas` `/criativos` `/roteiro` `/agregadores` `/pecas` `/perfil` `/configuracoes`. **Acesso por ÁREA** em `src/lib/accessControl.ts`: **comercial** (dashboard/inbox/contatos/leads/funil) vs **marketing** (campanhas/criativos/roteiro/agregadores/pecas — `/pecas` = Estúdio de Peças, gerador de peças de marca). Papéis: **admin** = tudo (operador técnico, ex-`diretor`); **gestor**/**vendedor** = só comercial. Bloqueio em 2 camadas: menu (`visibleNavItems`) + `guardRoute` nas rotas (URL direta → `/dashboard`).
 - **Públicas (sem sessão):** `/` `/crm` `/brandbook` `/privacidade` `/termos` `/exclusao-de-dados` + previews de prospecção. Lista em `PUBLIC_PATHS` (App.tsx) — usada no gate de render e no guard de auth; manter em sincronia.
 
 ## Dados (RLS `for all` com `auth.uid() = owner_id` em tudo)

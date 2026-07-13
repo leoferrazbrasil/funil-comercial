@@ -9,7 +9,7 @@ type PrivateRoute = Exclude<AppRoute, "login">;
 // futuro perfil (ex.: social_media → só marketing) é trivial.
 const AREA_ROUTES = {
   comercial: ["dashboard", "inbox", "contatos", "leads", "funil"],
-  marketing: ["campanhas", "criativos", "roteiro", "agregadores"],
+  marketing: ["campanhas", "criativos", "roteiro", "agregadores", "pecas"],
 } satisfies Record<string, PrivateRoute[]>;
 
 type Area = keyof typeof AREA_ROUTES;
