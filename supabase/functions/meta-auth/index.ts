@@ -89,7 +89,9 @@ serve(async (req) => {
     diag.push(`me/accounts=${userPages.length}`);
     instagramId = await igFromPages(userPages);
 
-    // (3): páginas via Business Manager (owned + client) — requer business_management.
+    // (3): páginas via Business Manager (owned + client). Só funciona se o app tiver
+    // a permissão business_management habilitada; sem ela, me/businesses vem vazio
+    // (inofensivo — apenas não ajuda no fallback).
     if (!instagramId) {
       const biz = await graph("me/businesses", accessToken, "id,name");
       const businesses = Array.isArray(biz?.data) ? biz.data : [];
@@ -110,7 +112,7 @@ serve(async (req) => {
 
     if (!instagramId) {
       throw new Error(
-        `Não encontrei um Instagram Comercial vinculado às Páginas concedidas (${diag.join(", ")}). Confira: 1) o Instagram é Profissional (Comercial/Criador); 2) está vinculado à Página no Gerenciador; 3) você concedeu ESSA Página no login (com a permissão business_management).`
+        `Não encontrei um Instagram Comercial vinculado às Páginas concedidas (${diag.join(", ")}). Confira: 1) o Instagram é Profissional (Comercial/Criador); 2) está vinculado à Página no Gerenciador de Contas do Instagram; 3) no login, você concedeu ESSA Página (a que tem o IG vinculado).`
       );
     }
     console.log("Resolved Instagram Business Account ID:", instagramId);
