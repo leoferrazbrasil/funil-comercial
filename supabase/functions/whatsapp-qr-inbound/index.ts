@@ -105,17 +105,9 @@ function extractEvolutionMessages(payload: JsonRecord): NormalizedInboundMessage
   const remoteJid = asString(key.remoteJid) ?? "";
   if (remoteJid.includes("@g.us")) return []; // Ignore group messages
 
-  // @lid: novo identificador de privacidade do WhatsApp — o número real fica
-  // mascarado. O Evolution às vezes traz o telefone verdadeiro em key.senderPn /
-  // key.remoteJidAlt; usamos se existir. Senão fica o próprio @lid (não-discável,
-  // que o front esconde) e o nome cai no pushName — nunca no ID.
-  const isLid = remoteJid.includes("@lid");
-  const realJid = isLid
-    ? (asString(key.senderPn) ?? asString(key.remoteJidAlt) ?? "")
-    : remoteJid;
-  const fromPhone = normalizePhone((realJid || remoteJid).split("@")[0]);
+  const fromPhone = normalizePhone(remoteJid.split("@")[0]);
   const providerMessageId = asString(key.id);
-  const senderName = asString(data.pushName) ?? (isLid ? "Contato do WhatsApp" : fromPhone);
+  const senderName = asString(data.pushName) ?? fromPhone;
   
   let messageText = "";
   let messageType = asString(data.messageType) ?? "unknown";

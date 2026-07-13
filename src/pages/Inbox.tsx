@@ -193,19 +193,6 @@ const normalizeSearch = (value: string) =>
 
 const normalizePhone = (value: string) => value.replace(/\D/g, "");
 
-// Um telefone DISCÁVEL (BR): 10–13 dígitos. IDs longos do WhatsApp (@lid, 14–15
-// díg — número mascarado) e ids de grupo (120363…) NÃO são telefones e não devem
-// ser exibidos como "número".
-const isRealPhone = (value?: string | null) => {
-  const d = (value ?? "").replace(/\D/g, "");
-  return d.length >= 10 && d.length <= 13 && !d.startsWith("120363");
-};
-
-// Um "nome" só vale se não for um número/ID puro (o webhook às vezes cai no próprio
-// id quando o WhatsApp não expõe o pushName).
-const isJustDigits = (value?: string | null) =>
-  Boolean(value) && /^\d+$/.test((value ?? "").replace(/\D/g, ""));
-
 // Helper to unify Brazilian numbers (with or without 9th digit, and missing 55) for grouping
 const unifyPhone = (phone: string | null | undefined) => {
   if (!phone) return "";
@@ -605,13 +592,8 @@ export default function InboxPage({
         const contact = contacts.find(
           (c) => unifyPhone(c.telefone) === key,
         );
-        // Nome da conversa: contato vinculado → nome do WhatsApp (se for nome, não
-        // um ID) → telefone real → rótulo genérico (nunca o @lid cru).
-        const waName = realInbound?.remetente_nome?.trim();
         const displayName =
-          contact?.nome ||
-          (waName && !isJustDigits(waName) ? waName : "") ||
-          (isRealPhone(latest.telefone) ? latest.telefone : "Contato do WhatsApp");
+          contact?.nome || realInbound?.remetente_nome || latest.telefone;
 
         // Estágio no funil (exclusivo) para o filtro de Tipo. "Contato" exige
         // que a pessoa esteja REGISTRADA no CRM (existe em `contacts` por
@@ -1123,7 +1105,7 @@ export default function InboxPage({
                   <div className="flex-1 min-w-0 mt-0.5">
                     <div className="flex items-center justify-between mb-1.5">
                       <strong className={`text-sm truncate ${hasUnread ? 'text-foreground font-bold' : 'text-foreground/90 font-medium'}`}>
-                        {conv.displayName}{isRealPhone(conv.latest.telefone) ? ` (${conv.latest.telefone})` : ""}
+                        {conv.displayName} ({conv.latest.telefone})
                       </strong>
                       <span className={`text-[11px] shrink-0 ml-2 font-medium ${hasUnread ? 'text-primary' : 'text-muted-foreground'}`}>
                         {formatRelativeDate(conv.latest.created_at)}

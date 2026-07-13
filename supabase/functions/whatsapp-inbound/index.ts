@@ -407,14 +407,8 @@ function extractZApiMessages(payload: JsonRecord): NormalizedInboundMessage[] {
     const person = payloadValue(payload, ["senderName", "participantName", "pushName"]) ?? fromPhone;
     senderName = `${person} · ${groupName}`;
   } else {
-    // @lid: o WhatsApp mascara o número e a Z-API manda um id longo (não-discável)
-    // no `phone`. Não usamos o id como nome — cai no senderName/chatName/contactName
-    // ou num rótulo genérico. O fromPhone (id) segue só como chave de agrupamento; o
-    // Inbox esconde ids não-discáveis (ver isRealPhone).
-    const looksLikeLid = rawPhoneStr.includes("@lid");
     fromPhone = normalizePhone(rawPhoneStr);
-    const nm = payloadValue(payload, ["senderName", "chatName", "contactName"]);
-    senderName = nm ?? (looksLikeLid || fromPhone.length > 13 ? "Contato do WhatsApp" : fromPhone);
+    senderName = payloadValue(payload, ["senderName", "chatName", "contactName"]) ?? fromPhone;
   }
   if (!fromPhone) return [];
 

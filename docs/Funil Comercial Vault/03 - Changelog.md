@@ -28,14 +28,6 @@ tags:
 ### Adicionado — botão "Desconectar" no modal de publicação
 - No modal **Publicar Arte** (`/criativos`), a "Conta Conectada" só tinha **Reconectar**; agora tem **Desconectar** — remove a integração do Instagram (`social_integrations`, RLS por dono) e volta ao estado "conectar", permitindo vincular **outra conta**. Estado de loading/`disabled` durante a operação. Só front-end (`PublishModal.tsx`).
 
-## [2026-07-13] - Inbox: tratar @lid do WhatsApp (ID mascarado ≠ telefone)
-
-### Corrigido — conversas de prospecção exibiam um ID longo no lugar do número
-- **Causa raiz:** o WhatsApp usa **`@lid`** (identificador de privacidade) quando o número é mascarado. O `whatsapp-qr-inbound` só ignorava grupos (`@g.us`) e gravava o `@lid` (14–15 díg) como se fosse telefone → o Inbox exibia o ID. **Não** tem relação com as mudanças de DDD/formulário.
-- **Front (`Inbox.tsx`):** `isRealPhone` (10–13 díg) — a conversa passa a mostrar o **nome do WhatsApp** (se houver) ou o rótulo **"Contato do WhatsApp"**, nunca o `@lid` cru; o telefone entre parênteses só aparece se for discável.
-- **Back — caminho ativo Z-API (`whatsapp-inbound`):** no 1:1, se o `phone` vem mascarado como `@lid` (ou id > 13 díg), o **nome deixa de ser o ID** (cai em `senderName`/`chatName`/`contactName` ou no rótulo genérico). **Requer deploy da função.** (Também endurecido o `whatsapp-qr-inbound` para o caso Evolution, por consistência.)
-- **Nota:** o WhatsApp mascara o número no `@lid`; se a Z-API não expõe o número real, ele fica indisponível — a conversa mostra o rótulo e você preenche o telefone ao criar/editar o contato.
-
 ## [2026-07-13] - Estúdio de Peças (`/pecas`): gerador de peças de marca
 
 ### Adicionado — hub de peças para presença social
