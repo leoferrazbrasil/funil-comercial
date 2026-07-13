@@ -20,19 +20,31 @@ const TEMPLATES = [
   { id: "t12", name: "Prova Social", format: "4:5" },
 ];
 
-// Área segura por formato (px na resolução real). Textos, títulos, logos e CTAs
-// ficam DENTRO desta faixa central; só elementos decorativos (pontos, brilho)
-// sangram até a borda. Evita que a UI do Instagram corte/cubra o essencial.
+// Margens de conteúdo por formato (px na resolução real). Textos, títulos, logos
+// e CTAs ficam DENTRO desta faixa; só decorativos (pontos, brilho) sangram até a
+// borda. Os valores RESPEITAM (excedem) o mínimo crop-safe da Meta — 34px laterais
+// / 60px topo-base no 4:5 — dando respiro visível, com o essencial bem dentro da
+// zona segura 1012 × 1230.
 type SafeInset = { top: number; right: number; bottom: number; left: number };
 const SAFE_AREA: Record<string, SafeInset> = {
-  // Padrão ideal do feed vertical: faixa central 1012 × 1230 (respiro 34 lados / 60 topo-base).
-  "4:5": { top: 60, right: 34, bottom: 60, left: 34 },
-  // Não especificado — respiro confortável e simétrico.
-  "1:1": { top: 48, right: 48, bottom: 48, left: 48 },
+  // Feed vertical: respiro confortável, acima do mínimo Meta (34/60).
+  "4:5": { top: 72, right: 64, bottom: 72, left: 64 },
+  // Feed quadrado (não especificado) — respiro simétrico.
+  "1:1": { top: 64, right: 64, bottom: 64, left: 64 },
   // Reels/Stories: 200px de topo livres (nome do perfil) + base reservada à legenda/áudio/ações.
-  "9:16": { top: 200, right: 40, bottom: 250, left: 40 },
+  "9:16": { top: 200, right: 64, bottom: 250, left: 64 },
 };
 const getSafeInset = (formatId: string): SafeInset => SAFE_AREA[formatId] ?? SAFE_AREA["4:5"];
+
+// Ajuste automático do tamanho da headline para caber na largura segura sem cruzar
+// as margens — funciona no snapshot do html-to-image (heurística, sem medir o DOM).
+// Fonte black/maiúscula ~0.72em por caractere; deixamos 10% de respiro interno.
+function fitHeadline(text: string, safeWidth: number, maxPx: number, minPx: number): number {
+  const words = (text || "").replace(/\\n/g, " ").split(/\s+/).filter(Boolean);
+  const longest = words.reduce((m, w) => Math.max(m, w.length), 1);
+  const byWidth = (safeWidth * 0.9) / (longest * 0.72);
+  return Math.round(Math.max(minPx, Math.min(maxPx, byWidth)));
+}
 
 // Os pilares editoriais agora vivem em src/lib/editorialPillars.ts (registro
 // compartilhado com o Roteiro /roteiro), importado acima como `PILARS`.
@@ -891,6 +903,7 @@ function SafeFrame({ inset, className = "", children }: { inset: SafeInset; clas
 
 function Template1({ theme, headline, highlight, subheadline, tags, inset }: any) {
   const isDark = theme === 'dark';
+  const headlineSize = fitHeadline(headline, 1080 - inset.left - inset.right, 110, 52);
 
   const formattedHeadline = headline.split('\\n').map((line: string, i: number) => {
     if (highlight && line.includes(highlight)) {
@@ -915,7 +928,7 @@ function Template1({ theme, headline, highlight, subheadline, tags, inset }: any
         </div>
 
         <div className="mt-auto">
-          <h1 className="text-[110px] font-black leading-[0.95] tracking-tight uppercase">
+          <h1 className="font-black tracking-tight uppercase" style={{ fontSize: headlineSize, lineHeight: 0.95 }}>
             {formattedHeadline}
           </h1>
           <p className={`text-[36px] mt-12 max-w-[80%] leading-relaxed font-medium ${isDark ? 'text-white/60' : 'text-black/60'}`}>
@@ -938,6 +951,7 @@ function Template1({ theme, headline, highlight, subheadline, tags, inset }: any
 function Template4({ theme, headline, subheadline, inset }: any) {
   const isDark = theme === 'dark';
   const lines = (subheadline||'').split('\\n').filter((l: string) => l.trim().length > 0);
+  const headlineSize = fitHeadline(headline, 1080 - inset.left - inset.right, 96, 44);
 
   return (
     <div className={`w-full h-full relative overflow-hidden ${isDark ? 'bg-[#09090B] text-white' : 'bg-[#FAF9F6] text-[#121214]'}`}>
@@ -947,7 +961,7 @@ function Template4({ theme, headline, subheadline, inset }: any) {
           <Logo iconSize={64} theme={isDark ? 'default' : 'monochrome-black'} />
           <span className="text-[32px] font-bold opacity-40 uppercase tracking-widest">PASSO A PASSO</span>
         </div>
-        <h1 className="text-[96px] font-black leading-[0.95] mb-24 uppercase">
+        <h1 className="font-black mb-24 uppercase" style={{ fontSize: headlineSize, lineHeight: 0.95 }}>
           {(headline||'').split('\\n').map((l: string, i: number) => <span key={i} className="block">{l}</span>)}
         </h1>
 

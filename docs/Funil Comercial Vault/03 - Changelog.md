@@ -15,10 +15,15 @@ tags:
 
 ### Adicionado — faixa central segura (crop-safe) por formato
 - O canvas ganhou `SAFE_AREA` (por formato) + componente `<SafeFrame>`: **texto, logo e CTA** ficam numa **faixa central**, afastados das bordas; só **decorativos** (pontos, brilho) sangram até a borda. Evita que a UI do Instagram **corte/cubra** elementos críticos.
-  - **4:5 (1080×1350, padrão ideal):** respiro 34px laterais / 60px topo-base → área central **1012×1230**.
-  - **9:16 (1080×1920):** **200px** de topo livres (nome do perfil) + **~250px** de base reservados à legenda/áudio/ações (*valor-base — a instrução do dono para a margem inferior veio cortada; ajustável em `SAFE_AREA`*).
-  - **1:1 (1080×1080):** respiro simétrico de 48px (não especificado).
+  - Margens de conteúdo **excedem o mínimo crop-safe da Meta** (34px laterais / 60px topo-base no 4:5), com o essencial bem dentro da zona segura **1012×1230**.
+  - **4:5:** 64px laterais / 72px topo-base.
+  - **9:16 (1080×1920):** **200px** de topo livres (nome do perfil) + **~250px** de base reservados à legenda/áudio/ações (*valor-base — a instrução do dono para a margem inferior veio cortada; ajustável em `SAFE_AREA`*) · laterais 64px.
+  - **1:1 (1080×1080):** 64px simétrico (não especificado).
 - Os 3 templates (`t1`/`t4`/`t12`) foram reestruturados para posicionar o conteúdo **dentro do `SafeFrame`**. Só front-end (`Creatives.tsx`).
+
+### Corrigido — headline cruzava a margem de segurança na prévia/publicação
+- **Bug:** com o fallback usando o **tema inteiro** como headline (110px fixos), palavras longas (ex.: "OPORTUNIDADES") ocupavam quase a largura total do 1080px e **encostavam/cruzavam** as margens seguras na "Prévia do Post".
+- **Correção:** `fitHeadline` **auto-ajusta o tamanho da headline** (máx 110px no `t1` / 96px no `t4`, mín 52/44px) para caber na largura segura com respiro — funciona no snapshot do `html-to-image`, para qualquer conteúdo. Margens do 4:5 elevadas de 34/60 para **64/72** (mais respiro, ainda acima do mínimo Meta).
 
 ## [2026-07-12] - Estúdio de Criativos: temas prontos no Passo 2 (fim da "página em branco")
 
