@@ -796,14 +796,32 @@ export async function convertContactToLead(ownerId: string, contact: Contact) {
 export async function updateOpportunityStage(
   opportunityId: string,
   novaEtapa: OpportunityStage,
+  motivoPerda?: string | null,
 ) {
   const supabase = requireSupabase();
-  const { data, error } = await supabase
+  // Ao marcar Perdido, grava o motivo; ao sair de Perdido, limpa. Nas demais
+  // transições não mexe no motivo (undefined).
+  const patch: { etapa: OpportunityStage; motivo_perda?: string | null } = { etapa: novaEtapa };
+  if (novaEtapa === "Perdido") patch.motivo_perda = motivoPerda?.trim() || null;
+  else if (motivoPerda === null) patch.motivo_perda = null;
+
+  let { data, error } = await supabase
     .from("opportunities")
-    .update({ etapa: novaEtapa })
+    .update(patch)
     .eq("id", opportunityId)
     .select()
     .single();
+
+  // Degrada com elegância se a coluna motivo_perda ainda não foi criada (migração
+  // pendente): grava só a etapa.
+  if (isMissingColumnError(error)) {
+    ({ data, error } = await supabase
+      .from("opportunities")
+      .update({ etapa: novaEtapa })
+      .eq("id", opportunityId)
+      .select()
+      .single());
+  }
 
   if (error) throw error;
   return data as Opportunity;

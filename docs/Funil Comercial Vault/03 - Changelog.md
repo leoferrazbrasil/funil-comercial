@@ -28,6 +28,13 @@ tags:
 ### Adicionado — botão "Desconectar" no modal de publicação
 - No modal **Publicar Arte** (`/criativos`), a "Conta Conectada" só tinha **Reconectar**; agora tem **Desconectar** — remove a integração do Instagram (`social_integrations`, RLS por dono) e volta ao estado "conectar", permitindo vincular **outra conta**. Estado de loading/`disabled` durante a operação. Só front-end (`PublishModal.tsx`).
 
+## [2026-07-13] - Funil: motivo da perda ao marcar Perdido
+
+### Adicionado — modal de motivo (obrigatório) em Perdido
+- Ao marcar uma oportunidade como **Perdido** — pelo **botão** do painel **ou** ao **arrastar** o card para a coluna Perdido — abre um **modal** que exige escolher o **motivo**: *Não tem interesse · Não respondeu · Bloqueou o contato · Preço/orçamento · Escolheu concorrente · Fora do perfil (ICP) · Outro* (texto livre). Confirmar sem motivo fica bloqueado.
+- O motivo é gravado em `opportunities.motivo_perda` e exibido no painel ("Motivo: …") quando a oportunidade está Perdida. A interceptação do drag fica toda no `Pipeline.tsx` (envolve o `onDragEnd`) — **sem tocar no `App.tsx`**.
+- `updateOpportunityStage` grava o motivo com **degradação elegante** (se a coluna ainda não existe, grava só a etapa). **Ativação:** aplicar a migração `20260713160000_opportunities_motivo_perda.sql`. Arquivos: `types.ts`, `crmService.ts`, `Pipeline.tsx`.
+
 ## [2026-07-13] - Confirmação de auth: feedback no navegador + admin por 2 e-mails
 
 ### Adicionado — tela de feedback para redirects de auth do Supabase

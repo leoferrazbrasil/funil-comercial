@@ -571,6 +571,17 @@ export function PipelineSignalCard({
   );
 }
 
+// Motivos de perda (Brandbook/processo comercial). "Outro" abre um campo livre.
+const LOST_REASONS = [
+  "Não tem interesse",
+  "Não respondeu",
+  "Bloqueou o contato",
+  "Preço / orçamento",
+  "Escolheu concorrente",
+  "Fora do perfil (ICP)",
+  "Outro",
+];
+
 export default function PipelinePage({
   leads,
   opportunities,
@@ -592,22 +603,34 @@ export default function PipelinePage({
   const [outcomeLoading, setOutcomeLoading] = useState<"Ganho" | "Perdido" | null>(null);
   const queryClient = useQueryClient();
 
-  // Marca a oportunidade como Ganho/Perdido (ação rápida do painel). Atualiza a UI
-  // de forma otimista (mesmo padrão do drag) e persiste; em erro, recarrega os dados.
-  const handleSetOutcome = async (opportunity: Opportunity, outcome: "Ganho" | "Perdido") => {
-    if (outcomeLoading) return;
+  // Modal "Motivo da perda": aberto ao marcar Perdido (botão ou drag). Guarda a
+  // oportunidade-alvo, o motivo escolhido e o texto de "Outro".
+  const [lostModalOpp, setLostModalOpp] = useState<Opportunity | null>(null);
+  const [lostReason, setLostReason] = useState<string>("");
+  const [lostOther, setLostOther] = useState("");
+  const [lostSaving, setLostSaving] = useState(false);
+
+  // Persiste etapa (Ganho/Perdido) com update otimista (mesmo padrão do drag) +
+  // motivo quando for Perdido; em erro, recarrega os dados.
+  const persistOutcome = async (
+    opportunity: Opportunity,
+    outcome: "Ganho" | "Perdido",
+    motivo?: string,
+  ) => {
     setOutcomeLoading(outcome);
     queryClient.setQueriesData({ queryKey: ["crmSnapshot"] }, (prev: any) => {
       if (!prev) return prev;
       return {
         ...prev,
         opportunities: prev.opportunities.map((opp: any) =>
-          opp.id === opportunity.id ? { ...opp, etapa: outcome } : opp,
+          opp.id === opportunity.id
+            ? { ...opp, etapa: outcome, ...(outcome === "Perdido" ? { motivo_perda: motivo ?? null } : {}) }
+            : opp,
         ),
       };
     });
     try {
-      await updateOpportunityStage(opportunity.id, outcome);
+      await updateOpportunityStage(opportunity.id, outcome, outcome === "Perdido" ? motivo : undefined);
       toast.success(outcome === "Ganho" ? "Oportunidade marcada como Ganho 🎉" : "Oportunidade marcada como Perdido");
     } catch (error) {
       console.error(error);
@@ -616,6 +639,48 @@ export default function PipelinePage({
     } finally {
       setOutcomeLoading(null);
     }
+  };
+
+  // Ação rápida do painel. Ganho persiste direto; Perdido pede o motivo primeiro.
+  const handleSetOutcome = (opportunity: Opportunity, outcome: "Ganho" | "Perdido") => {
+    if (outcomeLoading) return;
+    if (outcome === "Perdido") {
+      openLostModal(opportunity);
+      return;
+    }
+    persistOutcome(opportunity, "Ganho");
+  };
+
+  const openLostModal = (opportunity: Opportunity) => {
+    setLostReason("");
+    setLostOther("");
+    setLostModalOpp(opportunity);
+  };
+
+  const confirmLost = async () => {
+    if (!lostModalOpp) return;
+    const motivo = lostReason === "Outro" ? lostOther.trim() : lostReason;
+    if (!motivo) return; // obrigatório
+    setLostSaving(true);
+    try {
+      await persistOutcome(lostModalOpp, "Perdido", motivo);
+      setLostModalOpp(null);
+    } finally {
+      setLostSaving(false);
+    }
+  };
+
+  // Intercepta o drag: soltar na coluna "Perdido" abre o modal de motivo (em vez de
+  // persistir direto). As demais transições seguem pelo onDragEnd do App.
+  const handleBoardDragEnd = (event: any) => {
+    if (event?.over?.id === "Perdido" && event?.active?.id) {
+      const opp = opportunities.find((o) => o.id === event.active.id);
+      if (opp) {
+        if (opp.etapa !== "Perdido") openLostModal(opp);
+        return;
+      }
+    }
+    onDragEnd(event);
   };
 
   const handleConfirmDelete = async () => {
@@ -737,8 +802,11 @@ export default function PipelinePage({
                 </button>
               </div>
             ) : (
-              <div className={`p-4 rounded-xl border ${selectedOpp.etapa === 'Ganho' ? 'bg-green-500/10 border-green-500/20 text-green-500' : 'bg-red-500/10 border-red-500/20 text-red-500'} text-center font-bold`}>
+              <div className={`p-4 rounded-xl border text-center font-bold ${selectedOpp.etapa === 'Ganho' ? 'bg-green-500/10 border-green-500/20 text-green-500' : 'bg-red-500/10 border-red-500/20 text-red-500'}`}>
                 Oportunidade finalizada como {selectedOpp.etapa}
+                {selectedOpp.etapa === 'Perdido' && selectedOpp.motivo_perda && (
+                  <span className="block mt-1 text-xs font-medium text-red-400/90">Motivo: {selectedOpp.motivo_perda}</span>
+                )}
               </div>
             )}
             
@@ -882,7 +950,7 @@ export default function PipelinePage({
       </section>
 
       <div className="flex-1 overflow-hidden relative">
-        <DndContext onDragEnd={onDragEnd}>
+        <DndContext onDragEnd={handleBoardDragEnd}>
           {/* Scrollable Container just for the Board */}
           <section className="absolute inset-0 flex gap-4 overflow-x-auto pb-[calc(7rem+env(safe-area-inset-bottom))] md:pb-4 custom-scrollbar" aria-label="Funil de vendas">
             {grouped.map((column) => (
@@ -902,6 +970,69 @@ export default function PipelinePage({
         onConfirm={handleConfirmDelete}
         onCancel={() => setOpportunityToDelete(null)}
       />
+
+      {/* Modal: motivo da perda (obrigatório) ao marcar Perdido */}
+      {lostModalOpp && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4" role="presentation">
+          <div className="bg-card w-full max-w-md rounded-2xl border border-foreground/10 shadow-2xl flex flex-col" role="dialog" aria-modal="true">
+            <div className="p-6 border-b border-foreground/10">
+              <h2 className="text-lg font-bold tracking-tight flex items-center gap-2 text-red-400">
+                <X size={18} /> Marcar como Perdido
+              </h2>
+              <p className="text-sm text-muted-foreground mt-1 truncate">{lostModalOpp.titulo}</p>
+            </div>
+
+            <div className="p-6 flex flex-col gap-2.5 max-h-[50vh] overflow-y-auto custom-scrollbar">
+              <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">Qual o motivo da perda?</span>
+              {LOST_REASONS.map((reason) => {
+                const active = lostReason === reason;
+                return (
+                  <button
+                    key={reason}
+                    type="button"
+                    onClick={() => setLostReason(reason)}
+                    className={`text-left rounded-xl border p-3.5 transition-all flex items-center gap-3 active:scale-[0.99] ${active ? 'border-red-500/60 bg-red-500/10' : 'border-foreground/10 bg-foreground/5 hover:border-foreground/25'}`}
+                  >
+                    <span className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 ${active ? 'bg-red-500 border-red-500 text-white' : 'border-foreground/25 text-transparent'}`}>
+                      <CheckCircle2 size={13} />
+                    </span>
+                    <span className="text-sm text-foreground">{reason}</span>
+                  </button>
+                );
+              })}
+              {lostReason === "Outro" && (
+                <input
+                  autoFocus
+                  value={lostOther}
+                  onChange={(e) => setLostOther(e.target.value)}
+                  placeholder="Descreva o motivo…"
+                  className="mt-1 w-full bg-foreground/10 border border-foreground/10 rounded-xl p-3 text-sm outline-none focus:border-red-500/50 transition-colors text-foreground placeholder:text-muted-foreground/60"
+                />
+              )}
+            </div>
+
+            <div className="p-6 border-t border-foreground/10 flex items-center justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setLostModalOpp(null)}
+                disabled={lostSaving}
+                className="px-5 py-2.5 rounded-xl text-sm font-bold text-muted-foreground hover:bg-foreground/10 transition-colors disabled:opacity-50"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={confirmLost}
+                disabled={lostSaving || !(lostReason === "Outro" ? lostOther.trim() : lostReason)}
+                className="px-6 py-2.5 rounded-xl text-sm font-bold bg-red-500 text-white hover:bg-red-500/90 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                {lostSaving && <RotateCcw size={15} className="animate-spin" />}
+                Confirmar perda
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
