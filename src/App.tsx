@@ -651,6 +651,9 @@ function AppContent() {
       email: getFormValue(formData, "email"),
       origem: getFormValue(formData, "origem"),
       potencial: getFormValue(formData, "potencial"),
+      site: getFormValue(formData, "site"),
+      instagram: getFormValue(formData, "instagram"),
+      linkedin: getFormValue(formData, "linkedin"),
     };
 
     await runMutation(
@@ -1427,6 +1430,24 @@ function ContactModal({
           label="E-mail"
           name="email"
           type="email"
+        />
+        <TextField
+          defaultValue={contact?.site ?? ""}
+          label="Site"
+          name="site"
+          placeholder="https://exemplo.com.br"
+        />
+        <TextField
+          defaultValue={contact?.instagram ?? ""}
+          label="Instagram"
+          name="instagram"
+          placeholder="@usuario"
+        />
+        <TextField
+          defaultValue={contact?.linkedin ?? ""}
+          label="LinkedIn"
+          name="linkedin"
+          placeholder="linkedin.com/in/usuario"
         />
         <SelectField
           defaultValue={contact?.origem}

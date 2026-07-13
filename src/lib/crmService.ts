@@ -34,7 +34,25 @@ type ContactPayload = {
   email?: string;
   origem?: string;
   potencial?: string;
+  site?: string;
+  instagram?: string;
+  linkedin?: string;
 };
+
+// Campos sociais opcionais (site/instagram/linkedin). Gravados só se as colunas
+// existirem — a migração `contacts_social_fields` pode ainda não ter sido
+// aplicada; nesse caso o contato é salvo sem eles (ver isMissingColumnError).
+const contactSocialFields = (payload: ContactPayload) => ({
+  site: payload.site?.trim() || null,
+  instagram: payload.instagram?.trim() || null,
+  linkedin: payload.linkedin?.trim() || null,
+});
+
+const isMissingColumnError = (error: { code?: string; message?: string } | null) =>
+  !!error &&
+  (error.code === "42703" ||
+    error.code === "PGRST204" ||
+    /column .* does not exist|could not find the .* column/i.test(error.message ?? ""));
 
 type LeadPayload = {
   contact_id?: string | null;
@@ -200,18 +218,25 @@ export async function getCrmSnapshot(userId: string): Promise<CrmSnapshot> {
 
 export async function createContact(ownerId: string, payload: ContactPayload) {
   const supabase = requireSupabase();
-  const { data, error } = await supabase
+  const base = {
+    owner_id: ownerId,
+    nome: payload.nome.trim(),
+    telefone: normalizePhone(payload.telefone),
+    email: payload.email?.trim() || null,
+    origem: payload.origem?.trim() || "Manual",
+    potencial: payload.potencial?.trim() || "Novo",
+  };
+
+  let { data, error } = await supabase
     .from("contacts")
-    .insert({
-      owner_id: ownerId,
-      nome: payload.nome.trim(),
-      telefone: normalizePhone(payload.telefone),
-      email: payload.email?.trim() || null,
-      origem: payload.origem?.trim() || "Manual",
-      potencial: payload.potencial?.trim() || "Novo",
-    })
+    .insert({ ...base, ...contactSocialFields(payload) })
     .select()
     .single();
+
+  // Degrada com elegância se a migração dos campos sociais ainda não foi aplicada.
+  if (isMissingColumnError(error)) {
+    ({ data, error } = await supabase.from("contacts").insert(base).select().single());
+  }
 
   if (error) throw error;
   return data as Contact;
@@ -219,18 +244,25 @@ export async function createContact(ownerId: string, payload: ContactPayload) {
 
 export async function updateContact(contactId: string, payload: ContactPayload) {
   const supabase = requireSupabase();
-  const { data, error } = await supabase
+  const base = {
+    nome: payload.nome.trim(),
+    telefone: normalizePhone(payload.telefone),
+    email: payload.email?.trim() || null,
+    origem: payload.origem?.trim() || "Manual",
+    potencial: payload.potencial?.trim() || "Novo",
+  };
+
+  let { data, error } = await supabase
     .from("contacts")
-    .update({
-      nome: payload.nome.trim(),
-      telefone: normalizePhone(payload.telefone),
-      email: payload.email?.trim() || null,
-      origem: payload.origem?.trim() || "Manual",
-      potencial: payload.potencial?.trim() || "Novo",
-    })
+    .update({ ...base, ...contactSocialFields(payload) })
     .eq("id", contactId)
     .select()
     .single();
+
+  // Degrada com elegância se a migração dos campos sociais ainda não foi aplicada.
+  if (isMissingColumnError(error)) {
+    ({ data, error } = await supabase.from("contacts").update(base).eq("id", contactId).select().single());
+  }
 
   if (error) throw error;
   return data as Contact;

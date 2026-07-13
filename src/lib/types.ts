@@ -64,6 +64,9 @@ export type Contact = {
   email: string | null
   origem: string
   potencial: string
+  site: string | null
+  instagram: string | null
+  linkedin: string | null
   created_at: string
 }
 

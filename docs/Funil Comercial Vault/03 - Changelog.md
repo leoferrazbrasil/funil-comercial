@@ -28,6 +28,12 @@ tags:
 ### Adicionado — botão "Desconectar" no modal de publicação
 - No modal **Publicar Arte** (`/criativos`), a "Conta Conectada" só tinha **Reconectar**; agora tem **Desconectar** — remove a integração do Instagram (`social_integrations`, RLS por dono) e volta ao estado "conectar", permitindo vincular **outra conta**. Estado de loading/`disabled` durante a operação. Só front-end (`PublishModal.tsx`).
 
+## [2026-07-13] - Contatos: campos Site, Instagram e LinkedIn
+
+### Adicionado — 3 campos sociais no cadastro/edição de contato
+- O `ContactModal` (Novo **e** Editar contato) ganhou **Site**, **Instagram** e **LinkedIn** (opcionais, abaixo do E-mail); no Editar vêm pré-preenchidos. Persistidos na tabela `contacts` (`site`/`instagram`/`linkedin`, `text` nulos).
+- **Degradação elegante:** `createContact`/`updateContact` gravam os campos sociais só se as colunas existirem — se a **migração ainda não foi aplicada**, o contato é salvo sem eles (nunca quebra). **Ativação:** aplicar a migração `20260713140000_contacts_social_fields.sql` (colar o SQL). Arquivos: `types.ts`, `crmService.ts`, `App.tsx`.
+
 ## [2026-07-13] - Inbox: busca de conversas por nome e número
 
 ### Corrigido — o filtro de busca não encontrava conversas
