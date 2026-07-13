@@ -51,40 +51,34 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // For simplicity, we assume this is the main IG account for this tenant
-    // First, fetch the user's connected IG account ID using the token
-    const meUrl = `https://graph.facebook.com/v19.0/me/accounts?access_token=${accessToken}`
+    // Resolve o ID da conta do Instagram Comercial vinculada a uma das Páginas do
+    // usuário. Pedimos o campo instagram_business_account já na lista de Páginas
+    // (1 request) e varremos TODAS elas — não só a primeira. Se nenhuma tiver IG
+    // vinculado, falhamos aqui com mensagem clara (nunca salvamos 'unknown', que
+    // só quebraria depois, de forma confusa, na hora de publicar).
+    const meUrl = `https://graph.facebook.com/v19.0/me/accounts?fields=name,instagram_business_account{id,username}&access_token=${accessToken}`
     const meRes = await fetch(meUrl)
     const meData = await meRes.json()
-    
+
     if (meData.error) {
        throw new Error(meData.error.message)
     }
 
-    // Usually you have to traverse pages -> instagram_business_account
-    // We are mocking this logic for brevity, you'll need the exact Graph API flow
-    // To find the connected Instagram Account ID.
-    const pageId = meData.data?.[0]?.id; 
-    let instagramId = 'unknown';
-    
     console.log("Meta /me/accounts response:", JSON.stringify(meData));
 
-    if (pageId) {
-       console.log("Found Page ID:", pageId);
-       const igUrl = `https://graph.facebook.com/v19.0/${pageId}?fields=instagram_business_account&access_token=${accessToken}`
-       const igRes = await fetch(igUrl)
-       const igData = await igRes.json()
-       console.log("Meta Page response (looking for IG):", JSON.stringify(igData));
-       
-       if (igData.instagram_business_account) {
-         instagramId = igData.instagram_business_account.id
-         console.log("Successfully found Instagram ID:", instagramId);
-       } else {
-         console.log("Page has no instagram_business_account field!");
-       }
-    } else {
-       console.log("No pages found in meData!");
+    const pages = Array.isArray(meData.data) ? meData.data : [];
+    const pageWithIg = pages.find((p: any) => p?.instagram_business_account?.id);
+
+    if (!pageWithIg) {
+      throw new Error(
+        pages.length === 0
+          ? "Nenhuma Página do Facebook foi concedida ao app. Refaça a conexão e, na tela do Facebook, selecione a Página vinculada ao seu Instagram."
+          : "Nenhuma conta do Instagram Comercial vinculada a uma Página foi encontrada. Verifique se o Instagram é Profissional (Comercial/Criador) e está vinculado a uma Página do Facebook, e conceda essa Página ao conectar."
+      );
     }
+
+    const instagramId = pageWithIg.instagram_business_account.id;
+    console.log("Resolved Instagram Business Account ID:", instagramId);
 
     const expiresAt = new Date(Date.now() + expiresIn * 1000).toISOString()
 

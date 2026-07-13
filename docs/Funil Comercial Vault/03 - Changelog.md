@@ -11,6 +11,12 @@ tags:
 > [!note] Navegação
 > Histórico de mudanças, mais recente primeiro. Contexto do produto em [[01 - Requisitos]]; arquitetura em [[02 - Arquitetura e Design]]; índice em [[00 - Inicio]].
 
+## [2026-07-12] - meta-auth: resolver o Instagram em todas as Páginas (fim do 'unknown')
+
+### Corrigido — conexão salvava account_id 'unknown' e quebrava só ao publicar
+- **Bug:** `meta-auth` olhava só a **primeira Página** (`me/accounts[0]`) e, sem IG vinculado nela, salvava `account_id: 'unknown'` **silenciosamente** → o publish falhava depois com *"Graph API Container Error: Object with ID 'unknown' does not exist"*.
+- **Correção:** pede `instagram_business_account{id,username}` já na lista de Páginas (1 request) e **varre todas**; usa a primeira com IG vinculado. Se **nenhuma** tiver, **falha na conexão** com mensagem clara (nunca salva `'unknown'`). **Requer deploy da `meta-auth`** (ação do dono) + o IG ser **Profissional e vinculado a uma Página**, concedida no login. Ver pendências.
+
 ## [2026-07-12] - Publicar Arte: mostrar o erro real da meta-publish
 
 ### Corrigido — "Edge Function returned a non-2xx status code" escondia a causa
