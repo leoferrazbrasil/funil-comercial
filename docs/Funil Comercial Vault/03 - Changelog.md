@@ -28,6 +28,12 @@ tags:
 ### Adicionado — botão "Desconectar" no modal de publicação
 - No modal **Publicar Arte** (`/criativos`), a "Conta Conectada" só tinha **Reconectar**; agora tem **Desconectar** — remove a integração do Instagram (`social_integrations`, RLS por dono) e volta ao estado "conectar", permitindo vincular **outra conta**. Estado de loading/`disabled` durante a operação. Só front-end (`PublishModal.tsx`).
 
+## [2026-07-13] - Inbox: busca de conversas por nome e número
+
+### Corrigido — o filtro de busca não encontrava conversas
+- **Bug:** a busca do Inbox procurava em campos diferentes dos exibidos: `remetente_nome` (nome de perfil do WhatsApp, não o do contato), `mensagem` e `key` (telefone unificado, sem o 9º dígito). Resultado: buscar pelo **nome do contato** ou pelo **número como aparece** não filtrava nada.
+- **Correção:** passa a buscar em `displayName` (nome do contato), `remetente_nome`, `telefone` (exibido), `mensagem` e `key` + **fallback por dígitos** (casa o número mesmo digitado com `+`, espaços, `()` ou `-`). Só front-end (`Inbox.tsx`).
+
 ## [2026-07-12] - Funil: botões Ganho/Perdido do painel de oportunidade
 
 ### Corrigido — ação rápida Ganho/Perdido não funcionava

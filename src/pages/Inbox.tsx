@@ -769,12 +769,23 @@ export default function InboxPage({
       }
 
       if (localSearch) {
+        // Busca nos campos que o usuário VÊ na lista: nome do contato
+        // (displayName), nome de perfil do WhatsApp, telefone exibido, texto da
+        // última mensagem e a chave (telefone unificado).
         const searchTerms = [
+          conv.displayName,
           conv.latestInbound.remetente_nome,
+          conv.latest.telefone,
           conv.latest.mensagem,
-          conv.key
+          conv.key,
         ];
-        if (!matchesQuery(localSearch, searchTerms)) {
+        // Fallback de telefone: casa só pelos dígitos (ignora +, espaços, ( ) e -),
+        // para achar o número mesmo digitado com formatação.
+        const queryDigits = localSearch.replace(/\D/g, "");
+        const phoneDigits = String(conv.latest.telefone ?? "").replace(/\D/g, "");
+        const phoneMatch = queryDigits.length >= 3 && phoneDigits.includes(queryDigits);
+
+        if (!matchesQuery(localSearch, searchTerms) && !phoneMatch) {
           return false;
         }
       }
