@@ -10,14 +10,15 @@ alter table public.profiles drop constraint if exists profiles_role_check;
 update public.profiles set role = 'admin' where role = 'diretor';
 
 -- 3) Admin da plataforma = o primeiro usuário (operador técnico), definido por
---    e-mail (fonte da verdade: auth.users). Os demais mantêm gestor/vendedor.
+--    e-mail (fonte da verdade: auth.users). Aceita o e-mail antigo e o novo (troca
+--    em andamento). Os demais mantêm gestor/vendedor.
 --    Obs.: roda como postgres no SQL Editor (auth.uid() nulo), então o trigger
 --    profiles_protect_role NÃO bloqueia este update.
 update public.profiles p
   set role = 'admin'
   from auth.users u
   where u.id = p.id
-    and lower(u.email) = 'leonardoferrazbrasil@gmail.com';
+    and lower(u.email) in ('leonardoferrazbrasil@gmail.com', 'leonardo@funilcomercial.com');
 
 -- 4) Novo CHECK do role.
 alter table public.profiles

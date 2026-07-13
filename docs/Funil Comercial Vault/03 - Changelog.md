@@ -28,6 +28,12 @@ tags:
 ### Adicionado — botão "Desconectar" no modal de publicação
 - No modal **Publicar Arte** (`/criativos`), a "Conta Conectada" só tinha **Reconectar**; agora tem **Desconectar** — remove a integração do Instagram (`social_integrations`, RLS por dono) e volta ao estado "conectar", permitindo vincular **outra conta**. Estado de loading/`disabled` durante a operação. Só front-end (`PublishModal.tsx`).
 
+## [2026-07-13] - Confirmação de auth: feedback no navegador + admin por 2 e-mails
+
+### Adicionado — tela de feedback para redirects de auth do Supabase
+- Ao confirmar troca de e-mail, o Supabase redireciona para `/#message=...` (ou `#error=...`), mas a home não tem `Toaster` — o usuário ficava sem retorno. Agora o `App.tsx` lê esse hash **antes do gate público** e mostra uma **tela de confirmação** (com tradução pt-BR das mensagens conhecidas, ex.: "confirme também o link enviado ao outro e-mail") + botão "Continuar" que limpa o hash. Não é bug de código: a **troca segura de e-mail** do Supabase exige confirmar **os dois** endereços (novo e antigo).
+- **Migração de papéis** ajustada: a promoção a `admin` agora casa **ambos os e-mails** do Leonardo (`leonardoferrazbrasil@gmail.com` e `leonardo@funilcomercial.com`), para sobreviver à troca de e-mail em andamento.
+
 ## [2026-07-13] - Reset de senha funcional (ponta a ponta)
 
 ### Adicionado — "Esqueci minha senha" + página de redefinição

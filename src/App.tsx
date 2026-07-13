@@ -204,6 +204,32 @@ const getErrorMessage = (error: unknown) => {
 const getFormValue = (formData: FormData, key: string) =>
   String(formData.get(key) ?? "").trim();
 
+// Traduz as mensagens (em inglês) que o Supabase devolve no hash da URL ao
+// redirecionar de confirmações de auth (troca de e-mail, etc.).
+const translateAuthMessage = (text: string) => {
+  if (/proceed to confirm link sent to the other email/i.test(text))
+    return "Confirmação aceita! Para concluir a troca, confirme também o link enviado ao OUTRO e-mail (o antigo).";
+  if (/Confirmation link accepted/i.test(text))
+    return "Confirmação recebida com sucesso.";
+  if (/Email (address )?(changed|updated)/i.test(text))
+    return "E-mail alterado com sucesso.";
+  return text;
+};
+
+// Lê message/error do hash do Supabase (#message=... ou #error=...). Retorna null
+// quando não há nada a exibir.
+const readAuthRedirectMessage = (): { text: string; isError: boolean } | null => {
+  if (typeof window === "undefined") return null;
+  const hash = window.location.hash;
+  if (!hash || !/[#&](message|error|error_description)=/.test(hash)) return null;
+  const params = new URLSearchParams(hash.replace(/^#/, ""));
+  const error = params.get("error_description") || params.get("error");
+  if (error) return { text: error, isError: true };
+  const message = params.get("message");
+  if (message) return { text: translateAuthMessage(message), isError: false };
+  return null;
+};
+
 const buildInboxRecommendation = (message: InboxMessage) => {
   const text = normalizeSearch(
     [message.mensagem, message.status, message.canal].join(" "),
@@ -416,6 +442,7 @@ function AppContent() {
   const [editing, setEditing] = useState<EditingTarget | null>(null);
   const [isBooting, setIsBooting] = useState(true);
   const queryClient = useQueryClient();
+  const [authMessage, setAuthMessage] = useState(readAuthRedirectMessage);
 
   const [theme, setTheme] = useState<"light" | "dark">(() => {
     const saved = localStorage.getItem("theme");
@@ -1008,6 +1035,38 @@ function AppContent() {
       reloadData();
     }
   };
+
+  // Feedback de redirects de auth do Supabase (ex.: confirmação de troca de e-mail)
+  // que caem numa rota com #message=.../#error=... — renderiza ANTES do gate público
+  // (a home não tem Toaster), para o usuário sempre ter retorno no navegador.
+  if (authMessage) {
+    return (
+      <div className="flex min-h-[100dvh] items-center justify-center bg-background text-foreground p-6">
+        <div className="bg-card border border-border rounded-3xl p-8 max-w-md w-full text-center shadow-xl flex flex-col items-center gap-4">
+          <Logo iconSize={40} />
+          {authMessage.isError ? (
+            <X className="text-destructive" size={44} />
+          ) : (
+            <CheckCircle2 className="text-green-500" size={44} />
+          )}
+          <h2 className="text-xl font-bold tracking-tight">
+            {authMessage.isError ? "Não foi possível concluir" : "Confirmação recebida"}
+          </h2>
+          <p className="text-sm text-muted-foreground">{authMessage.text}</p>
+          <button
+            onClick={() => {
+              setAuthMessage(null);
+              window.history.replaceState(null, "", window.location.pathname);
+              navigate("/");
+            }}
+            className="mt-2 h-12 px-6 bg-primary text-primary-foreground font-semibold rounded-xl hover:bg-primary/90 transition-all active:scale-[0.98]"
+          >
+            Continuar
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // Rotas públicas (home da marca, /crm, legais, previews) NÃO dependem de sessão
   // e por isso renderizam antes do boot de autenticação — assim o visitante que
