@@ -6,9 +6,11 @@ import { SOCIAL_PIECES, getPieceById, type SocialPiece } from "../lib/socialPiec
 
 // Cores fixas da ARTE (exportada) — não são theme-aware (a peça precisa ser idêntica
 // em qualquer tema). A UI ao redor é theme-aware.
-const ART_BG = "#0d1526";
+// Paleta OFICIAL do brandbook (/brandbook → Paleta de Cores): fundo neutro + mostarda,
+// SEM azul. Fundo Escuro #09090B; Mostarda Principal #F59E0B (único dourado da marca).
+const ART_BG = "#09090B";
 const GOLD = "#F59E0B";
-const AMBER = "#EAB308";
+const AMBER = "#F59E0B";
 
 // ---------------------------------------------------------------------------
 // Arte da marca (renderizada em px reais dentro do canvasRef → vira o PNG)
