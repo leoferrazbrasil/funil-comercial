@@ -478,16 +478,36 @@ export default function CreativesPage() {
               )}
 
               <div>
-                <h2 className="text-xl font-bold mb-1">Passo 2: Sobre o que é o post?</h2>
-                <p className="text-sm text-muted-foreground mb-4">Um resumo em uma ou duas frases. É o ponto de partida do criativo — você monta e ajusta tudo no editor a seguir.</p>
-                <div className="bg-card border border-foreground/10 rounded-2xl p-2 shadow-xl relative overflow-hidden group">
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity pointer-events-none"></div>
+                <h2 className="text-xl font-bold mb-1">Passo 2: Escolha o tema do post</h2>
+                <p className="text-sm text-muted-foreground mb-4">Temas prontos deste pilar (Brandbook 04 · Linha Editorial). Clique em um — sem precisar pensar do zero. Você ajusta tudo no editor a seguir.</p>
+
+                {/* Temas prontos do pilar — "o conteúdo a postar", eliminando a página em branco */}
+                <div className="flex flex-col gap-2.5">
+                  {selectedPilar?.temas.map((t) => {
+                    const active = idea.trim() === t;
+                    return (
+                      <button
+                        key={t}
+                        onClick={() => setIdea(t)}
+                        className={`text-left rounded-xl border p-4 transition-all flex items-start gap-3 active:scale-[0.99] ${active ? 'border-primary bg-primary/10' : 'border-foreground/10 bg-card hover:border-primary/40'}`}
+                      >
+                        <span className={`mt-0.5 w-5 h-5 rounded-full border flex items-center justify-center shrink-0 ${active ? 'bg-primary border-primary text-black' : 'border-foreground/25 text-transparent'}`}>
+                          <Check size={13} />
+                        </span>
+                        <span className="text-sm text-foreground leading-snug">{t}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Ajustar/escrever o próprio (opcional) */}
+                <div className="mt-4">
+                  <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Ajuste o tema escolhido ou escreva o seu <span className="font-normal normal-case">(opcional)</span></label>
                   <textarea
                     value={idea}
                     onChange={e => setIdea(e.target.value)}
-                    placeholder="Ex: 3 sinais de que o WhatsApp do negócio está perdendo venda por falta de organização..."
-                    className="w-full bg-transparent border-none outline-none p-4 text-lg min-h-[140px] resize-none placeholder:text-muted-foreground/50 relative z-10"
-                    autoFocus
+                    placeholder="Clique num tema acima — ou escreva aqui do seu jeito..."
+                    className="mt-1.5 w-full bg-foreground/10 border border-foreground/10 rounded-xl p-3 text-sm min-h-[80px] resize-y outline-none focus:border-primary/50 transition-colors text-foreground/90 placeholder:text-muted-foreground/50"
                   />
                 </div>
               </div>
