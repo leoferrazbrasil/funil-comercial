@@ -41,7 +41,7 @@ tags:
 - **Conceito:** permissão por **área**, não por papel solto. `AREA_ROUTES` em `accessControl.ts`: **comercial** = dashboard/inbox/contatos/leads/funil; **marketing** = campanhas/criativos/roteiro/agregadores. `roleAreas`: **admin** = comercial+marketing; **gestor**/**vendedor** = só comercial. Adicionar um futuro perfil (ex.: `social_media` → só marketing) é trivial.
 - **Papel `diretor` eliminado → `admin`** (o operador técnico da plataforma; "diretor de vendas" não faz sentido numa estrutura de tech). Time comercial = gestor + vendedor.
 - **Enforcement em 2 camadas:** o menu já escondia (via `visibleNavItems`); agora `guardRoute` no `App.tsx` **bloqueia o acesso direto por URL** (ex.: vendedor em `/criativos` → redireciona `/dashboard`). A lógica de "dono do time" (Inbox/Settings: `role !== 'vendedor' && sem admin_id`) segue dando ao gestor os poderes gerenciais.
-- **Ativação:** aplicar a migração `20260713150000_roles_admin_restructure.sql` — troca o `check` do `role` para `('admin','gestor','vendedor')`, renomeia `diretor`→`admin`, **promove o(s) dono(s) da conta (sem `admin_id`) a `admin`**, e restringe as policies de `social_integrations` (publicar IG) a `admin`. Arquivos: `types.ts`, `accessControl.ts`, `App.tsx`.
+- **Ativação:** aplicar a migração `20260713150000_roles_admin_restructure.sql` — troca o `check` do `role` para `('admin','gestor','vendedor')`, renomeia `diretor`→`admin`, **promove a conta `leonardoferrazbrasil@gmail.com` (1º usuário) a `admin`** por e-mail (os demais mantêm gestor/vendedor), e restringe as policies de `social_integrations` (publicar IG) a `admin`. Arquivos: `types.ts`, `accessControl.ts`, `App.tsx`.
 
 ## [2026-07-13] - Contatos: campos Site, Instagram e LinkedIn
 
