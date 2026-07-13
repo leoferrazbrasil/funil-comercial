@@ -992,14 +992,20 @@ export function TextField({
       ? undefined
       : String(defaultValue);
 
-  // Remove o DDI 55 de números salvos em formato internacional (12–13 dígitos),
-  // para a máscara local (00) 00000-0000 mostrar o DDD real (e não ler o 55 como
-  // DDD, o que ainda truncaria o número ao salvar). O 55 é re-adicionado na hora
-  // de discar/enviar WhatsApp (normalizeContactPhone).
+  // Remove o DDI 55 de números salvos em formato internacional, para a máscara
+  // local (00) 00000-0000 mostrar o DDD real (e não ler o 55 como DDD, o que ainda
+  // truncaria o número ao salvar). O 55 é re-adicionado ao discar/enviar WhatsApp
+  // (normalizeContactPhone).
   const phoneDefault = (() => {
     if (!isPhone || !defaultText) return defaultText;
     const d = defaultText.replace(/\D/g, "");
-    return (d.length === 12 || d.length === 13) && d.startsWith("55") ? d.slice(2) : defaultText;
+    if (!d.startsWith("55")) return defaultText;
+    // 12 díg (55+DDD+8) ou 13 díg (55+DDD+9): claramente com DDI → tira o 55.
+    if (d.length === 12 || d.length === 13) return d.slice(2);
+    // 11 díg começando com 55 que NÃO é celular local válido (celular de 11 díg tem
+    // o 9º dígito na 3ª posição): o 55 é DDI, não DDD → tira. Preserva DDD 55 real.
+    if (d.length === 11 && d[2] !== "9") return d.slice(2);
+    return defaultText;
   })();
 
   return (
