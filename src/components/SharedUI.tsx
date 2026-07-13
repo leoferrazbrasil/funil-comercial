@@ -992,11 +992,21 @@ export function TextField({
       ? undefined
       : String(defaultValue);
 
+  // Remove o DDI 55 de números salvos em formato internacional (12–13 dígitos),
+  // para a máscara local (00) 00000-0000 mostrar o DDD real (e não ler o 55 como
+  // DDD, o que ainda truncaria o número ao salvar). O 55 é re-adicionado na hora
+  // de discar/enviar WhatsApp (normalizeContactPhone).
+  const phoneDefault = (() => {
+    if (!isPhone || !defaultText) return defaultText;
+    const d = defaultText.replace(/\D/g, "");
+    return (d.length === 12 || d.length === 13) && d.startsWith("55") ? d.slice(2) : defaultText;
+  })();
+
   return (
     <label>
       {label}
       {isPhone ? (
-        <IMaskInput className="flex min-h-10 w-full rounded-md border border-foreground/10 bg-foreground/5 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" defaultValue={defaultText}
+        <IMaskInput className="flex min-h-10 w-full rounded-md border border-foreground/10 bg-foreground/5 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" defaultValue={phoneDefault}
           name={name}
           mask="(00) 00000-0000"
           placeholder={placeholder || "(11) 99999-9999"}

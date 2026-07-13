@@ -28,6 +28,12 @@ tags:
 ### Adicionado — botão "Desconectar" no modal de publicação
 - No modal **Publicar Arte** (`/criativos`), a "Conta Conectada" só tinha **Reconectar**; agora tem **Desconectar** — remove a integração do Instagram (`social_integrations`, RLS por dono) e volta ao estado "conectar", permitindo vincular **outra conta**. Estado de loading/`disabled` durante a operação. Só front-end (`PublishModal.tsx`).
 
+## [2026-07-13] - Contatos: telefone sem o DDI 55 no form (DDD correto)
+
+### Corrigido — máscara lia o 55 (país) como DDD e truncava o número
+- **Bug:** a máscara `(00) 00000-0000` (11 dígitos) estourava com números salvos com o DDI `55` (13 díg.), lendo o 55 como DDD (ex.: `555181491193` → `(55) 51814-9119`) e **truncando** o resto ao salvar. **Correção:** o `TextField` remove o `55` de números internacionais (12–13 díg.) antes de alimentar a máscara — mostra o **DDD real** e não corrompe ao salvar. O 55 é re-adicionado ao discar/enviar WhatsApp (`normalizeContactPhone`). Vale para contatos e leads.
+- **Placeholder:** os campos de **telefone** (contato/lead/criação via Inbox) deixaram de sugerir `5511999999999`; agora usam o padrão local `(11) 99999-9999`. O campo **"Número de entrada"** do canal WhatsApp mantém o formato internacional (é o número oficial do canal). Arquivos: `SharedUI.tsx`, `App.tsx`.
+
 ## [2026-07-13] - Funil: motivo da perda ao marcar Perdido
 
 ### Adicionado — modal de motivo (obrigatório) em Perdido

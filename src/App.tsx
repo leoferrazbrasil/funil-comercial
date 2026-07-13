@@ -1491,7 +1491,6 @@ function ContactModal({
           defaultValue={contact?.telefone}
           label="Telefone"
           name="telefone"
-          placeholder="5511999999999"
           required
         />
         <TextField
@@ -1577,7 +1576,6 @@ function LeadModal({
           defaultValue={lead?.telefone}
           label="Telefone"
           name="telefone"
-          placeholder="5511999999999"
           required
         />
         <TextField
@@ -1739,7 +1737,6 @@ function MessageModal({
         <TextField
           label="Telefone"
           name="telefone"
-          placeholder="5511999999999"
           required
         />
         <TextField label="Status" name="status" placeholder="Novo lead" />
