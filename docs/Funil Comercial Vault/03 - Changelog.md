@@ -28,6 +28,13 @@ tags:
 ### Adicionado — botão "Desconectar" no modal de publicação
 - No modal **Publicar Arte** (`/criativos`), a "Conta Conectada" só tinha **Reconectar**; agora tem **Desconectar** — remove a integração do Instagram (`social_integrations`, RLS por dono) e volta ao estado "conectar", permitindo vincular **outra conta**. Estado de loading/`disabled` durante a operação. Só front-end (`PublishModal.tsx`).
 
+## [2026-07-13] - Publicar no IG: migração para login DIRETO pelo Instagram
+
+### Mudado — abandona o login via Facebook (Página/Business) → Instagram Login
+- Diagnóstico final: as Páginas/IG são geridas por Business Manager → `me/accounts=0` no token do usuário, e `business_management` dá "Invalid Scopes" (não habilitado no app). Decisão: migrar para a **"Instagram API com login pelo Instagram"** (Business Login) — sem Página do Facebook, sem `me/accounts`, sem Business Manager.
+- **Fluxo novo:** `PublishModal` abre `instagram.com/oauth/authorize` (Instagram App ID + escopos `instagram_business_basic,instagram_business_content_publish`) → callback **`/oauth/instagram`** (`InstagramOAuthCallback`) → Edge Function **`instagram-auth`** troca o code por token (já recebe o `user_id` do IG) → long-lived → `social_integrations`. `meta-publish` passou a usar **`graph.instagram.com/v21.0`**.
+- **Ativação (dono):** no painel Meta, adicionar o produto **Instagram → API com login pelo Instagram**, pegar **Instagram App ID + Secret**, configurar o redirect `https://funilcomercial.com/oauth/instagram`; secrets Supabase `INSTAGRAM_APP_ID`/`INSTAGRAM_APP_SECRET`; env do front `VITE_INSTAGRAM_APP_ID`; deploy `instagram-auth` + `meta-publish`. IG precisa ser Profissional (Comercial/Criador). Arquivos: `instagram-auth/index.ts`, `InstagramOAuthCallback.tsx`, `PublishModal.tsx`, `meta-publish/index.ts`, `App.tsx`.
+
 ## [2026-07-13] - meta-auth: resolver IG via Business Manager (fim do "nenhuma Página")
 
 ### Corrigido — assets geridos por Business não apareciam em me/accounts

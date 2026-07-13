@@ -88,23 +88,25 @@ export default function PublishModal({ isOpen, onClose, imageUrl, defaultCaption
   };
 
   const handleLogin = () => {
-    const appId = import.meta.env.VITE_META_APP_ID;
+    // Login DIRETO pelo Instagram (Instagram API with Instagram Login): sem Página
+    // do Facebook, sem me/accounts, sem Business Manager. Usa o Instagram App ID.
+    const appId = import.meta.env.VITE_INSTAGRAM_APP_ID;
     if (!appId) {
-      setErrorMessage("O ID do Aplicativo Meta (VITE_META_APP_ID) não está configurado. Verifique as configurações de ambiente (.env).");
+      setErrorMessage("O ID do App do Instagram (VITE_INSTAGRAM_APP_ID) não está configurado no ambiente.");
       setStatus("error");
       return;
     }
-    
-    const redirectUri = encodeURIComponent(`${window.location.origin}/oauth/meta`);
-    const scopes = 'instagram_basic,instagram_content_publish,pages_show_list,pages_read_engagement';
-    const oauthUrl = `https://www.facebook.com/v19.0/dialog/oauth?client_id=${appId}&display=popup&response_type=code&redirect_uri=${redirectUri}&scope=${scopes}`;
-    
+
+    const redirectUri = encodeURIComponent(`${window.location.origin}/oauth/instagram`);
+    const scopes = 'instagram_business_basic,instagram_business_content_publish';
+    const oauthUrl = `https://www.instagram.com/oauth/authorize?client_id=${appId}&redirect_uri=${redirectUri}&response_type=code&scope=${scopes}`;
+
     const width = 600;
     const height = 700;
     const left = window.innerWidth / 2 - width / 2;
     const top = window.innerHeight / 2 - height / 2;
-    
-    window.open(oauthUrl, 'MetaAuth', `width=${width},height=${height},top=${top},left=${left}`);
+
+    window.open(oauthUrl, 'InstagramAuth', `width=${width},height=${height},top=${top},left=${left}`);
   };
 
   const handlePublish = async () => {

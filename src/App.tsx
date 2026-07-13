@@ -110,6 +110,7 @@ import LeadsPage from "./pages/Leads";
 import CreativesPage from "./pages/Creatives";
 import CampaignsPage from "./pages/Campaigns";
 import MetaOAuthCallback from "./pages/MetaOAuthCallback";
+import InstagramOAuthCallback from "./pages/InstagramOAuthCallback";
 import WhatsappPage from "./pages/Whatsapp";
 import LinkAggregatorPage from "./pages/LinkAggregator";
 import ResetPasswordPage from "./pages/ResetPassword";
@@ -1239,6 +1240,7 @@ function AppContent() {
             />
             <Route path="/whatsapp" element={<WhatsappPage />} />
             <Route path="/oauth/meta" element={<MetaOAuthCallback />} />
+            <Route path="/oauth/instagram" element={<InstagramOAuthCallback />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
         </section>
