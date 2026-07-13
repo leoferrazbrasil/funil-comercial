@@ -11,6 +11,12 @@ tags:
 > [!note] Navegação
 > Histórico de mudanças, mais recente primeiro. Contexto do produto em [[01 - Requisitos]]; arquitetura em [[02 - Arquitetura e Design]]; índice em [[00 - Inicio]].
 
+## [2026-07-12] - Publicar Arte: mostrar o erro real da meta-publish
+
+### Corrigido — "Edge Function returned a non-2xx status code" escondia a causa
+- A `meta-publish` devolve **400 com o motivo real no corpo** (`{ error }`), mas o `supabase-js` só expõe a mensagem genérica *"non-2xx status code"* e o frontend descartava o corpo. Agora `handlePublish` lê `error.context` (o `Response`) e **exibe a mensagem de verdade** (ex.: "Failed to upload image to temporary storage.", "Graph API Container Error: …"). Só front-end (`PublishModal.tsx`), sem deploy.
+- **Provável causa da falha de publicação:** o bucket de Storage **`social_media_temp`** (migração `20260706195257_create_storage_bucket.sql`, público) pode **não ter sido aplicado** — a `meta-publish` sobe a arte nele e envia a **URL pública** ao IG (que não aceita base64). Ver pendências do dono.
+
 ## [2026-07-12] - Publicar Arte: desconectar a conta do Instagram
 
 ### Adicionado — botão "Desconectar" no modal de publicação

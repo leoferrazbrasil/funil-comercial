@@ -123,7 +123,20 @@ export default function PublishModal({ isOpen, onClose, imageUrl, defaultCaption
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        // A meta-publish devolve 400 com o motivo real no corpo ({ error }). O
+        // supabase-js entrega esse corpo em error.context (Response) e, por padrão,
+        // só expõe "non-2xx status code". Extraímos a mensagem de verdade.
+        let detail = "";
+        const ctx = (error as any).context;
+        if (ctx && typeof ctx.json === "function") {
+          try {
+            const body = await ctx.json();
+            detail = body?.error || "";
+          } catch { /* corpo não-JSON: mantém a mensagem padrão */ }
+        }
+        throw new Error(detail || error.message);
+      }
       if (data && data.error) throw new Error(data.error);
 
       setStatus("success");
