@@ -521,6 +521,12 @@ function AppContent() {
     allowedRoutes.includes(item.id),
   );
 
+  // Guarda de rota: além de esconder no menu, bloqueia o acesso direto por URL.
+  // Se o papel não tem a rota liberada (ex.: vendedor em /criativos), redireciona
+  // para o /dashboard. Fonte única de verdade: getAllowedRoutes (accessControl).
+  const guardRoute = (id: Exclude<AppRoute, "login">, element: ReactNode) =>
+    allowedRoutes.includes(id) ? element : <Navigate to="/dashboard" replace />;
+
   useEffect(() => {
     if (fetchError) {
       setCrmError(getErrorMessage(fetchError));
@@ -1156,17 +1162,18 @@ function AppContent() {
                 />
               }
             />
-            <Route path="/criativos" element={<CreativesPage />} />
-            <Route path="/roteiro" element={<EditorialPlannerPage />} />
-            <Route path="/agregadores" element={<AggregatorsAdminPage />} />
+            <Route path="/criativos" element={guardRoute("criativos", <CreativesPage />)} />
+            <Route path="/roteiro" element={guardRoute("roteiro", <EditorialPlannerPage />)} />
+            <Route path="/agregadores" element={guardRoute("agregadores", <AggregatorsAdminPage />)} />
             <Route
               path="/campanhas"
-              element={
+              element={guardRoute(
+                "campanhas",
                 <CampaignsPage
                   contacts={snapshot.contacts}
                   channels={snapshot.channels}
-                />
-              }
+                />,
+              )}
             />
             <Route path="/whatsapp" element={<WhatsappPage />} />
             <Route path="/oauth/meta" element={<MetaOAuthCallback />} />

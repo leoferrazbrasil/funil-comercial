@@ -50,7 +50,7 @@ export type Profile = {
   nome: string | null
   email: string | null
   telefone: string | null
-  role: 'diretor' | 'gestor' | 'vendedor'
+  role: 'admin' | 'gestor' | 'vendedor'
   avatar_url?: string | null
   admin_id?: string | null
   created_at: string
@@ -172,7 +172,7 @@ export type TeamMember = {
   id: string
   nome: string | null
   email: string | null
-  role: 'diretor' | 'gestor' | 'vendedor'
+  role: 'admin' | 'gestor' | 'vendedor'
   admin_id: string | null
   avatar_url?: string | null
 }
