@@ -28,6 +28,12 @@ tags:
 ### Adicionado — botão "Desconectar" no modal de publicação
 - No modal **Publicar Arte** (`/criativos`), a "Conta Conectada" só tinha **Reconectar**; agora tem **Desconectar** — remove a integração do Instagram (`social_integrations`, RLS por dono) e volta ao estado "conectar", permitindo vincular **outra conta**. Estado de loading/`disabled` durante a operação. Só front-end (`PublishModal.tsx`).
 
+## [2026-07-13] - meta-auth: resolver IG via Business Manager (fim do "nenhuma Página")
+
+### Corrigido — assets geridos por Business não apareciam em me/accounts
+- **Bug:** com Páginas/IG sob um **Business Manager** ("Funil Comercial Social Media"), o `me/accounts` no token do usuário vinha **vazio** → conexão falhava com "Nenhuma Página concedida", mesmo o usuário selecionando Página + IG.
+- **Correção:** `meta-auth` resolve o IG em **camadas**: (1) `me/accounts` (campo simples, sem expansão aninhada instável); (2) fallback por página (node direto com o **token da página**); (3) **fallback via Business Manager** (`me/businesses` → `owned_pages` + `client_pages`). Erro final agora traz **diagnóstico** (contagem por etapa). O escopo do login ganhou **`business_management`** (para o `me/businesses`). **Requer deploy da `meta-auth`** + **reconectar** (nova permissão no consentimento). Arquivos: `meta-auth/index.ts`, `PublishModal.tsx`.
+
 ## [2026-07-13] - Contatos: telefone sem o DDI 55 no form (DDD correto)
 
 ### Corrigido — máscara lia o 55 (país) como DDD e truncava o número

@@ -96,7 +96,7 @@ export default function PublishModal({ isOpen, onClose, imageUrl, defaultCaption
     }
     
     const redirectUri = encodeURIComponent(`${window.location.origin}/oauth/meta`);
-    const scopes = 'instagram_basic,instagram_content_publish,pages_show_list,pages_read_engagement';
+    const scopes = 'instagram_basic,instagram_content_publish,pages_show_list,pages_read_engagement,business_management';
     const oauthUrl = `https://www.facebook.com/v19.0/dialog/oauth?client_id=${appId}&display=popup&response_type=code&redirect_uri=${redirectUri}&scope=${scopes}`;
     
     const width = 600;

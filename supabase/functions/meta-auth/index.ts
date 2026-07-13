@@ -51,33 +51,68 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // Resolve o ID da conta do Instagram Comercial vinculada a uma das Páginas do
-    // usuário. Pedimos o campo instagram_business_account já na lista de Páginas
-    // (1 request) e varremos TODAS elas — não só a primeira. Se nenhuma tiver IG
-    // vinculado, falhamos aqui com mensagem clara (nunca salvamos 'unknown', que
-    // só quebraria depois, de forma confusa, na hora de publicar).
-    const meUrl = `https://graph.facebook.com/v19.0/me/accounts?fields=name,instagram_business_account{id,username}&access_token=${accessToken}`
-    const meRes = await fetch(meUrl)
-    const meData = await meRes.json()
+    // --- Resolve o Instagram Business Account (robusto) --------------------------
+    // Assets geridos por Business Manager costumam NÃO aparecer em me/accounts no
+    // token do usuário. Estratégia em camadas:
+    //  (1) me/accounts (campo simples — expansão aninhada na edge é instável);
+    //  (2) fallback por página (node direto com o token da própria página);
+    //  (3) fallback via Business Manager (owned_pages + client_pages).
+    const graph = async (path: string, token: string, fields?: string) => {
+      const params = new URLSearchParams();
+      if (fields) params.set("fields", fields);
+      params.set("limit", "100");
+      params.set("access_token", token);
+      const res = await fetch(`https://graph.facebook.com/v19.0/${path}?${params.toString()}`);
+      return await res.json();
+    };
 
-    if (meData.error) {
-       throw new Error(meData.error.message)
+    // Acha o IG dentro de uma lista de páginas: 1º pela expansão, senão consultando
+    // cada página diretamente (com o token da página, mais confiável).
+    const igFromPages = async (pages: any[]): Promise<string | null> => {
+      for (const p of pages) {
+        if (p?.instagram_business_account?.id) return p.instagram_business_account.id;
+      }
+      for (const p of pages) {
+        if (!p?.id) continue;
+        const d = await graph(String(p.id), p.access_token || accessToken, "instagram_business_account");
+        if (d?.instagram_business_account?.id) return d.instagram_business_account.id;
+      }
+      return null;
+    };
+
+    let instagramId: string | null = null;
+    const diag: string[] = [];
+
+    // (1) + (2): páginas do próprio usuário
+    const acc = await graph("me/accounts", accessToken, "id,name,access_token,instagram_business_account");
+    const userPages = Array.isArray(acc?.data) ? acc.data : [];
+    diag.push(`me/accounts=${userPages.length}`);
+    instagramId = await igFromPages(userPages);
+
+    // (3): páginas via Business Manager (owned + client) — requer business_management.
+    if (!instagramId) {
+      const biz = await graph("me/businesses", accessToken, "id,name");
+      const businesses = Array.isArray(biz?.data) ? biz.data : [];
+      diag.push(`businesses=${businesses.length}`);
+      for (const b of businesses) {
+        for (const edge of ["owned_pages", "client_pages"]) {
+          const bp = await graph(`${b.id}/${edge}`, accessToken, "id,name,access_token,instagram_business_account");
+          const bpages = Array.isArray(bp?.data) ? bp.data : [];
+          diag.push(`${b.id}:${edge}=${bpages.length}`);
+          instagramId = await igFromPages(bpages);
+          if (instagramId) break;
+        }
+        if (instagramId) break;
+      }
     }
 
-    console.log("Meta /me/accounts response:", JSON.stringify(meData));
+    console.log("meta-auth IG resolution:", diag.join(" "), "->", instagramId);
 
-    const pages = Array.isArray(meData.data) ? meData.data : [];
-    const pageWithIg = pages.find((p: any) => p?.instagram_business_account?.id);
-
-    if (!pageWithIg) {
+    if (!instagramId) {
       throw new Error(
-        pages.length === 0
-          ? "Nenhuma Página do Facebook foi concedida ao app. Refaça a conexão e, na tela do Facebook, selecione a Página vinculada ao seu Instagram."
-          : "Nenhuma conta do Instagram Comercial vinculada a uma Página foi encontrada. Verifique se o Instagram é Profissional (Comercial/Criador) e está vinculado a uma Página do Facebook, e conceda essa Página ao conectar."
+        `Não encontrei um Instagram Comercial vinculado às Páginas concedidas (${diag.join(", ")}). Confira: 1) o Instagram é Profissional (Comercial/Criador); 2) está vinculado à Página no Gerenciador; 3) você concedeu ESSA Página no login (com a permissão business_management).`
       );
     }
-
-    const instagramId = pageWithIg.instagram_business_account.id;
     console.log("Resolved Instagram Business Account ID:", instagramId);
 
     const expiresAt = new Date(Date.now() + expiresIn * 1000).toISOString()
