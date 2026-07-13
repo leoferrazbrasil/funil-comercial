@@ -405,10 +405,10 @@ export default function LoginScreen({
         <div className="max-w-lg mx-auto relative z-10">
           <Logo iconSize={48} className="mb-10" />
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-6 leading-tight">
-            Gestão inteligente para sua operação imobiliária.
+            A estrutura de vendas do seu negócio local, em um só lugar.
           </h1>
           <p className="text-lg text-muted-foreground mb-12 max-w-md">
-            Conecte tráfego, CRM e automações em um só lugar e nunca mais perca um lead por falta de acompanhamento.
+            Presença, aquisição, conversão e escala funcionando juntas — do Google ao WhatsApp, sem perder lead por falta de acompanhamento.
           </p>
           
           <div className="grid gap-6 max-w-md">
