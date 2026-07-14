@@ -11,6 +11,7 @@ const routes = [
   "/diagnostico-estrutura-de-vendas",
   "/google-meu-negocio",
   "/trafego-pago-negocios-locais",
+  "/crm-whatsapp-organizado",
   "/login",
   "/dashboard",
   "/inbox",

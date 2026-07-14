@@ -50,6 +50,7 @@ import LocalBusinessWebsiteLanding from "./pages/LocalBusinessWebsiteLanding";
 import SalesStructureDiagnosticLanding from "./pages/SalesStructureDiagnosticLanding";
 import GoogleBusinessProfileLanding from "./pages/GoogleBusinessProfileLanding";
 import PaidTrafficLocalBusinessLanding from "./pages/PaidTrafficLocalBusinessLanding";
+import CrmWhatsappLanding from "./pages/CrmWhatsappLanding";
 import { PrivacyPage, TermsPage, DataDeletionPage } from "./pages/LegalPages";
 import SignUpScreen from "./pages/SignUp";
 import LoginScreen from "./pages/Login";
@@ -145,6 +146,7 @@ const PUBLIC_PATHS = [
   "/diagnostico-estrutura-de-vendas",
   "/google-meu-negocio",
   "/trafego-pago-negocios-locais",
+  "/crm-whatsapp-organizado",
   "/privacidade",
   "/termos",
   "/exclusao-de-dados",
@@ -1111,6 +1113,7 @@ function AppContent() {
         <Route path="/diagnostico-estrutura-de-vendas" element={<SalesStructureDiagnosticLanding />} />
         <Route path="/google-meu-negocio" element={<GoogleBusinessProfileLanding />} />
         <Route path="/trafego-pago-negocios-locais" element={<PaidTrafficLocalBusinessLanding />} />
+        <Route path="/crm-whatsapp-organizado" element={<CrmWhatsappLanding />} />
         <Route path="/privacidade" element={<PrivacyPage />} />
         <Route path="/termos" element={<TermsPage />} />
         <Route path="/exclusao-de-dados" element={<DataDeletionPage />} />
