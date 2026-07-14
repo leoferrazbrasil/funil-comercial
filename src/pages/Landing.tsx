@@ -177,7 +177,7 @@ export default function LandingPage() {
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans selection:bg-primary/30">
       <SeoHead 
         title="Estrutura de Vendas para Negócios Locais"
-        description="Site, Google, anúncios, WhatsApp e CRM funcionando juntos — para o seu negócio ser encontrado, atrair clientes e fechar todos os dias."
+        description="Criação de sites, Google Ads, Meta Ads, WhatsApp e CRM integrados. A estrutura completa para seu negócio atrair e fechar clientes todos os dias."
         canonicalUrl="https://funilcomercial.com/"
         schema={generateLocalBusinessSchema()}
       />
