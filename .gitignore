@@ -35,3 +35,6 @@ graph.html
 graph.json
 GRAPH_REPORT.md
 .graphify/
+
+# Worktrees locais do Codex
+.worktrees/
