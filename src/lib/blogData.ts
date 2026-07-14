@@ -285,7 +285,7 @@ Com essas camadas, a percepção de valor sobre o seu trabalho dispara. O pacien
     author: "Leonardo Brasil",
     authorAvatar: "/images/leo-avatar.jpg",
     category: "Estética",
-    imageUrl: "https://images.unsplash.com/photo-1598440947619-2ce65f8c3ca5?q=80&w=1200&auto=format&fit=crop",
+    imageUrl: "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?q=80&w=1200&auto=format&fit=crop",
     content: `
 O mercado de estética avançada em Curitiba cresceu exponencialmente. Hoje, tratamentos como harmonização facial, preenchimento labial, bioestimuladores e lasers estão sendo ofertados em cada esquina da capital paranaense.
 
