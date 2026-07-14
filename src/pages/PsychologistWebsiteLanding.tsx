@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { trackEvent } from "../lib/analytics";
 import { Link } from "react-router-dom";
 import {
   AlertTriangle,
@@ -317,7 +318,7 @@ export default function PsychologistWebsiteLanding() {
             </a>
           </nav>
           <a
-            href={whatsappLink}
+            href={whatsappLink} onClick={(e) => { trackEvent("generate_lead", { method: "whatsapp" }); }}
             target="_blank"
             rel="noreferrer"
             className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-primary px-5 text-sm font-black text-primary-foreground transition hover:bg-primary/90"
@@ -349,7 +350,7 @@ export default function PsychologistWebsiteLanding() {
               </p>
               <div className="mt-9 flex flex-col gap-3 sm:flex-row">
                 <a
-                  href={whatsappLink}
+                  href={whatsappLink} onClick={(e) => { trackEvent("generate_lead", { method: "whatsapp" }); }}
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex min-h-14 items-center justify-center gap-2 rounded-full bg-primary px-7 text-base font-black text-primary-foreground transition hover:bg-primary/90"
@@ -434,7 +435,7 @@ export default function PsychologistWebsiteLanding() {
                 </p>
               </div>
               <a
-                href={whatsappLink}
+                href={whatsappLink} onClick={(e) => { trackEvent("generate_lead", { method: "whatsapp" }); }}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-primary px-6 font-bold text-primary-foreground"
@@ -469,7 +470,7 @@ export default function PsychologistWebsiteLanding() {
                 mantém o site no ar, hospedado, atualizado e com suporte básico.
               </p>
               <a
-                href={whatsappLink}
+                href={whatsappLink} onClick={(e) => { trackEvent("generate_lead", { method: "whatsapp" }); }}
                 target="_blank"
                 rel="noreferrer"
                 className="mt-8 inline-flex min-h-14 items-center justify-center gap-2 rounded-full bg-primary px-7 text-base font-black text-primary-foreground transition hover:bg-primary/90"
@@ -685,7 +686,7 @@ export default function PsychologistWebsiteLanding() {
                 </p>
               </div>
               <a
-                href={whatsappLink}
+                href={whatsappLink} onClick={(e) => { trackEvent("generate_lead", { method: "whatsapp" }); }}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex min-h-14 items-center justify-center gap-2 rounded-full bg-primary px-7 text-base font-black text-primary-foreground transition hover:bg-primary/90"

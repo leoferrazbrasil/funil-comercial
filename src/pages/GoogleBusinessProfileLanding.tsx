@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { trackEvent } from "../lib/analytics";
 import { Link } from "react-router-dom";
 import {
   AlertTriangle,
@@ -234,7 +235,7 @@ export default function GoogleBusinessProfileLanding() {
             </a>
           </nav>
           <a
-            href={whatsappLink}
+            href={whatsappLink} onClick={(e) => { trackEvent("generate_lead", { method: "whatsapp" }); }}
             target="_blank"
             rel="noreferrer"
             className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-primary px-5 text-sm font-black text-primary-foreground transition hover:bg-primary/90"
@@ -267,7 +268,7 @@ export default function GoogleBusinessProfileLanding() {
               </p>
               <div className="mt-9 flex flex-col gap-3 sm:flex-row">
                 <a
-                  href={whatsappLink}
+                  href={whatsappLink} onClick={(e) => { trackEvent("generate_lead", { method: "whatsapp" }); }}
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex min-h-14 items-center justify-center gap-2 rounded-full bg-primary px-7 text-base font-black text-primary-foreground transition hover:bg-primary/90"
@@ -356,7 +357,7 @@ export default function GoogleBusinessProfileLanding() {
                 </p>
               </div>
               <a
-                href={whatsappLink}
+                href={whatsappLink} onClick={(e) => { trackEvent("generate_lead", { method: "whatsapp" }); }}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-primary px-6 font-bold text-primary-foreground"
@@ -403,7 +404,7 @@ export default function GoogleBusinessProfileLanding() {
               <div className="my-6 h-px bg-white/10" />
               <p className="text-2xl font-black">Sem mensalidade</p>
               <a
-                href={whatsappLink}
+                href={whatsappLink} onClick={(e) => { trackEvent("generate_lead", { method: "whatsapp" }); }}
                 target="_blank"
                 rel="noreferrer"
                 className="mt-8 inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-full bg-primary px-7 text-base font-black text-primary-foreground transition hover:bg-primary/90"
@@ -578,7 +579,7 @@ export default function GoogleBusinessProfileLanding() {
                 </p>
               </div>
               <a
-                href={whatsappLink}
+                href={whatsappLink} onClick={(e) => { trackEvent("generate_lead", { method: "whatsapp" }); }}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex min-h-14 items-center justify-center gap-2 rounded-full bg-primary px-7 text-base font-black text-primary-foreground transition hover:bg-primary/90"

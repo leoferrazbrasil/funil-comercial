@@ -7,6 +7,7 @@
 // Aquisição, Conversão, Escala). O cliente entra pela camada que precisa hoje.
 
 import { useState, useEffect } from "react";
+import { trackEvent } from "../lib/analytics";
 import { Link } from "react-router-dom";
 import {
   MoveRight,
@@ -199,7 +200,7 @@ export default function LandingPage() {
           </nav>
 
           <div className="hidden md:flex items-center gap-4">
-            <a href={whatsappLink} target="_blank" rel="noreferrer" className="flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-all active:scale-95 shadow-[0_0_24px_rgba(245,158,11,0.2)] dark:shadow-[0_0_24px_rgba(245,158,11,0.1)]">
+            <a href={whatsappLink} onClick={(e) => { trackEvent("generate_lead", { method: "whatsapp" }); }} target="_blank" rel="noreferrer" className="flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-all active:scale-95 shadow-[0_0_24px_rgba(245,158,11,0.2)] dark:shadow-[0_0_24px_rgba(245,158,11,0.1)]">
               Diagnóstico gratuito
               <MoveRight size={16} />
             </a>
@@ -227,7 +228,7 @@ export default function LandingPage() {
               <Link to="/blog" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-medium text-foreground">Blog</Link>
               <a href="#faq" onClick={(e) => handleScroll(e, "faq")} className="text-lg font-medium text-foreground">FAQ</a>
             </nav>
-            <a href={whatsappLink} target="_blank" rel="noreferrer" onClick={() => setIsMobileMenuOpen(false)} className="flex justify-center items-center gap-2 rounded-full bg-primary px-6 py-4 text-base font-bold text-primary-foreground mt-auto mb-10 active:scale-95">
+            <a href={whatsappLink} onClick={(e) => { trackEvent("generate_lead", { method: "whatsapp" }); setIsMobileMenuOpen(false); }} target="_blank" rel="noreferrer" className="flex justify-center items-center gap-2 rounded-full bg-primary px-6 py-4 text-base font-bold text-primary-foreground mt-auto mb-10 active:scale-95">
               Diagnóstico gratuito
               <MoveRight size={20} />
             </a>
@@ -259,7 +260,7 @@ export default function LandingPage() {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
-              <a href={whatsappLink} target="_blank" rel="noreferrer" className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-full bg-primary px-8 py-4 text-base font-bold text-primary-foreground hover:bg-primary/90 transition-all active:scale-95 shadow-[0_0_32px_rgba(245,158,11,0.25)]">
+              <a href={whatsappLink} onClick={(e) => { trackEvent("generate_lead", { method: "whatsapp" }); }} target="_blank" rel="noreferrer" className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-full bg-primary px-8 py-4 text-base font-bold text-primary-foreground hover:bg-primary/90 transition-all active:scale-95 shadow-[0_0_32px_rgba(245,158,11,0.25)]">
                 <MessageCircle size={20} />
                 Quero um diagnóstico gratuito
               </a>
@@ -431,7 +432,7 @@ export default function LandingPage() {
               })}
 
               {/* Card: estrutura completa */}
-              <a href={whatsappLink} target="_blank" rel="noreferrer" className="block h-full">
+              <a href={whatsappLink} onClick={(e) => { trackEvent("generate_lead", { method: "whatsapp" }); }} target="_blank" rel="noreferrer" className="block h-full">
                 <div className="bg-primary/10 p-8 rounded-3xl border border-primary/30 hover:border-primary/60 transition-colors h-full flex flex-col justify-between">
                   <div>
                     <div className="w-12 h-12 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center mb-6">
@@ -599,7 +600,7 @@ export default function LandingPage() {
             <h2 className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tight mb-6 md:mb-8">Seu concorrente não é melhor que você. Ele só tem estrutura.</h2>
             <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-10 md:mb-12 max-w-2xl mx-auto">Peça o diagnóstico gratuito e descubra exatamente o que falta para o seu negócio vender todos os dias.</p>
 
-            <a href={whatsappLink} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-8 sm:px-10 py-4 sm:py-5 text-base sm:text-lg font-bold text-primary-foreground hover:bg-primary/90 transition-all active:scale-95 shadow-[0_0_40px_rgba(245,158,11,0.3)] w-full sm:w-auto">
+            <a href={whatsappLink} onClick={(e) => { trackEvent("generate_lead", { method: "whatsapp" }); }} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-8 sm:px-10 py-4 sm:py-5 text-base sm:text-lg font-bold text-primary-foreground hover:bg-primary/90 transition-all active:scale-95 shadow-[0_0_40px_rgba(245,158,11,0.3)] w-full sm:w-auto">
               <MessageCircle size={22} />
               Pedir diagnóstico no WhatsApp
             </a>
@@ -641,7 +642,7 @@ export default function LandingPage() {
 
       {/* Botão flutuante de WhatsApp — mais informações */}
       <a
-        href={whatsappInfoLink}
+        href={whatsappInfoLink} onClick={(e) => { trackEvent("generate_lead", { method: "whatsapp_info" }); }}
         target="_blank"
         rel="noreferrer"
         aria-label="Fale conosco no WhatsApp"

@@ -3,6 +3,7 @@
 // EMPRESA de estrutura de vendas; o CRM é a camada de Conversão do método.
 
 import { useState, useEffect } from "react";
+import { trackEvent } from "../lib/analytics";
 import { Link } from "react-router-dom";
 import { MoveRight, Lock, LayoutDashboard, MessageCircle, BarChart3, ChevronDown, CheckCircle2, Building2, Briefcase, Zap, Menu, X, Layers } from "lucide-react";
 import Logo from "../components/Logo";

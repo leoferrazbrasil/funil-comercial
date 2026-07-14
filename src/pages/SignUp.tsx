@@ -5,6 +5,7 @@ import { MessageCircle, CheckCircle2, Database, MoveRight, Eye, EyeOff, AlertCir
 import Logo from "../components/Logo";
 import { brandConfig } from "../lib/branding";
 import { isSupabaseConfigured } from "../lib/supabase";
+import { trackEvent } from "../lib/analytics";
 
 export default function SignUpScreen({
   authError,
@@ -45,6 +46,7 @@ export default function SignUpScreen({
     }
 
     setIsSubmitting(true);
+    trackEvent("sign_up", { method: "crm_platform" });
     await onAuth(email, password, "signup", name);
     setIsSubmitting(false);
   };
