@@ -13,17 +13,23 @@ tags:
 
 ## [2026-07-14] - Posicionamento e Estratégia de SEO: Foco em Profissionais e Regiões
 
+> [!abstract] Resumo da Atualização
+> Toda a estratégia de SEO e conteúdo da plataforma foi pivotada para focar estritamente em profissionais liberais e autônomos, abandonando o foco em clínicas e escritórios estruturados de nichos não prioritários.
+
 ### Modificado — transição completa de nichos alvo (SEO local e Conteúdo)
-- **Nichos:** O posicionamento da plataforma abandonou as clínicas estruturadas e focos indesejados. Todas as referências em Landing Pages, matriz de SEO (`seoNicheData.ts`) e textos-base foram limpas.
-- **Novos Focos:** A estratégia agora foca em profissionais autônomos e liberais: Psicólogos, Terapeutas, Nutricionistas, Fisioterapeutas, Massoterapeutas, Contadores e Engenheiros Autônomos.
-- **Removidos:** Dentistas, Clínicas Médicas, Advogados, Corretores, Arquitetos, Estéticas, E-commerce, Agências e Lojas de Móveis/Roupas. A página e a rota `/site-para-dentistas` foram totalmente excluídas (`DentistWebsiteLanding.tsx`).
+- **Nichos focados:** A estratégia agora mira em Psicólogos, Terapeutas, Nutricionistas, Fisioterapeutas, Massoterapeutas, Contadores e Engenheiros Autônomos.
+- **Limpeza de referências:** Todas as menções em Landing Pages, matriz de SEO (`seoNicheData.ts`) e textos-base institucionais foram atualizadas para esse novo foco.
+
+> [!success] Remoção de Públicos
+> Dentistas, Clínicas Médicas, Advogados, Corretores, Arquitetos, Estéticas, E-commerce, Agências e Lojas de Móveis/Roupas foram **removidos**. A página e a rota `/site-para-dentistas` foram totalmente excluídas (`DentistWebsiteLanding.tsx`).
 
 ### Modificado — Blog e Roteiro Editorial realinhados ao novo ICP
 - Artigos e posts de blog reescritos para atacar as dores dos novos nichos alvo (ex: foco migrado de advogados para contadores, e de odontologia para fisioterapia).
-- `editorialPillars.ts` atualizado para gerar sugestões e contextos condizentes com nutricionistas e engenheiros.
+- Os temas em `editorialPillars.ts` foram atualizados para gerar sugestões e contextos condizentes com nutricionistas e engenheiros, interligando com o [[01 - Requisitos#8.1. Roteiro Editorial (`/roteiro`)|Roteiro Editorial]].
 
 ### Adicionado — Bloco estratégico de Cidades Prioritárias
-- Em vez de alterar a navegação geral da página de Cidades, foi inserido um bloco fixo "Principais Regiões Atendidas" no rodapé da página inicial (`Landing.tsx`). Ele injeta relevância local de SEO para 25 cidades chave (Balneário Camboriú, São Paulo, Campinas, etc.) a partir da home.
+- Em vez de alterar a navegação geral da página de Cidades, foi inserido um bloco fixo "Principais Regiões Atendidas" no rodapé da página inicial (`Landing.tsx`). 
+- Isso injeta relevância local de SEO para 25 cidades chave (Balneário Camboriú, São Paulo, Campinas, etc.) a partir da home, preservando a autoridade da página mãe.
 
 ## [2026-07-14] - Infraestrutura de IA: Novas Skills e Sincronização Claude
 
