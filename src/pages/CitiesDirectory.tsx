@@ -63,12 +63,18 @@ export default function CitiesDirectory() {
                         <h3 className="text-xl font-bold mb-4">{city.nome}</h3>
                         <ul className="flex flex-col gap-2">
                            {NICHES.map(niche => (
-                             <li key={niche.slug}>
+                             <li key={niche.slug} className="mb-4">
                                 <Link 
                                   to={`/local/${niche.slug}/${city.estado}/${city.cidade}`}
                                   className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-2 before:content-[''] before:w-1 before:h-1 before:bg-primary/50 before:rounded-full hover:before:bg-primary"
                                 >
                                    Site para {niche.nome} em {city.nome}
+                                </Link>
+                                <Link 
+                                  to={`/blog/guia-de-vendas/${niche.slug}/${city.estado}/${city.cidade}`}
+                                  className="text-xs text-muted-foreground/60 hover:text-primary transition-colors ml-3 mt-1 flex items-center gap-2 before:content-['↳']"
+                                >
+                                   Guia de Atração de {niche.nome}
                                 </Link>
                              </li>
                            ))}

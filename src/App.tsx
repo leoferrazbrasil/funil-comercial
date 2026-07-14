@@ -60,6 +60,7 @@ import ConsultoriaLanding from "./pages/ConsultoriaLanding";
 import { AnnouncementBar } from "./components/AnnouncementBar";
 import BlogIndex from "./pages/BlogIndex";
 import BlogPost from "./pages/BlogPost";
+import ProgrammaticBlogPost from "./pages/ProgrammaticBlogPost";
 import { PrivacyPage, TermsPage, DataDeletionPage } from "./pages/LegalPages";
 import SignUpScreen from "./pages/SignUp";
 import LoginScreen from "./pages/Login";
@@ -1144,6 +1145,7 @@ function AppContent() {
           <Route path="/cidades-atendidas" element={<CitiesDirectory />} />
           <Route path="/blog" element={<BlogIndex />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
+          <Route path="/blog/guia-de-vendas/:nicho/:estado/:cidade" element={<ProgrammaticBlogPost />} />
           <Route path="/local/:nicho/:estado/:cidade" element={<LocalCityLanding />} />
           <Route path="/l/:slug" element={<LinkAggregatorPage />} />
           <Route path="/:slug" element={<ProspectingPreviewPage />} />
