@@ -136,12 +136,12 @@ export const EDITORIAL_PILLARS: EditorialPillar[] = [
     icon: Star,
     temas: [
       {
-        titulo: "Como uma clínica organiza o WhatsApp e para de perder pacientes.",
+        titulo: "Como um consultório de fisioterapia organiza o WhatsApp e para de perder pacientes.",
         apoio: "Agendamentos e retornos acompanhados de perto, sem mensagem esquecida.",
       },
       {
-        titulo: "Como um advogado aparece melhor no Google sem depender só de indicação.",
-        apoio: "Presença digital estruturada trazendo casos qualificados de forma constante.",
+        titulo: "Como um nutricionista aparece melhor no Google sem depender só de indicação.",
+        apoio: "Presença digital estruturada trazendo pacientes particulares de forma constante.",
       },
       {
         titulo: "Como um contador transforma contatos soltos em oportunidades acompanhadas.",

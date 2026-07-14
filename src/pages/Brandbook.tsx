@@ -260,7 +260,7 @@ export default function BrandbookPage() {
                   </div>
                   <h3 className="text-xl font-bold text-foreground mb-4">Segmentos de Clientes</h3>
                   <div className="flex flex-wrap gap-2">
-                    {['Médicos e Clínicas', 'Advogados', 'Contadores', 'Estética e Beleza', 'Arquitetos e Engenheiros', 'Prestadores de Serviço', 'Comércio Local', 'Negócios Locais', 'Autônomos'].map((badge) => (
+                    {['Psicólogos e Terapeutas', 'Fisioterapeutas', 'Nutricionistas', 'Contadores', 'Engenheiros', 'Prestadores de Serviço', 'Autônomos'].map((badge) => (
                       <span key={badge} className="px-3 py-1.5 rounded-lg border border-white/5 bg-white/5 text-xs font-medium text-foreground">
                         {badge}
                       </span>

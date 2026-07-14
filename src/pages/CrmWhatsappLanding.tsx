@@ -112,14 +112,13 @@ const priceItems = [
 ];
 
 const audiences = [
-  "clínicas e consultórios",
-  "dentistas",
   "nutricionistas",
-  "advogados",
+  "psicólogos e terapeutas",
+  "fisioterapeutas e massoterapeutas",
   "contadores",
-  "estética e beleza",
+  "engenheiros",
   "prestadores de serviço",
-  "comércio local",
+  "autônomos",
   "negócios que recebem orçamento pelo WhatsApp",
   "negócios que fazem follow-up manual",
   "negócios que já anunciam e precisam acompanhar os leads",

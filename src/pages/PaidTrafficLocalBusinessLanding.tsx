@@ -129,14 +129,14 @@ const structuredTraffic = [
 ];
 
 const audiences = [
-  "clínicas e consultórios",
-  "dentistas",
   "nutricionistas",
-  "estética e beleza",
-  "advogados e contadores",
+  "psicólogos e terapeutas",
+  "fisioterapeutas e massoterapeutas",
+  "contadores",
+  "engenheiros",
   "prestadores de serviço",
   "academias e estúdios",
-  "comércio local",
+  "autônomos",
   "negócios que já recebem WhatsApp, mas não acompanham bem",
   "negócios que já anunciaram e não sabem o que virou venda",
 ];

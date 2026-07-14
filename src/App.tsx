@@ -51,7 +51,7 @@ import SalesStructureDiagnosticLanding from "./pages/SalesStructureDiagnosticLan
 import GoogleBusinessProfileLanding from "./pages/GoogleBusinessProfileLanding";
 import PaidTrafficLocalBusinessLanding from "./pages/PaidTrafficLocalBusinessLanding";
 import CrmWhatsappLanding from "./pages/CrmWhatsappLanding";
-import DentistWebsiteLanding from "./pages/DentistWebsiteLanding";
+
 import NutritionistWebsiteLanding from "./pages/NutritionistWebsiteLanding";
 import PsychologistWebsiteLanding from "./pages/PsychologistWebsiteLanding";
 import LocalCityLanding from "./pages/LocalCityLanding";
@@ -1134,7 +1134,7 @@ function AppContent() {
           <Route path="/google-meu-negocio" element={<GoogleBusinessProfileLanding />} />
           <Route path="/trafego-pago-negocios-locais" element={<PaidTrafficLocalBusinessLanding />} />
           <Route path="/crm-whatsapp-organizado" element={<CrmWhatsappLanding />} />
-          <Route path="/site-para-dentistas" element={<DentistWebsiteLanding />} />
+
           <Route path="/site-para-nutricionistas" element={<NutritionistWebsiteLanding />} />
           <Route path="/site-para-psicologas" element={<PsychologistWebsiteLanding />} />
           <Route path="/privacidade" element={<PrivacyPage />} />

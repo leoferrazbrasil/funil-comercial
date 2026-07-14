@@ -11,6 +11,20 @@ tags:
 > [!note] Navegação
 > Histórico de mudanças, mais recente primeiro. Contexto do produto em [[01 - Requisitos]]; arquitetura em [[02 - Arquitetura e Design]]; índice em [[00 - Inicio]].
 
+## [2026-07-14] - Posicionamento e Estratégia de SEO: Foco em Profissionais e Regiões
+
+### Modificado — transição completa de nichos alvo (SEO local e Conteúdo)
+- **Nichos:** O posicionamento da plataforma abandonou as clínicas estruturadas e focos indesejados. Todas as referências em Landing Pages, matriz de SEO (`seoNicheData.ts`) e textos-base foram limpas.
+- **Novos Focos:** A estratégia agora foca em profissionais autônomos e liberais: Psicólogos, Terapeutas, Nutricionistas, Fisioterapeutas, Massoterapeutas, Contadores e Engenheiros Autônomos.
+- **Removidos:** Dentistas, Clínicas Médicas, Advogados, Corretores, Arquitetos, Estéticas, E-commerce, Agências e Lojas de Móveis/Roupas. A página e a rota `/site-para-dentistas` foram totalmente excluídas (`DentistWebsiteLanding.tsx`).
+
+### Modificado — Blog e Roteiro Editorial realinhados ao novo ICP
+- Artigos e posts de blog reescritos para atacar as dores dos novos nichos alvo (ex: foco migrado de advogados para contadores, e de odontologia para fisioterapia).
+- `editorialPillars.ts` atualizado para gerar sugestões e contextos condizentes com nutricionistas e engenheiros.
+
+### Adicionado — Bloco estratégico de Cidades Prioritárias
+- Em vez de alterar a navegação geral da página de Cidades, foi inserido um bloco fixo "Principais Regiões Atendidas" no rodapé da página inicial (`Landing.tsx`). Ele injeta relevância local de SEO para 25 cidades chave (Balneário Camboriú, São Paulo, Campinas, etc.) a partir da home.
+
 ## [2026-07-14] - Infraestrutura de IA: Novas Skills e Sincronização Claude
 
 ### Adicionado — instalação de skills externas e sincronização

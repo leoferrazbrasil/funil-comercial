@@ -72,12 +72,11 @@ const includedItems = [
 ];
 
 const audiences = [
-  { label: "Clínicas e consultórios", icon: Stethoscope },
-  { label: "Dentistas e nutricionistas", icon: UserRound },
-  { label: "Advogados e contadores", icon: Scale },
-  { label: "Beleza e estética", icon: Scissors },
+  { label: "Nutricionistas", icon: UserRound },
+  { label: "Psicólogos e terapeutas", icon: Stethoscope },
+  { label: "Fisioterapeutas e massoterapeutas", icon: UserRound },
+  { label: "Contadores e engenheiros", icon: Scale },
   { label: "Prestadores de serviço", icon: Wrench },
-  { label: "Comércio local", icon: Store },
   { label: "Autônomos", icon: Briefcase },
 ];
 

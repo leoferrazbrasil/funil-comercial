@@ -64,15 +64,14 @@ const includedItems = [
 ];
 
 const audiences = [
-  "clínicas e consultórios",
-  "dentistas",
   "nutricionistas",
-  "advogados",
+  "psicólogos e terapeutas",
+  "fisioterapeutas e massoterapeutas",
   "contadores",
-  "estética e beleza",
+  "engenheiros",
   "prestadores de serviço",
-  "lojas e comércio local",
-  "oficinas, assistências e serviços da casa",
+  "autônomos",
+  "serviços da casa",
   "profissionais autônomos",
   "negócios que recebem clientes por ligação, rota, WhatsApp ou visita presencial",
 ];

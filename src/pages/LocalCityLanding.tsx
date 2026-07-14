@@ -41,10 +41,10 @@ function formatLocationName(slug?: string) {
 
 function formatNiche(nicho?: string) {
   if (!nicho) return "negócios locais";
-  if (nicho === "dentistas") return "dentistas";
-  if (nicho === "advogados") return "advogados";
   if (nicho === "psicologas") return "psicólogas";
   if (nicho === "nutricionistas") return "nutricionistas";
+  if (nicho === "contadores") return "contadores";
+  if (nicho === "fisioterapeutas") return "fisioterapeutas";
   return "negócios locais";
 }
 

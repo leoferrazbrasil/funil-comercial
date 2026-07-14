@@ -141,14 +141,12 @@ const SERVICES = [
 
 // Segmentos de negócio local que atendemos.
 const SEGMENTS = [
-  { nome: "Clínicas e consultórios", icon: Stethoscope },
-  { nome: "Advogados e contadores", icon: Scale },
-  { nome: "Beleza e estética", icon: Scissors },
-  { nome: "Serviços da casa", icon: Wrench },
-  { nome: "Pet e veterinária", icon: PawPrint },
-  { nome: "Academias e estúdios", icon: Dumbbell },
-  { nome: "Comércio local", icon: Building2 },
-  { nome: "Autônomos e liberais", icon: Briefcase },
+  { nome: "Psicólogos e terapeutas", icon: Stethoscope },
+  { nome: "Nutricionistas", icon: UserRound },
+  { nome: "Fisioterapeutas e massoterapeutas", icon: UserRound },
+  { nome: "Contadores e engenheiros", icon: Scale },
+  { nome: "Prestadores de serviço", icon: Wrench },
+  { nome: "Autônomos", icon: Briefcase },
 ];
 
 export default function LandingPage() {
@@ -572,7 +570,7 @@ export default function LandingPage() {
               {[
                 { q: "Preciso contratar a estrutura inteira?", a: "Não — e normalmente nem recomendamos. O diagnóstico mostra qual camada está travando suas vendas hoje (presença, aquisição, conversão ou escala) e você começa por ela. As outras entram quando fizer sentido." },
                 { q: "Quanto custa para começar?", a: "Depende da porta de entrada — por isso o diagnóstico vem antes. Ele é gratuito e você recebe o plano da sua estrutura com os valores fechados de cada camada, sem surpresa e sem pacote inflado. Você decide com tudo na mesa." },
-                { q: "Funciona para o meu segmento?", a: "Se o seu cliente te procura no Google ou chega pelo WhatsApp, funciona. Atendemos clínicas, advogados, contadores, estética, serviços da casa, pet, academias, comércio e autônomos em geral." },
+                { q: "Funciona para o meu segmento?", a: "Se o seu cliente te procura no Google ou chega pelo WhatsApp, funciona. Atendemos nutricionistas, psicólogos, fisioterapeutas, contadores, engenheiros e prestadores de serviços autônomos em geral." },
                 { q: "Já tenho site (ou já faço anúncios). E agora?", a: "Melhor ainda: aproveitamos o que já existe. O diagnóstico avalia o que está funcionando, o que precisa de ajuste e qual é a próxima camada — sem refazer o que está bom." },
                 { q: "Vocês atendem a minha cidade?", a: "Sim. Toda a estrutura é digital e o acompanhamento é remoto, então atendemos negócios locais de todo o Brasil." },
                 { q: "O que é o CRM Funil Comercial?", a: "É o nosso sistema próprio de vendas: WhatsApp, contatos, leads e funil em uma tela só. Ele é a camada de Conversão do método — e você pode testá-lo gratuitamente." },
@@ -610,32 +608,40 @@ export default function LandingPage() {
       </main>
 
       <footer className="border-t border-white/10 bg-background py-10 md:py-12">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-0">
-          <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6 text-center md:text-left">
-            <div className="flex items-center gap-3">
-              <div className="grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all">
-                <Logo iconSize={32} variant="icon-only" />
-              </div>
-              <span className="font-bold text-muted-foreground hidden md:inline">{brandConfig.name}</span>
-            </div>
-            <div className="flex flex-col items-center md:items-start gap-1">
-              <p className="text-xs md:text-sm text-muted-foreground">© {new Date().getFullYear()} {brandConfig.name}. Todos os direitos reservados.</p>
-              <div className="text-[10px] md:text-xs text-muted-foreground/80 mt-2 text-center md:text-left space-y-1">
-                <p>Funil Comercial é uma marca operada por LEONARDO FERRAZ DA SILVA BRASIL.</p>
-                <p>Razão social: LEONARDO FERRAZ DA SILVA BRASIL</p>
-                <p>CNPJ: 65.993.728/0001-07</p>
-                <p>E-mail: <a href="mailto:funil@funilcomercial.com" className="hover:text-primary transition-colors">funil@funilcomercial.com</a></p>
-                <p>Site: <a href="https://funilcomercial.com" className="hover:text-primary transition-colors">https://funilcomercial.com</a></p>
-              </div>
-            </div>
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <div className="flex flex-col gap-3 md:gap-4 border-b border-white/10 pb-8 mb-8 text-center md:text-left">
+            <h4 className="text-sm font-bold text-foreground">Principais Regiões Atendidas</h4>
+            <p className="text-xs md:text-sm text-muted-foreground leading-relaxed max-w-4xl">
+              Balneário Camboriú, Itajaí, Blumenau, São Paulo, Campinas, Ribeirão Preto, Sorocaba, São José dos Campos, Rio de Janeiro, Niterói, Duque de Caxias, Nova Iguaçu, Petrópolis, Belo Horizonte, Uberlândia, Contagem, Juiz de Fora, Betim, Curitiba, Londrina, Maringá, Ponta Grossa, Cascavel, Florianópolis, Joinville.
+            </p>
           </div>
-          <div className="flex flex-wrap justify-center gap-4 md:gap-6">
-            <Link to="/blog" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">Blog</Link>
-            <Link to="/cidades-atendidas" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">Cidades Atendidas</Link>
-            <Link to="/crm" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">CRM</Link>
-            <Link to="/termos" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">Termos</Link>
-            <Link to="/privacidade" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">Privacidade</Link>
-            <Link to="/exclusao-de-dados" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">Exclusão de Dados</Link>
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8">
+            <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6 text-center md:text-left">
+              <div className="flex items-center gap-3">
+                <div className="grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all">
+                  <Logo iconSize={32} variant="icon-only" />
+                </div>
+                <span className="font-bold text-muted-foreground hidden md:inline">{brandConfig.name}</span>
+              </div>
+              <div className="flex flex-col items-center md:items-start gap-1">
+                <p className="text-xs md:text-sm text-muted-foreground">© {new Date().getFullYear()} {brandConfig.name}. Todos os direitos reservados.</p>
+                <div className="text-[10px] md:text-xs text-muted-foreground/80 mt-2 text-center md:text-left space-y-1">
+                  <p>Funil Comercial é uma marca operada por LEONARDO FERRAZ DA SILVA BRASIL.</p>
+                  <p>Razão social: LEONARDO FERRAZ DA SILVA BRASIL</p>
+                  <p>CNPJ: 65.993.728/0001-07</p>
+                  <p>E-mail: <a href="mailto:funil@funilcomercial.com" className="hover:text-primary transition-colors">funil@funilcomercial.com</a></p>
+                  <p>Site: <a href="https://funilcomercial.com" className="hover:text-primary transition-colors">https://funilcomercial.com</a></p>
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-wrap justify-center md:justify-end gap-4 md:gap-6">
+              <Link to="/blog" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">Blog</Link>
+              <Link to="/cidades-atendidas" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">Cidades Atendidas</Link>
+              <Link to="/crm" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">CRM</Link>
+              <Link to="/termos" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">Termos</Link>
+              <Link to="/privacidade" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">Privacidade</Link>
+              <Link to="/exclusao-de-dados" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">Exclusão de Dados</Link>
+            </div>
           </div>
         </div>
       </footer>

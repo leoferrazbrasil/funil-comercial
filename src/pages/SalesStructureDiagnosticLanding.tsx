@@ -93,14 +93,12 @@ const diagnosticDeliverables = [
 ];
 
 const audiences = [
-  "clínicas e consultórios",
-  "dentistas",
   "nutricionistas",
-  "advogados",
+  "psicólogos e terapeutas",
+  "fisioterapeutas e massoterapeutas",
   "contadores",
-  "estética e beleza",
+  "engenheiros",
   "prestadores de serviço",
-  "comércio local",
   "autônomos",
   "negócios que já anunciam mas não sabem se está funcionando",
   "negócios que recebem contatos mas não acompanham bem",
