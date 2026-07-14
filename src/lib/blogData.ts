@@ -4,6 +4,7 @@ export interface BlogPost {
   excerpt: string;
   date: string;
   author: string;
+  authorAvatar?: string;
   category: string;
   content: string;
   imageUrl?: string;
@@ -15,7 +16,8 @@ export const blogPosts: BlogPost[] = [
     title: "A Importância de um Site Profissional para Advogados em 2026",
     excerpt: "Descubra por que escritórios de advocacia que dependem apenas de indicações e redes sociais estão perdendo os melhores clientes da cidade para a concorrência.",
     date: "2026-07-14",
-    author: "Leonardo Ferraz",
+    author: "Leonardo Brasil",
+    authorAvatar: "/images/leo-avatar.jpg",
     category: "Advocacia",
     imageUrl: "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?q=80&w=1200&auto=format&fit=crop",
     content: `
@@ -52,7 +54,8 @@ Se o seu escritório ainda não possui essa estrutura, você está deixando dinh
     title: "Como Captar Pacientes Particulares na Odontologia",
     excerpt: "Cansado de depender de planos de saúde? Veja a estratégia definitiva de SEO local e tráfego pago para lotar sua agenda com pacientes particulares.",
     date: "2026-07-13",
-    author: "Leonardo Ferraz",
+    author: "Leonardo Brasil",
+    authorAvatar: "/images/leo-avatar.jpg",
     category: "Odontologia",
     imageUrl: "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?q=80&w=1200&auto=format&fit=crop",
     content: `
@@ -90,7 +93,8 @@ Invista na sua estrutura própria e veja sua agenda de pacientes particulares de
     title: "Google Ads vs Meta Ads para Negócios Locais",
     excerpt: "Onde você deve investir o dinheiro do seu negócio? Entenda a diferença entre a Intenção de Busca do Google e a Descoberta Ativa do Meta (Instagram/Facebook).",
     date: "2026-07-12",
-    author: "Leonardo Ferraz",
+    author: "Leonardo Brasil",
+    authorAvatar: "/images/leo-avatar.jpg",
     category: "Tráfego Pago",
     imageUrl: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1200&auto=format&fit=crop",
     content: `

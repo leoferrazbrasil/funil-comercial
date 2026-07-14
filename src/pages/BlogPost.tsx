@@ -81,8 +81,12 @@ export default function BlogPost() {
               {post.title}
             </h1>
             <div className="flex items-center justify-center gap-x-4">
-               <div className="h-12 w-12 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary text-lg">
-                 {post.author.charAt(0)}
+               <div className="h-12 w-12 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary text-lg overflow-hidden border-2 border-primary/20">
+                 {post.authorAvatar ? (
+                   <img src={post.authorAvatar} alt={post.author} className="h-full w-full object-cover" />
+                 ) : (
+                   post.author.charAt(0)
+                 )}
                </div>
                <div className="text-left leading-6">
                  <p className="font-semibold text-foreground text-sm">

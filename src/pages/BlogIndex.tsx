@@ -72,8 +72,12 @@ export default function BlogIndex() {
                     </div>
                  </div>
                  <div className="mt-8 flex items-center gap-x-4">
-                    <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary">
-                      {post.author.charAt(0)}
+                    <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary overflow-hidden border border-primary/20">
+                      {post.authorAvatar ? (
+                        <img src={post.authorAvatar} alt={post.author} className="h-full w-full object-cover" loading="lazy" />
+                      ) : (
+                        post.author.charAt(0)
+                      )}
                     </div>
                     <div className="text-sm leading-6">
                       <p className="font-semibold text-foreground">
