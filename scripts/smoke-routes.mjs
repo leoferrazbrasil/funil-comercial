@@ -14,6 +14,7 @@ const routes = [
   "/crm-whatsapp-organizado",
   "/site-para-dentistas",
   "/site-para-nutricionistas",
+  "/site-para-psicologas",
   "/login",
   "/dashboard",
   "/inbox",

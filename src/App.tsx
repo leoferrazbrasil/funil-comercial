@@ -53,6 +53,7 @@ import PaidTrafficLocalBusinessLanding from "./pages/PaidTrafficLocalBusinessLan
 import CrmWhatsappLanding from "./pages/CrmWhatsappLanding";
 import DentistWebsiteLanding from "./pages/DentistWebsiteLanding";
 import NutritionistWebsiteLanding from "./pages/NutritionistWebsiteLanding";
+import PsychologistWebsiteLanding from "./pages/PsychologistWebsiteLanding";
 import { PrivacyPage, TermsPage, DataDeletionPage } from "./pages/LegalPages";
 import SignUpScreen from "./pages/SignUp";
 import LoginScreen from "./pages/Login";
@@ -151,6 +152,7 @@ const PUBLIC_PATHS = [
   "/crm-whatsapp-organizado",
   "/site-para-dentistas",
   "/site-para-nutricionistas",
+  "/site-para-psicologas",
   "/privacidade",
   "/termos",
   "/exclusao-de-dados",
@@ -1120,6 +1122,7 @@ function AppContent() {
         <Route path="/crm-whatsapp-organizado" element={<CrmWhatsappLanding />} />
         <Route path="/site-para-dentistas" element={<DentistWebsiteLanding />} />
         <Route path="/site-para-nutricionistas" element={<NutritionistWebsiteLanding />} />
+        <Route path="/site-para-psicologas" element={<PsychologistWebsiteLanding />} />
         <Route path="/privacidade" element={<PrivacyPage />} />
         <Route path="/termos" element={<TermsPage />} />
         <Route path="/exclusao-de-dados" element={<DataDeletionPage />} />
