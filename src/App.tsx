@@ -48,6 +48,7 @@ import CrmLandingPage from "./pages/CrmLanding";
 import BrandbookPage from "./pages/Brandbook";
 import LocalBusinessWebsiteLanding from "./pages/LocalBusinessWebsiteLanding";
 import SalesStructureDiagnosticLanding from "./pages/SalesStructureDiagnosticLanding";
+import GoogleBusinessProfileLanding from "./pages/GoogleBusinessProfileLanding";
 import { PrivacyPage, TermsPage, DataDeletionPage } from "./pages/LegalPages";
 import SignUpScreen from "./pages/SignUp";
 import LoginScreen from "./pages/Login";
@@ -141,6 +142,7 @@ const PUBLIC_PATHS = [
   "/brandbook",
   "/site-para-negocios-locais",
   "/diagnostico-estrutura-de-vendas",
+  "/google-meu-negocio",
   "/privacidade",
   "/termos",
   "/exclusao-de-dados",
@@ -1105,6 +1107,7 @@ function AppContent() {
         <Route path="/brandbook" element={<BrandbookPage />} />
         <Route path="/site-para-negocios-locais" element={<LocalBusinessWebsiteLanding />} />
         <Route path="/diagnostico-estrutura-de-vendas" element={<SalesStructureDiagnosticLanding />} />
+        <Route path="/google-meu-negocio" element={<GoogleBusinessProfileLanding />} />
         <Route path="/privacidade" element={<PrivacyPage />} />
         <Route path="/termos" element={<TermsPage />} />
         <Route path="/exclusao-de-dados" element={<DataDeletionPage />} />
