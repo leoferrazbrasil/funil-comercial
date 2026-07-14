@@ -1,0 +1,501 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dentista 24 Horas | Odontologia 24 Horas</title>
+  <meta name="description" content="Atendimento odontologico 24 horas no Ipiranga, Sao Paulo. Emergencias, implantes, protese dentaria, ortodontia, Invisalign e demais tratamentos.">
+  <style>
+    :root {
+      --ink: #103c55;
+      --ink-soft: #315c72;
+      --blue: #0877b7;
+      --teal: #067f86;
+      --cyan: #e6f7fb;
+      --gold: #caa46a;
+      --paper: #fbfcfd;
+      --line: #d6e4ea;
+      --white: #ffffff;
+      --shadow: 0 22px 55px rgba(16, 60, 85, .14);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+      line-height: 1.55;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+
+    .topbar {
+      background: #08324a;
+      color: var(--white);
+      font-size: 14px;
+    }
+
+    .wrap {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .topbar .wrap,
+    header .wrap,
+    .hero-grid,
+    .split,
+    .cards,
+    .proof-grid,
+    .footer-grid {
+      display: grid;
+      gap: 24px;
+    }
+
+    .topbar .wrap {
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      padding: 10px 0;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(255, 255, 255, .94);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--line);
+    }
+
+    header .wrap {
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      padding: 14px 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      width: 54px;
+      height: 54px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #0877b7, #08a6b0);
+      display: grid;
+      place-items: center;
+      color: var(--white);
+      font-weight: 800;
+      box-shadow: var(--shadow);
+    }
+
+    .brand strong {
+      display: block;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    .brand span {
+      display: block;
+      color: var(--ink-soft);
+      font-size: 13px;
+    }
+
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 22px;
+      font-size: 14px;
+      color: var(--ink-soft);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 48px;
+      padding: 0 18px;
+      border-radius: 999px;
+      background: var(--blue);
+      color: var(--white);
+      font-weight: 700;
+      box-shadow: 0 14px 28px rgba(8, 119, 183, .24);
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+
+    .btn.alt {
+      background: var(--white);
+      color: var(--ink);
+      border-color: var(--line);
+      box-shadow: none;
+    }
+
+    .hero {
+      background:
+        linear-gradient(90deg, rgba(251,252,253,.98), rgba(251,252,253,.82) 42%, rgba(251,252,253,.48)),
+        url("https://static.wixstatic.com/media/9e32ec_b4226c83d53941d0b9037e14b92e2fb5~mv2.jpg/v1/fit/w_2500,h_1330,al_c/9e32ec_b4226c83d53941d0b9037e14b92e2fb5~mv2.jpg");
+      background-size: cover;
+      background-position: center;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .hero-grid {
+      min-height: 660px;
+      grid-template-columns: minmax(0, 1.05fr) minmax(280px, .55fr);
+      align-items: center;
+      padding: 72px 0;
+    }
+
+    .eyebrow {
+      color: var(--teal);
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 16px;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    h1 {
+      font-size: clamp(42px, 6vw, 76px);
+      line-height: .98;
+      letter-spacing: 0;
+      margin-bottom: 22px;
+      max-width: 780px;
+    }
+
+    .lead {
+      font-size: 20px;
+      color: var(--ink-soft);
+      max-width: 720px;
+      margin-bottom: 30px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .trust-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .pill {
+      padding: 9px 13px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,.78);
+      color: var(--ink-soft);
+      font-size: 14px;
+    }
+
+    .hero-card {
+      background: rgba(255,255,255,.9);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero-card strong {
+      display: block;
+      font-size: 22px;
+      margin-bottom: 8px;
+    }
+
+    section {
+      padding: 78px 0;
+    }
+
+    .section-head {
+      max-width: 760px;
+      margin-bottom: 34px;
+    }
+
+    h2 {
+      font-size: clamp(32px, 4vw, 50px);
+      line-height: 1.05;
+      margin-bottom: 14px;
+    }
+
+    .section-head p,
+    .split p {
+      color: var(--ink-soft);
+      font-size: 18px;
+    }
+
+    .cards {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .card {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 24px;
+      min-height: 190px;
+      box-shadow: 0 12px 28px rgba(16, 60, 85, .08);
+    }
+
+    .card h3 {
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+
+    .card p {
+      color: var(--ink-soft);
+      margin-bottom: 0;
+    }
+
+    .split {
+      grid-template-columns: .95fr 1.05fr;
+      align-items: center;
+    }
+
+    .photo-panel {
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--line);
+      background: var(--white);
+    }
+
+    .photo-panel img {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+    }
+
+    .soft {
+      background: var(--cyan);
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .proof-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .quote {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 24px;
+    }
+
+    .quote strong {
+      display: block;
+      color: var(--gold);
+      margin-bottom: 8px;
+    }
+
+    .cta-band {
+      background: #08324a;
+      color: var(--white);
+      padding: 58px 0;
+    }
+
+    .cta-band .wrap {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .cta-band p { color: rgba(255,255,255,.78); margin-bottom: 0; }
+
+    footer {
+      padding: 42px 0;
+      background: var(--white);
+      border-top: 1px solid var(--line);
+      color: var(--ink-soft);
+    }
+
+    .footer-grid {
+      grid-template-columns: 1.2fr 1fr 1fr;
+    }
+
+    footer strong {
+      color: var(--ink);
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    @media (max-width: 860px) {
+      .topbar .wrap,
+      header .wrap,
+      .hero-grid,
+      .split,
+      .cards,
+      .proof-grid,
+      .cta-band .wrap,
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+
+      nav { display: none; }
+
+      header .btn {
+        width: 100%;
+      }
+
+      .hero-grid {
+        min-height: auto;
+        padding: 52px 0;
+      }
+
+      .hero {
+        background:
+          linear-gradient(180deg, rgba(251,252,253,.96), rgba(251,252,253,.88)),
+          url("https://static.wixstatic.com/media/9e32ec_b4226c83d53941d0b9037e14b92e2fb5~mv2.jpg/v1/fit/w_2500,h_1330,al_c/9e32ec_b4226c83d53941d0b9037e14b92e2fb5~mv2.jpg");
+        background-size: cover;
+        background-position: center;
+      }
+
+      h1 { font-size: 42px; }
+      .actions .btn { width: 100%; }
+      section { padding: 56px 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="wrap">
+      <div>Responsável técnica: Dra. Danielly S Costa de Oliveira - CRO SP 110.939</div>
+      <a href="https://wa.me/5511967441230?text=Ol%C3%A1%21%20Vim%20pelo%20site%20da%20cl%C3%ADnica%20e%20gostaria%20de%20atendimento." target="_blank" rel="noopener">(11) 2273-0023</a>
+    </div>
+  </div>
+
+  <header>
+    <div class="wrap">
+      <a class="brand" href="#inicio">
+        <div class="brand-mark">24H</div>
+        <div>
+          <strong>Danielly S Costa Odontologia</strong>
+          <span>Atendimento odontológico 24 horas</span>
+        </div>
+      </a>
+      <nav aria-label="Navegação principal">
+        <a href="#tratamentos">Tratamentos</a>
+        <a href="#urgencia">Urgência</a>
+        <a href="#localizacao">Localização</a>
+        <a href="#perguntas">Perguntas frequentes</a>
+      </nav>
+      <a class="btn" href="https://wa.me/5511967441230?text=Ol%C3%A1%21%20Vim%20pelo%20site%20da%20cl%C3%ADnica%20e%20gostaria%20de%20agendar%20uma%20consulta." target="_blank" rel="noopener">Agendar pelo WhatsApp</a>
+    </div>
+  </header>
+
+  <main id="inicio">
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div>
+          <div class="eyebrow">Emergência odontológica em São Paulo</div>
+          <h1>Dentista 24 horas no Ipiranga</h1>
+          <p class="lead">Atendimento para emergências odontológicas e tratamentos eletivos com horários flexíveis. A clínica avalia cada caso em consulta para indicar um plano de tratamento personalizado.</p>
+          <div class="actions">
+            <a class="btn" href="https://wa.me/5511967441230?text=Ol%C3%A1%21%20Estou%20com%20uma%20urg%C3%AAncia%20odontol%C3%B3gica%20e%20vim%20pelo%20site%20da%20cl%C3%ADnica." target="_blank" rel="noopener">Preciso de atendimento agora</a>
+            <a class="btn alt" href="https://wa.me/5511967441230?text=Ol%C3%A1%21%20Quero%20informa%C3%A7%C3%B5es%20sobre%20tratamentos%20odontol%C3%B3gicos." target="_blank" rel="noopener">Ver tratamentos</a>
+          </div>
+          <div class="trust-row">
+            <span class="pill">Aberto 24 horas</span>
+            <span class="pill">Ipiranga - São Paulo/SP</span>
+            <span class="pill">Invisalign Doctor</span>
+            <span class="pill">Não atendemos convênios ou SUS</span>
+          </div>
+        </div>
+        <aside class="hero-card" aria-label="Resumo de contato">
+          <strong>Atendimento todos os dias</strong>
+          <p>Av. Dr. Ricardo Jafet, 457, sala 2 - Ipiranga, São Paulo/SP, próximo ao Museu do Ipiranga.</p>
+          <a class="btn" href="https://wa.me/5511967441230?text=Ol%C3%A1%21%20Vim%20pelo%20site%20e%20gostaria%20de%20confirmar%20o%20endere%C3%A7o%20da%20cl%C3%ADnica." target="_blank" rel="noopener">Confirmar localização</a>
+        </aside>
+      </div>
+    </section>
+
+    <section id="urgencia">
+      <div class="wrap split">
+        <div class="photo-panel">
+          <img src="https://static.wixstatic.com/media/9e32ec_b4226c83d53941d0b9037e14b92e2fb5~mv2.jpg/v1/fit/w_2500,h_1330,al_c/9e32ec_b4226c83d53941d0b9037e14b92e2fb5~mv2.jpg" alt="Consultório da Odontologia 24 Horas">
+        </div>
+        <div>
+          <div class="eyebrow">Alívio imediato e cuidado de qualidade</div>
+          <h2>Emergências dentárias podem surgir sem aviso</h2>
+          <p>O consultório prioriza atendimento de emergência para dor de dente aguda, trauma na boca e outras urgências odontológicas. A equipe trabalha com dentistas experientes, equipamentos modernos e uma abordagem compassiva para ajudar o paciente a recuperar a saúde bucal sem demora.</p>
+          <a class="btn" href="https://wa.me/5511967441230?text=Ol%C3%A1%21%20Estou%20com%20dor%20ou%20uma%20emerg%C3%AAncia%20odontol%C3%B3gica%20e%20preciso%20de%20atendimento." target="_blank" rel="noopener">Falar com a clínica</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="soft" id="tratamentos">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="eyebrow">Tratamentos informados no site atual</div>
+          <h2>Cuidados odontológicos para urgência e rotina</h2>
+          <p>Os serviços abaixo foram preservados a partir do conteúdo real da página atual.</p>
+        </div>
+        <div class="cards">
+          <article class="card"><h3>Urgência odontológica</h3><p>Atendimento 24 horas para dor, trauma e situações que exigem avaliação rápida.</p></article>
+          <article class="card"><h3>Implante dental</h3><p>Tratamento citado no site atual para reabilitação do sorriso.</p></article>
+          <article class="card"><h3>Prótese dentária</h3><p>Prótese dentária, reabilitação oral e prótese imediata em 48 horas.</p></article>
+          <article class="card"><h3>Ortodontia e Invisalign</h3><p>Ortodontia e Invisalign aparecem entre os tratamentos da clínica.</p></article>
+          <article class="card"><h3>Endodontia e periodontia</h3><p>Tratamento de canal, periodontia e cuidados de suporte à saúde bucal.</p></article>
+          <article class="card"><h3>Estética e dentística</h3><p>Dentística, estética, cirurgia, odontogeriatria e odontopediatria.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="perguntas">
+      <div class="wrap proof-grid">
+        <div>
+          <div class="eyebrow">Como funciona</div>
+          <h2>Avaliação individual, sem valores por telefone</h2>
+          <p>O site atual informa que a clínica não fornece valores por telefone porque cada caso é único. Durante a consulta, as necessidades são avaliadas e um plano de tratamento personalizado é elaborado.</p>
+          <a class="btn" href="https://wa.me/5511967441230?text=Ol%C3%A1%21%20Quero%20agendar%20uma%20avalia%C3%A7%C3%A3o%20para%20entender%20meu%20caso." target="_blank" rel="noopener">Agendar avaliação</a>
+        </div>
+        <div class="quote">
+          <strong>Compromisso declarado pela clínica</strong>
+          <p>“Nosso compromisso é proporcionar um atendimento excepcional, aliviando a dor e cuidando de nossos pacientes.”</p>
+          <p>Texto preservado do conteúdo atual da página.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta-band" id="localizacao">
+      <div class="wrap">
+        <div>
+          <h2>Av. Dr. Ricardo Jafet, 457 - Ipiranga</h2>
+          <p>Sala 2, São Paulo/SP. Próximo ao Museu do Ipiranga.</p>
+        </div>
+        <a class="btn" href="https://wa.me/5511967441230?text=Ol%C3%A1%21%20Vim%20pelo%20site%20e%20quero%20receber%20orienta%C3%A7%C3%B5es%20para%20chegar%20%C3%A0%20cl%C3%ADnica." target="_blank" rel="noopener">Receber orientação pelo WhatsApp</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap footer-grid">
+      <div>
+        <strong>Danielly S Costa Odontologia 24 Horas</strong>
+        <span>Atendimento odontológico 24 horas em São Paulo.</span>
+      </div>
+      <div>
+        <strong>Contato</strong>
+        <a href="https://wa.me/5511967441230?text=Ol%C3%A1%21%20Vim%20pelo%20site%20da%20cl%C3%ADnica." target="_blank" rel="noopener">(11) 2273-0023</a>
+      </div>
+      <div>
+        <strong>Responsável técnica</strong>
+        <span>Dra. Danielly S Costa de Oliveira - CRO SP 110.939</span>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

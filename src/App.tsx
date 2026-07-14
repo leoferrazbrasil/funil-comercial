@@ -46,6 +46,7 @@ import {
 import LandingPage from "./pages/Landing";
 import CrmLandingPage from "./pages/CrmLanding";
 import BrandbookPage from "./pages/Brandbook";
+import LocalBusinessWebsiteLanding from "./pages/LocalBusinessWebsiteLanding";
 import { PrivacyPage, TermsPage, DataDeletionPage } from "./pages/LegalPages";
 import SignUpScreen from "./pages/SignUp";
 import LoginScreen from "./pages/Login";
@@ -115,6 +116,11 @@ import InstagramOAuthCallback from "./pages/InstagramOAuthCallback";
 import WhatsappPage from "./pages/Whatsapp";
 import LinkAggregatorPage from "./pages/LinkAggregator";
 import ResetPasswordPage from "./pages/ResetPassword";
+import ProspectingPreviewPage from "./pages/ProspectingPreview";
+import {
+  isProspectingPreviewPath,
+  normalizePublicPath,
+} from "./lib/prospectingPreviews";
 
 type ModalType = "contact" | "lead" | "opportunity" | "message" | "channel";
 type EditingTarget =
@@ -132,15 +138,19 @@ const PUBLIC_PATHS = [
   "/",
   "/crm",
   "/brandbook",
+  "/site-para-negocios-locais",
   "/privacidade",
   "/termos",
   "/exclusao-de-dados",
   "/redefinir-senha",
 ];
 
-// Rota pública exata OU um agregador de links (/l/:slug — bio do Instagram / produto).
+// Pública: match exato (com normalização), agregador de links (/l/:slug — bio/produto)
+// ou preview de prospecção.
 const isPublicPath = (pathname: string) =>
-  PUBLIC_PATHS.includes(pathname) || pathname.startsWith("/l/");
+  PUBLIC_PATHS.includes(normalizePublicPath(pathname)) ||
+  pathname.startsWith("/l/") ||
+  isProspectingPreviewPath(pathname);
 
 const stages: OpportunityStage[] = pipelineStages;
 const leadStatuses: Array<{ label: string; value: Lead["status"] }> = [
@@ -1091,11 +1101,14 @@ function AppContent() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/crm" element={<CrmLandingPage />} />
         <Route path="/brandbook" element={<BrandbookPage />} />
+        <Route path="/site-para-negocios-locais" element={<LocalBusinessWebsiteLanding />} />
         <Route path="/privacidade" element={<PrivacyPage />} />
         <Route path="/termos" element={<TermsPage />} />
         <Route path="/exclusao-de-dados" element={<DataDeletionPage />} />
         <Route path="/redefinir-senha" element={<ResetPasswordPage />} />
         <Route path="/l/:slug" element={<LinkAggregatorPage />} />
+        <Route path="/:slug" element={<ProspectingPreviewPage />} />
+        <Route path="/:slug/index.html" element={<ProspectingPreviewPage />} />
       </Routes>
     );
   }

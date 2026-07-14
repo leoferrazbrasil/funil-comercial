@@ -5,7 +5,16 @@ import { spawn } from "node:child_process";
 const host = "127.0.0.1";
 const port = Number(process.env.FUNIL_PREVIEW_PORT ?? 4174);
 const baseUrl = `http://${host}:${port}`;
-const routes = ["/", "/login", "/dashboard", "/inbox", "/contatos", "/leads", "/funil"];
+const routes = [
+  "/",
+  "/site-para-negocios-locais",
+  "/login",
+  "/dashboard",
+  "/inbox",
+  "/contatos",
+  "/leads",
+  "/funil",
+];
 const distIndex = join(process.cwd(), "dist", "index.html");
 const viteBin = join(process.cwd(), "node_modules", "vite", "bin", "vite.js");
 
