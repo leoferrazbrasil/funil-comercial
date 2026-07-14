@@ -11,7 +11,7 @@ import {
   Search,
 } from "lucide-react";
 import Logo from "../components/Logo";
-import { SeoHead, generateLocalBusinessSchema, generateServiceSchema } from "../components/SeoHead";
+import { SeoHead, generateLocalBusinessSchema, generateServiceSchema, generateFAQSchema } from "../components/SeoHead";
 import { seoNicheData, getDefaultNicheData } from "../lib/seoNicheData";
 
 const WHATSAPP_NUMBER = "5551996737359";
@@ -64,13 +64,18 @@ export default function LocalCityLanding() {
   const whatsappMessage = `Olá! Quero saber mais sobre a criação de site para ${formattedNicho} em ${formattedCidade}.`;
   const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`;
 
-  const schema = [
+  const schema: any[] = [
     generateLocalBusinessSchema(),
     generateServiceSchema(
       `Criação de Site para ${formattedNicho} em ${formattedCidade}`,
       description
     )
   ];
+
+  if (nicheData.faqs) {
+    const faqSchema = generateFAQSchema(nicheData.faqs);
+    if (faqSchema) schema.push(faqSchema);
+  }
 
   return (
     <div data-theme="dark" className="min-h-screen bg-background text-foreground">
@@ -141,7 +146,28 @@ export default function LocalCityLanding() {
                 ))}
              </div>
           </div>
-        </section>
+         </section>
+
+         {nicheData.faqs && nicheData.faqs.length > 0 && (
+           <section className="bg-background py-20 md:py-28">
+             <div className="mx-auto max-w-4xl px-5 md:px-8">
+               <div className="text-center mb-12">
+                 <h2 className="text-3xl font-black md:text-4xl">Perguntas Frequentes</h2>
+                 <p className="mt-4 text-muted-foreground">
+                   Tudo o que você precisa saber sobre nosso serviço para {formattedNicho} em {formattedCidade}.
+                 </p>
+               </div>
+               <div className="flex flex-col gap-6">
+                 {nicheData.faqs.map((faq, i) => (
+                   <div key={i} className="rounded-xl border border-white/10 bg-card/30 p-6">
+                     <h3 className="text-xl font-bold mb-3">{faq.question}</h3>
+                     <p className="text-muted-foreground leading-relaxed">{faq.answer}</p>
+                   </div>
+                 ))}
+               </div>
+             </div>
+           </section>
+         )}
       </main>
 
       <footer className="border-t border-white/10 py-8 text-center flex flex-col gap-4 items-center justify-center">
