@@ -13,6 +13,7 @@ const routes = [
   "/trafego-pago-negocios-locais",
   "/crm-whatsapp-organizado",
   "/site-para-dentistas",
+  "/site-para-nutricionistas",
   "/login",
   "/dashboard",
   "/inbox",
