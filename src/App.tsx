@@ -1126,6 +1126,17 @@ function AppContent() {
         <Route path="/site-para-nutricionistas" element={<NutritionistWebsiteLanding />} />
         <Route path="/site-para-psicologas" element={<PsychologistWebsiteLanding />} />
         <Route path="/privacidade" element={<PrivacyPage />} />
+        <Route path="/termos" element={<TermsPage />} />
+        <Route path="/exclusao-de-dados" element={<DataDeletionPage />} />
+        <Route path="/redefinir-senha" element={<ResetPasswordPage />} />
+        <Route path="/local/:nicho/:estado/:cidade" element={<LocalCityLanding />} />
+        <Route path="/l/:slug" element={<LinkAggregatorPage />} />
+        <Route path="/:slug" element={<ProspectingPreviewPage />} />
+        <Route path="/:slug/index.html" element={<ProspectingPreviewPage />} />
+      </Routes>
+    );
+  }
+
   // Rota privada: aguardamos a sessão resolver para não piscar o login.
   if (isBooting) {
     return <LoadingScreen label="Preparando sua experiência..." />;
