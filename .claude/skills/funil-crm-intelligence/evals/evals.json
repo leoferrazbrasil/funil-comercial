@@ -1,0 +1,30 @@
+{
+  "skill_name": "funil-crm-intelligence",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Analise este atendimento: lead recebido via WhatsApp ha 18 minutos, sem responsavel, mensagem inicial 'Quero saber valores e visitar no fim de semana', canal whatsapp, origem Meta Ads, oportunidade ainda em novo_contato. Gere recomendacao operacional estruturada para o CRM.",
+      "expected_output": "Deve classificar prioridade como critica ou alta, justificar SLA/intencao, sugerir resposta de WhatsApp, recomendar etapa visita ou qualificacao e listar tarefas executaveis.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Tenho um contato duplicado no CRM com telefone em formatos diferentes: (51) 99999-9999 e 5551999999999. O modulo e contatos. Gere diagnostico e proxima acao sem apagar dados.",
+      "expected_output": "Deve recomendar normalizacao para 5551999999999, sinalizar risco de duplicidade, sugerir consolidacao segura e evitar exclusao automatica.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "No funil parceiros chegou uma incorporadora com dois empreendimentos ativos, dificuldade em gerar leads qualificados e interesse em parceria por participacao em resultado. Sugira etapa, perguntas de diagnostico e proxima acao.",
+      "expected_output": "Deve identificar fit B2B, recomendar diagnostico ou proposta_parceria conforme contexto, sugerir perguntas comerciais e tarefas para o gestor.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "Quero melhorar o dashboard conversacional para ele nao apenas navegar, mas dizer ao usuario o que fazer primeiro com base em leads, SLA e funil. Defina como a inteligencia da skill deve aparecer na UI.",
+      "expected_output": "Deve propor superficie dashboard_agent, card/chips de acao, dados necessarios, prioridade operacional e evitar automacao exagerada no MVP.",
+      "files": []
+    }
+  ]
+}
+

@@ -16,6 +16,7 @@
     "db:apply": "node scripts/apply-supabase-sql.mjs",
     "functions:smoke": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test-supabase-functions.ps1",
     "routes:smoke": "node scripts/smoke-routes.mjs",
+    "sync-skills": "node scripts/sync-skills.mjs",
     "preview": "vite preview"
   },
   "devDependencies": {
