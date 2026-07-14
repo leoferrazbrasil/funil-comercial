@@ -47,6 +47,7 @@ import LandingPage from "./pages/Landing";
 import CrmLandingPage from "./pages/CrmLanding";
 import BrandbookPage from "./pages/Brandbook";
 import LocalBusinessWebsiteLanding from "./pages/LocalBusinessWebsiteLanding";
+import SalesStructureDiagnosticLanding from "./pages/SalesStructureDiagnosticLanding";
 import { PrivacyPage, TermsPage, DataDeletionPage } from "./pages/LegalPages";
 import SignUpScreen from "./pages/SignUp";
 import LoginScreen from "./pages/Login";
@@ -139,6 +140,7 @@ const PUBLIC_PATHS = [
   "/crm",
   "/brandbook",
   "/site-para-negocios-locais",
+  "/diagnostico-estrutura-de-vendas",
   "/privacidade",
   "/termos",
   "/exclusao-de-dados",
@@ -1102,6 +1104,7 @@ function AppContent() {
         <Route path="/crm" element={<CrmLandingPage />} />
         <Route path="/brandbook" element={<BrandbookPage />} />
         <Route path="/site-para-negocios-locais" element={<LocalBusinessWebsiteLanding />} />
+        <Route path="/diagnostico-estrutura-de-vendas" element={<SalesStructureDiagnosticLanding />} />
         <Route path="/privacidade" element={<PrivacyPage />} />
         <Route path="/termos" element={<TermsPage />} />
         <Route path="/exclusao-de-dados" element={<DataDeletionPage />} />

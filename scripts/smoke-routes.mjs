@@ -8,6 +8,7 @@ const baseUrl = `http://${host}:${port}`;
 const routes = [
   "/",
   "/site-para-negocios-locais",
+  "/diagnostico-estrutura-de-vendas",
   "/login",
   "/dashboard",
   "/inbox",
