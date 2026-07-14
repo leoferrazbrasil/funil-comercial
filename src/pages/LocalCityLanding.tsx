@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import Logo from "../components/Logo";
 import { SeoHead, generateLocalBusinessSchema, generateServiceSchema } from "../components/SeoHead";
+import { seoNicheData, getDefaultNicheData } from "../lib/seoNicheData";
 
 const WHATSAPP_NUMBER = "5551996737359";
 
@@ -53,8 +54,12 @@ export default function LocalCityLanding() {
   const formattedEstado = formatLocationName(estado);
   const formattedNicho = formatNiche(nicho);
   
-  const title = `Site Profissional para ${formattedNicho.charAt(0).toUpperCase() + formattedNicho.slice(1)} em ${formattedCidade} - ${formattedEstado}`;
-  const description = `Procurando criar um site para ${formattedNicho} em ${formattedCidade} (${formattedEstado})? Criamos sua página otimizada, rápida e focada em vendas locais. R$497 + hospedagem.`;
+  const nicheData = nicho && seoNicheData[nicho] 
+    ? seoNicheData[nicho] 
+    : getDefaultNicheData(formattedNicho, formattedCidade);
+  
+  const title = `${nicheData.title} em ${formattedCidade} - ${formattedEstado}`;
+  const description = `Procurando criar um site para ${formattedNicho} em ${formattedCidade} (${formattedEstado})? ${nicheData.heroSubtitle} R$497 + hospedagem.`;
   
   const whatsappMessage = `Olá! Quero saber mais sobre a criação de site para ${formattedNicho} em ${formattedCidade}.`;
   const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`;
@@ -102,7 +107,7 @@ export default function LocalCityLanding() {
               Site profissional para {formattedNicho} em <span className="text-primary">{formattedCidade}</span>
             </h1>
             <p className="mx-auto mt-7 max-w-2xl text-base leading-8 text-muted-foreground sm:text-lg md:text-xl">
-              Seu cliente em {formattedCidade} pesquisa no Google antes de agendar. Tenha uma página que passa confiança e transforma visitas em conversas no WhatsApp.
+              {nicheData.heroSubtitle.replace("sua cidade", formattedCidade).replace("sua região", formattedCidade)}
             </p>
             <div className="mt-10 flex justify-center">
               <a
@@ -119,11 +124,22 @@ export default function LocalCityLanding() {
         </section>
 
         <section className="bg-card/20 py-20 md:py-28">
-          <div className="mx-auto max-w-7xl px-5 md:px-8 text-center">
-             <h2 className="text-3xl font-black md:text-4xl">Por que ter um site otimizado para sua cidade?</h2>
-             <p className="mx-auto mt-5 max-w-2xl text-lg text-muted-foreground">
-               Concorrentes em {formattedCidade} já estão aparecendo no topo. Um site estruturado garante que quem procure por {formattedNicho} na região encontre seu negócio preparado para atender.
-             </p>
+          <div className="mx-auto max-w-7xl px-5 md:px-8">
+             <div className="text-center">
+               <h2 className="text-3xl font-black md:text-4xl">{nicheData.painPointTitle.replace("sua cidade", formattedCidade).replace("sua região", formattedCidade)}</h2>
+               <p className="mx-auto mt-5 max-w-2xl text-lg text-muted-foreground">
+                 {nicheData.painPointDescription.replace("sua cidade", formattedCidade).replace("sua região", formattedCidade)}
+               </p>
+             </div>
+             
+             <div className="mt-16 grid gap-6 md:grid-cols-3">
+                {nicheData.benefits.map((benefit, i) => (
+                  <div key={i} className="rounded-2xl border border-white/5 bg-background/50 p-6 flex gap-4">
+                    <CheckCircle2 className="text-primary shrink-0" size={24} />
+                    <p className="text-sm md:text-base font-medium">{benefit}</p>
+                  </div>
+                ))}
+             </div>
           </div>
         </section>
       </main>
