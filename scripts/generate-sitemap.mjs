@@ -10,6 +10,7 @@ const DOMAIN = 'https://funilcomercial.com';
 const PUBLIC_ROUTES = [
   '/',
   '/crm',
+  '/consultoria',
   '/brandbook',
   '/site-para-negocios-locais',
   '/diagnostico-estrutura-de-vendas',

@@ -10,6 +10,7 @@ const __dirname = path.dirname(__filename);
 // The routes we specifically want to prerender (High Priority / Top of Funnel)
 const CORE_ROUTES = [
   '/',
+  '/consultoria',
   '/cidades-atendidas',
   '/blog',
   '/blog/importancia-do-site-para-advogados',

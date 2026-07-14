@@ -56,6 +56,8 @@ import NutritionistWebsiteLanding from "./pages/NutritionistWebsiteLanding";
 import PsychologistWebsiteLanding from "./pages/PsychologistWebsiteLanding";
 import LocalCityLanding from "./pages/LocalCityLanding";
 import CitiesDirectory from "./pages/CitiesDirectory";
+import ConsultoriaLanding from "./pages/ConsultoriaLanding";
+import { AnnouncementBar } from "./components/AnnouncementBar";
 import BlogIndex from "./pages/BlogIndex";
 import BlogPost from "./pages/BlogPost";
 import { PrivacyPage, TermsPage, DataDeletionPage } from "./pages/LegalPages";
@@ -148,6 +150,7 @@ const navItems = navigationItems;
 const PUBLIC_PATHS = [
   "/",
   "/cidades-atendidas",
+  "/consultoria",
   "/blog",
   "/crm",
   "/brandbook",
@@ -1119,30 +1122,34 @@ function AppContent() {
   // chega pela primeira vez vê a página imediatamente, sem a tela de carregamento.
   if (isPublicRoute) {
     return (
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/crm" element={<CrmLandingPage />} />
-        <Route path="/brandbook" element={<BrandbookPage />} />
-        <Route path="/site-para-negocios-locais" element={<LocalBusinessWebsiteLanding />} />
-        <Route path="/diagnostico-estrutura-de-vendas" element={<SalesStructureDiagnosticLanding />} />
-        <Route path="/google-meu-negocio" element={<GoogleBusinessProfileLanding />} />
-        <Route path="/trafego-pago-negocios-locais" element={<PaidTrafficLocalBusinessLanding />} />
-        <Route path="/crm-whatsapp-organizado" element={<CrmWhatsappLanding />} />
-        <Route path="/site-para-dentistas" element={<DentistWebsiteLanding />} />
-        <Route path="/site-para-nutricionistas" element={<NutritionistWebsiteLanding />} />
-        <Route path="/site-para-psicologas" element={<PsychologistWebsiteLanding />} />
-        <Route path="/privacidade" element={<PrivacyPage />} />
-        <Route path="/termos" element={<TermsPage />} />
-        <Route path="/exclusao-de-dados" element={<DataDeletionPage />} />
-        <Route path="/redefinir-senha" element={<ResetPasswordPage />} />
-        <Route path="/cidades-atendidas" element={<CitiesDirectory />} />
-        <Route path="/blog" element={<BlogIndex />} />
-        <Route path="/blog/:slug" element={<BlogPost />} />
-        <Route path="/local/:nicho/:estado/:cidade" element={<LocalCityLanding />} />
-        <Route path="/l/:slug" element={<LinkAggregatorPage />} />
-        <Route path="/:slug" element={<ProspectingPreviewPage />} />
-        <Route path="/:slug/index.html" element={<ProspectingPreviewPage />} />
-      </Routes>
+      <>
+        <AnnouncementBar />
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/crm" element={<CrmLandingPage />} />
+          <Route path="/consultoria" element={<ConsultoriaLanding />} />
+          <Route path="/brandbook" element={<BrandbookPage />} />
+          <Route path="/site-para-negocios-locais" element={<LocalBusinessWebsiteLanding />} />
+          <Route path="/diagnostico-estrutura-de-vendas" element={<SalesStructureDiagnosticLanding />} />
+          <Route path="/google-meu-negocio" element={<GoogleBusinessProfileLanding />} />
+          <Route path="/trafego-pago-negocios-locais" element={<PaidTrafficLocalBusinessLanding />} />
+          <Route path="/crm-whatsapp-organizado" element={<CrmWhatsappLanding />} />
+          <Route path="/site-para-dentistas" element={<DentistWebsiteLanding />} />
+          <Route path="/site-para-nutricionistas" element={<NutritionistWebsiteLanding />} />
+          <Route path="/site-para-psicologas" element={<PsychologistWebsiteLanding />} />
+          <Route path="/privacidade" element={<PrivacyPage />} />
+          <Route path="/termos" element={<TermsPage />} />
+          <Route path="/exclusao-de-dados" element={<DataDeletionPage />} />
+          <Route path="/redefinir-senha" element={<ResetPasswordPage />} />
+          <Route path="/cidades-atendidas" element={<CitiesDirectory />} />
+          <Route path="/blog" element={<BlogIndex />} />
+          <Route path="/blog/:slug" element={<BlogPost />} />
+          <Route path="/local/:nicho/:estado/:cidade" element={<LocalCityLanding />} />
+          <Route path="/l/:slug" element={<LinkAggregatorPage />} />
+          <Route path="/:slug" element={<ProspectingPreviewPage />} />
+          <Route path="/:slug/index.html" element={<ProspectingPreviewPage />} />
+        </Routes>
+      </>
     );
   }
 
