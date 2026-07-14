@@ -12,6 +12,7 @@ const routes = [
   "/google-meu-negocio",
   "/trafego-pago-negocios-locais",
   "/crm-whatsapp-organizado",
+  "/site-para-dentistas",
   "/login",
   "/dashboard",
   "/inbox",
