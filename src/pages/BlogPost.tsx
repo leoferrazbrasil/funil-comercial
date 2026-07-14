@@ -42,6 +42,12 @@ export default function BlogPost() {
     }
   };
 
+  const formattedDate = new Date(post.date).toLocaleDateString('pt-BR', { 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  });
+
   return (
     <div data-theme="dark" className="min-h-screen bg-background text-foreground font-sans selection:bg-primary/30">
       <SeoHead 
