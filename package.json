@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc && vite build && node scripts/generate-sitemap.mjs",
     "typecheck": "tsc --noEmit",
     "check": "npm run typecheck && npm run build",
     "db:apply": "node scripts/apply-supabase-sql.mjs",
@@ -40,6 +40,7 @@
     "lucide-react": "^1.23.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
+    "react-helmet-async": "^3.0.0",
     "react-hot-toast": "^2.6.0",
     "react-imask": "^7.6.1",
     "react-router-dom": "^7.18.1"

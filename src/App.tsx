@@ -54,6 +54,7 @@ import CrmWhatsappLanding from "./pages/CrmWhatsappLanding";
 import DentistWebsiteLanding from "./pages/DentistWebsiteLanding";
 import NutritionistWebsiteLanding from "./pages/NutritionistWebsiteLanding";
 import PsychologistWebsiteLanding from "./pages/PsychologistWebsiteLanding";
+import LocalCityLanding from "./pages/LocalCityLanding";
 import { PrivacyPage, TermsPage, DataDeletionPage } from "./pages/LegalPages";
 import SignUpScreen from "./pages/SignUp";
 import LoginScreen from "./pages/Login";
@@ -160,10 +161,11 @@ const PUBLIC_PATHS = [
 ];
 
 // Pública: match exato (com normalização), agregador de links (/l/:slug — bio/produto)
-// ou preview de prospecção.
+// ou preview de prospecção, ou rotas locais programáticas (/local/...).
 const isPublicPath = (pathname: string) =>
   PUBLIC_PATHS.includes(normalizePublicPath(pathname)) ||
   pathname.startsWith("/l/") ||
+  pathname.startsWith("/local/") ||
   isProspectingPreviewPath(pathname);
 
 const stages: OpportunityStage[] = pipelineStages;
@@ -1124,16 +1126,6 @@ function AppContent() {
         <Route path="/site-para-nutricionistas" element={<NutritionistWebsiteLanding />} />
         <Route path="/site-para-psicologas" element={<PsychologistWebsiteLanding />} />
         <Route path="/privacidade" element={<PrivacyPage />} />
-        <Route path="/termos" element={<TermsPage />} />
-        <Route path="/exclusao-de-dados" element={<DataDeletionPage />} />
-        <Route path="/redefinir-senha" element={<ResetPasswordPage />} />
-        <Route path="/l/:slug" element={<LinkAggregatorPage />} />
-        <Route path="/:slug" element={<ProspectingPreviewPage />} />
-        <Route path="/:slug/index.html" element={<ProspectingPreviewPage />} />
-      </Routes>
-    );
-  }
-
   // Rota privada: aguardamos a sessão resolver para não piscar o login.
   if (isBooting) {
     return <LoadingScreen label="Preparando sua experiência..." />;

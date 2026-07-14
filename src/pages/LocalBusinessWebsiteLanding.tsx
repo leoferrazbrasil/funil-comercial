@@ -20,6 +20,7 @@ import {
   Wrench,
 } from "lucide-react";
 import Logo from "../components/Logo";
+import { SeoHead, generateLocalBusinessSchema, generateServiceSchema } from "../components/SeoHead";
 
 const WHATSAPP_NUMBER = "5551996737359";
 const WHATSAPP_MESSAGE =
@@ -122,17 +123,6 @@ const faq = [
   },
 ];
 
-function updateMetaDescription(content: string) {
-  const selector = 'meta[name="description"]';
-  let meta = document.querySelector<HTMLMetaElement>(selector);
-  if (!meta) {
-    meta = document.createElement("meta");
-    meta.name = "description";
-    document.head.appendChild(meta);
-  }
-
-  meta.content = content;
-}
 
 function SitePreview() {
   return (
@@ -183,24 +173,22 @@ function SitePreview() {
 }
 
 export default function LocalBusinessWebsiteLanding() {
-  useEffect(() => {
-    const previousTitle = document.title;
-    const description =
-      "Criação de site profissional para negócios locais por R$497 + R$37,90/mês de hospedagem e manutenção. Página rápida, responsiva e com WhatsApp em destaque.";
-    const meta = document.querySelector<HTMLMetaElement>('meta[name="description"]');
-    const previousDescription = meta?.content;
-
-    document.title = "Site para Negócios Locais por R$497 | Funil Comercial";
-    updateMetaDescription(description);
-
-    return () => {
-      document.title = previousTitle;
-      if (previousDescription) updateMetaDescription(previousDescription);
-    };
-  }, []);
+  const schema = [
+    generateLocalBusinessSchema(),
+    generateServiceSchema(
+      "Criação de Sites para Negócios Locais",
+      "Página rápida, responsiva e com WhatsApp em destaque. Investimento único + hospedagem e manutenção mensal."
+    )
+  ];
 
   return (
     <div data-theme="dark" className="min-h-screen bg-background text-foreground">
+      <SeoHead 
+        title="Site para Negócios Locais por R$497"
+        description="Criação de site profissional para negócios locais por R$497 + R$37,90/mês de hospedagem e manutenção. Página rápida, responsiva e com WhatsApp em destaque."
+        canonicalUrl="https://funilcomercial.com/site-para-negocios-locais"
+        schema={schema}
+      />
       <header className="sticky top-0 z-50 border-b border-white/10 bg-background/90 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 md:h-20 md:px-8">
           <Link to="/" aria-label="Funil Comercial">
