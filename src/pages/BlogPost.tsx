@@ -67,20 +67,43 @@ export default function BlogPost() {
       </header>
 
       <main className="py-12 md:py-20">
-        <article className="mx-auto max-w-3xl px-5 md:px-8">
-          <header className="mb-14 text-center">
-            <div className="flex items-center justify-center gap-x-4 text-xs mb-6">
-              <time dateTime={post.date} className="text-muted-foreground">
-                {new Date(post.date).toLocaleDateString('pt-BR', { year: 'numeric', month: 'long', day: 'numeric' })}
-              </time>
-              <span className="rounded-full bg-primary/10 px-3 py-1.5 font-medium text-primary">
+        <article 
+          className="mx-auto max-w-3xl overflow-hidden rounded-3xl bg-card/50 backdrop-blur-sm border border-white/10 shadow-2xl pb-16"
+          itemScope 
+          itemType="http://schema.org/BlogPosting"
+        >
+          <meta itemProp="headline" content={post.title} />
+          <meta itemProp="image" content={post.imageUrl || ""} />
+          
+          <header className="px-6 py-12 md:px-12 md:py-16 text-center border-b border-white/10 bg-black/20">
+            <div className="mb-6 flex items-center justify-center gap-4">
+              <span 
+                className="rounded-full bg-primary/10 px-4 py-1.5 text-sm font-semibold text-primary border border-primary/20"
+                itemProp="articleSection"
+              >
                 {post.category}
               </span>
+              <time 
+                dateTime={post.date} 
+                className="text-sm text-muted-foreground font-medium"
+                itemProp="datePublished"
+              >
+                {formattedDate}
+              </time>
             </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight mb-8 leading-tight">
+            
+            <h1 
+              className="text-3xl md:text-5xl font-black tracking-tight text-white mb-8 leading-tight"
+            >
               {post.title}
             </h1>
-            <div className="flex items-center justify-center gap-x-4">
+            
+            <div 
+              className="flex items-center justify-center gap-x-4"
+              itemProp="author" 
+              itemScope 
+              itemType="http://schema.org/Person"
+            >
                <div className="h-12 w-12 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary text-lg overflow-hidden border-2 border-primary/20">
                  {post.authorAvatar ? (
                    <img src={post.authorAvatar} alt={post.author} className="h-full w-full object-cover" />
@@ -89,16 +112,18 @@ export default function BlogPost() {
                  )}
                </div>
                <div className="text-left leading-6">
-                 <p className="font-semibold text-foreground text-sm">
+                 <p className="font-semibold text-foreground text-sm" itemProp="name">
                    {post.author}
                  </p>
-                 <p className="text-muted-foreground text-xs">Especialista de Vendas</p>
+                 <p className="text-xs text-muted-foreground">
+                   Especialista em Vendas
+                 </p>
                </div>
             </div>
           </header>
 
           {post.imageUrl && (
-            <figure className="mb-14 aspect-video w-full overflow-hidden rounded-2xl border border-white/5 shadow-2xl">
+            <figure className="mb-14 aspect-video w-full overflow-hidden border-b border-white/5 shadow-2xl">
               <img 
                 src={post.imageUrl} 
                 alt={post.title}
@@ -107,7 +132,10 @@ export default function BlogPost() {
             </figure>
           )}
 
-          <div className="prose prose-invert prose-lg md:prose-xl mx-auto prose-headings:font-bold prose-headings:tracking-tight prose-a:text-primary hover:prose-a:text-primary/80 prose-img:rounded-xl">
+          <div 
+            className="prose prose-invert prose-lg md:prose-xl mx-auto px-6 md:px-12 prose-headings:font-bold prose-headings:tracking-tight prose-a:text-primary hover:prose-a:text-primary/80 prose-img:rounded-xl"
+            itemProp="articleBody"
+          >
             <ReactMarkdown>{post.content}</ReactMarkdown>
           </div>
 
