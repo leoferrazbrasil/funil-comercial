@@ -18,7 +18,9 @@ const PUBLIC_ROUTES = [
   '/crm-whatsapp-organizado',
   '/site-para-dentistas',
   '/site-para-nutricionistas',
-  '/site-para-psicologas'
+  '/site-para-psicologas',
+  '/cidades-atendidas',
+  '/blog'
 ];
 
 const locationsPath = path.join(__dirname, '..', 'src', 'lib', 'seoLocations.json');
@@ -53,6 +55,26 @@ function generateSitemap() {
     });
   });
 
+  // Generate Blog SEO URLs
+  const blogDataPath = path.join(__dirname, '..', 'src', 'lib', 'blogData.ts');
+  let blogRouteCount = 0;
+  if (fs.existsSync(blogDataPath)) {
+    const blogDataContent = fs.readFileSync(blogDataPath, 'utf8');
+    const blogSlugs = [...blogDataContent.matchAll(/slug:\s*["']([^"']+)["']/g)].map(m => m[1]);
+    
+    blogSlugs.forEach(slug => {
+      blogRouteCount++;
+      const route = `/blog/${slug}`;
+      urls += `
+  <url>
+    <loc>${DOMAIN}${route}</loc>
+    <lastmod>${currentDate}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>`;
+    });
+  }
+
   const sitemapContent = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls}
@@ -68,6 +90,7 @@ ${urls}
   
   console.log(`✅ Sitemap successfully generated at ${sitemapPath}`);
   console.log(`🚀 Total Local SEO routes injected: ${localRouteCount}`);
+  console.log(`🚀 Total Blog routes injected: ${blogRouteCount}`);
 }
 
 generateSitemap();

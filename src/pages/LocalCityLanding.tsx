@@ -174,9 +174,14 @@ export default function LocalCityLanding() {
         <p className="text-sm text-muted-foreground">
           Criamos estruturas de vendas para {formattedNicho} no Brasil inteiro.
         </p>
-        <Link to="/cidades-atendidas" className="text-xs text-muted-foreground hover:text-primary transition-colors">
-          Ver todas as cidades atendidas
-        </Link>
+        <div className="flex gap-4">
+          <Link to="/blog" className="text-xs text-muted-foreground hover:text-primary transition-colors">
+            Blog e Estratégias
+          </Link>
+          <Link to="/cidades-atendidas" className="text-xs text-muted-foreground hover:text-primary transition-colors">
+            Ver todas as cidades atendidas
+          </Link>
+        </div>
       </footer>
     </div>
   );

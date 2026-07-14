@@ -194,6 +194,7 @@ export default function LandingPage() {
             <a href="#servicos" onClick={(e) => handleScroll(e, "servicos")} className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Serviços</a>
             <a href="#para-quem" onClick={(e) => handleScroll(e, "para-quem")} className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Para quem</a>
             <Link to="/crm" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">CRM</Link>
+            <Link to="/blog" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Blog</Link>
             <a href="#faq" onClick={(e) => handleScroll(e, "faq")} className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">FAQ</a>
           </nav>
 
@@ -223,6 +224,7 @@ export default function LandingPage() {
               <a href="#servicos" onClick={(e) => handleScroll(e, "servicos")} className="text-lg font-medium text-foreground">Serviços</a>
               <a href="#para-quem" onClick={(e) => handleScroll(e, "para-quem")} className="text-lg font-medium text-foreground">Para quem</a>
               <Link to="/crm" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-medium text-foreground">CRM</Link>
+              <Link to="/blog" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-medium text-foreground">Blog</Link>
               <a href="#faq" onClick={(e) => handleScroll(e, "faq")} className="text-lg font-medium text-foreground">FAQ</a>
             </nav>
             <a href={whatsappLink} target="_blank" rel="noreferrer" onClick={() => setIsMobileMenuOpen(false)} className="flex justify-center items-center gap-2 rounded-full bg-primary px-6 py-4 text-base font-bold text-primary-foreground mt-auto mb-10 active:scale-95">
@@ -627,6 +629,7 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="flex flex-wrap justify-center gap-4 md:gap-6">
+            <Link to="/blog" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">Blog</Link>
             <Link to="/cidades-atendidas" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">Cidades Atendidas</Link>
             <Link to="/crm" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">CRM</Link>
             <Link to="/termos" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">Termos</Link>

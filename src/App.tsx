@@ -56,6 +56,8 @@ import NutritionistWebsiteLanding from "./pages/NutritionistWebsiteLanding";
 import PsychologistWebsiteLanding from "./pages/PsychologistWebsiteLanding";
 import LocalCityLanding from "./pages/LocalCityLanding";
 import CitiesDirectory from "./pages/CitiesDirectory";
+import BlogIndex from "./pages/BlogIndex";
+import BlogPost from "./pages/BlogPost";
 import { PrivacyPage, TermsPage, DataDeletionPage } from "./pages/LegalPages";
 import SignUpScreen from "./pages/SignUp";
 import LoginScreen from "./pages/Login";
@@ -146,6 +148,7 @@ const navItems = navigationItems;
 const PUBLIC_PATHS = [
   "/",
   "/cidades-atendidas",
+  "/blog",
   "/crm",
   "/brandbook",
   "/site-para-negocios-locais",
@@ -168,6 +171,7 @@ const isPublicPath = (pathname: string) =>
   PUBLIC_PATHS.includes(normalizePublicPath(pathname)) ||
   pathname.startsWith("/l/") ||
   pathname.startsWith("/local/") ||
+  pathname.startsWith("/blog/") ||
   isProspectingPreviewPath(pathname);
 
 const stages: OpportunityStage[] = pipelineStages;
@@ -1132,6 +1136,8 @@ function AppContent() {
         <Route path="/exclusao-de-dados" element={<DataDeletionPage />} />
         <Route path="/redefinir-senha" element={<ResetPasswordPage />} />
         <Route path="/cidades-atendidas" element={<CitiesDirectory />} />
+        <Route path="/blog" element={<BlogIndex />} />
+        <Route path="/blog/:slug" element={<BlogPost />} />
         <Route path="/local/:nicho/:estado/:cidade" element={<LocalCityLanding />} />
         <Route path="/l/:slug" element={<LinkAggregatorPage />} />
         <Route path="/:slug" element={<ProspectingPreviewPage />} />
