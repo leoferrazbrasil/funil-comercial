@@ -11,6 +11,25 @@ tags:
 > [!note] Navegação
 > Histórico de mudanças, mais recente primeiro. Contexto do produto em [[01 - Requisitos]]; arquitetura em [[02 - Arquitetura e Design]]; índice em [[00 - Inicio]].
 
+## [2026-07-14] - Consultoria: Landing Page e Banner Global
+
+### Adicionado — nova vertical de aquisição focada em consultoria B2B
+- Criação de uma Landing Page focada exclusivamente em captação de leads para "Consultoria Comercial Estratégica" (`/consultoria`).
+- O botão de ação é direcionado direto ao WhatsApp de pré-vendas com uma mensagem pré-configurada sobre diagnóstico comercial.
+- Inserido um Banner Global (`AnnouncementBar`) fixado no topo de todas as páginas públicas (Home, Cidades, Serviços e Blog) promovendo o novo canal de captação. O Header público de Consultoria agora usa `sticky top-0` para evitar "buracos" de scroll ao rolar a página abaixo do banner.
+
+## [2026-07-14] - SEO Avançado: Blog Posting Schema e Tailwind Typography
+
+### Modificado — páginas do blog agora renderizam HTML corretamente e injetam Microdados SEO
+- **Bug Fix de Estilização:** O texto dos artigos no `/blog/:slug` não assumia as formatações corretas. O plugin `@tailwindcss/typography` foi integrado, aplicando a classe `prose prose-invert` na renderização do `react-markdown` na `BlogPost.tsx`, resgatando listas, bolds, citações e headings automaticamente do MD.
+- **Estrutura Semântica (SEO):** A tag principal `<article>` da página `BlogPost.tsx` agora recebe os atributos de microdados `itemScope` e `itemType="http://schema.org/BlogPosting"`. Metadados ocultos (Headline, DatePublished, Author) foram marcados via `itemProp` para facilitar a indexação rica pelo Google.
+
+## [2026-07-14] - Deploy: Isolar Puppeteer (Prerender) do pipeline de build normal
+
+### Corrigido — o build quebrava no servidor compartilhado da Hostinger
+- O script automatizado de pré-renderização estática de SEO (`prerender-core.mjs`), que exige a execução de um navegador Chromium invisível (Puppeteer), estava causando falhas de compilação em ambientes de hospedagem compartilhada (Hostinger) por falta de bibliotecas de sistema gráfico (`libatk-bridge`, etc).
+- **Ação:** O comando de Prerender foi desacoplado do hook padrão de `build` no `package.json`. O build natural do Vite foi restaurado e processa o deploy da Hostinger sem bloqueios. O pré-render segue vivo, mas agora é acionado opcionalmente localmente (`npm run prerender`).
+
 ## [2026-07-12] - meta-auth: resolver o Instagram em todas as Páginas (fim do 'unknown')
 
 ### Corrigido — conexão salvava account_id 'unknown' e quebrava só ao publicar
