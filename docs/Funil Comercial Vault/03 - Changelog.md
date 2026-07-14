@@ -11,6 +11,12 @@ tags:
 > [!note] Navegação
 > Histórico de mudanças, mais recente primeiro. Contexto do produto em [[01 - Requisitos]]; arquitetura em [[02 - Arquitetura e Design]]; índice em [[00 - Inicio]].
 
+## [2026-07-14] - Infraestrutura de IA: Novas Skills e Sincronização Claude
+
+### Adicionado — instalação de skills externas e sincronização
+- Foram baixadas e instaladas novas habilidades (Skills) no diretório de inteligência do projeto (`.agents/skills`), incluindo ferramentas completas de manipulação do Obsidian (via repositório oficial `obsidian-skills`) e o utilitário `graphify`.
+- Foi executado com sucesso o script de espelhamento (`npm run sync-skills`), garantindo que a inteligência de código (Claude) tenha acesso imediato e sincronizado ao acervo completo de 27 skills através da pasta espelho `.claude/skills`.
+
 ## [2026-07-14] - Consultoria: Landing Page e Banner Global
 
 ### Adicionado — nova vertical de aquisição focada em consultoria B2B
