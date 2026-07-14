@@ -7,7 +7,15 @@ import { Toaster, toast } from "react-hot-toast";
 import { DndContext, useDraggable, useDroppable } from "@dnd-kit/core";
 import { IMaskInput } from "react-imask";
 import { useEffect, useMemo, useState } from "react";
-import { effectiveValue } from "../lib/products";
+import {
+  calculateDashboardRealMetrics,
+  calculateGoalProjection,
+  clampRate,
+  pricingForGoalProduct,
+  type GoalProjection,
+  type RateMetric,
+} from "../lib/dashboardMetrics";
+import { effectiveValue, PRODUCTS, type Product } from "../lib/products";
 import {
   BrowserRouter,
   Routes,
@@ -96,6 +104,34 @@ const formatMoney = (value: number) =>
     currency: "BRL",
     maximumFractionDigits: 0,
   }).format(value);
+
+const formatNumber = (value: number | null | undefined) =>
+  value === null || value === undefined || !Number.isFinite(value)
+    ? "—"
+    : new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 0 }).format(value);
+
+const formatPercent = (metric: RateMetric) =>
+  metric.value === null
+    ? "Sem dados"
+    : new Intl.NumberFormat("pt-BR", {
+        style: "percent",
+        maximumFractionDigits: 1,
+      }).format(metric.value);
+
+const formatDecimalPercent = (value: number | null) =>
+  value === null
+    ? ""
+    : new Intl.NumberFormat("pt-BR", {
+        maximumFractionDigits: 1,
+      }).format(value * 100);
+
+const parsePercentInput = (value: string) => {
+  const normalized = value.replace(",", ".").trim();
+  if (!normalized) return null;
+  const parsed = Number(normalized);
+  if (!Number.isFinite(parsed)) return null;
+  return clampRate(parsed / 100);
+};
 
 const normalizeSearch = (value: string) =>
   value
@@ -425,6 +461,59 @@ function FunnelChart({ opportunities, stages }: { opportunities: Opportunity[], 
   );
 }
 
+function ProjectionResult({
+  projection,
+}: {
+  projection: GoalProjection;
+}) {
+  if (projection.status === "invalid_ticket") {
+    return (
+      <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-500">
+        Informe um ticket/setup maior que zero para calcular a meta.
+      </div>
+    );
+  }
+
+  if (projection.status === "needs_rates") {
+    return (
+      <div className="rounded-xl border border-amber-500/20 bg-amber-500/10 p-4 text-sm text-muted-foreground">
+        Informe as taxas de conversão para calcular contatos e leads necessários.
+      </div>
+    );
+  }
+
+  if (projection.status === "unreachable") {
+    return (
+      <div className="rounded-xl border border-amber-500/20 bg-amber-500/10 p-4 text-sm text-muted-foreground">
+        Com taxa zero em uma etapa, a meta não é alcançável. Ajuste a conversão esperada.
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-2 gap-3">
+      <MiniMetric label="Vendas necessárias" value={formatNumber(projection.salesNeeded)} />
+      <MiniMetric label="Leads necessários" value={formatNumber(projection.leadsNeeded)} />
+      <MiniMetric label="Contatos necessários" value={formatNumber(projection.contactsNeeded)} />
+      <MiniMetric
+        label="Contatos por dia útil"
+        value={formatNumber(projection.contactsPerBusinessDayRemaining)}
+      />
+      <MiniMetric label="Caixa projetado" value={formatMoney(projection.cashProjected)} />
+      <MiniMetric label="MRR novo projetado" value={formatMoney(projection.newMrrProjected)} />
+    </div>
+  );
+}
+
+function MiniMetric({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-xl border border-foreground/5 bg-foreground/[0.02] p-4">
+      <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{label}</p>
+      <strong className="mt-1 block text-lg font-bold text-foreground">{value}</strong>
+    </div>
+  );
+}
+
 export default function Dashboard({
   snapshot,
   onOpenModal,
@@ -447,6 +536,32 @@ export default function Dashboard({
     return null; // tudo
   }, [period]);
   const inPeriod = (dateStr: string) => !periodStart || new Date(dateStr) >= periodStart;
+
+  const realMetrics = useMemo(
+    () => calculateDashboardRealMetrics(snapshot, new Date()),
+    [snapshot],
+  );
+  const defaultProduct: Product = "Site / Landing Page";
+  const defaultPricing = pricingForGoalProduct(defaultProduct);
+  const [goalProduct, setGoalProduct] = useState<Product>(defaultProduct);
+  const [monthlyCashGoal, setMonthlyCashGoal] = useState(5000);
+  const [setupTicket, setSetupTicket] = useState(defaultPricing.setupTicket);
+  const [mrrPerSale, setMrrPerSale] = useState(defaultPricing.mrrPerSale);
+  const [manualContactToLeadRate, setManualContactToLeadRate] = useState<number | null>(null);
+  const [manualLeadToSaleRate, setManualLeadToSaleRate] = useState<number | null>(null);
+
+  const contactToLeadRate =
+    manualContactToLeadRate ?? realMetrics.rates.contactToLead.value;
+  const leadToSaleRate =
+    manualLeadToSaleRate ?? realMetrics.rates.leadToSale.value;
+  const projection = calculateGoalProjection({
+    monthlyCashGoal,
+    setupTicket,
+    mrrPerSale,
+    contactToLeadRate,
+    leadToSaleRate,
+    now: new Date(),
+  });
 
   const periodLeads = snapshot.leads.filter((l) => inPeriod(l.created_at));
   const periodOpps = snapshot.opportunities.filter((o) => inPeriod(o.created_at));
@@ -509,68 +624,64 @@ export default function Dashboard({
   return (
     <div className="flex flex-col gap-8 w-full max-w-[1600px] mx-auto pb-12">
       
-      {/* 1. HEADER & Z-PATTERN TOP */}
-      <header className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pb-6 border-b border-foreground/5">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight mb-1">Visão Geral</h1>
-          <p className="text-muted-foreground">Aqui está o resumo da sua operação neste momento.</p>
+      <header className="flex flex-col gap-6 border-b border-foreground/5 pb-6">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight mb-1">Meta comercial do mês</h1>
+            <p className="text-muted-foreground">
+              Acompanhe caixa realizado, MRR novo e a capacidade necessária para bater a meta.
+            </p>
+          </div>
+          <div className="flex items-center gap-2 bg-card border border-foreground/5 rounded-2xl p-1">
+            <Calendar size={16} className="text-muted-foreground ml-2 mr-1 shrink-0" />
+            {PERIODS.map((option) => (
+              <button
+                key={option.key}
+                type="button"
+                onClick={() => setPeriod(option.key)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors ${
+                  period === option.key
+                    ? "bg-primary/15 text-primary"
+                    : "text-muted-foreground hover:text-foreground hover:bg-foreground/5"
+                }`}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
         </div>
-        <div className="flex items-center gap-2 bg-card border border-foreground/5 rounded-2xl p-1">
-          <Calendar size={16} className="text-muted-foreground ml-2 mr-1 shrink-0" />
-          {PERIODS.map((option) => (
-            <button
-              key={option.key}
-              type="button"
-              onClick={() => setPeriod(option.key)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors ${
-                period === option.key
-                  ? "bg-primary/15 text-primary"
-                  : "text-muted-foreground hover:text-foreground hover:bg-foreground/5"
-              }`}
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
-      </header>
 
-      {/* 2. KPIs (PULSO DA OPERAÇÃO) */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard 
-          title="Atenção Necessária" 
-          value={String(pendingMessages.length)} 
-          icon={Bell} 
-          tone={pendingMessages.length > 0 ? "warning" : "success"}
-          actionLabel="Ver Inbox"
-          onAction={() => onOpenModal("message")}
-          emptyState="Conversas pendentes no inbox."
-        />
-        <StatCard 
-          title="Leads Ativos" 
-          value={String(activeLeads.length)} 
-          icon={UsersRound} 
-          tone="neutral"
-          emptyState="Histórico de tendência indisponível."
-        />
-        <StatCard 
-          title="Pipeline Aberto" 
-          value={formatMoney(openPipeline)} 
-          icon={CircleDollarSign} 
-          tone="neutral"
-          emptyState="Oportunidades ativas no funil."
-        />
-        <StatCard
-          title="Taxa de Conversão"
-          value={totalValue ? `${conversionRate}%` : "—"}
-          icon={Target}
-          tone={totalValue === 0 ? "neutral" : conversionRate >= 50 ? "success" : "warning"}
-          emptyState={
-            totalValue
-              ? `${formatMoney(wonValue)} ganho de ${formatMoney(totalValue)} no funil`
-              : "Sem oportunidades no período."
-          }
-        />
-      </section>
+        <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+          <StatCard
+            title="Meta de caixa"
+            value={formatMoney(monthlyCashGoal)}
+            icon={Target}
+            tone="neutral"
+            emptyState="Conta apenas pagamento único/setup."
+          />
+          <StatCard
+            title="Caixa realizado"
+            value={formatMoney(realMetrics.currentMonth.cashRealized)}
+            icon={CircleDollarSign}
+            tone={realMetrics.currentMonth.cashRealized >= monthlyCashGoal ? "success" : "warning"}
+            emptyState={`${formatNumber(realMetrics.currentMonth.wonSales)} venda(s) ganhas no mês.`}
+          />
+          <StatCard
+            title="Falta para a meta"
+            value={formatMoney(Math.max(0, monthlyCashGoal - realMetrics.currentMonth.cashRealized))}
+            icon={TrendingUp}
+            tone={realMetrics.currentMonth.cashRealized >= monthlyCashGoal ? "success" : "warning"}
+            emptyState="Diferença entre meta e caixa realizado."
+          />
+          <StatCard
+            title="MRR novo contratado"
+            value={formatMoney(realMetrics.currentMonth.newMrr)}
+            icon={RotateCcw}
+            tone="success"
+            emptyState="Recorrência nova separada do caixa do mês."
+          />
+        </section>
+      </header>
 
       {/* 2b. ROTINA DO DIA — Contatos criados hoje e conversão em lead */}
       <section className="flex flex-col gap-4">
