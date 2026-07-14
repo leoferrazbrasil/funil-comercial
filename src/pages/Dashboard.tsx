@@ -105,6 +105,14 @@ const formatMoney = (value: number) =>
     maximumFractionDigits: 0,
   }).format(value);
 
+const formatMoneyWithCents = (value: number) =>
+  new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value);
+
 const formatNumber = (value: number | null | undefined) =>
   value === null || value === undefined || !Number.isFinite(value)
     ? "—"
@@ -500,7 +508,7 @@ function ProjectionResult({
         value={formatNumber(projection.contactsPerBusinessDayRemaining)}
       />
       <MiniMetric label="Caixa projetado" value={formatMoney(projection.cashProjected)} />
-      <MiniMetric label="MRR novo projetado" value={formatMoney(projection.newMrrProjected)} />
+      <MiniMetric label="MRR novo projetado" value={formatMoneyWithCents(projection.newMrrProjected)} />
     </div>
   );
 }
@@ -675,7 +683,7 @@ export default function Dashboard({
           />
           <StatCard
             title="MRR novo contratado"
-            value={formatMoney(realMetrics.currentMonth.newMrr)}
+            value={formatMoneyWithCents(realMetrics.currentMonth.newMrr)}
             icon={RotateCcw}
             tone="success"
             emptyState="Recorrência nova separada do caixa do mês."
