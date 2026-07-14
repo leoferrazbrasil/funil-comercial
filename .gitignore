@@ -38,3 +38,6 @@ GRAPH_REPORT.md
 
 # Worktrees locais do Codex
 .worktrees/
+
+# Ledger local de execução subagent-driven
+.superpowers/sdd/
