@@ -34,6 +34,7 @@ import {
   Clock3,
   LayoutDashboard,
   Sparkles,
+  UserRound,
 } from "lucide-react";
 import Logo from "../components/Logo";
 import { brandConfig } from "../lib/branding";
