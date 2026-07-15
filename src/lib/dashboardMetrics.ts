@@ -114,6 +114,11 @@ export function calculateDashboardRealMetrics(
   const leadsFromContacts = currentMonthLeads.filter((lead) =>
     leadHasCurrentMonthContact(lead, currentMonthContactIds),
   ).length;
+  const contactsConvertedToLeadIds = new Set(
+    currentMonthLeads
+      .filter((lead) => leadHasCurrentMonthContact(lead, currentMonthContactIds))
+      .map((lead) => lead.contact_id as string),
+  );
   const convertedLeadIds = new Set(
     currentMonthWonOpportunities
       .map((opportunity) => opportunity.lead_id)
@@ -151,7 +156,7 @@ export function calculateDashboardRealMetrics(
       newMrr,
     },
     rates: {
-      contactToLead: safeRate(leadsFromContacts, currentMonthContacts.length),
+      contactToLead: safeRate(contactsConvertedToLeadIds.size, currentMonthContacts.length),
       leadToSale: safeRate(convertedLeadIds.size, currentMonthLeads.length),
       contactToSale: safeRate(convertedCurrentMonthContacts.size, currentMonthContacts.length),
       contactsPerSale: safeRate(currentMonthContacts.length, convertedCurrentMonthContacts.size),

@@ -977,9 +977,6 @@ export default function Dashboard({
                 </div>
               )}
             </div>
-            <div className="p-4 border-t border-foreground/5 bg-foreground/5 text-center">
-              <button className="text-xs font-semibold text-muted-foreground hover:text-primary transition-colors">Ver todo o funil</button>
-            </div>
           </div>
 
         </div>

@@ -156,6 +156,19 @@ describe("calculateDashboardRealMetrics", () => {
     expect(metrics.rates.contactToSale.value).toBeCloseTo(1 / 3, 6);
     expect(metrics.rates.contactsPerSale.value).toBe(3);
   });
+
+  it("calculates contact-to-lead conversion from unique contacts", () => {
+    const metrics = calculateDashboardRealMetrics(
+      snapshot({
+        contacts: [contact("1")],
+        leads: [lead("lead-1", "1"), lead("lead-2", "1")],
+      }),
+      now,
+    );
+
+    expect(metrics.currentMonth.leadsFromContacts).toBe(2);
+    expect(metrics.rates.contactToLead.value).toBe(1);
+  });
 });
 
 describe("calculateGoalProjection", () => {
