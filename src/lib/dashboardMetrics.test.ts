@@ -130,6 +130,32 @@ describe("calculateDashboardRealMetrics", () => {
     expect(metrics.rates.contactsPerSale.status).toBe("insufficient");
     expect(metrics.rates.contactsPerSale.value).toBeNull();
   });
+
+  it("counts lead-to-sale conversion from linked current-month leads only", () => {
+    const metrics = calculateDashboardRealMetrics(
+      snapshot({
+        contacts: [contact("1"), contact("2"), contact("3")],
+        leads: [
+          lead("converted-lead", "1"),
+          lead("open-lead", "2"),
+          lead("old-lead", "3", "2026-06-30T23:59:00-03:00"),
+        ],
+        opportunities: [
+          opportunity("linked-sale", "converted-lead", "Ganho"),
+          opportunity("duplicate-sale", "converted-lead", "Ganho"),
+          opportunity("unlinked-sale", null, "Ganho"),
+          opportunity("old-lead-sale", "old-lead", "Ganho"),
+          opportunity("open-opp", "open-lead", "Proposta"),
+        ],
+      }),
+      now,
+    );
+
+    expect(metrics.currentMonth.wonSales).toBe(4);
+    expect(metrics.rates.leadToSale.value).toBe(0.5);
+    expect(metrics.rates.contactToSale.value).toBeCloseTo(1 / 3, 6);
+    expect(metrics.rates.contactsPerSale.value).toBe(3);
+  });
 });
 
 describe("calculateGoalProjection", () => {

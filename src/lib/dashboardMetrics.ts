@@ -106,6 +106,7 @@ export function calculateDashboardRealMetrics(
   const currentMonthLeads = snapshot.leads.filter((lead) =>
     isInRange(lead.created_at, monthStart, monthEnd),
   );
+  const currentMonthLeadIds = new Set(currentMonthLeads.map((lead) => lead.id));
   const currentMonthWonOpportunities = snapshot.opportunities.filter(
     (opportunity) =>
       wonThisMonth(opportunity) && isInRange(opportunity.created_at, monthStart, monthEnd),
@@ -113,6 +114,24 @@ export function calculateDashboardRealMetrics(
   const leadsFromContacts = currentMonthLeads.filter((lead) =>
     leadHasCurrentMonthContact(lead, currentMonthContactIds),
   ).length;
+  const convertedLeadIds = new Set(
+    currentMonthWonOpportunities
+      .map((opportunity) => opportunity.lead_id)
+      .filter(
+        (leadId): leadId is string =>
+          Boolean(leadId) && currentMonthLeadIds.has(leadId),
+      ),
+  );
+  const convertedCurrentMonthContacts = new Set(
+    currentMonthLeads
+      .filter(
+        (lead) =>
+          convertedLeadIds.has(lead.id) &&
+          lead.contact_id &&
+          currentMonthContactIds.has(lead.contact_id),
+      )
+      .map((lead) => lead.contact_id as string),
+  );
   const cashRealized = currentMonthWonOpportunities.reduce(
     (sum, opportunity) => sum + effectiveValue(opportunity.valor, opportunity.produto),
     0,
@@ -133,9 +152,9 @@ export function calculateDashboardRealMetrics(
     },
     rates: {
       contactToLead: safeRate(leadsFromContacts, currentMonthContacts.length),
-      leadToSale: safeRate(currentMonthWonOpportunities.length, currentMonthLeads.length),
-      contactToSale: safeRate(currentMonthWonOpportunities.length, currentMonthContacts.length),
-      contactsPerSale: safeRate(currentMonthContacts.length, currentMonthWonOpportunities.length),
+      leadToSale: safeRate(convertedLeadIds.size, currentMonthLeads.length),
+      contactToSale: safeRate(convertedCurrentMonthContacts.size, currentMonthContacts.length),
+      contactsPerSale: safeRate(currentMonthContacts.length, convertedCurrentMonthContacts.size),
     },
   };
 }

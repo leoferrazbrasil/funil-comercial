@@ -15,7 +15,7 @@ import {
   type GoalProjection,
   type RateMetric,
 } from "../lib/dashboardMetrics";
-import { effectiveValue, PRODUCTS, type Product } from "../lib/products";
+import { PRODUCTS, type Product } from "../lib/products";
 import {
   BrowserRouter,
   Routes,
@@ -532,6 +532,57 @@ function MiniMetric({ label, value }: { label: string; value: string }) {
   );
 }
 
+function StageMetricCard({
+  title,
+  value,
+  needed,
+  rateLabel,
+  icon: Icon,
+  iconClassName = "text-primary",
+}: {
+  title: string;
+  value: number;
+  needed: number | null;
+  rateLabel: string;
+  icon: LucideIcon;
+  iconClassName?: string;
+}) {
+  const delta = needed === null ? null : needed - value;
+  const deltaLabel =
+    delta === null
+      ? "Aguardando taxas"
+      : delta > 0
+        ? `Faltam ${formatNumber(delta)}`
+        : `${formatNumber(Math.abs(delta))} acima`;
+
+  return (
+    <div className="rounded-2xl border border-foreground/5 bg-card p-5 shadow-sm">
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{title}</p>
+        <Icon size={18} className={iconClassName} />
+      </div>
+      <strong className="mt-3 block text-3xl font-bold">{formatNumber(value)}</strong>
+      <p className="mt-2 text-xs text-muted-foreground">{rateLabel}</p>
+      <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
+        <div className="rounded-xl bg-foreground/[0.03] p-3">
+          <span className="block font-semibold text-muted-foreground">Necessário</span>
+          <strong className="mt-1 block text-sm text-foreground">{formatNumber(needed)}</strong>
+        </div>
+        <div className="rounded-xl bg-foreground/[0.03] p-3">
+          <span className="block font-semibold text-muted-foreground">Diferença</span>
+          <strong
+            className={`mt-1 block text-sm ${
+              delta !== null && delta <= 0 ? "text-green-500" : "text-foreground"
+            }`}
+          >
+            {deltaLabel}
+          </strong>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Dashboard({
   snapshot,
   onOpenModal,
@@ -539,22 +590,6 @@ export default function Dashboard({
   snapshot: CrmSnapshot;
   onOpenModal: (modal: ModalType) => void;
 }) {
-  // Filtro temporal: escopa os KPIs por `created_at` no período selecionado.
-  const [period, setPeriod] = useState<"hoje" | "7d" | "mes" | "tudo">("mes");
-  const periodStart = useMemo(() => {
-    const now = new Date();
-    if (period === "hoje") return new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    if (period === "7d") {
-      const d = new Date(now);
-      d.setDate(d.getDate() - 6);
-      d.setHours(0, 0, 0, 0);
-      return d;
-    }
-    if (period === "mes") return new Date(now.getFullYear(), now.getMonth(), 1);
-    return null; // tudo
-  }, [period]);
-  const inPeriod = (dateStr: string) => !periodStart || new Date(dateStr) >= periodStart;
-
   const realMetrics = useMemo(
     () => calculateDashboardRealMetrics(snapshot, new Date()),
     [snapshot],
@@ -613,38 +648,6 @@ export default function Dashboard({
     now: new Date(),
   });
 
-  const periodLeads = snapshot.leads.filter((l) => inPeriod(l.created_at));
-  const periodOpps = snapshot.opportunities.filter((o) => inPeriod(o.created_at));
-  const periodMessages = snapshot.messages.filter((m) => inPeriod(m.created_at));
-
-  const activeLeads = periodLeads.filter(
-    (lead) => !["convertido", "perdido"].includes(lead.status),
-  );
-  const openPipeline = periodOpps
-    .filter((item) => !["Ganho", "Perdido"].includes(item.etapa))
-    .reduce((sum, item) => sum + effectiveValue(item.valor, item.produto), 0);
-
-  // Taxa de Conversão (por VALOR): quanto do valor total das oportunidades do
-  // período já foi convertido em venda (etapa "Ganho"). Sobe conforme os ganhos.
-  // Usa o valor efetivo (1º pagamento) — inclui serviços só-mensais (ex.: Tráfego).
-  const totalValue = periodOpps.reduce((sum, o) => sum + effectiveValue(o.valor, o.produto), 0);
-  const wonValue = periodOpps
-    .filter((o) => o.etapa === "Ganho")
-    .reduce((sum, o) => sum + effectiveValue(o.valor, o.produto), 0);
-  const conversionRate = totalValue ? Math.round((wonValue / totalValue) * 100) : 0;
-
-  // Urgent Messages (Inbox) — no período selecionado.
-  const pendingMessages = periodMessages.filter(
-    (message) => message.unread_count > 0 || message.status !== "Resolvido",
-  );
-
-  const PERIODS: Array<{ key: typeof period; label: string }> = [
-    { key: "hoje", label: "Hoje" },
-    { key: "7d", label: "7 dias" },
-    { key: "mes", label: "Mês" },
-    { key: "tudo", label: "Tudo" },
-  ];
-
   const recommendations = buildCommercialRecommendations(snapshot);
   
   // Sort recent opportunities
@@ -663,22 +666,9 @@ export default function Dashboard({
               Acompanhe caixa realizado, MRR novo e a capacidade necessária para bater a meta.
             </p>
           </div>
-          <div className="flex items-center gap-2 bg-card border border-foreground/5 rounded-2xl p-1">
-            <Calendar size={16} className="text-muted-foreground ml-2 mr-1 shrink-0" />
-            {PERIODS.map((option) => (
-              <button
-                key={option.key}
-                type="button"
-                onClick={() => setPeriod(option.key)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors ${
-                  period === option.key
-                    ? "bg-primary/15 text-primary"
-                    : "text-muted-foreground hover:text-foreground hover:bg-foreground/5"
-                }`}
-              >
-                {option.label}
-              </button>
-            ))}
+          <div className="flex items-center gap-2 rounded-2xl border border-foreground/5 bg-card px-3 py-2 text-sm font-semibold text-muted-foreground">
+            <Calendar size={16} className="shrink-0 text-primary" />
+            Mês atual
           </div>
         </div>
 
@@ -715,40 +705,34 @@ export default function Dashboard({
       </header>
 
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="rounded-2xl border border-foreground/5 bg-card p-5 shadow-sm">
-          <div className="flex items-center justify-between gap-3">
-            <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Contatos</p>
-            <UsersRound size={18} className="text-primary" />
-          </div>
-          <strong className="mt-3 block text-3xl font-bold">{formatNumber(realMetrics.currentMonth.contacts)}</strong>
-          <p className="mt-2 text-xs text-muted-foreground">
-            {formatPercent(realMetrics.rates.contactToLead)} viram lead no mês.
-          </p>
-        </div>
+        <StageMetricCard
+          title="Contatos"
+          value={realMetrics.currentMonth.contacts}
+          needed={projection.contactsNeeded}
+          rateLabel={`${formatPercent(realMetrics.rates.contactToLead)} viram lead no mês.`}
+          icon={UsersRound}
+        />
 
-        <div className="rounded-2xl border border-foreground/5 bg-card p-5 shadow-sm">
-          <div className="flex items-center justify-between gap-3">
-            <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Leads</p>
-            <Target size={18} className="text-primary" />
-          </div>
-          <strong className="mt-3 block text-3xl font-bold">{formatNumber(realMetrics.currentMonth.leads)}</strong>
-          <p className="mt-2 text-xs text-muted-foreground">
-            {formatPercent(realMetrics.rates.leadToSale)} viram venda no mês.
-          </p>
-        </div>
+        <StageMetricCard
+          title="Leads"
+          value={realMetrics.currentMonth.leads}
+          needed={projection.leadsNeeded}
+          rateLabel={`${formatPercent(realMetrics.rates.leadToSale)} viram venda no mês.`}
+          icon={Target}
+        />
 
-        <div className="rounded-2xl border border-foreground/5 bg-card p-5 shadow-sm">
-          <div className="flex items-center justify-between gap-3">
-            <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Vendas</p>
-            <CheckCircle2 size={18} className="text-green-500" />
-          </div>
-          <strong className="mt-3 block text-3xl font-bold">{formatNumber(realMetrics.currentMonth.wonSales)}</strong>
-          <p className="mt-2 text-xs text-muted-foreground">
-            {realMetrics.rates.contactsPerSale.value === null
+        <StageMetricCard
+          title="Vendas"
+          value={realMetrics.currentMonth.wonSales}
+          needed={projection.salesNeeded}
+          rateLabel={
+            realMetrics.rates.contactsPerSale.value === null
               ? "Sem base suficiente para contatos por venda."
-              : `${formatNumber(realMetrics.rates.contactsPerSale.value)} contatos por venda.`}
-          </p>
-        </div>
+              : `${formatNumber(realMetrics.rates.contactsPerSale.value)} contatos por venda.`
+          }
+          icon={CheckCircle2}
+          iconClassName="text-green-500"
+        />
       </section>
 
       <section className="grid grid-cols-1 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-6">
