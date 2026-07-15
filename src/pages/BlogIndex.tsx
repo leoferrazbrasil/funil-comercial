@@ -1,15 +1,30 @@
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import Logo from "../components/Logo";
 import { SeoHead } from "../components/SeoHead";
 import { blogPosts } from "../lib/blogData";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function BlogIndex() {
+  const [searchParams] = useSearchParams();
+  const pageParam = searchParams.get("page");
+  const currentPage = pageParam ? parseInt(pageParam, 10) : 1;
+  const itemsPerPage = 9;
+  
+  const totalPages = Math.ceil(blogPosts.length / itemsPerPage);
+  const validPage = Math.max(1, Math.min(currentPage || 1, Math.max(1, totalPages)));
+  
+  const startIndex = (validPage - 1) * itemsPerPage;
+  const currentPosts = blogPosts.slice(startIndex, startIndex + itemsPerPage);
+  
+  const pageTitle = validPage > 1 ? `Blog e Estratégias de Vendas Locais - Página ${validPage}` : "Blog e Estratégias de Vendas Locais";
+  const canonicalUrl = validPage > 1 ? `https://funilcomercial.com/blog?page=${validPage}` : "https://funilcomercial.com/blog";
+
   return (
     <div data-theme="dark" className="min-h-screen bg-background text-foreground font-sans">
       <SeoHead 
-        title="Blog e Estratégias de Vendas Locais"
+        title={pageTitle}
         description="Dicas de SEO local, Tráfego Pago e estruturação de funis comerciais para Advogados, Médicos, Dentistas e Negócios Locais."
-        canonicalUrl="https://funilcomercial.com/blog"
+        canonicalUrl={canonicalUrl}
       />
       
       <header className="sticky top-0 z-50 border-b border-white/10 bg-background/90 backdrop-blur">
@@ -38,7 +53,7 @@ export default function BlogIndex() {
           </div>
 
           <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
-             {blogPosts.map(post => (
+             {currentPosts.map(post => (
                <article key={post.slug} className="group relative flex flex-col items-start justify-between rounded-2xl border border-white/10 bg-card/30 p-6 hover:bg-card/50 transition-colors">
                  <div className="w-full">
                     {post.imageUrl && (
@@ -89,6 +104,60 @@ export default function BlogIndex() {
                </article>
              ))}
           </div>
+
+          {/* Paginação SEO */}
+          {totalPages > 1 && (
+            <div className="mt-16 flex items-center justify-center gap-2">
+              {validPage > 1 ? (
+                <Link 
+                  to={`/blog${validPage === 2 ? '' : `?page=${validPage - 1}`}`} 
+                  className="flex h-10 items-center justify-center rounded-lg border border-white/10 bg-card px-4 text-sm font-medium hover:bg-white/5 transition-colors"
+                  aria-label="Página anterior"
+                >
+                  <ChevronLeft size={16} className="mr-2" /> Anterior
+                </Link>
+              ) : (
+                <span className="flex h-10 items-center justify-center rounded-lg border border-white/5 bg-black/20 px-4 text-sm font-medium text-white/30 cursor-not-allowed">
+                  <ChevronLeft size={16} className="mr-2" /> Anterior
+                </span>
+              )}
+              
+              <div className="flex items-center gap-1 mx-2 md:mx-4">
+                {Array.from({ length: totalPages }).map((_, i) => {
+                  const pageNum = i + 1;
+                  const isCurrent = pageNum === validPage;
+                  return (
+                    <Link
+                      key={pageNum}
+                      to={`/blog${pageNum === 1 ? '' : `?page=${pageNum}`}`}
+                      className={`flex h-10 w-10 items-center justify-center rounded-lg border text-sm font-semibold transition-colors ${
+                        isCurrent 
+                          ? "border-primary bg-primary/20 text-primary" 
+                          : "border-white/10 bg-card hover:bg-white/5 text-muted-foreground hover:text-foreground"
+                      }`}
+                      aria-current={isCurrent ? "page" : undefined}
+                    >
+                      {pageNum}
+                    </Link>
+                  );
+                })}
+              </div>
+
+              {validPage < totalPages ? (
+                <Link 
+                  to={`/blog?page=${validPage + 1}`} 
+                  className="flex h-10 items-center justify-center rounded-lg border border-white/10 bg-card px-4 text-sm font-medium hover:bg-white/5 transition-colors"
+                  aria-label="Próxima página"
+                >
+                  Próxima <ChevronRight size={16} className="ml-2" />
+                </Link>
+              ) : (
+                <span className="flex h-10 items-center justify-center rounded-lg border border-white/5 bg-black/20 px-4 text-sm font-medium text-white/30 cursor-not-allowed">
+                  Próxima <ChevronRight size={16} className="ml-2" />
+                </span>
+              )}
+            </div>
+          )}
         </div>
       </main>
 
