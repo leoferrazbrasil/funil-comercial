@@ -129,7 +129,7 @@ const formatPercent = (metric: RateMetric) =>
 const formatDecimalPercent = (value: number | null) =>
   value === null
     ? ""
-    : new Intl.NumberFormat("pt-BR", {
+    : new Intl.NumberFormat("en-US", {
         maximumFractionDigits: 1,
       }).format(value * 100);
 
@@ -555,6 +555,7 @@ export default function Dashboard({
   const [monthlyCashGoal, setMonthlyCashGoal] = useState(5000);
   const [setupTicket, setSetupTicket] = useState(defaultPricing.setupTicket);
   const [mrrPerSale, setMrrPerSale] = useState(defaultPricing.mrrPerSale);
+  const [mrrPerSaleInput, setMrrPerSaleInput] = useState(String(defaultPricing.mrrPerSale));
   const [manualContactToLeadRate, setManualContactToLeadRate] = useState<number | null>(null);
   const [manualLeadToSaleRate, setManualLeadToSaleRate] = useState<number | null>(null);
 
@@ -563,6 +564,7 @@ export default function Dashboard({
     const pricing = pricingForGoalProduct(nextProduct);
     setSetupTicket(pricing.setupTicket);
     setMrrPerSale(pricing.mrrPerSale);
+    setMrrPerSaleInput(String(pricing.mrrPerSale));
   };
 
   const shownContactToLeadRate =
@@ -775,11 +777,25 @@ export default function Dashboard({
               MRR por venda
               <input
                 className="min-h-10 rounded-md border border-foreground/10 bg-foreground/5 px-3 py-2 text-sm"
-                type="number"
+                type="text"
+                inputMode="decimal"
                 min={0}
                 step="0.01"
-                value={mrrPerSale}
-                onChange={(event) => setMrrPerSale(Math.max(0, Number(event.target.value) || 0))}
+                value={mrrPerSaleInput}
+                onChange={(event) => {
+                  const nextValue = event.target.value;
+                  setMrrPerSaleInput(nextValue);
+                  const normalized = nextValue.replace(",", ".").trim();
+                  const parsed = Number(normalized);
+                  if (normalized && Number.isFinite(parsed) && parsed >= 0) setMrrPerSale(parsed);
+                }}
+                onBlur={() => {
+                  const normalized = mrrPerSaleInput.replace(",", ".").trim();
+                  const parsed = Number(normalized);
+                  if (!normalized || !Number.isFinite(parsed) || parsed < 0) {
+                    setMrrPerSaleInput(String(mrrPerSale));
+                  }
+                }}
               />
             </label>
 
