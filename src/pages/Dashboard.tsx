@@ -142,7 +142,9 @@ const parsePercentInput = (value: string) => {
 };
 
 const normalizePercentInput = (value: string, fallback: number | null) => {
-  const rate = value.trim() ? parsePercentInput(value) : fallback;
+  const parsedRate = value.trim() ? parsePercentInput(value) : fallback;
+  const rate =
+    parsedRate === null ? null : Math.round(parsedRate * 1000) / 1000;
   return {
     input: formatDecimalPercent(rate),
     rate,
