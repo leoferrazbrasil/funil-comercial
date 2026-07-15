@@ -558,6 +558,12 @@ export default function Dashboard({
   const [mrrPerSaleInput, setMrrPerSaleInput] = useState(String(defaultPricing.mrrPerSale));
   const [manualContactToLeadRate, setManualContactToLeadRate] = useState<number | null>(null);
   const [manualLeadToSaleRate, setManualLeadToSaleRate] = useState<number | null>(null);
+  const [contactToLeadRateInput, setContactToLeadRateInput] = useState(() =>
+    formatDecimalPercent(realMetrics.rates.contactToLead.value),
+  );
+  const [leadToSaleRateInput, setLeadToSaleRateInput] = useState(() =>
+    formatDecimalPercent(realMetrics.rates.leadToSale.value),
+  );
 
   const handleProductChange = (nextProduct: Product) => {
     setGoalProduct(nextProduct);
@@ -571,6 +577,18 @@ export default function Dashboard({
     manualContactToLeadRate ?? realMetrics.rates.contactToLead.value;
   const shownLeadToSaleRate =
     manualLeadToSaleRate ?? realMetrics.rates.leadToSale.value;
+
+  useEffect(() => {
+    if (manualContactToLeadRate === null) {
+      setContactToLeadRateInput(formatDecimalPercent(realMetrics.rates.contactToLead.value));
+    }
+  }, [realMetrics.rates.contactToLead.value]);
+
+  useEffect(() => {
+    if (manualLeadToSaleRate === null) {
+      setLeadToSaleRateInput(formatDecimalPercent(realMetrics.rates.leadToSale.value));
+    }
+  }, [realMetrics.rates.leadToSale.value]);
 
   const contactToLeadRate =
     manualContactToLeadRate ?? realMetrics.rates.contactToLead.value;
@@ -803,13 +821,28 @@ export default function Dashboard({
               Conversão contato → lead (%)
               <input
                 className="min-h-10 rounded-md border border-foreground/10 bg-foreground/5 px-3 py-2 text-sm"
-                type="number"
+                type="text"
+                inputMode="decimal"
                 min={0}
                 max={100}
                 step="0.1"
                 placeholder={realMetrics.rates.contactToLead.value === null ? "Informe uma taxa" : undefined}
-                value={formatDecimalPercent(shownContactToLeadRate)}
-                onChange={(event) => setManualContactToLeadRate(parsePercentInput(event.target.value))}
+                value={contactToLeadRateInput}
+                onChange={(event) => {
+                  const nextValue = event.target.value;
+                  setContactToLeadRateInput(nextValue);
+                  if (!nextValue.trim()) {
+                    setManualContactToLeadRate(null);
+                    return;
+                  }
+                  const parsed = parsePercentInput(nextValue);
+                  if (parsed !== null) setManualContactToLeadRate(parsed);
+                }}
+                onBlur={() => {
+                  if (!contactToLeadRateInput.trim()) {
+                    setContactToLeadRateInput(formatDecimalPercent(shownContactToLeadRate));
+                  }
+                }}
               />
             </label>
 
@@ -817,13 +850,28 @@ export default function Dashboard({
               Conversão lead → venda (%)
               <input
                 className="min-h-10 rounded-md border border-foreground/10 bg-foreground/5 px-3 py-2 text-sm"
-                type="number"
+                type="text"
+                inputMode="decimal"
                 min={0}
                 max={100}
                 step="0.1"
                 placeholder={realMetrics.rates.leadToSale.value === null ? "Informe uma taxa" : undefined}
-                value={formatDecimalPercent(shownLeadToSaleRate)}
-                onChange={(event) => setManualLeadToSaleRate(parsePercentInput(event.target.value))}
+                value={leadToSaleRateInput}
+                onChange={(event) => {
+                  const nextValue = event.target.value;
+                  setLeadToSaleRateInput(nextValue);
+                  if (!nextValue.trim()) {
+                    setManualLeadToSaleRate(null);
+                    return;
+                  }
+                  const parsed = parsePercentInput(nextValue);
+                  if (parsed !== null) setManualLeadToSaleRate(parsed);
+                }}
+                onBlur={() => {
+                  if (!leadToSaleRateInput.trim()) {
+                    setLeadToSaleRateInput(formatDecimalPercent(shownLeadToSaleRate));
+                  }
+                }}
               />
             </label>
           </div>
