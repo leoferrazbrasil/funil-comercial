@@ -1255,6 +1255,7 @@ function AppContent() {
                     openEditModal({ type: "contact", record: contact })
                   }
                   onOpenModal={openModal}
+                  onQueryChange={setQuery}
                 />
               }
             />

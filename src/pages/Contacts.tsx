@@ -418,6 +418,7 @@ export default function ContactsPage({
   onDeleteContact,
   onEditContact,
   onOpenModal,
+  onQueryChange,
 }: {
   contacts: Contact[];
   query: string;
@@ -426,6 +427,7 @@ export default function ContactsPage({
   onDeleteContact: (contactId: string) => Promise<void>;
   onEditContact: (contact: Contact) => void;
   onOpenModal: (modal: ModalType) => void;
+  onQueryChange: (query: string) => void;
 }) {
   const navigate = useNavigate();
   const [selectedContactId, setSelectedContactId] = useState<string | null>(null);
