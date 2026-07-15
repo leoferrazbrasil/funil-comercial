@@ -31,6 +31,7 @@ export type GoalProjectionInput = {
   mrrPerSale: number;
   contactToLeadRate: number | null;
   leadToSaleRate: number | null;
+  contactsRealized?: number;
   now: Date;
 };
 
@@ -41,6 +42,8 @@ export type GoalProjection = {
   salesNeeded: number | null;
   leadsNeeded: number | null;
   contactsNeeded: number | null;
+  contactsRemaining: number | null;
+  contactsNeededToday: number | null;
   contactsPerSale: number | null;
   contactsPerBusinessDayRemaining: number | null;
   cashProjected: number;
@@ -176,6 +179,8 @@ export function calculateGoalProjection(input: GoalProjectionInput): GoalProject
       salesNeeded: null,
       leadsNeeded: null,
       contactsNeeded: null,
+      contactsRemaining: null,
+      contactsNeededToday: null,
       contactsPerSale: null,
       contactsPerBusinessDayRemaining: null,
       cashProjected: 0,
@@ -194,6 +199,8 @@ export function calculateGoalProjection(input: GoalProjectionInput): GoalProject
       salesNeeded,
       leadsNeeded: null,
       contactsNeeded: null,
+      contactsRemaining: null,
+      contactsNeededToday: null,
       contactsPerSale: null,
       contactsPerBusinessDayRemaining: null,
       cashProjected,
@@ -211,6 +218,8 @@ export function calculateGoalProjection(input: GoalProjectionInput): GoalProject
       salesNeeded,
       leadsNeeded: null,
       contactsNeeded: null,
+      contactsRemaining: null,
+      contactsNeededToday: null,
       contactsPerSale: null,
       contactsPerBusinessDayRemaining: null,
       cashProjected,
@@ -221,15 +230,20 @@ export function calculateGoalProjection(input: GoalProjectionInput): GoalProject
 
   const leadsNeeded = Math.ceil(salesNeeded / leadToSaleRate);
   const contactsNeeded = Math.ceil(leadsNeeded / contactToLeadRate);
+  const contactsRealized = Math.max(0, Number(input.contactsRealized) || 0);
+  const contactsRemaining = Math.max(0, contactsNeeded - contactsRealized);
+  const contactsNeededToday =
+    businessDaysRemaining > 0 ? Math.ceil(contactsRemaining / businessDaysRemaining) : null;
 
   return {
     status: "ok",
     salesNeeded,
     leadsNeeded,
     contactsNeeded,
+    contactsRemaining,
+    contactsNeededToday,
     contactsPerSale: contactsNeeded / salesNeeded,
-    contactsPerBusinessDayRemaining:
-      businessDaysRemaining > 0 ? Math.ceil(contactsNeeded / businessDaysRemaining) : null,
+    contactsPerBusinessDayRemaining: contactsNeededToday,
     cashProjected,
     newMrrProjected,
     businessDaysRemaining,

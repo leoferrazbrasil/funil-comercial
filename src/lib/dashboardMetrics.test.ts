@@ -205,6 +205,55 @@ describe("calculateGoalProjection", () => {
     expect(projection.contactsPerSale).toBe(8);
   });
 
+  it("calculates contacts needed today from remaining monthly contacts", () => {
+    const projection = calculateGoalProjection({
+      monthlyCashGoal: 5000,
+      setupTicket: 497,
+      mrrPerSale: 37.9,
+      contactToLeadRate: 0.5,
+      leadToSaleRate: 0.25,
+      contactsRealized: 17,
+      now,
+    });
+
+    expect(projection.status).toBe("ok");
+    expect(projection.contactsNeeded).toBe(88);
+    expect(projection.contactsRemaining).toBe(71);
+    expect(projection.contactsNeededToday).toBe(6);
+  });
+
+  it("returns zero contacts needed today when monthly contact target is already covered", () => {
+    const projection = calculateGoalProjection({
+      monthlyCashGoal: 5000,
+      setupTicket: 497,
+      mrrPerSale: 37.9,
+      contactToLeadRate: 0.5,
+      leadToSaleRate: 0.25,
+      contactsRealized: 100,
+      now,
+    });
+
+    expect(projection.status).toBe("ok");
+    expect(projection.contactsRemaining).toBe(0);
+    expect(projection.contactsNeededToday).toBe(0);
+  });
+
+  it("does not expose contacts needed today when rates are missing", () => {
+    const projection = calculateGoalProjection({
+      monthlyCashGoal: 5000,
+      setupTicket: 497,
+      mrrPerSale: 37.9,
+      contactToLeadRate: null,
+      leadToSaleRate: null,
+      contactsRealized: 17,
+      now,
+    });
+
+    expect(projection.status).toBe("needs_rates");
+    expect(projection.contactsRemaining).toBeNull();
+    expect(projection.contactsNeededToday).toBeNull();
+  });
+
   it("marks projections as needing rates when conversion rates are missing", () => {
     const projection = calculateGoalProjection({
       monthlyCashGoal: 5000,
