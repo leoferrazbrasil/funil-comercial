@@ -53,11 +53,13 @@ export default function BlogIndex() {
           </div>
 
           <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
-             {currentPosts.map(post => (
-               <article key={post.slug} className="group relative flex flex-col items-start justify-between rounded-2xl border border-white/10 bg-card/30 p-6 hover:bg-card/50 transition-colors">
-                 <div className="w-full">
+             {currentPosts.map((post, index) => {
+               const isFeatured = validPage === 1 && index === 0;
+               return (
+               <article key={post.slug} className={`group relative flex flex-col items-start justify-between rounded-2xl border border-white/10 transition-colors ${isFeatured ? 'md:col-span-2 lg:col-span-3 lg:flex-row lg:gap-10 lg:items-center bg-card/40 p-6 lg:p-10 hover:bg-card/60' : 'bg-card/30 p-6 hover:bg-card/50'}`}>
+                 <div className={`w-full ${isFeatured ? 'lg:w-[55%]' : ''}`}>
                     {post.imageUrl && (
-                      <div className="mb-6 aspect-video w-full overflow-hidden rounded-lg">
+                      <div className={`mb-6 w-full overflow-hidden rounded-lg ${isFeatured ? 'lg:mb-0 aspect-video lg:aspect-[16/10]' : 'aspect-video'}`}>
                         <img 
                           src={post.imageUrl} 
                           alt={post.title}
@@ -66,6 +68,8 @@ export default function BlogIndex() {
                         />
                       </div>
                     )}
+                 </div>
+                 <div className={`w-full flex flex-col justify-between ${isFeatured ? 'lg:w-[45%] lg:py-6' : ''}`}>
                     <div className="flex items-center gap-x-4 text-xs">
                       <time dateTime={post.date} className="text-muted-foreground">
                         {new Date(post.date).toLocaleDateString('pt-BR', { year: 'numeric', month: 'long', day: 'numeric' })}
@@ -75,34 +79,34 @@ export default function BlogIndex() {
                       </span>
                     </div>
                     <div className="group relative mt-4">
-                      <h3 className="text-xl font-bold leading-tight group-hover:text-primary transition-colors">
+                      <h3 className={`font-bold leading-tight group-hover:text-primary transition-colors ${isFeatured ? 'text-2xl md:text-4xl lg:leading-tight mb-6' : 'text-xl'}`}>
                         <Link to={`/blog/${post.slug}`}>
                           <span className="absolute inset-0" />
                           {post.title}
                         </Link>
                       </h3>
-                      <p className="mt-4 line-clamp-3 text-sm leading-relaxed text-muted-foreground">
+                      <p className={`mt-4 line-clamp-3 text-sm leading-relaxed text-muted-foreground ${isFeatured ? 'md:text-base md:line-clamp-4' : ''}`}>
                         {post.excerpt}
                       </p>
                     </div>
-                 </div>
-                 <div className="mt-8 flex items-center gap-x-4">
-                    <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary overflow-hidden border border-primary/20">
-                      {post.authorAvatar ? (
-                        <img src={post.authorAvatar} alt={post.author} className="h-full w-full object-cover" loading="lazy" />
-                      ) : (
-                        post.author.charAt(0)
-                      )}
-                    </div>
-                    <div className="text-sm leading-6">
-                      <p className="font-semibold text-foreground">
-                        {post.author}
-                      </p>
-                      <p className="text-muted-foreground text-xs">Especialista de Vendas</p>
+                    <div className="mt-8 flex items-center gap-x-4">
+                      <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary overflow-hidden border border-primary/20">
+                        {post.authorAvatar ? (
+                          <img src={post.authorAvatar} alt={post.author} className="h-full w-full object-cover" loading="lazy" />
+                        ) : (
+                          post.author.charAt(0)
+                        )}
+                      </div>
+                      <div className="text-sm leading-6">
+                        <p className="font-semibold text-foreground">
+                          {post.author}
+                        </p>
+                        <p className="text-muted-foreground text-xs">Especialista de Vendas</p>
+                      </div>
                     </div>
                  </div>
                </article>
-             ))}
+             )})}
           </div>
 
           {/* Paginação SEO */}
