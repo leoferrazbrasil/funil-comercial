@@ -170,7 +170,7 @@ export default function ProgrammaticIntentLanding({ intentType }: IntentProps) {
          </section>
       </main>
 
-      <RelatedContent currentNiche={nicho} currentState={estado} currentCity={cidade} />
+      <RelatedContent currentNiche={nicho} currentState={estado} currentCity={cidade} intentType={intentType} />
 
       <footer className="border-t border-white/10 py-8 text-center flex flex-col gap-4 items-center justify-center">
         <p className="text-sm text-muted-foreground">

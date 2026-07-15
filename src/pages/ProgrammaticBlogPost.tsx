@@ -226,7 +226,7 @@ export default function ProgrammaticBlogPost() {
         </article>
       </main>
 
-      <RelatedContent currentNiche={nicho} currentState={estado} currentCity={cidade} isBlog />
+      <RelatedContent currentNiche={nicho} currentState={estado} currentCity={cidade} intentType="guia" />
 
       <footer className="border-t border-white/10 py-12 text-center mt-12">
         <p className="text-sm text-muted-foreground">

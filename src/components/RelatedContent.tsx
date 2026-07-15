@@ -6,14 +6,14 @@ interface RelatedContentProps {
   currentNiche?: string;
   currentState?: string;
   currentCity?: string;
-  isBlog?: boolean;
+  intentType?: 'local' | 'agencia' | 'captacao' | 'crm' | 'guia';
 }
 
 export function RelatedContent({
   currentNiche,
   currentState,
   currentCity,
-  isBlog = false,
+  intentType = 'local',
 }: RelatedContentProps) {
   if (!currentNiche || !currentState || !currentCity) return null;
 
@@ -32,7 +32,18 @@ export function RelatedContent({
   // Encontra 3 nichos diferentes na mesma cidade
   const relatedNiches = NICHES.filter((n) => n.slug !== currentNiche).slice(0, 3);
 
-  const basePath = isBlog ? "/blog/guia-de-vendas" : "/local";
+  const getPath = (niche: string, state: string, city: string) => {
+    switch(intentType) {
+      case 'agencia': return `/agencia-de-marketing/${niche}/${state}/${city}`;
+      case 'captacao': return `/empresa-de-captacao/${niche}/${state}/${city}`;
+      case 'crm': return `/melhor-crm/${niche}/${state}/${city}`;
+      case 'guia': return `/blog/guia-de-vendas/${niche}/${state}/${city}`;
+      case 'local':
+      default: return `/local/${niche}/${state}/${city}`;
+    }
+  };
+
+  const isBlog = intentType === 'guia';
 
   return (
     <section className="bg-background py-16 border-t border-white/5">
@@ -51,7 +62,7 @@ export function RelatedContent({
                 return (
                   <li key={city.cidade}>
                     <Link
-                      to={`${basePath}/${currentNiche}/${city.estado}/${city.cidade}`}
+                      to={getPath(currentNiche, city.estado, city.cidade)}
                       className="group flex items-center justify-between rounded-lg p-3 hover:bg-white/5 transition-colors border border-transparent hover:border-white/10 text-muted-foreground hover:text-foreground"
                     >
                       <span>
@@ -74,7 +85,7 @@ export function RelatedContent({
               {relatedNiches.map((niche) => (
                 <li key={niche.slug}>
                   <Link
-                    to={`${basePath}/${niche.slug}/${currentState}/${currentCity}`}
+                    to={getPath(niche.slug, currentState, currentCity)}
                     className="group flex items-center justify-between rounded-lg p-3 hover:bg-white/5 transition-colors border border-transparent hover:border-white/10 text-muted-foreground hover:text-foreground"
                   >
                     <span>

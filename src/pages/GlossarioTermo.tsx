@@ -4,7 +4,9 @@ import Logo from "../components/Logo";
 import { SeoHead } from "../components/SeoHead";
 import { glossarioTerms } from "../lib/glossarioData";
 import { ArrowLeft, MessageCircle } from "lucide-react";
-import Config from "../config";
+
+const WHATSAPP_NUMBER = "5551996737359";
+const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=Ol%C3%A1%2C%20estava%20lendo%20o%20Gloss%C3%A1rio%20e%20gostaria%20de%20ajuda%20para%20aplicar%20isso%20no%20meu%20neg%C3%B3cio.`;
 
 export default function GlossarioTermo() {
   const { slug } = useParams();
@@ -113,7 +115,7 @@ export default function GlossarioTermo() {
                </div>
                <div className="shrink-0 w-full md:w-auto">
                  <a 
-                   href={Config.whatsappLink}
+                   href={whatsappLink}
                    target="_blank"
                    rel="noopener noreferrer"
                    className="inline-flex h-14 w-full md:w-auto items-center justify-center gap-2 rounded-full bg-primary px-8 text-base font-black text-primary-foreground transition-transform hover:scale-105 shadow-[0_0_40px_-10px_rgba(var(--primary),0.8)]"
