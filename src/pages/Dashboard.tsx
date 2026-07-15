@@ -141,6 +141,11 @@ const parsePercentInput = (value: string) => {
   return clampRate(parsed / 100);
 };
 
+const normalizePercentInput = (value: string, fallback: number | null) => {
+  if (!value.trim()) return formatDecimalPercent(fallback);
+  return formatDecimalPercent(parsePercentInput(value) ?? fallback);
+};
+
 const normalizeSearch = (value: string) =>
   value
     .normalize("NFD")
@@ -839,9 +844,9 @@ export default function Dashboard({
                   if (parsed !== null) setManualContactToLeadRate(parsed);
                 }}
                 onBlur={() => {
-                  if (!contactToLeadRateInput.trim()) {
-                    setContactToLeadRateInput(formatDecimalPercent(shownContactToLeadRate));
-                  }
+                  setContactToLeadRateInput(
+                    normalizePercentInput(contactToLeadRateInput, shownContactToLeadRate),
+                  );
                 }}
               />
             </label>
@@ -868,9 +873,9 @@ export default function Dashboard({
                   if (parsed !== null) setManualLeadToSaleRate(parsed);
                 }}
                 onBlur={() => {
-                  if (!leadToSaleRateInput.trim()) {
-                    setLeadToSaleRateInput(formatDecimalPercent(shownLeadToSaleRate));
-                  }
+                  setLeadToSaleRateInput(
+                    normalizePercentInput(leadToSaleRateInput, shownLeadToSaleRate),
+                  );
                 }}
               />
             </label>
