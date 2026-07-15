@@ -514,8 +514,13 @@ function ProjectionResult({
       <MiniMetric label="Leads necessários" value={formatNumber(projection.leadsNeeded)} />
       <MiniMetric label="Contatos necessários" value={formatNumber(projection.contactsNeeded)} />
       <MiniMetric
-        label="Contatos por dia útil"
-        value={formatNumber(projection.contactsPerBusinessDayRemaining)}
+        label="Contatos para hoje"
+        value={formatNumber(projection.contactsNeededToday)}
+        hint={
+          projection.contactsRemaining === null
+            ? undefined
+            : `${formatNumber(projection.contactsRemaining)} restantes / ${formatNumber(projection.businessDaysRemaining)} dias úteis`
+        }
       />
       <MiniMetric label="Caixa projetado" value={formatMoney(projection.cashProjected)} />
       <MiniMetric label="MRR novo projetado" value={formatMoneyWithCents(projection.newMrrProjected)} />
@@ -523,11 +528,12 @@ function ProjectionResult({
   );
 }
 
-function MiniMetric({ label, value }: { label: string; value: string }) {
+function MiniMetric({ label, value, hint }: { label: string; value: string; hint?: string }) {
   return (
     <div className="rounded-xl border border-foreground/5 bg-foreground/[0.02] p-4">
       <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{label}</p>
       <strong className="mt-1 block text-lg font-bold text-foreground">{value}</strong>
+      {hint ? <span className="mt-1 block text-xs text-muted-foreground">{hint}</span> : null}
     </div>
   );
 }
@@ -645,6 +651,7 @@ export default function Dashboard({
     mrrPerSale,
     contactToLeadRate,
     leadToSaleRate,
+    contactsRealized: realMetrics.currentMonth.contacts,
     now: new Date(),
   });
 
