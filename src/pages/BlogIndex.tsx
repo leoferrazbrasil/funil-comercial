@@ -8,13 +8,15 @@ export default function BlogIndex() {
   const [searchParams] = useSearchParams();
   const pageParam = searchParams.get("page");
   const currentPage = pageParam ? parseInt(pageParam, 10) : 1;
-  const itemsPerPage = 9;
+  const firstPageItems = 10;
+  const regularItems = 9;
   
-  const totalPages = Math.ceil(blogPosts.length / itemsPerPage);
+  const totalPages = 1 + Math.ceil(Math.max(0, blogPosts.length - firstPageItems) / regularItems);
   const validPage = Math.max(1, Math.min(currentPage || 1, Math.max(1, totalPages)));
   
-  const startIndex = (validPage - 1) * itemsPerPage;
-  const currentPosts = blogPosts.slice(startIndex, startIndex + itemsPerPage);
+  const startIndex = validPage === 1 ? 0 : firstPageItems + (validPage - 2) * regularItems;
+  const itemsForThisPage = validPage === 1 ? firstPageItems : regularItems;
+  const currentPosts = blogPosts.slice(startIndex, startIndex + itemsForThisPage);
   
   const pageTitle = validPage > 1 ? `Blog e Estratégias de Vendas Locais - Página ${validPage}` : "Blog e Estratégias de Vendas Locais";
   const canonicalUrl = validPage > 1 ? `https://funilcomercial.com/blog?page=${validPage}` : "https://funilcomercial.com/blog";
