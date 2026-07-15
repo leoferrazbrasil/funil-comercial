@@ -558,6 +558,18 @@ export default function Dashboard({
   const [manualContactToLeadRate, setManualContactToLeadRate] = useState<number | null>(null);
   const [manualLeadToSaleRate, setManualLeadToSaleRate] = useState<number | null>(null);
 
+  const handleProductChange = (nextProduct: Product) => {
+    setGoalProduct(nextProduct);
+    const pricing = pricingForGoalProduct(nextProduct);
+    setSetupTicket(pricing.setupTicket);
+    setMrrPerSale(pricing.mrrPerSale);
+  };
+
+  const shownContactToLeadRate =
+    manualContactToLeadRate ?? realMetrics.rates.contactToLead.value;
+  const shownLeadToSaleRate =
+    manualLeadToSaleRate ?? realMetrics.rates.leadToSale.value;
+
   const contactToLeadRate =
     manualContactToLeadRate ?? realMetrics.rates.contactToLead.value;
   const leadToSaleRate =
@@ -590,25 +602,6 @@ export default function Dashboard({
     .filter((o) => o.etapa === "Ganho")
     .reduce((sum, o) => sum + effectiveValue(o.valor, o.produto), 0);
   const conversionRate = totalValue ? Math.round((wonValue / totalValue) * 100) : 0;
-
-  // Rotina comercial do DIA (sempre hoje, independente do filtro).
-  const isToday = (dateStr: string) => {
-    const d = new Date(dateStr);
-    const now = new Date();
-    return (
-      d.getFullYear() === now.getFullYear() &&
-      d.getMonth() === now.getMonth() &&
-      d.getDate() === now.getDate()
-    );
-  };
-  const contactsToday = snapshot.contacts.filter((c) => isToday(c.created_at));
-  const leadContactIds = new Set(
-    snapshot.leads.map((l) => l.contact_id).filter(Boolean),
-  );
-  const contactsTodayConverted = contactsToday.filter((c) => leadContactIds.has(c.id));
-  const contactToLeadRateToday = contactsToday.length
-    ? Math.round((contactsTodayConverted.length / contactsToday.length) * 100)
-    : 0;
 
   // Urgent Messages (Inbox) — no período selecionado.
   const pendingMessages = periodMessages.filter(
@@ -691,34 +684,145 @@ export default function Dashboard({
         </section>
       </header>
 
-      {/* 2b. ROTINA DO DIA — Contatos criados hoje e conversão em lead */}
-      <section className="flex flex-col gap-4">
-        <div className="flex items-center gap-2">
-          <Calendar size={16} className="text-primary" />
-          <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Rotina de Hoje</h2>
+      <section className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="rounded-2xl border border-foreground/5 bg-card p-5 shadow-sm">
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Contatos</p>
+            <UsersRound size={18} className="text-primary" />
+          </div>
+          <strong className="mt-3 block text-3xl font-bold">{formatNumber(realMetrics.currentMonth.contacts)}</strong>
+          <p className="mt-2 text-xs text-muted-foreground">
+            {formatPercent(realMetrics.rates.contactToLead)} viram lead no mês.
+          </p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          <StatCard
-            title="Contatos criados hoje"
-            value={String(contactsToday.length)}
-            icon={UsersRound}
-            tone="neutral"
-            emptyState="Novos contatos cadastrados no dia."
-          />
-          <StatCard
-            title="Viraram lead hoje"
-            value={String(contactsTodayConverted.length)}
-            icon={Target}
-            tone={contactsTodayConverted.length > 0 ? "success" : "neutral"}
-            emptyState="Contatos de hoje que já viraram lead."
-          />
-          <StatCard
-            title="Conversão contato → lead"
-            value={`${contactToLeadRateToday}%`}
-            icon={TrendingUp}
-            tone="neutral"
-            emptyState={`${contactsTodayConverted.length} de ${contactsToday.length} contatos de hoje`}
-          />
+
+        <div className="rounded-2xl border border-foreground/5 bg-card p-5 shadow-sm">
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Leads</p>
+            <Target size={18} className="text-primary" />
+          </div>
+          <strong className="mt-3 block text-3xl font-bold">{formatNumber(realMetrics.currentMonth.leads)}</strong>
+          <p className="mt-2 text-xs text-muted-foreground">
+            {formatPercent(realMetrics.rates.leadToSale)} viram venda no mês.
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-foreground/5 bg-card p-5 shadow-sm">
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Vendas</p>
+            <CheckCircle2 size={18} className="text-green-500" />
+          </div>
+          <strong className="mt-3 block text-3xl font-bold">{formatNumber(realMetrics.currentMonth.wonSales)}</strong>
+          <p className="mt-2 text-xs text-muted-foreground">
+            {realMetrics.rates.contactsPerSale.value === null
+              ? "Sem base suficiente para contatos por venda."
+              : `${formatNumber(realMetrics.rates.contactsPerSale.value)} contatos por venda.`}
+          </p>
+        </div>
+      </section>
+
+      <section className="grid grid-cols-1 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-6">
+        <div className="rounded-3xl border border-foreground/5 bg-card p-6 shadow-lg">
+          <div className="flex items-center gap-3 mb-5">
+            <div className="p-2 rounded-xl bg-primary/10 text-primary">
+              <Sparkles size={20} />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold">Simulador de meta</h2>
+              <p className="text-sm text-muted-foreground">Ajuste a meta e as taxas para prever a capacidade necessária.</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <label className="flex flex-col gap-2 text-sm font-medium">
+              Meta mensal de caixa
+              <input
+                className="min-h-10 rounded-md border border-foreground/10 bg-foreground/5 px-3 py-2 text-sm"
+                type="number"
+                min={0}
+                value={monthlyCashGoal}
+                onChange={(event) => setMonthlyCashGoal(Math.max(0, Number(event.target.value) || 0))}
+              />
+            </label>
+
+            <label className="flex flex-col gap-2 text-sm font-medium">
+              Produto
+              <select
+                className="min-h-10 rounded-md border border-foreground/10 bg-foreground/5 px-3 py-2 text-sm"
+                value={goalProduct}
+                onChange={(event) => handleProductChange(event.target.value as Product)}
+              >
+                {PRODUCTS.map((product) => (
+                  <option key={product} value={product}>
+                    {product}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="flex flex-col gap-2 text-sm font-medium">
+              Setup por venda
+              <input
+                className="min-h-10 rounded-md border border-foreground/10 bg-foreground/5 px-3 py-2 text-sm"
+                type="number"
+                min={0}
+                value={setupTicket}
+                onChange={(event) => setSetupTicket(Math.max(0, Number(event.target.value) || 0))}
+              />
+            </label>
+
+            <label className="flex flex-col gap-2 text-sm font-medium">
+              MRR por venda
+              <input
+                className="min-h-10 rounded-md border border-foreground/10 bg-foreground/5 px-3 py-2 text-sm"
+                type="number"
+                min={0}
+                step="0.01"
+                value={mrrPerSale}
+                onChange={(event) => setMrrPerSale(Math.max(0, Number(event.target.value) || 0))}
+              />
+            </label>
+
+            <label className="flex flex-col gap-2 text-sm font-medium">
+              Conversão contato → lead (%)
+              <input
+                className="min-h-10 rounded-md border border-foreground/10 bg-foreground/5 px-3 py-2 text-sm"
+                type="number"
+                min={0}
+                max={100}
+                step="0.1"
+                placeholder={realMetrics.rates.contactToLead.value === null ? "Informe uma taxa" : undefined}
+                value={formatDecimalPercent(shownContactToLeadRate)}
+                onChange={(event) => setManualContactToLeadRate(parsePercentInput(event.target.value))}
+              />
+            </label>
+
+            <label className="flex flex-col gap-2 text-sm font-medium">
+              Conversão lead → venda (%)
+              <input
+                className="min-h-10 rounded-md border border-foreground/10 bg-foreground/5 px-3 py-2 text-sm"
+                type="number"
+                min={0}
+                max={100}
+                step="0.1"
+                placeholder={realMetrics.rates.leadToSale.value === null ? "Informe uma taxa" : undefined}
+                value={formatDecimalPercent(shownLeadToSaleRate)}
+                onChange={(event) => setManualLeadToSaleRate(parsePercentInput(event.target.value))}
+              />
+            </label>
+          </div>
+        </div>
+
+        <div className="rounded-3xl border border-foreground/5 bg-card p-6 shadow-lg">
+          <div className="flex items-center justify-between gap-3 mb-5">
+            <div>
+              <h2 className="text-xl font-bold">Necessário para bater a meta</h2>
+              <p className="text-sm text-muted-foreground">
+                Baseado em {projection.businessDaysRemaining} dia(s) útil(eis) restantes.
+              </p>
+            </div>
+          </div>
+          <ProjectionResult projection={projection} />
         </div>
       </section>
 
