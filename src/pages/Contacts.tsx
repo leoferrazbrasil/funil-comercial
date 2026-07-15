@@ -456,6 +456,10 @@ export default function ContactsPage({
       contact.potencial,
     ]),
   );
+  const hasSearch = query.trim().length > 0;
+  const contactsCountLabel = hasSearch
+    ? `${filteredContacts.length} de ${contacts.length} contatos`
+    : `${filteredContacts.length} registros`;
 
   const selectedContact = contacts.find((c) => c.id === selectedContactId);
 
@@ -474,7 +478,11 @@ export default function ContactsPage({
         {filteredContacts.length === 0 ? (
           <EmptyState
             action="Novo Contato"
-            description="Cadastre, organize e encontre rapidamente pessoas que podem virar leads."
+            description={
+              hasSearch
+                ? "Nenhum contato encontrado para a busca atual."
+                : "Cadastre, organize e encontre rapidamente pessoas que podem virar leads."
+            }
             onAction={() => onOpenModal("contact")}
           />
         ) : (
@@ -762,7 +770,7 @@ export default function ContactsPage({
         <div>
           <h1 className="text-3xl font-bold tracking-tight mb-1">Base de Contatos</h1>
           <p className="text-sm text-muted-foreground">
-            Sua agenda centralizada ({filteredContacts.length} registros).
+            Sua agenda centralizada ({contactsCountLabel}).
           </p>
         </div>
         
@@ -788,6 +796,33 @@ export default function ContactsPage({
         >
           <Plus size={24} />
         </button>
+      </div>
+
+      <div className="shrink-0 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <label className="relative flex-1 max-w-2xl">
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <input
+            value={query}
+            onChange={(event) => onQueryChange(event.target.value)}
+            placeholder="Buscar por nome, telefone, e-mail, origem ou potencial..."
+            className="w-full min-h-11 rounded-2xl border border-foreground/10 bg-card px-10 py-2.5 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary/50 focus:bg-foreground/[0.02]"
+          />
+          {hasSearch ? (
+            <button
+              type="button"
+              onClick={() => onQueryChange("")}
+              className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-foreground/10 hover:text-foreground"
+              aria-label="Limpar busca"
+            >
+              <X size={16} />
+            </button>
+          ) : null}
+        </label>
+        {hasSearch ? (
+          <span className="text-xs font-semibold text-muted-foreground">
+            {contactsCountLabel}
+          </span>
+        ) : null}
       </div>
 
       <div className="flex flex-1 overflow-hidden gap-6 pb-6">
