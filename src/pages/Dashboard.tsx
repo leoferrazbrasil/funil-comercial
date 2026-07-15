@@ -142,8 +142,11 @@ const parsePercentInput = (value: string) => {
 };
 
 const normalizePercentInput = (value: string, fallback: number | null) => {
-  if (!value.trim()) return formatDecimalPercent(fallback);
-  return formatDecimalPercent(parsePercentInput(value) ?? fallback);
+  const rate = value.trim() ? parsePercentInput(value) : fallback;
+  return {
+    input: formatDecimalPercent(rate),
+    rate,
+  };
 };
 
 const normalizeSearch = (value: string) =>
@@ -844,9 +847,12 @@ export default function Dashboard({
                   if (parsed !== null) setManualContactToLeadRate(parsed);
                 }}
                 onBlur={() => {
-                  setContactToLeadRateInput(
-                    normalizePercentInput(contactToLeadRateInput, shownContactToLeadRate),
+                  const normalized = normalizePercentInput(
+                    contactToLeadRateInput,
+                    shownContactToLeadRate,
                   );
+                  setContactToLeadRateInput(normalized.input);
+                  setManualContactToLeadRate(normalized.rate);
                 }}
               />
             </label>
@@ -873,9 +879,12 @@ export default function Dashboard({
                   if (parsed !== null) setManualLeadToSaleRate(parsed);
                 }}
                 onBlur={() => {
-                  setLeadToSaleRateInput(
-                    normalizePercentInput(leadToSaleRateInput, shownLeadToSaleRate),
+                  const normalized = normalizePercentInput(
+                    leadToSaleRateInput,
+                    shownLeadToSaleRate,
                   );
+                  setLeadToSaleRateInput(normalized.input);
+                  setManualLeadToSaleRate(normalized.rate);
                 }}
               />
             </label>
