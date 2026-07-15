@@ -2,12 +2,19 @@ import { useParams, Link } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import Logo from "../components/Logo";
 import { SeoHead } from "../components/SeoHead";
-import { getBlogPostBySlug } from "../lib/blogData";
-import { ArrowLeft } from "lucide-react";
+import { getBlogPostBySlug, blogPosts } from "../lib/blogData";
+import { ArrowLeft, BookOpen } from "lucide-react";
 
 export default function BlogPost() {
   const { slug } = useParams();
   const post = getBlogPostBySlug(slug || "");
+
+  const satellitePosts = post?.clusterType === 'pillar' 
+    ? blogPosts.filter(p => p.pillarSlug === post.slug) 
+    : [];
+  const pillarPost = post?.clusterType === 'satellite' && post.pillarSlug 
+    ? blogPosts.find(p => p.slug === post.pillarSlug) 
+    : null;
 
   if (!post) {
     return (
@@ -138,12 +145,54 @@ export default function BlogPost() {
             </figure>
           )}
 
+          {post.clusterType === 'satellite' && pillarPost && (
+            <div className="mx-auto px-6 md:px-12 mb-10">
+              <div className="rounded-2xl border border-primary/30 bg-primary/10 p-5 flex flex-col sm:flex-row items-start sm:items-center gap-5">
+                <div className="bg-primary/20 p-3 rounded-xl text-primary shrink-0">
+                  <BookOpen size={24} />
+                </div>
+                <div className="flex-1">
+                  <p className="text-xs font-bold text-primary uppercase tracking-wider mb-1">Faz parte do guia</p>
+                  <Link to={`/blog/${pillarPost.slug}`} className="text-lg font-bold text-foreground hover:text-primary transition-colors">
+                    {pillarPost.title}
+                  </Link>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div 
             className="prose prose-invert prose-lg md:prose-xl mx-auto px-6 md:px-12 prose-headings:font-bold prose-headings:tracking-tight prose-a:text-primary hover:prose-a:text-primary/80 prose-img:rounded-xl"
             itemProp="articleBody"
           >
             <ReactMarkdown>{post.content}</ReactMarkdown>
           </div>
+
+          {post.clusterType === 'pillar' && satellitePosts.length > 0 && (
+            <div className="mx-auto px-6 md:px-12 mt-16">
+              <div className="rounded-3xl border border-white/10 bg-black/40 p-8 md:p-10">
+                <h3 className="text-2xl md:text-3xl font-black mb-2">Artigos neste Guia</h3>
+                <p className="text-muted-foreground mb-8">Aprofunde-se em cada estratégia clicando nos capítulos abaixo.</p>
+                <div className="flex flex-col gap-3">
+                  {satellitePosts.map((sat, index) => (
+                    <Link 
+                      key={sat.slug} 
+                      to={`/blog/${sat.slug}`} 
+                      className="group flex items-center justify-between p-5 rounded-2xl bg-card/50 border border-white/5 hover:bg-primary/10 hover:border-primary/30 transition-all"
+                    >
+                      <div className="flex items-center gap-4">
+                        <span className="flex items-center justify-center w-8 h-8 rounded-full bg-white/5 text-sm font-bold text-muted-foreground group-hover:bg-primary/20 group-hover:text-primary transition-colors">
+                          {index + 1}
+                        </span>
+                        <span className="font-bold text-foreground group-hover:text-primary transition-colors">{sat.title}</span>
+                      </div>
+                      <ArrowLeft size={20} className="rotate-180 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="mt-20 pt-10 border-t border-white/10 text-center">
             <h3 className="text-2xl font-bold mb-4">Gostou deste conteúdo?</h3>

@@ -11,6 +11,18 @@ tags:
 > [!note] Navegação
 > Histórico de mudanças, mais recente primeiro. Contexto do produto em [[01 - Requisitos]]; arquitetura em [[02 - Arquitetura e Design]]; índice em [[00 - Inicio]].
 
+## [2026-07-15] - Arquitetura de Conteúdo: Topic Clusters (Pilares e Satélites)
+
+### Adicionado — Rede Semântica no Blog
+- A estrutura de dados do blog (`blogData.ts`) foi expandida para suportar Artigos Pilar (`clusterType: 'pillar'`) e Artigos Satélites (`clusterType: 'satellite'`).
+- Criado o artigo pilar inaugural: *"O Guia Definitivo de Vendas para Negócios Locais"*.
+
+### Modificado — Renderização Dinâmica de Contexto (`BlogPost.tsx` e `BlogIndex.tsx`)
+- O componente de postagem de blog agora mapeia links internos automaticamente:
+  - Artigos Satélites ganham um *badge* visível e clicável no topo, apontando para o Pilar principal.
+  - Artigos Pilares renderizam um "Índice de Capítulos" ao final do post, listando e criando links diretos para todos os seus satélites.
+- A página inicial do blog (`BlogIndex.tsx`) agora destaca visualmente os artigos que são "Conteúdo Pilar", orientando os leads para guias aprofundados.
+
 ## [2026-07-15] - Expansão do Motor de SEO Programático: Intenção Comercial
 
 ### Adicionado — Landings de Intenção de Fundo de Funil

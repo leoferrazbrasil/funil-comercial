@@ -8,9 +8,38 @@ export interface BlogPost {
   category: string;
   content: string;
   imageUrl?: string;
+  clusterType?: 'pillar' | 'satellite';
+  pillarSlug?: string;
 }
 
 export const blogPosts: BlogPost[] = [
+  {
+    slug: "guia-definitivo-vendas-negocios-locais",
+    title: "O Guia Definitivo de Vendas para Negócios Locais",
+    excerpt: "Tudo o que você precisa saber para transformar o seu negócio local em uma máquina de vendas previsível usando SEO e automação.",
+    date: "2026-07-28",
+    author: "Leonardo Brasil",
+    authorAvatar: "/images/leo-avatar.jpg",
+    category: "Guia Completo",
+    imageUrl: "https://images.unsplash.com/photo-1552581234-26160f608093?q=80&w=1200&auto=format&fit=crop",
+    clusterType: "pillar",
+    content: `
+A era em que um negócio local sobrevivia apenas de indicação e panfletagem acabou. Hoje, a jornada do consumidor local começa invariavelmente na tela de um celular.
+
+Neste guia definitivo, vamos detalhar as engrenagens essenciais para criar uma verdadeira máquina de aquisição de clientes para a sua empresa na sua cidade.
+
+### 1. Posicionamento de Busca (Estar onde o cliente procura)
+O erro mais comum é apostar todo o orçamento de marketing em redes sociais. A rede social gera desejo, mas é o **Google** que captura a intenção de compra. Se você tem um consultório, escritório ou clínica, a otimização do seu Google Meu Negócio e um SEO Local bem feito (com páginas rápidas e responsivas) garantem que você seja a primeira escolha quando a dor do cliente bater.
+
+### 2. Tráfego Pago Inteligente
+Não adianta impulsionar postagens sem direcionamento. Uma estratégia de anúncios eficaz separa o orçamento entre a Rede de Pesquisa do Google (fundo de funil) e o Meta Ads (topo e meio de funil), criando um cerco digital na sua região. 
+
+### 3. A Recepção Digital e CRM
+O que acontece quando o lead chega no WhatsApp? Se a sua secretária demora horas para responder, o investimento em anúncios vai para o lixo. A implementação de uma rotina comercial baseada em CRM transforma o WhatsApp em uma esteira de negociação ativa, com follow-ups precisos e zero vazamento de oportunidades.
+
+*Explore os artigos interligados a este guia para se aprofundar em cada estratégia.*
+    `
+  },
   {
     slug: "importancia-do-site-para-contadores",
     title: "A Importância de um Site Profissional para Contadores em 2026",
@@ -97,6 +126,8 @@ Invista na sua estrutura própria e veja sua agenda de pacientes particulares de
     authorAvatar: "/images/leo-avatar.jpg",
     category: "Tráfego Pago",
     imageUrl: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1200&auto=format&fit=crop",
+    clusterType: "satellite",
+    pillarSlug: "guia-definitivo-vendas-negocios-locais",
     content: `
 A dúvida número um de 9 em cada 10 prestadores de serviço e autônomos é: *"Devo colocar meu dinheiro no Google ou no Instagram?"*
 
@@ -438,6 +469,8 @@ Deixe as dancinhas para quem quer ser influencer. Se você quer ser uma profissi
     authorAvatar: "/images/leo-avatar.jpg",
     category: "Clínicas Médicas",
     imageUrl: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=1200&auto=format&fit=crop",
+    clusterType: "satellite",
+    pillarSlug: "guia-definitivo-vendas-negocios-locais",
     content: `
 O polo médico de Porto Alegre (RS) e região metropolitana atrai pacientes de todo o estado. Clínicas especializadas (oftalmologia, dermatologia, fertilização) investem pesado em Google Ads e SEO para atrair pacientes particulares, já que os repasses dos convênios estão cada vez menores.
 

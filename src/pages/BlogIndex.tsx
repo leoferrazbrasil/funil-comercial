@@ -79,6 +79,11 @@ export default function BlogIndex() {
                       <span className="relative z-10 rounded-full bg-primary/10 px-3 py-1.5 font-medium text-primary">
                         {post.category}
                       </span>
+                      {post.clusterType === 'pillar' && (
+                        <span className="relative z-10 rounded-full bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 font-bold text-amber-500 flex items-center gap-1">
+                          📚 Conteúdo Pilar
+                        </span>
+                      )}
                     </div>
                     <div className="group relative mt-4">
                       <h3 className={`font-bold leading-tight group-hover:text-primary transition-colors ${isFeatured ? 'text-2xl md:text-4xl lg:leading-tight mb-6' : 'text-xl'}`}>
