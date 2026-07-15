@@ -11,6 +11,18 @@ tags:
 > [!note] Navegação
 > Histórico de mudanças, mais recente primeiro. Contexto do produto em [[01 - Requisitos]]; arquitetura em [[02 - Arquitetura e Design]]; índice em [[00 - Inicio]].
 
+## [2026-07-15] - Conteúdo Topo de Funil: O Glossário (Dicionário de Vendas)
+
+### Adicionado — Estrutura de Dicionário
+- Criada a base de dados leve e escalável `glossarioData.ts` contendo as definições dos termos.
+- Implementada a rota raiz `/glossario` (`GlossarioIndex.tsx`) para listagem A-Z de termos, ranqueável para buscas genéricas.
+- Implementada a página do termo `/glossario/:slug` (`GlossarioTermo.tsx`) gerando nativamente o Schema `FAQPage` para abocanhar Snippets do Google.
+- Motor de Sitemap atualizado: O arquivo `generate-sitemap.mjs` agora intercepta as rotas do glossário, gerando o arquivo secundário `sitemap-glossario.xml` atrelado ao index.
+
+### Modificado — Taxonomia e Conversão
+- Rotas adicionadas aos caminhos públicos em `App.tsx` para permitir leitura sem necessidade de login.
+- Injetada a arquitetura de conversão na landing page dos termos: o visitante chega por uma dúvida acadêmica (Topo do Funil), mas é fisgado no fim da página por um Call-To-Action focado em gerar receita com a equipe comercial da Funil Comercial.
+
 ## [2026-07-15] - Arquitetura de Conteúdo: Topic Clusters (Pilares e Satélites)
 
 ### Adicionado — Rede Semântica no Blog

@@ -2,14 +2,18 @@
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <sitemap>
     <loc>https://funilcomercial.com/sitemap-core.xml</loc>
-    <lastmod>2026-07-15T17:35:46.536Z</lastmod>
+    <lastmod>2026-07-15T17:57:37.277Z</lastmod>
   </sitemap>
   <sitemap>
     <loc>https://funilcomercial.com/sitemap-local.xml</loc>
-    <lastmod>2026-07-15T17:35:46.536Z</lastmod>
+    <lastmod>2026-07-15T17:57:37.277Z</lastmod>
   </sitemap>
   <sitemap>
     <loc>https://funilcomercial.com/sitemap-blog.xml</loc>
-    <lastmod>2026-07-15T17:35:46.536Z</lastmod>
+    <lastmod>2026-07-15T17:57:37.277Z</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://funilcomercial.com/sitemap-glossario.xml</loc>
+    <lastmod>2026-07-15T17:57:37.277Z</lastmod>
   </sitemap>
 </sitemapindex>

@@ -61,6 +61,8 @@ import { AnnouncementBar } from "./components/AnnouncementBar";
 import { SeoHead } from "./components/SeoHead";
 import BlogIndex from "./pages/BlogIndex";
 import BlogPost from "./pages/BlogPost";
+import GlossarioIndex from "./pages/GlossarioIndex";
+import GlossarioTermo from "./pages/GlossarioTermo";
 import ProgrammaticBlogPost from "./pages/ProgrammaticBlogPost";
 import ProgrammaticIntentLanding from "./pages/ProgrammaticIntentLanding";
 import { PrivacyPage, TermsPage, DataDeletionPage } from "./pages/LegalPages";
@@ -155,6 +157,7 @@ const PUBLIC_PATHS = [
   "/cidades-atendidas",
   "/consultoria",
   "/blog",
+  "/glossario",
   "/crm",
   "/brandbook",
   "/site-para-negocios-locais",
@@ -178,6 +181,7 @@ const isPublicPath = (pathname: string) =>
   pathname.startsWith("/l/") ||
   pathname.startsWith("/local/") ||
   pathname.startsWith("/blog/") ||
+  pathname.startsWith("/glossario/") ||
   pathname.startsWith("/agencia-de-marketing/") ||
   pathname.startsWith("/empresa-de-captacao/") ||
   pathname.startsWith("/melhor-crm/") ||
@@ -1150,6 +1154,8 @@ function AppContent() {
           <Route path="/cidades-atendidas" element={<CitiesDirectory />} />
           <Route path="/blog" element={<BlogIndex />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
+          <Route path="/glossario" element={<GlossarioIndex />} />
+          <Route path="/glossario/:slug" element={<GlossarioTermo />} />
           <Route path="/blog/guia-de-vendas/:nicho/:estado/:cidade" element={<ProgrammaticBlogPost />} />
           <Route path="/local/:nicho/:estado/:cidade" element={<LocalCityLanding />} />
           <Route path="/agencia-de-marketing/:nicho/:estado/:cidade" element={<ProgrammaticIntentLanding intentType="agencia" />} />

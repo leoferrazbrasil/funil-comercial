@@ -98,7 +98,28 @@ function generateSitemap() {
   const blogSitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${blogUrls}\n</urlset>`;
   fs.writeFileSync(path.join(publicDir, 'sitemap-blog.xml'), blogSitemap);
 
-  // 4. Sitemap Index
+  // 4. Glossary Sitemap
+  const glossarioDataPath = path.join(__dirname, '..', 'src', 'lib', 'glossarioData.ts');
+  let glossarioUrls = '';
+  let glossarioRouteCount = 0;
+
+  glossarioRouteCount++;
+  glossarioUrls += generateUrlNode(`/glossario`, '0.8', 'weekly');
+  
+  if (fs.existsSync(glossarioDataPath)) {
+    const glossarioDataContent = fs.readFileSync(glossarioDataPath, 'utf8');
+    const glossarioSlugs = [...glossarioDataContent.matchAll(/slug:\s*["']([^"']+)["']/g)].map(m => m[1]);
+    
+    glossarioSlugs.forEach(slug => {
+      glossarioRouteCount++;
+      glossarioUrls += generateUrlNode(`/glossario/${slug}`, '0.7', 'monthly');
+    });
+  }
+
+  const glossarioSitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${glossarioUrls}\n</urlset>`;
+  fs.writeFileSync(path.join(publicDir, 'sitemap-glossario.xml'), glossarioSitemap);
+
+  // 5. Sitemap Index
   const sitemapIndex = `<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <sitemap>
@@ -113,6 +134,10 @@ function generateSitemap() {
     <loc>${DOMAIN}/sitemap-blog.xml</loc>
     <lastmod>${new Date().toISOString()}</lastmod>
   </sitemap>
+  <sitemap>
+    <loc>${DOMAIN}/sitemap-glossario.xml</loc>
+    <lastmod>${new Date().toISOString()}</lastmod>
+  </sitemap>
 </sitemapindex>`;
   
   fs.writeFileSync(path.join(publicDir, 'sitemap.xml'), sitemapIndex);
@@ -121,6 +146,7 @@ function generateSitemap() {
   console.log(`🚀 Total Core routes: ${PUBLIC_ROUTES.length}`);
   console.log(`🚀 Total Local SEO routes: ${localRouteCount}`);
   console.log(`🚀 Total Blog routes: ${blogRouteCount}`);
+  console.log(`🚀 Total Glossario routes: ${glossarioRouteCount}`);
 }
 
 generateSitemap();
