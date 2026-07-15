@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { brandConfig } from '../lib/branding';
-import { Check, Copy, ChevronRight, Menu, X, Download, CheckCircle2, ShieldAlert, Target, Users, Briefcase, LayoutGrid, Activity, Building2, Workflow } from 'lucide-react';
+import { Check, Copy, ChevronRight, Menu, X, Download, CheckCircle2, ShieldAlert, Target, Users, Briefcase, LayoutGrid, Activity, Building2, Workflow, MapPin, UserCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Logo from '../components/Logo';
 import SocialMediaSection from '../components/SocialMediaSection';
@@ -45,6 +45,7 @@ function ColorSwatch({ color, name, hex, description }: { color: string, name: s
 const SECTIONS = [
   { id: 'visao-geral', label: 'Visão Geral' },
   { id: 'atuacao-mercado', label: 'Atuação de Mercado' },
+  { id: 'icp-regioes', label: 'ICP & Regiões' },
   { id: 'logo', label: 'Sistema de Logo' },
   { id: 'cores', label: 'Paleta de Cores' },
   { id: 'tipografia', label: 'Tipografia' },
@@ -354,6 +355,169 @@ export default function BrandbookPage() {
                     <p className="text-xs text-muted-foreground leading-relaxed">
                       Elimina follow-ups esquecidos, a baixa produtividade da equipe e a dificuldade de medir resultados com a ausência de visão do funil.
                     </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* ICP & REGIÕES */}
+          <section id="icp-regioes" className="scroll-mt-24 space-y-12">
+            <div>
+              <h2 className="text-3xl font-bold mb-2">ICP &amp; Principais Regiões</h2>
+              <p className="text-muted-foreground">Quem é o cliente ideal do Funil Comercial — e onde ele está.</p>
+            </div>
+
+            {/* ICP */}
+            <div className="space-y-6">
+              <h3 className="text-xl font-semibold border-b border-white/10 pb-2">Perfil de Cliente Ideal (ICP)</h3>
+
+              <div className="grid gap-6 sm:grid-cols-2">
+                <div className="rounded-2xl border border-white/5 bg-card/30 p-8">
+                  <div className="mb-4 h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                    <UserCheck size={24} />
+                  </div>
+                  <h3 className="text-xl font-bold text-foreground mb-3">Quem é</h3>
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    <strong className="text-foreground">Donos de negócios locais, profissionais liberais e autônomos</strong> que recebem leads e <strong className="text-foreground">vendem pelo WhatsApp</strong>. Operações enxutas, sem estrutura comercial montada.
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-white/5 bg-card/30 p-8">
+                  <div className="mb-4 h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                    <Target size={24} />
+                  </div>
+                  <h3 className="text-xl font-bold text-foreground mb-3">Em que momento</h3>
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    Dependem de <strong className="text-foreground">indicação</strong>, precisam <strong className="text-foreground">aparecer melhor no Google</strong> e querem <strong className="text-foreground">previsibilidade</strong> — estão estruturando as vendas para crescer com processo.
+                  </p>
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-white/5 bg-card/30 p-8">
+                <div className="mb-4 h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                  <Briefcase size={24} />
+                </div>
+                <h3 className="text-xl font-bold text-foreground mb-4">Nichos-alvo</h3>
+                <div className="flex flex-wrap gap-2">
+                  {['Dentistas', 'Médicos', 'Psicólogas', 'Nutricionistas', 'Fisioterapeutas', 'Clínicas de Estética', 'Personal Trainers', 'Advogados', 'Contadores', 'Arquitetos', 'Engenheiros', 'Corretores de Imóveis'].map((badge) => (
+                    <span key={badge} className="px-3 py-1.5 rounded-lg border border-white/5 bg-white/5 text-xs font-medium text-foreground">
+                      {badge}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid gap-6 sm:grid-cols-2">
+                <div className="rounded-2xl border border-white/5 bg-card p-6">
+                  <div className="flex items-center gap-2 fc-success mb-4">
+                    <CheckCircle2 size={18} />
+                    <h3 className="font-bold">Sinais de fit (é ICP)</h3>
+                  </div>
+                  <ul className="space-y-3 text-sm text-muted-foreground">
+                    <li className="flex items-start gap-2"><CheckCircle2 size={16} className="fc-success shrink-0 mt-0.5" />Atende e vende pelo WhatsApp.</li>
+                    <li className="flex items-start gap-2"><CheckCircle2 size={16} className="fc-success shrink-0 mt-0.5" />Recebe leads e vive de indicação.</li>
+                    <li className="flex items-start gap-2"><CheckCircle2 size={16} className="fc-success shrink-0 mt-0.5" />Negócio local ou profissional liberal.</li>
+                    <li className="flex items-start gap-2"><CheckCircle2 size={16} className="fc-success shrink-0 mt-0.5" />Quer processo, follow-up e previsibilidade.</li>
+                  </ul>
+                </div>
+                <div className="rounded-2xl border border-white/5 bg-card p-6">
+                  <div className="flex items-center gap-2 text-red-500 mb-4">
+                    <X size={18} />
+                    <h3 className="font-bold">Fora do perfil</h3>
+                  </div>
+                  <ul className="space-y-3 text-sm text-muted-foreground">
+                    <li className="flex items-start gap-2"><X size={16} className="text-red-500 shrink-0 mt-0.5" />Grandes empresas / operação corporativa.</li>
+                    <li className="flex items-start gap-2"><X size={16} className="text-red-500 shrink-0 mt-0.5" />E-commerce puro, sem atendimento consultivo.</li>
+                    <li className="flex items-start gap-2"><X size={16} className="text-red-500 shrink-0 mt-0.5" />Quem não vende pelo WhatsApp.</li>
+                    <li className="flex items-start gap-2"><X size={16} className="text-red-500 shrink-0 mt-0.5" />Sem operação local ou base de clientes.</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-primary/20 bg-primary/5 p-8">
+                <h3 className="text-lg font-bold text-foreground mb-4">Dores que qualificam o ICP</h3>
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground text-sm">Leads perdidos</h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed">Atendimento disperso no WhatsApp e sem histórico centralizado.</p>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground text-sm">Sem previsibilidade</h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed">Falta de processo comercial e dificuldade de acompanhar oportunidades.</p>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground text-sm">Follow-up falho</h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed">Retornos esquecidos, baixa produtividade e resultados difíceis de medir.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* REGIÕES */}
+            <div className="space-y-6">
+              <h3 className="text-xl font-semibold border-b border-white/10 pb-2">Principais Regiões</h3>
+              <p className="text-muted-foreground">
+                Cobertura de aquisição (base do SEO local, rotas <span className="text-foreground">/local/[nicho]/[uf]/[cidade]</span>): <strong className="text-foreground">14 estados</strong> e <strong className="text-foreground">113 cidades-alvo</strong>, com o núcleo no Sudeste e no Sul.
+              </p>
+
+              <div className="grid gap-6 sm:grid-cols-2">
+                <div className="rounded-2xl border border-white/5 bg-card/30 p-8">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0"><MapPin size={24} /></div>
+                    <div>
+                      <h3 className="text-lg font-bold text-foreground">Sudeste — núcleo</h3>
+                      <span className="text-xs text-muted-foreground">SP · RJ · MG · ES — 54 cidades</span>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {['São Paulo', 'Campinas', 'Rio de Janeiro', 'Niterói', 'Belo Horizonte', 'Uberlândia', 'Vitória'].map((b) => (
+                      <span key={b} className="px-3 py-1.5 rounded-lg border border-white/5 bg-white/5 text-xs font-medium text-foreground">{b}</span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-white/5 bg-card/30 p-8">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0"><MapPin size={24} /></div>
+                    <div>
+                      <h3 className="text-lg font-bold text-foreground">Sul</h3>
+                      <span className="text-xs text-muted-foreground">PR · RS · SC — 30 cidades</span>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {['Curitiba', 'Londrina', 'Maringá', 'Porto Alegre', 'Caxias do Sul', 'Florianópolis', 'Joinville'].map((b) => (
+                      <span key={b} className="px-3 py-1.5 rounded-lg border border-white/5 bg-white/5 text-xs font-medium text-foreground">{b}</span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-white/5 bg-card/30 p-8">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0"><MapPin size={24} /></div>
+                    <div>
+                      <h3 className="text-lg font-bold text-foreground">Nordeste</h3>
+                      <span className="text-xs text-muted-foreground">BA · PE · CE — 18 cidades</span>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {['Salvador', 'Feira de Santana', 'Recife', 'Olinda', 'Fortaleza'].map((b) => (
+                      <span key={b} className="px-3 py-1.5 rounded-lg border border-white/5 bg-white/5 text-xs font-medium text-foreground">{b}</span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-white/5 bg-card/30 p-8">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0"><MapPin size={24} /></div>
+                    <div>
+                      <h3 className="text-lg font-bold text-foreground">Centro-Oeste</h3>
+                      <span className="text-xs text-muted-foreground">GO · MT · MS · DF — 11 cidades</span>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {['Goiânia', 'Cuiabá', 'Campo Grande', 'Brasília'].map((b) => (
+                      <span key={b} className="px-3 py-1.5 rounded-lg border border-white/5 bg-white/5 text-xs font-medium text-foreground">{b}</span>
+                    ))}
                   </div>
                 </div>
               </div>
