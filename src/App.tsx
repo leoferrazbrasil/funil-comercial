@@ -62,6 +62,7 @@ import { SeoHead } from "./components/SeoHead";
 import BlogIndex from "./pages/BlogIndex";
 import BlogPost from "./pages/BlogPost";
 import ProgrammaticBlogPost from "./pages/ProgrammaticBlogPost";
+import ProgrammaticIntentLanding from "./pages/ProgrammaticIntentLanding";
 import { PrivacyPage, TermsPage, DataDeletionPage } from "./pages/LegalPages";
 import SignUpScreen from "./pages/SignUp";
 import LoginScreen from "./pages/Login";
@@ -177,6 +178,9 @@ const isPublicPath = (pathname: string) =>
   pathname.startsWith("/l/") ||
   pathname.startsWith("/local/") ||
   pathname.startsWith("/blog/") ||
+  pathname.startsWith("/agencia-de-marketing/") ||
+  pathname.startsWith("/empresa-de-captacao/") ||
+  pathname.startsWith("/melhor-crm/") ||
   isProspectingPreviewPath(pathname);
 
 const stages: OpportunityStage[] = pipelineStages;
@@ -1148,6 +1152,9 @@ function AppContent() {
           <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="/blog/guia-de-vendas/:nicho/:estado/:cidade" element={<ProgrammaticBlogPost />} />
           <Route path="/local/:nicho/:estado/:cidade" element={<LocalCityLanding />} />
+          <Route path="/agencia-de-marketing/:nicho/:estado/:cidade" element={<ProgrammaticIntentLanding intentType="agencia" />} />
+          <Route path="/empresa-de-captacao/:nicho/:estado/:cidade" element={<ProgrammaticIntentLanding intentType="captacao" />} />
+          <Route path="/melhor-crm/:nicho/:estado/:cidade" element={<ProgrammaticIntentLanding intentType="crm" />} />
           <Route path="/l/:slug" element={<LinkAggregatorPage />} />
           <Route path="/:slug" element={<ProspectingPreviewPage />} />
           <Route path="/:slug/index.html" element={<ProspectingPreviewPage />} />

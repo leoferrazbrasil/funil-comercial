@@ -11,7 +11,16 @@ tags:
 > [!note] Navegação
 > Histórico de mudanças, mais recente primeiro. Contexto do produto em [[01 - Requisitos]]; arquitetura em [[02 - Arquitetura e Design]]; índice em [[00 - Inicio]].
 
-## [2026-07-15] - Arquitetura Avançada de SEO: Sitemap Index e Internal Linking
+## [2026-07-15] - Expansão do Motor de SEO Programático: Intenção Comercial
+
+### Adicionado — Landings de Intenção de Fundo de Funil
+- Criação de uma nova estrutura dinâmica de página (`ProgrammaticIntentLanding.tsx`) que altera sua Copy (H1, Meta Titles e descrições) com base em 3 novas intenções de busca altamente qualificadas: "Agência de Marketing", "Empresa de Captação" e "Melhor CRM".
+- Integração dessas novas rotas no `App.tsx` para garantir acesso público livre do gate de autenticação.
+- Com isso, o rastreador gera de forma automática Landing Pages super focadas, cruzando nicho, cidade e o *serviço exato* buscado pelo cliente.
+
+### Modificado — Explosão de Cobertura no Sitemap Local
+- O gerador de mapas do site (`generate-sitemap.mjs`) foi alterado para mapear também essas 3 variações comerciais para cada local e nicho já suportado.
+- O impacto foi o salto de 1.356 para **5.424 URLs** na categoria local, englobando buscas comerciais massivas (ex: "Melhor crm para nutricionistas em Campinas").
 
 ### Adicionado — Componente de Internal Linking Dinâmico
 - Novo componente `<RelatedContent />` que gera dinamicamente links para outras especialidades na mesma cidade e para a mesma especialidade em cidades vizinhas.

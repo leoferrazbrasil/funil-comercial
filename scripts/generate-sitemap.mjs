@@ -60,6 +60,12 @@ function generateSitemap() {
     NICHES.forEach(nicho => {
       localRouteCount++;
       localUrls += generateUrlNode(`/local/${nicho}/${location.estado}/${location.cidade}`, '0.7', 'monthly');
+      
+      // Commercial Intent Routes
+      localRouteCount += 3;
+      localUrls += generateUrlNode(`/agencia-de-marketing/${nicho}/${location.estado}/${location.cidade}`, '0.7', 'monthly');
+      localUrls += generateUrlNode(`/empresa-de-captacao/${nicho}/${location.estado}/${location.cidade}`, '0.7', 'monthly');
+      localUrls += generateUrlNode(`/melhor-crm/${nicho}/${location.estado}/${location.cidade}`, '0.7', 'monthly');
     });
   });
   
