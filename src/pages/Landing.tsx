@@ -100,6 +100,7 @@ const SERVICES = [
     descricao:
       "Página profissional, rápida e feita para gerar contato no WhatsApp — não só para \"existir\".",
     icon: Globe,
+    to: "/site-para-negocios-locais",
   },
   {
     nome: "Google Meu Negócio",
@@ -109,6 +110,7 @@ const SERVICES = [
     descricao:
       "Perfil otimizado para aparecer no mapa quando alguém procura o que você faz na sua região.",
     icon: MapPin,
+    to: "/google-meu-negocio",
   },
   {
     nome: "Tráfego Pago",
@@ -118,6 +120,7 @@ const SERVICES = [
     descricao:
       "Gestão profissional dos seus anúncios, com foco em uma coisa só: gerar conversa de venda.",
     icon: Megaphone,
+    to: "/trafego-pago-negocios-locais",
   },
   {
     nome: "CRM Funil Comercial",
