@@ -11,6 +11,16 @@ tags:
 > [!note] Navegação
 > Histórico de mudanças, mais recente primeiro. Contexto do produto em [[01 - Requisitos]]; arquitetura em [[02 - Arquitetura e Design]]; índice em [[00 - Inicio]].
 
+## [2026-07-15] - Arquitetura Avançada de SEO: Sitemap Index e Internal Linking
+
+### Adicionado — Componente de Internal Linking Dinâmico
+- Novo componente `<RelatedContent />` que gera dinamicamente links para outras especialidades na mesma cidade e para a mesma especialidade em cidades vizinhas.
+- Injetado nativamente nas milhares de páginas de SEO Programático (`LocalCityLanding.tsx` e `ProgrammaticBlogPost.tsx`), retendo o rastreamento do Googlebot e distribuindo autoridade (PageRank) em formato de teia.
+
+### Modificado — Fragmentação e expansão do Sitemap (Sitemap Index)
+- O script `generate-sitemap.mjs` foi reescrito para gerar um **Sitemap Index** apontando para sub-sitemaps menores (`sitemap-core.xml`, `sitemap-local.xml` e `sitemap-blog.xml`), facilitando o diagnóstico de indexação no Google Search Console.
+- **Correção Crítica:** O gerador de sitemap antigo ignorava os guias programáticos do blog. O novo script agora inclui e indexa 1.356 novas rotas de blog focadas em intenção de compra.
+- Rotas privadas da plataforma receberam tag `noindex` centralizada (`App.tsx`) e `index.html` agora faz *preload* das fontes críticas.
 ## [2026-07-14] - Posicionamento e Estratégia de SEO: Foco em Profissionais e Regiões
 
 > [!abstract] Resumo da Atualização

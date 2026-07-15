@@ -14,6 +14,7 @@ import {
 import Logo from "../components/Logo";
 import { SeoHead, generateLocalBusinessSchema, generateServiceSchema, generateFAQSchema } from "../components/SeoHead";
 import { seoNicheData, getDefaultNicheData } from "../lib/seoNicheData";
+import { RelatedContent } from "../components/RelatedContent";
 
 const WHATSAPP_NUMBER = "5551996737359";
 
@@ -170,6 +171,8 @@ export default function LocalCityLanding() {
            </section>
          )}
       </main>
+
+      <RelatedContent currentNiche={nicho} currentState={estado} currentCity={cidade} />
 
       <footer className="border-t border-white/10 py-8 text-center flex flex-col gap-4 items-center justify-center">
         <p className="text-sm text-muted-foreground">

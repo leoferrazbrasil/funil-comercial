@@ -5,6 +5,7 @@ import Logo from "../components/Logo";
 import { SeoHead, generateLocalBusinessSchema, generateServiceSchema, generateFAQSchema } from "../components/SeoHead";
 import { seoNicheData, getDefaultNicheData } from "../lib/seoNicheData";
 import { EDITORIAL_PILLARS } from "../lib/editorialPillars";
+import { RelatedContent } from "../components/RelatedContent";
 
 const WHATSAPP_NUMBER = "5551996737359";
 
@@ -224,6 +225,8 @@ export default function ProgrammaticBlogPost() {
           </div>
         </article>
       </main>
+
+      <RelatedContent currentNiche={nicho} currentState={estado} currentCity={cidade} isBlog />
 
       <footer className="border-t border-white/10 py-12 text-center mt-12">
         <p className="text-sm text-muted-foreground">

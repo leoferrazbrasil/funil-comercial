@@ -7,6 +7,8 @@ interface SeoHeadProps {
   canonicalUrl?: string;
   image?: string;
   schema?: Record<string, any> | Record<string, any>[];
+  noindex?: boolean;
+  breadcrumbs?: { name: string; url: string }[];
 }
 
 export function SeoHead({
@@ -15,6 +17,8 @@ export function SeoHead({
   canonicalUrl,
   image = "https://funilcomercial.com/logo.png",
   schema,
+  noindex = false,
+  breadcrumbs,
 }: SeoHeadProps) {
   const defaultTitle = `${brandConfig.name} — Estrutura de Vendas para Negócios Locais`;
   const finalTitle = title ? `${title} | ${brandConfig.name}` : defaultTitle;
@@ -24,10 +28,37 @@ export function SeoHead({
   
   const finalCanonical = canonicalUrl || "https://funilcomercial.com";
 
+  // Breadcrumb Schema
+  const breadcrumbSchema = breadcrumbs && breadcrumbs.length > 0 ? {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": breadcrumbs.map((crumb, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "name": crumb.name,
+      "item": crumb.url
+    }))
+  } : null;
+
+  // Combine schemas if both exist
+  let finalSchema: any[] = [];
+  if (schema) {
+    if (Array.isArray(schema)) {
+      finalSchema = [...schema];
+    } else {
+      finalSchema.push(schema);
+    }
+  }
+  if (breadcrumbSchema) {
+    finalSchema.push(breadcrumbSchema);
+  }
+
   return (
     <Helmet>
       <title>{finalTitle}</title>
       <meta name="description" content={finalDescription} />
+      
+      {noindex && <meta name="robots" content="noindex, nofollow" />}
       
       {/* Open Graph / Facebook */}
       <meta property="og:type" content="website" />
@@ -47,9 +78,9 @@ export function SeoHead({
       <link rel="canonical" href={finalCanonical} />
 
       {/* Structured Data (JSON-LD) */}
-      {schema && (
+      {finalSchema.length > 0 && (
         <script type="application/ld+json">
-          {JSON.stringify(schema)}
+          {JSON.stringify(finalSchema.length === 1 ? finalSchema[0] : finalSchema)}
         </script>
       )}
     </Helmet>

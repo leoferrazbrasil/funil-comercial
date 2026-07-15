@@ -58,6 +58,7 @@ import LocalCityLanding from "./pages/LocalCityLanding";
 import CitiesDirectory from "./pages/CitiesDirectory";
 import ConsultoriaLanding from "./pages/ConsultoriaLanding";
 import { AnnouncementBar } from "./components/AnnouncementBar";
+import { SeoHead } from "./components/SeoHead";
 import BlogIndex from "./pages/BlogIndex";
 import BlogPost from "./pages/BlogPost";
 import ProgrammaticBlogPost from "./pages/ProgrammaticBlogPost";
@@ -1169,6 +1170,7 @@ function AppContent() {
 
   return (
     <div className="shell">
+      <SeoHead noindex />
       <Toaster position="bottom-right" />
       {session ? (
         <Sidebar
