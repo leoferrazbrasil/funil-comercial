@@ -24,6 +24,19 @@ type ProcessedMessage = {
   inbox_message_id: string | null;
 };
 
+type PersistedInboxMessage = {
+  created_at: string;
+  direction: "inbound" | "outbound";
+  telefone: string;
+  channel_id: string | null;
+};
+
+export function reopenArchiveBefore(
+  message: Pick<PersistedInboxMessage, "created_at" | "direction">,
+) {
+  return message.direction === "inbound" ? message.created_at : null;
+}
+
 type SupabaseClientAny = ReturnType<typeof createClient<any, "public", any>>;
 
 const corsHeaders = {
@@ -529,7 +542,6 @@ async function resolveOwnerChannel(
       .from("integration_channels")
       .select("id, owner_id")
       .eq("provider", "z-api")
-      .eq("status", "ativo")
       .contains("metadata", { instanceId: message.instanceId })
       .limit(1)
       .maybeSingle();
@@ -546,7 +558,6 @@ async function resolveOwnerChannel(
       .select("id, owner_id")
       .in("numero", message.channelIdentifiers)
       .in("provider", providers)
-      .eq("status", "ativo")
       .limit(1)
       .maybeSingle();
 
@@ -573,21 +584,21 @@ function conversationStatePhoneKey(value: string) {
   return phone;
 }
 
-async function reopenConversationIfInbound(
+async function reopenConversationIfNewerInbound(
   supabase: SupabaseClientAny,
   ownerId: string,
-  phone: string,
-  channelId: string | null,
-  direction?: "inbound" | "outbound",
+  message: PersistedInboxMessage,
 ) {
-  if (direction === "outbound") return;
+  const archivedBefore = reopenArchiveBefore(message);
+  if (!archivedBefore) return;
 
   const { error } = await supabase
     .from("inbox_conversation_states")
     .update({ archived_at: null, archived_by: null, archive_reason: null })
     .eq("owner_id", ownerId)
-    .eq("telefone", conversationStatePhoneKey(phone))
-    .eq("channel_key", channelId ?? "legacy");
+    .eq("telefone", conversationStatePhoneKey(message.telefone))
+    .eq("channel_key", message.channel_id ?? "legacy")
+    .lt("archived_at", archivedBefore);
 
   if (error) throw error;
 }
@@ -660,7 +671,7 @@ async function processInboundMessage(
 
   const { ownerId, channelId } = await resolveOwnerChannel(supabase, inboundMessage);
   if (!ownerId) {
-    throw new Error("No active integration channel found for inbound message.");
+    throw new Error("No integration channel found for inbound message.");
   }
 
   let finalPhone = inboundMessage.fromPhone;
@@ -707,17 +718,29 @@ async function processInboundMessage(
         is_lid: isLid
       }
     })
-    .select()
+    .select("id, created_at, direction, telefone, channel_id")
     .single();
 
   if (messageError) {
     if (messageError.code === "23505") {
-      await reopenConversationIfInbound(
+      if (!inboundMessage.providerMessageId) throw messageError;
+
+      const { data: existingMessage, error: existingMessageError } = await supabase
+        .from("inbox_messages")
+        .select("created_at, direction, telefone, channel_id")
+        .eq("owner_id", ownerId)
+        .eq("provider", inboundMessage.provider)
+        .eq("provider_message_id", inboundMessage.providerMessageId)
+        .limit(1)
+        .maybeSingle();
+
+      if (existingMessageError) throw existingMessageError;
+      if (!existingMessage) throw messageError;
+
+      await reopenConversationIfNewerInbound(
         supabase,
         ownerId,
-        finalPhone,
-        channelId,
-        inboundMessage.direction,
+        existingMessage as PersistedInboxMessage,
       );
       console.log(
         JSON.stringify({
@@ -739,12 +762,10 @@ async function processInboundMessage(
     throw messageError;
   }
 
-  await reopenConversationIfInbound(
+  await reopenConversationIfNewerInbound(
     supabase,
     ownerId,
-    finalPhone,
-    channelId,
-    inboundMessage.direction,
+    inboxMessage as PersistedInboxMessage,
   );
 
   // Se agora temos o telefone real e existe o chatLid, atualizamos mensagens antigas que só tinham o LID
@@ -793,7 +814,7 @@ function verifyWebhookChallenge(request: Request) {
   return jsonResponse({ error: "Webhook verification failed." }, 403);
 }
 
-Deno.serve(async (request) => {
+if (import.meta.main) Deno.serve(async (request) => {
   if (request.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }

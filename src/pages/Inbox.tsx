@@ -492,6 +492,23 @@ type DateFilter = "tudo" | "hoje" | "7d" | "30d";
 type TypeFilter = "todos" | ConversationStage;
 type ChannelFilter = "ativos" | "legado" | "todos" | string;
 
+export function conversationMatchesChannelFilter(
+  channelId: string | null,
+  channelFilter: ChannelFilter,
+  activeChannelIds: ReadonlySet<string>,
+  isSeller: boolean,
+) {
+  if (channelFilter === "ativos") {
+    // Sellers cannot read the admin's integration_channels rows through RLS.
+    // Their assigned messages are already scoped by message RLS, so the default
+    // view must not require unavailable channel metadata.
+    return isSeller || (channelId !== null && activeChannelIds.has(channelId));
+  }
+  if (channelFilter === "legado") return channelId === null;
+  if (channelFilter === "todos") return true;
+  return channelId === channelFilter;
+}
+
 type ConversationViewModel = {
   key: string;
   latest: InboxMessage;
@@ -795,6 +812,27 @@ export default function InboxPage({
   // server pelo whatsapp-send), então não precisa de canal próprio conectado.
   const isSeller = Boolean(myProfile?.admin_id);
 
+  useEffect(() => {
+    if (!supabase) return;
+
+    const archiveStateChannel = supabase
+      .channel("inbox-conversation-states-realtime")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "inbox_conversation_states",
+        },
+        () => queryClient.invalidateQueries({ queryKey: ["crmSnapshot"] }),
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(archiveStateChannel);
+    };
+  }, [queryClient]);
+
   // Mapa telefone (unificado) -> atribuição, para casar com `conv.key` (que já
   // é `unifyPhone`). `conversation_assignments.telefone` é gravado cru, então
   // unificamos aqui do mesmo jeito que as conversas são agrupadas.
@@ -817,8 +855,13 @@ export default function InboxPage({
   }, [teamMembers, myProfile]);
 
   const showAssignedFilter = isAdmin ? teamMembers.length > 0 : Boolean(myProfile);
-  const activeChannels = channels.filter(
-    (channel) => channel.status === "ativo",
+  const activeChannels = useMemo(
+    () => channels.filter((channel) => channel.status === "ativo"),
+    [channels],
+  );
+  const activeChannelIds = useMemo(
+    () => new Set(activeChannels.map((channel) => channel.id)),
+    [activeChannels],
   );
 
   const displayedConversations = useMemo(() => {
@@ -837,16 +880,13 @@ export default function InboxPage({
       if (filterTab === "nao_lidas" && conv.unreadCount === 0) return false;
 
       // Filtro de canal
-      if (channelFilter === "ativos") {
-        const isActiveChannel = conv.channelId
-          ? activeChannels.some((channel) => channel.id === conv.channelId)
-          : false;
-        if (!isActiveChannel) return false;
-      }
-      if (channelFilter === "legado" && conv.channelId !== null) return false;
       if (
-        !["ativos", "legado", "todos"].includes(channelFilter) &&
-        conv.channelId !== channelFilter
+        !conversationMatchesChannelFilter(
+          conv.channelId,
+          channelFilter,
+          activeChannelIds,
+          isSeller,
+        )
       ) {
         return false;
       }
@@ -892,7 +932,8 @@ export default function InboxPage({
     conversations,
     filterTab,
     channelFilter,
-    activeChannels,
+    activeChannelIds,
+    isSeller,
     localSearch,
     typeFilter,
     dateFilter,
