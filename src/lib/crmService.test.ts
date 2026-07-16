@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   archiveInboxConversations,
   conversationStatePhoneKey,
+  getCrmSnapshot,
   reopenInboxConversation,
   unarchiveInboxConversation,
 } from "./crmService";
@@ -90,5 +91,50 @@ describe("Inbox conversation archive state", () => {
     expect(eq).toHaveBeenNthCalledWith(1, "owner_id", "owner-1");
     expect(eq).toHaveBeenNthCalledWith(2, "telefone", "551198765432");
     expect(eq).toHaveBeenNthCalledWith(3, "channel_key", "legacy");
+  });
+});
+
+describe("getCrmSnapshot", () => {
+  const from = vi.fn();
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(requireSupabase).mockReturnValue({
+      from,
+    } as never);
+  });
+
+  it("keeps the Inbox loading when archive state table is not deployed yet", async () => {
+    const listResult = { data: [], error: null };
+    const profileResult = { data: null, error: null };
+    const missingStatesResult = {
+      data: null,
+      error: {
+        code: "PGRST205",
+        message: "Could not find the table 'public.inbox_conversation_states' in the schema cache",
+      },
+    };
+
+    from.mockImplementation((table: string) => {
+      if (table === "profiles") {
+        return {
+          select: () => ({
+            eq: () => ({
+              maybeSingle: () => Promise.resolve(profileResult),
+            }),
+          }),
+        };
+      }
+
+      return {
+        select: () => ({
+          order: () => Promise.resolve(table === "inbox_conversation_states" ? missingStatesResult : listResult),
+        }),
+      };
+    });
+
+    await expect(getCrmSnapshot("owner-1")).resolves.toMatchObject({
+      conversationStates: [],
+    });
   });
 });

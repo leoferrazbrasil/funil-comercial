@@ -55,6 +55,12 @@ const isMissingColumnError = (error: { code?: string; message?: string } | null)
     error.code === "PGRST204" ||
     /column .* does not exist|could not find the .* column/i.test(error.message ?? ""));
 
+const isMissingRelationError = (error: { code?: string; message?: string } | null) =>
+  !!error &&
+  (error.code === "42P01" ||
+    error.code === "PGRST205" ||
+    /relation .* does not exist|could not find the table|schema cache/i.test(error.message ?? ""));
+
 type LeadPayload = {
   contact_id?: string | null;
   nome: string;
@@ -221,7 +227,7 @@ export async function getCrmSnapshot(userId: string): Promise<CrmSnapshot> {
     opportunitiesResult.error,
     messagesResult.error,
     channelsResult.error,
-    statesResult.error,
+    isMissingRelationError(statesResult.error) ? null : statesResult.error,
   ].filter(Boolean);
 
   if (errors[0]) throw errors[0];
