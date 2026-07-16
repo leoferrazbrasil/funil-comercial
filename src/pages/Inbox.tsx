@@ -1036,16 +1036,18 @@ export default function InboxPage({
 
   const cleanupCandidates = useMemo(
     () =>
-      conversations.filter((conv) => {
-        if (conv.isArchived || conv.unreadCount > 0) return false;
-        if (conv.channelId === null) return true;
-        return !activeChannels.some((channel) => channel.id === conv.channelId);
-      }),
-    [conversations, activeChannels],
+      isAdmin
+        ? conversations.filter((conv) => {
+            if (conv.isArchived || conv.unreadCount > 0) return false;
+            if (conv.channelId === null) return true;
+            return !activeChannels.some((channel) => channel.id === conv.channelId);
+          })
+        : [],
+    [conversations, activeChannels, isAdmin],
   );
 
   const handleArchiveConversation = async (conv: ConversationViewModel) => {
-    if (!conv.latest.owner_id || conv.isDraft) return;
+    if (!isAdmin || !conv.latest.owner_id || conv.isDraft) return;
     try {
       await archiveInboxConversations(
         [
@@ -1065,7 +1067,7 @@ export default function InboxPage({
   };
 
   const handleUnarchiveConversation = async (conv: ConversationViewModel) => {
-    if (!conv.latest.owner_id || conv.isDraft) return;
+    if (!isAdmin || !conv.latest.owner_id || conv.isDraft) return;
     try {
       await unarchiveInboxConversation({
         owner_id: conv.latest.owner_id,
@@ -1080,7 +1082,7 @@ export default function InboxPage({
   };
 
   const handleArchiveCleanupCandidates = async () => {
-    if (cleanupCandidates.length === 0) return;
+    if (!isAdmin || cleanupCandidates.length === 0) return;
     try {
       await archiveInboxConversations(
         cleanupCandidates.map((conv) => ({
@@ -1271,7 +1273,7 @@ export default function InboxPage({
             <p className="mt-1">Seu histórico de conversas está preservado.</p>
           </div>
         )}
-        {cleanupCandidates.length > 0 && (
+        {isAdmin && cleanupCandidates.length > 0 && (
           <div className="p-4 m-4 text-xs bg-amber-500/10 border border-amber-500/30 text-amber-500 rounded-xl">
             <strong>Conversas antigas encontradas</strong>
             <p className="mt-1">Arquive conversas de canais antigos para manter a Inbox limpa.</p>
@@ -1347,7 +1349,7 @@ export default function InboxPage({
                       </div>
                     </div>
                   </button>
-                  {!conv.isDraft && (
+                  {isAdmin && !conv.isDraft && (
                     <button
                       type="button"
                       onClick={(event) => {
