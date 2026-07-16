@@ -1239,6 +1239,7 @@ function AppContent() {
               element={
                 <InboxPage
                   channels={snapshot.channels}
+                  conversationStates={snapshot.conversationStates}
                   contacts={snapshot.contacts}
                   isSaving={isSaving}
                   leads={snapshot.leads}

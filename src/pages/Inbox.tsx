@@ -27,6 +27,8 @@ import {
   Check,
   CheckCheck,
   AlertTriangle,
+  Archive,
+  ArchiveRestore,
   UserPlus,
 } from "lucide-react";
 import type { FormEvent, ReactNode } from "react";
@@ -71,6 +73,9 @@ import {
   getTeamMembers,
   getConversationAssignments,
   assignConversation,
+  archiveInboxConversations,
+  conversationStatePhoneKey,
+  unarchiveInboxConversation,
 } from "../lib/crmService";
 import { TemplatePicker } from "../components/TemplatePicker";
 import type { WhatsAppTemplate } from "../lib/crmService";
@@ -90,6 +95,7 @@ import type {
   Contact,
   ConversationAssignment,
   CrmSnapshot,
+  InboxConversationState,
   InboxMessage,
   IntegrationChannel,
   Lead,
@@ -484,6 +490,23 @@ const buildDraftMessage = (target: WhatsAppTarget): InboxMessage => ({
 type ConversationStage = "contato" | "lead" | "oportunidade" | "nao_cadastrado";
 type DateFilter = "tudo" | "hoje" | "7d" | "30d";
 type TypeFilter = "todos" | ConversationStage;
+type ChannelFilter = "ativos" | "legado" | "todos" | string;
+
+type ConversationViewModel = {
+  key: string;
+  latest: InboxMessage;
+  latestInbound: InboxMessage;
+  displayName: string;
+  stage: ConversationStage;
+  isResolved: boolean;
+  messages: InboxMessage[];
+  unreadCount: number;
+  channelId: string | null;
+  channelLabel: string;
+  archiveState: InboxConversationState | null;
+  isArchived: boolean;
+  isDraft: boolean;
+};
 
 const DATE_FILTERS: ReadonlyArray<{ value: DateFilter; label: string }> = [
   { value: "tudo", label: "Tudo" },
@@ -512,6 +535,7 @@ function dateFilterCutoff(filter: DateFilter): number | null {
 
 export default function InboxPage({
   channels,
+  conversationStates,
   contacts,
   isSaving,
   leads,
@@ -530,6 +554,7 @@ export default function InboxPage({
   onUpdateMessageStatus,
 }: {
   channels: IntegrationChannel[];
+  conversationStates: InboxConversationState[];
   contacts: Contact[];
   isSaving: boolean;
   leads: Lead[];
@@ -561,6 +586,7 @@ export default function InboxPage({
   ) => Promise<void>;
 }) {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const filteredMessages = messages.filter((message) =>
     matchesQuery(query, [
@@ -570,6 +596,18 @@ export default function InboxPage({
       message.status,
     ]),
   );
+
+  const archiveStateByConversation = useMemo(() => {
+    const map = new Map<string, InboxConversationState>();
+    for (const state of conversationStates) {
+      const channelKey = state.channel_id ?? "legacy";
+      map.set(
+        `${conversationStatePhoneKey(state.telefone)}:${channelKey}`,
+        state,
+      );
+    }
+    return map;
+  }, [conversationStates]);
 
   const conversations = useMemo(() => {
     const grouped = new Map<string, InboxMessage[]>();
@@ -621,6 +659,17 @@ export default function InboxPage({
         // "Resolvida" = a última mensagem RECEBIDA foi marcada como "Resolvido"
         // (uma nova mensagem recebida reabre a conversa). Usado pela aba "Abertas".
         const isResolved = latestInbound.status === "Resolvido";
+        const channelId = latest.channel_id ?? null;
+        const channel = channelId
+          ? channels.find((item) => item.id === channelId)
+          : null;
+        const channelKey = channelId ?? "legacy";
+        const archiveState =
+          archiveStateByConversation.get(`${key}:${channelKey}`) ?? null;
+        const isArchived = Boolean(archiveState?.archived_at);
+        const channelLabel = channel
+          ? `${formatProviderName(channel.provider)} ${displayPhone(channel.numero)}`
+          : "Legado / sem canal";
 
         return {
           key,
@@ -634,18 +683,32 @@ export default function InboxPage({
             (sum, item) => sum + Number(item.unread_count || 0),
             0,
           ),
-        };
+          channelId,
+          channelLabel,
+          archiveState,
+          isArchived,
+          isDraft: false,
+        } satisfies ConversationViewModel;
       })
       .sort(
         (a, b) =>
           new Date(b.latest.created_at).getTime() -
           new Date(a.latest.created_at).getTime(),
       );
-  }, [filteredMessages, contacts, opportunities]);
+  }, [
+    filteredMessages,
+    contacts,
+    opportunities,
+    channels,
+    archiveStateByConversation,
+  ]);
 
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
-  const [filterTab, setFilterTab] = useState<"abertas" | "nao_lidas" | "todas">("abertas");
+  const [filterTab, setFilterTab] = useState<
+    "abertas" | "nao_lidas" | "arquivadas" | "todas"
+  >("abertas");
+  const [channelFilter, setChannelFilter] = useState<ChannelFilter>("ativos");
   const [dateFilter, setDateFilter] = useState<DateFilter>("tudo");
   const [typeFilter, setTypeFilter] = useState<TypeFilter>("todos");
   const [localSearch, setLocalSearch] = useState("");
@@ -754,13 +817,39 @@ export default function InboxPage({
   }, [teamMembers, myProfile]);
 
   const showAssignedFilter = isAdmin ? teamMembers.length > 0 : Boolean(myProfile);
+  const activeChannels = channels.filter(
+    (channel) => channel.status === "ativo",
+  );
 
   const displayedConversations = useMemo(() => {
     const dateCutoff = dateFilterCutoff(dateFilter);
     return conversations.filter(conv => {
       // Abas de status
+      if (filterTab === "arquivadas" && !conv.isArchived) return false;
+      if (
+        filterTab !== "arquivadas" &&
+        filterTab !== "todas" &&
+        conv.isArchived
+      ) {
+        return false;
+      }
       if (filterTab === "abertas" && conv.isResolved) return false;
       if (filterTab === "nao_lidas" && conv.unreadCount === 0) return false;
+
+      // Filtro de canal
+      if (channelFilter === "ativos") {
+        const isActiveChannel = conv.channelId
+          ? activeChannels.some((channel) => channel.id === conv.channelId)
+          : false;
+        if (!isActiveChannel) return false;
+      }
+      if (channelFilter === "legado" && conv.channelId !== null) return false;
+      if (
+        !["ativos", "legado", "todos"].includes(channelFilter) &&
+        conv.channelId !== channelFilter
+      ) {
+        return false;
+      }
 
       // Filtro de Tipo (estágio exclusivo do funil)
       if (typeFilter !== "todos" && conv.stage !== typeFilter) return false;
@@ -799,7 +888,18 @@ export default function InboxPage({
       }
       return true;
     });
-  }, [conversations, filterTab, localSearch, typeFilter, dateFilter, onlyMine, assignmentByKey, myProfile]);
+  }, [
+    conversations,
+    filterTab,
+    channelFilter,
+    activeChannels,
+    localSearch,
+    typeFilter,
+    dateFilter,
+    onlyMine,
+    assignmentByKey,
+    myProfile,
+  ]);
 
   // Selection Logic — auto-select the first conversation on desktop, BUT never
   // when a specific conversation was requested via ?to= (Contacts "WhatsApp"
@@ -826,7 +926,6 @@ export default function InboxPage({
     if (unreadIds.length > 0) void onMarkConversationRead(unreadIds);
   };
 
-  const activeChannels = channels.filter((channel) => channel.status === "ativo");
   // Templates são exclusivos da Meta Cloud API — o botão só aparece com Meta ativa.
   const metaActive = activeChannels.some(
     (c) => c.provider === "whatsapp" || c.provider === "whatsapp_cloud",
@@ -850,10 +949,15 @@ export default function InboxPage({
           isResolved: false,
           messages: [] as InboxMessage[],
           unreadCount: 0,
+          channelId: null,
+          channelLabel: "Nova conversa",
+          archiveState: null,
+          isArchived: false,
+          isDraft: true,
         }
       : null;
   const showDraft = Boolean(draftConversation && selectedKey === draftConversation!.key);
-  const displayedConversationsWithDraft =
+  const displayedConversationsWithDraft: ConversationViewModel[] =
     showDraft ? [draftConversation!, ...displayedConversations] : displayedConversations;
 
   const selectedConversation =
@@ -930,6 +1034,69 @@ export default function InboxPage({
   // conversa real (o rascunho de conversa nova ainda não tem owner_id).
   const canTransfer = isAdmin && teamMembers.length > 0 && Boolean(selected?.owner_id);
 
+  const cleanupCandidates = useMemo(
+    () =>
+      conversations.filter((conv) => {
+        if (conv.isArchived || conv.unreadCount > 0) return false;
+        if (conv.channelId === null) return true;
+        return !activeChannels.some((channel) => channel.id === conv.channelId);
+      }),
+    [conversations, activeChannels],
+  );
+
+  const handleArchiveConversation = async (conv: ConversationViewModel) => {
+    if (!conv.latest.owner_id || conv.isDraft) return;
+    try {
+      await archiveInboxConversations(
+        [
+          {
+            owner_id: conv.latest.owner_id,
+            telefone: conv.key,
+            channel_id: conv.channelId,
+          },
+        ],
+        "Arquivado manualmente na Inbox",
+      );
+      await queryClient.invalidateQueries({ queryKey: ["crmSnapshot"] });
+      toast.success("Conversa arquivada.");
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    }
+  };
+
+  const handleUnarchiveConversation = async (conv: ConversationViewModel) => {
+    if (!conv.latest.owner_id || conv.isDraft) return;
+    try {
+      await unarchiveInboxConversation({
+        owner_id: conv.latest.owner_id,
+        telefone: conv.key,
+        channel_id: conv.channelId,
+      });
+      await queryClient.invalidateQueries({ queryKey: ["crmSnapshot"] });
+      toast.success("Conversa reaberta.");
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    }
+  };
+
+  const handleArchiveCleanupCandidates = async () => {
+    if (cleanupCandidates.length === 0) return;
+    try {
+      await archiveInboxConversations(
+        cleanupCandidates.map((conv) => ({
+          owner_id: conv.latest.owner_id,
+          telefone: conv.key,
+          channel_id: conv.channelId,
+        })),
+        "Arquivado por troca de numero/canal WhatsApp",
+      );
+      await queryClient.invalidateQueries({ queryKey: ["crmSnapshot"] });
+      toast.success("Conversas antigas arquivadas.");
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    }
+  };
+
   const handleAssign = async (member: TeamMember) => {
     const ownerId = selected?.owner_id;
     if (!ownerId || !sourcePhone) return;
@@ -990,13 +1157,19 @@ export default function InboxPage({
           >
             Abertas
           </button>
-          <button 
+          <button
             onClick={() => setFilterTab("nao_lidas")}
-            className={`flex-1 py-1.5 px-3 text-xs font-semibold rounded-lg transition-all relative z-10 ${filterTab === 'nao_lidas' ? 'text-foreground' : 'text-muted-foreground hover:text-foreground/80'}`}
+            className={`flex-1 py-1.5 px-2 text-[11px] font-semibold rounded-lg transition-all relative z-10 ${filterTab === 'nao_lidas' ? 'text-foreground' : 'text-muted-foreground hover:text-foreground/80'}`}
           >
             Não Lidas
           </button>
           <button 
+            onClick={() => setFilterTab("arquivadas")}
+            className={`flex-1 py-1.5 px-2 text-[11px] font-semibold rounded-lg transition-all relative z-10 ${filterTab === 'arquivadas' ? 'text-foreground' : 'text-muted-foreground hover:text-foreground/80'}`}
+          >
+            Arquivadas
+          </button>
+          <button
             onClick={() => setFilterTab("todas")}
             className={`flex-1 py-1.5 px-3 text-xs font-semibold rounded-lg transition-all relative z-10 ${filterTab === 'todas' ? 'text-foreground' : 'text-muted-foreground hover:text-foreground/80'}`}
           >
@@ -1006,24 +1179,47 @@ export default function InboxPage({
           <div
             className="absolute top-1 bottom-1 bg-foreground/10 shadow-sm rounded-lg transition-all duration-300 ease-in-out border border-foreground/5"
             style={{
-              width: 'calc(33.333% - 2.6px)',
-              left: filterTab === 'abertas' ? '4px' : filterTab === 'nao_lidas' ? 'calc(33.333% + 2px)' : 'calc(66.666%)'
+              width: 'calc(25% - 3px)',
+              left: filterTab === 'abertas'
+                ? '4px'
+                : filterTab === 'nao_lidas'
+                  ? 'calc(25% + 1px)'
+                  : filterTab === 'arquivadas'
+                    ? 'calc(50% - 1px)'
+                    : 'calc(75% - 3px)'
             }}
           />
         </div>
 
         {/* Filtros: Data + Tipo + Time (combinam com as abas acima) */}
         <div className="space-y-1.5">
-          {(dateFilter !== "tudo" || typeFilter !== "todos" || onlyMine) && (
+          {(dateFilter !== "tudo" || typeFilter !== "todos" || onlyMine || channelFilter !== "ativos") && (
             <div className="flex justify-end">
               <button
-                onClick={() => { setDateFilter("tudo"); setTypeFilter("todos"); setOnlyMine(false); }}
+                onClick={() => { setDateFilter("tudo"); setTypeFilter("todos"); setOnlyMine(false); setChannelFilter("ativos"); }}
                 className="text-[10px] font-medium text-muted-foreground hover:text-primary transition-colors"
               >
                 Limpar filtros
               </button>
             </div>
           )}
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground w-9 shrink-0">Canal</span>
+            <select
+              value={channelFilter}
+              onChange={(event) => setChannelFilter(event.target.value)}
+              className="flex-1 bg-foreground/5 border border-foreground/10 rounded-lg px-2 py-1 text-[11px] text-foreground"
+            >
+              <option value="ativos">Numero atual</option>
+              <option value="legado">Legado</option>
+              <option value="todos">Todos</option>
+              {channels.map((channel) => (
+                <option key={channel.id} value={channel.id}>
+                  {formatProviderName(channel.provider)} {displayPhone(channel.numero)}
+                </option>
+              ))}
+            </select>
+          </div>
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground w-9 shrink-0">Data</span>
             <div className="flex gap-1 flex-1">
@@ -1075,6 +1271,19 @@ export default function InboxPage({
             <p className="mt-1">Seu histórico de conversas está preservado.</p>
           </div>
         )}
+        {cleanupCandidates.length > 0 && (
+          <div className="p-4 m-4 text-xs bg-amber-500/10 border border-amber-500/30 text-amber-500 rounded-xl">
+            <strong>Conversas antigas encontradas</strong>
+            <p className="mt-1">Arquive conversas de canais antigos para manter a Inbox limpa.</p>
+            <button
+              type="button"
+              onClick={handleArchiveCleanupCandidates}
+              className="mt-3 rounded-lg border border-amber-500/40 px-2.5 py-1.5 text-[11px] font-semibold hover:bg-amber-500/10 transition-colors"
+            >
+              Arquivar conversas antigas
+            </button>
+          </div>
+        )}
         
         {displayedConversationsWithDraft.length === 0 ? (
           <div className="p-8 flex flex-col items-center justify-center text-center text-muted-foreground h-full">
@@ -1096,39 +1305,64 @@ export default function InboxPage({
                   "vendedor"
                 : null;
               return (
-                <button
+                <div
                   key={conv.key}
-                  onClick={() => handleSelectConversation(conv.key)}
-                  className={`flex items-start gap-3 p-4 border-b border-border text-left transition-all ${isSelected ? 'bg-primary/10 lg:border-l-2 lg:border-l-primary' : 'hover:bg-foreground/[0.03] lg:border-l-2 lg:border-l-transparent'}`}
+                  className={`relative border-b border-border transition-all ${isSelected ? 'bg-primary/10 lg:border-l-2 lg:border-l-primary' : 'hover:bg-foreground/[0.03] lg:border-l-2 lg:border-l-transparent'}`}
                 >
-                  <div className="relative shrink-0 mt-1">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-foreground/10 to-foreground/5 flex items-center justify-center font-bold text-lg text-foreground shadow-sm border border-foreground/10">
-                      {conv.displayName.charAt(0).toUpperCase()}
+                  <button
+                    type="button"
+                    onClick={() => handleSelectConversation(conv.key)}
+                    className="flex w-full items-start gap-3 p-4 pr-24 text-left"
+                  >
+                    <div className="relative shrink-0 mt-1">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-foreground/10 to-foreground/5 flex items-center justify-center font-bold text-lg text-foreground shadow-sm border border-foreground/10">
+                        {conv.displayName.charAt(0).toUpperCase()}
+                      </div>
+                      {hasUnread && (
+                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-destructive rounded-full border-2 border-background shadow-sm animate-pulse" />
+                      )}
                     </div>
-                    {hasUnread && (
-                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-destructive rounded-full border-2 border-background shadow-sm animate-pulse" />
-                    )}
-                  </div>
-                  
-                  <div className="flex-1 min-w-0 mt-0.5">
-                    <div className="flex items-center justify-between mb-1.5">
-                      <strong className={`text-sm truncate ${hasUnread ? 'text-foreground font-bold' : 'text-foreground/90 font-medium'}`}>
-                        {conv.displayName} ({displayPhone(conv.latest.telefone)})
-                      </strong>
-                      <span className={`text-[11px] shrink-0 ml-2 font-medium ${hasUnread ? 'text-primary' : 'text-muted-foreground'}`}>
-                        {formatRelativeDate(conv.latest.created_at)}
-                      </span>
+
+                    <div className="flex-1 min-w-0 mt-0.5">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <strong className={`text-sm truncate ${hasUnread ? 'text-foreground font-bold' : 'text-foreground/90 font-medium'}`}>
+                          {conv.displayName} ({displayPhone(conv.latest.telefone)})
+                        </strong>
+                        <span className={`text-[11px] shrink-0 ml-2 font-medium ${hasUnread ? 'text-primary' : 'text-muted-foreground'}`}>
+                          {formatRelativeDate(conv.latest.created_at)}
+                        </span>
+                      </div>
+                      <p className={`text-xs line-clamp-1 ${hasUnread ? 'text-foreground/80 font-medium' : 'text-muted-foreground'}`}>
+                        {conv.latest.mensagem}
+                      </p>
+                      <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                        <span className="max-w-full truncate text-[10px] font-medium text-muted-foreground">
+                          {conv.channelLabel}
+                        </span>
+                        {assigneeName && (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-medium text-primary/90 bg-primary/10 border border-primary/20 rounded-full px-2 py-0.5">
+                            <UserPlus size={10} /> Atendendo: {assigneeName}
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <p className={`text-xs line-clamp-1 ${hasUnread ? 'text-foreground/80 font-medium' : 'text-muted-foreground'}`}>
-                      {conv.latest.mensagem}
-                    </p>
-                    {assigneeName && (
-                      <span className="inline-flex items-center gap-1 mt-1.5 text-[10px] font-medium text-primary/90 bg-primary/10 border border-primary/20 rounded-full px-2 py-0.5">
-                        <UserPlus size={10} /> Atendendo: {assigneeName}
-                      </span>
-                    )}
-                  </div>
-                </button>
+                  </button>
+                  {!conv.isDraft && (
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        void (conv.isArchived
+                          ? handleUnarchiveConversation(conv)
+                          : handleArchiveConversation(conv));
+                      }}
+                      className="absolute right-4 bottom-4 inline-flex items-center gap-1 rounded-lg border border-foreground/10 bg-background/80 px-2 py-1 text-[10px] font-semibold text-muted-foreground hover:text-foreground hover:bg-foreground/10 transition-colors"
+                    >
+                      {conv.isArchived ? <ArchiveRestore size={12} /> : <Archive size={12} />}
+                      {conv.isArchived ? "Reabrir" : "Arquivar"}
+                    </button>
+                  )}
+                </div>
               );
             })}
           </div>
