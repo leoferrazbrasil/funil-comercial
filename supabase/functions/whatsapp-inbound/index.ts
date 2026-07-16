@@ -713,12 +713,14 @@ async function processInboundMessage(
     throw messageError;
   }
 
-  await supabase
+  const { error: reopenError } = await supabase
     .from("inbox_conversation_states")
     .update({ archived_at: null, archived_by: null, archive_reason: null })
     .eq("owner_id", ownerId)
     .eq("telefone", conversationStatePhoneKey(finalPhone))
     .eq("channel_key", channelId ?? "legacy");
+
+  if (reopenError) throw reopenError;
 
   // Se agora temos o telefone real e existe o chatLid, atualizamos mensagens antigas que só tinham o LID
   if (!isLid && chatLid) {
