@@ -443,6 +443,7 @@ async function registerLocalInboxReply(
     contact_id: message.contact_id,
     lead_id: message.lead_id,
     canal: message.canal,
+    channel_id: message.channel_id ?? null,
     provider: "manual",
     remetente_nome: senderName,
     telefone: message.telefone,

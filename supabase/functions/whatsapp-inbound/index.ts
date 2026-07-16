@@ -573,6 +573,25 @@ function conversationStatePhoneKey(value: string) {
   return phone;
 }
 
+async function reopenConversationIfInbound(
+  supabase: SupabaseClientAny,
+  ownerId: string,
+  phone: string,
+  channelId: string | null,
+  direction?: "inbound" | "outbound",
+) {
+  if (direction === "outbound") return;
+
+  const { error } = await supabase
+    .from("inbox_conversation_states")
+    .update({ archived_at: null, archived_by: null, archive_reason: null })
+    .eq("owner_id", ownerId)
+    .eq("telefone", conversationStatePhoneKey(phone))
+    .eq("channel_key", channelId ?? "legacy");
+
+  if (error) throw error;
+}
+
 // Helper to generate phone variations for robust searching
 function getPhoneVariations(phone: string) {
   if (!phone) return [];
@@ -693,6 +712,13 @@ async function processInboundMessage(
 
   if (messageError) {
     if (messageError.code === "23505") {
+      await reopenConversationIfInbound(
+        supabase,
+        ownerId,
+        finalPhone,
+        channelId,
+        inboundMessage.direction,
+      );
       console.log(
         JSON.stringify({
           event: "whatsapp_inbound_duplicate",
@@ -713,14 +739,13 @@ async function processInboundMessage(
     throw messageError;
   }
 
-  const { error: reopenError } = await supabase
-    .from("inbox_conversation_states")
-    .update({ archived_at: null, archived_by: null, archive_reason: null })
-    .eq("owner_id", ownerId)
-    .eq("telefone", conversationStatePhoneKey(finalPhone))
-    .eq("channel_key", channelId ?? "legacy");
-
-  if (reopenError) throw reopenError;
+  await reopenConversationIfInbound(
+    supabase,
+    ownerId,
+    finalPhone,
+    channelId,
+    inboundMessage.direction,
+  );
 
   // Se agora temos o telefone real e existe o chatLid, atualizamos mensagens antigas que só tinham o LID
   if (!isLid && chatLid) {
