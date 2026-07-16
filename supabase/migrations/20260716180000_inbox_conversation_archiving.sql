@@ -23,6 +23,36 @@ create unique index if not exists inbox_conversation_states_unique_idx
 create index if not exists inbox_conversation_states_owner_archived_idx
   on public.inbox_conversation_states (owner_id, archived_at);
 
+create or replace function public.inbox_conversation_states_archive_clock()
+returns trigger
+language plpgsql
+as $$
+begin
+  if new.archived_at is null then
+    return new;
+  end if;
+
+  if tg_op = 'INSERT' then
+    new.archived_at := clock_timestamp();
+    return new;
+  end if;
+
+  if old.archived_at is distinct from new.archived_at
+    or old.archived_by is distinct from new.archived_by
+    or old.archive_reason is distinct from new.archive_reason
+  then
+    new.archived_at := clock_timestamp();
+  end if;
+
+  return new;
+end;
+$$;
+
+drop trigger if exists inbox_conversation_states_archive_clock on public.inbox_conversation_states;
+create trigger inbox_conversation_states_archive_clock
+  before insert or update on public.inbox_conversation_states
+  for each row execute function public.inbox_conversation_states_archive_clock();
+
 drop trigger if exists inbox_conversation_states_set_updated_at on public.inbox_conversation_states;
 create trigger inbox_conversation_states_set_updated_at
   before update on public.inbox_conversation_states

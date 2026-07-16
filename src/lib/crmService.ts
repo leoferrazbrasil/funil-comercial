@@ -722,6 +722,8 @@ export type ConversationArchiveTarget = {
   channel_id?: string | null;
 };
 
+const archiveTimestampMarker = "1970-01-01T00:00:00.000Z";
+
 export async function archiveInboxConversations(
   targets: ConversationArchiveTarget[],
   reason: string,
@@ -733,12 +735,12 @@ export async function archiveInboxConversations(
   if (userError) throw userError;
 
   const archivedBy = userData.user?.id ?? null;
-  const archivedAt = new Date().toISOString();
   const rows = targets.map((target) => ({
     owner_id: target.owner_id,
     telefone: conversationStatePhoneKey(target.telefone),
     channel_id: target.channel_id ?? null,
-    archived_at: archivedAt,
+    // The database trigger replaces this marker with Postgres clock_timestamp().
+    archived_at: archiveTimestampMarker,
     archived_by: archivedBy,
     archive_reason: reason.trim() || "Arquivado para organizar a Inbox",
   }));

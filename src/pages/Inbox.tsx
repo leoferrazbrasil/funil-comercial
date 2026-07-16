@@ -686,7 +686,9 @@ export default function InboxPage({
         const isArchived = Boolean(archiveState?.archived_at);
         const channelLabel = channel
           ? `${formatProviderName(channel.provider)} ${displayPhone(channel.numero)}`
-          : "Legado / sem canal";
+          : channelId
+            ? "Canal da conta"
+            : "Legado / sem canal";
 
         return {
           key,

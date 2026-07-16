@@ -51,6 +51,7 @@ describe("Inbox conversation archive state", () => {
           owner_id: "owner-1",
           telefone: "551198765432",
           channel_id: "channel-1",
+          archived_at: "1970-01-01T00:00:00.000Z",
           archived_by: "user-1",
           archive_reason: "Arquivado para organizar a Inbox",
         }),
