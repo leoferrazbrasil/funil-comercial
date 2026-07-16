@@ -127,6 +127,17 @@ const normalizePhone = (value: string | null | undefined) => {
   return unified;
 };
 
+// Archive-state keys must match Inbox conversation grouping, not dialable storage.
+export const conversationStatePhoneKey = (value: string | null | undefined) => {
+  let phone = value?.replace(/\D/g, "") ?? "";
+  while (phone.startsWith("0")) phone = phone.substring(1);
+  if (phone.length === 10 || phone.length === 11) phone = "55" + phone;
+  if (phone.startsWith("55") && phone.length === 13 && phone[4] === "9") {
+    return phone.slice(0, 4) + phone.slice(5);
+  }
+  return phone;
+};
+
 export async function upsertProfile(user: User) {
   const supabase = requireSupabase();
   const profile: Omit<Profile, "created_at" | "role"> = {
@@ -701,7 +712,7 @@ export async function markInboxConversationRead(messageIds: string[]) {
   if (error) throw error;
 }
 
-type ConversationArchiveTarget = {
+export type ConversationArchiveTarget = {
   owner_id: string;
   telefone: string;
   channel_id?: string | null;
@@ -721,7 +732,7 @@ export async function archiveInboxConversations(
   const archivedAt = new Date().toISOString();
   const rows = targets.map((target) => ({
     owner_id: target.owner_id,
-    telefone: normalizePhone(target.telefone),
+    telefone: conversationStatePhoneKey(target.telefone),
     channel_id: target.channel_id ?? null,
     archived_at: archivedAt,
     archived_by: archivedBy,
@@ -745,7 +756,7 @@ export async function unarchiveInboxConversation(
     .from("inbox_conversation_states")
     .update({ archived_at: null, archived_by: null, archive_reason: null })
     .eq("owner_id", target.owner_id)
-    .eq("telefone", normalizePhone(target.telefone))
+    .eq("telefone", conversationStatePhoneKey(target.telefone))
     .eq("channel_key", target.channel_id ?? "legacy")
     .select()
     .maybeSingle();
