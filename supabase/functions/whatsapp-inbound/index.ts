@@ -520,7 +520,7 @@ function getSupabaseClient() {
   });
 }
 
-async function resolveOwnerId(
+async function resolveOwnerChannel(
   supabase: SupabaseClientAny,
   message: NormalizedInboundMessage,
 ) {
@@ -534,7 +534,9 @@ async function resolveOwnerId(
       .limit(1)
       .maybeSingle();
 
-    if (!error && data?.owner_id) return data.owner_id as string;
+    if (!error && data?.owner_id) {
+      return { ownerId: data.owner_id as string, channelId: data.id as string };
+    }
   }
 
   if (message.channelIdentifiers.length > 0) {
@@ -549,10 +551,26 @@ async function resolveOwnerId(
       .maybeSingle();
 
     if (error) throw error;
-    if (data?.owner_id) return data.owner_id as string;
+    if (data?.owner_id) {
+      return { ownerId: data.owner_id as string, channelId: data.id as string };
+    }
   }
 
-  return Deno.env.get("FUNIL_DEFAULT_OWNER_ID") ?? null;
+  return {
+    ownerId: Deno.env.get("FUNIL_DEFAULT_OWNER_ID") ?? null,
+    channelId: null,
+  };
+}
+
+function conversationStatePhoneKey(value: string) {
+  let phone = value.replace(/\D/g, "");
+  while (phone.startsWith("0")) phone = phone.substring(1);
+  while (phone.startsWith("550")) phone = "55" + phone.substring(3);
+  if (phone.length === 10 || phone.length === 11) phone = "55" + phone;
+  if (phone.startsWith("55") && phone.length === 13 && phone[4] === "9") {
+    return phone.slice(0, 4) + phone.slice(5);
+  }
+  return phone;
 }
 
 // Helper to generate phone variations for robust searching
@@ -621,7 +639,7 @@ async function processInboundMessage(
     throw new Error("Inbound message missing phone or body.");
   }
 
-  const ownerId = await resolveOwnerId(supabase, inboundMessage);
+  const { ownerId, channelId } = await resolveOwnerChannel(supabase, inboundMessage);
   if (!ownerId) {
     throw new Error("No active integration channel found for inbound message.");
   }
@@ -653,6 +671,7 @@ async function processInboundMessage(
     .from("inbox_messages")
     .insert({
       owner_id: ownerId,
+      channel_id: channelId,
       contact_id: contact?.id ?? null,
       lead_id: lead?.id ?? null,
       canal: "WhatsApp",
@@ -693,6 +712,13 @@ async function processInboundMessage(
 
     throw messageError;
   }
+
+  await supabase
+    .from("inbox_conversation_states")
+    .update({ archived_at: null, archived_by: null, archive_reason: null })
+    .eq("owner_id", ownerId)
+    .eq("telefone", conversationStatePhoneKey(finalPhone))
+    .eq("channel_key", channelId ?? "legacy");
 
   // Se agora temos o telefone real e existe o chatLid, atualizamos mensagens antigas que só tinham o LID
   if (!isLid && chatLid) {

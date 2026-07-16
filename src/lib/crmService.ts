@@ -81,6 +81,7 @@ type MessagePayload = {
   contact_id?: string | null;
   lead_id?: string | null;
   canal?: string;
+  channel_id?: string | null;
   provider?: string;
   provider_message_id?: string | null;
   remetente_nome: string;
@@ -398,6 +399,7 @@ export async function createInboxMessage(
       contact_id: payload.contact_id ?? null,
       lead_id: payload.lead_id ?? null,
       canal: payload.canal ?? "WhatsApp",
+      channel_id: payload.channel_id ?? null,
       provider: payload.provider ?? "manual",
       provider_message_id: payload.provider_message_id ?? null,
       remetente_nome: payload.remetente_nome.trim(),

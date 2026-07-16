@@ -503,6 +503,7 @@ Deno.serve(async (request) => {
       .insert({
         owner_id: conversationOwnerId,
         sent_by: user.id,
+        channel_id: channel.id,
         // Vendedor não gerencia vínculos de CRM do admin: usa apenas o que já
         // está na conversa de origem, nunca valores arbitrários do cliente.
         contact_id: (senderProfile?.admin_id
