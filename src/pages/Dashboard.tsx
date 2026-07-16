@@ -96,6 +96,7 @@ const emptySnapshot: CrmSnapshot = {
   opportunities: [],
   messages: [],
   channels: [],
+  conversationStates: [],
 };
 
 const formatMoney = (value: number) =>

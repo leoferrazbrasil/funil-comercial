@@ -78,6 +78,7 @@ function snapshot(partial: Partial<CrmSnapshot>): CrmSnapshot {
     opportunities: [],
     messages: [],
     channels: [],
+    conversationStates: [],
     ...partial,
   };
 }
