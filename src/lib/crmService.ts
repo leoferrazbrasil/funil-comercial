@@ -131,6 +131,7 @@ const normalizePhone = (value: string | null | undefined) => {
 export const conversationStatePhoneKey = (value: string | null | undefined) => {
   let phone = value?.replace(/\D/g, "") ?? "";
   while (phone.startsWith("0")) phone = phone.substring(1);
+  while (phone.startsWith("550")) phone = "55" + phone.substring(3);
   if (phone.length === 10 || phone.length === 11) phone = "55" + phone;
   if (phone.startsWith("55") && phone.length === 13 && phone[4] === "9") {
     return phone.slice(0, 4) + phone.slice(5);

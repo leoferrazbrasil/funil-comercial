@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   archiveInboxConversations,
   conversationStatePhoneKey,
+  reopenInboxConversation,
   unarchiveInboxConversation,
 } from "./crmService";
 import { requireSupabase } from "./supabase";
@@ -14,6 +15,7 @@ describe("conversationStatePhoneKey", () => {
   it.each([
     ["(11) 99876-5432", "551198765432"],
     ["5511998765432", "551198765432"],
+    ["55011998765432", "551198765432"],
     ["011998765432", "551198765432"],
     ["1198765432", "551198765432"],
     ["", ""],
@@ -69,6 +71,20 @@ describe("Inbox conversation archive state", () => {
       telefone: "5511998765432",
       channel_id: null,
     });
+
+    expect(eq).toHaveBeenNthCalledWith(1, "owner_id", "owner-1");
+    expect(eq).toHaveBeenNthCalledWith(2, "telefone", "551198765432");
+    expect(eq).toHaveBeenNthCalledWith(3, "channel_key", "legacy");
+  });
+
+  it("reopens through the canonical phone key and legacy channel key", async () => {
+    const maybeSingle = vi.fn().mockResolvedValue({ data: null, error: null });
+    const select = vi.fn().mockReturnValue({ maybeSingle });
+    const eq = vi.fn().mockReturnThis();
+    const update = vi.fn().mockReturnValue({ eq, select });
+    from.mockReturnValue({ update });
+
+    await reopenInboxConversation("owner-1", "55011998765432", null);
 
     expect(eq).toHaveBeenNthCalledWith(1, "owner_id", "owner-1");
     expect(eq).toHaveBeenNthCalledWith(2, "telefone", "551198765432");
