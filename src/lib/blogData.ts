@@ -14,6 +14,93 @@ export interface BlogPost {
 
 export const blogPosts: BlogPost[] = [
   {
+    slug: "google-ads-ou-meta-ads-negocios-locais",
+    title: "Google Ads ou Meta Ads: Qual o melhor para Negócios Locais?",
+    excerpt: "Pare de torrar dinheiro na plataforma errada. Entenda a diferença fundamental entre intenção de busca (Google) e geração de desejo (Meta) para empresas locais.",
+    date: "2026-07-16",
+    author: "Leonardo Brasil",
+    authorAvatar: "/images/leo-avatar.jpg",
+    category: "Tráfego Pago",
+    imageUrl: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1200&auto=format&fit=crop",
+    content: `
+A dúvida número um de qualquer dono de negócio local que decide investir em tráfego pago é: **"Onde eu coloco meu dinheiro? No botão impulsionar do Instagram ou no Google?"**
+
+A resposta rápida é: depende do que você vende. A resposta profissional e estratégica envolve entender a diferença brutal entre **Intenção** e **Atenção**.
+
+### Meta Ads (Facebook e Instagram): A Máquina de Atenção
+Quando uma pessoa está no Instagram, ela está ali para ver fotos de amigos, memes e notícias. Ninguém abre o Instagram pensando: "Nossa, estou com uma dor de dente terrível, deixa eu rolar o feed para ver se acho um dentista".
+
+O Meta Ads trabalha com a **geração de demanda**. Você interrompe a atenção do usuário com uma oferta visualmente atrativa (como um antes e depois de um procedimento estético, ou a foto de um prato apetitoso do seu restaurante). Funciona incrivelmente bem para compras de impulso, moda, estética e gastronomia.
+
+### Google Ads: A Máquina de Intenção
+Quando alguém vai ao Google e digita "desentupidora 24 horas" ou "advogado trabalhista perto de mim", ela não quer ver um vídeo engraçado. Ela tem um problema urgente e o cartão de crédito na mão. 
+
+O Google trabalha com **captura de demanda**. Você não precisa convencer a pessoa de que ela precisa do serviço; você só precisa convencê-la de que a *sua empresa* é a melhor escolha. Por isso, serviços de urgência (chaveiros, médicos, assistência técnica) e serviços de alto ticket (arquitetos, contadores) devem priorizar o Google.
+
+### O Veredito para Negócios Locais
+O cenário ideal de um Funil Comercial perfeito é **usar os dois de forma combinada**.
+1. Você usa o **Google Ads** (Fundo de Funil) para capturar quem já está procurando pelo seu serviço hoje e garantir o caixa da empresa.
+2. Você usa o **Meta Ads** (Topo/Meio de Funil) para mostrar sua marca para o bairro inteiro, construindo reconhecimento para que, quando precisarem do seu serviço no futuro, lembrem de você antes mesmo de pesquisar no Google.
+    `
+  },
+  {
+    slug: "como-otimizar-google-meu-negocio",
+    title: "Como Otimizar o Google Meu Negócio em 2026 (Passo a Passo)",
+    excerpt: "O Perfil de Empresa do Google é o ativo digital mais importante de um negócio local. Veja como aparecer no cobiçado 'Local Pack' de 3 resultados.",
+    date: "2026-07-16",
+    author: "Leonardo Brasil",
+    authorAvatar: "/images/leo-avatar.jpg",
+    category: "SEO Local",
+    imageUrl: "https://images.unsplash.com/photo-1533750516457-a7e9a0a7fa8d?q=80&w=1200&auto=format&fit=crop",
+    content: `
+Se o seu negócio tem um endereço físico ou atende presencialmente em uma região específica, o seu **Google Meu Negócio** (agora chamado de Perfil da Empresa no Google) é muito mais importante que o seu site. Ponto final.
+
+Quando alguém pesquisa por "Pizzaria", o Google não mostra sites comuns no topo; ele mostra o **Local Pack**: aquele mapinha com os três negócios mais relevantes perto da pessoa. Estar ali significa receber ligações e mensagens de graça todos os dias. 
+
+Aqui está o passo a passo para otimizar sua ficha e roubar as posições da concorrência:
+
+### 1. Nome e Categoria Corretos (Sem Keyword Stuffing)
+Coloque o nome real da sua empresa. Evite colocar "Clínica Odontológica Dr. João - Implantes, Aparelho e Clareamento". O Google pode suspender sua ficha por isso. O que define pelo que você vai aparecer é a sua **Categoria Principal** e as categorias secundárias. Escolha "Dentista", "Clínica odontológica" e "Periodontista de implantes", por exemplo.
+
+### 2. A Batalha das Avaliações (Reviews)
+O fator número um de ranqueamento local hoje é a quantidade, a frequência e a qualidade das suas avaliações. Não adianta ter 100 avaliações de 5 estrelas feitas todas em 2023. O Google quer frescor. 
+**Dica de Ouro:** Crie um link curto da sua página de avaliação (via gerador de links do GMN) e coloque isso em uma mensagem automática no seu CRM (ex: 2 dias após a venda). Se o cliente respondeu elogiando no WhatsApp, peça a avaliação imediatamente!
+
+### 3. Fotos e Atualizações Semanais
+O Google Meu Negócio não é "crie e esqueça". Trate-o como uma rede social. Suba fotos reais da sua fachada, da sua equipe trabalhando e das suas instalações semanalmente. Empresas com fotos recentes recebem 42% mais solicitações de rotas no Maps e 35% mais cliques.
+
+E não se esqueça: a consistência do seu Nome, Endereço e Telefone (conhecido como NAP) em toda a internet é crucial. Se o seu site mostra um telefone e a ficha mostra outro, o Google perde a confiança na sua empresa e te rebaixa nas buscas.
+    `
+  },
+  {
+    slug: "por-que-consultorio-nao-recebe-pacientes-google",
+    title: "Por que seu consultório não recebe pacientes pelo Google?",
+    excerpt: "Você tem um site, posta no Instagram todo dia, mas a agenda continua vazia. Entenda os três erros fatais de posicionamento médico digital.",
+    date: "2026-07-16",
+    author: "Leonardo Brasil",
+    authorAvatar: "/images/leo-avatar.jpg",
+    category: "Saúde",
+    imageUrl: "https://images.unsplash.com/photo-1576091160550-2173ff9e5e3c?q=80&w=1200&auto=format&fit=crop",
+    content: `
+O mercado da saúde é altamente concorrido. Médicos, dentistas e fisioterapeutas muitas vezes investem milhares de reais em agências de marketing e se frustram quando o retorno é apenas um aumento nas "curtidas" do Instagram, mas zero agendamentos particulares no WhatsApp da recepção.
+
+Se você está passando por isso, o problema não é a falta de pacientes. O problema é que você está invisível no momento em que eles precisam de você. Aqui estão os três motivos clássicos:
+
+### 1. Seu site é um "cartão de visitas digital", não uma máquina de conversão
+Muitos consultórios têm sites institucionais lentos, cheios de textos acadêmicos sobre as especialidades e fotos genéricas de banco de imagens. Quando um paciente entra, ele não encontra o botão do WhatsApp fácil, a página demora 5 segundos para abrir no 4G e ele vai embora. Um site médico focado em **Funil Comercial** precisa de extrema velocidade, copywriting focado em agendamento imediato e botões pegajosos.
+
+### 2. Você não está rodando Rede de Pesquisa (Fundo de Funil)
+Se um paciente torceu o joelho jogando futebol no domingo à noite, ele não vai abrir o Instagram para ver se o algoritmo recomenda um ortopedista. Ele vai no Google e digita: "ortopedista joelho unimed [nome da cidade]". Se o seu anúncio do Google Ads não está aparecendo nas três primeiras posições para essa busca exata, você acabou de perder uma consulta (e possivelmente uma cirurgia) para o seu concorrente que está lá.
+
+### 3. A "Bolsa Furada" do Atendimento na Recepção
+O marketing atraiu o paciente, ele clicou no anúncio e mandou WhatsApp para a sua clínica. O que acontece depois?
+Em 80% das clínicas que auditamos, a resposta padrão da secretária é demorada e reativa. O paciente pergunta: "Aceita convênio X?". A secretária responde: "Não, só particular". E o assunto morre aí. 
+Sua recepção precisa de **Treinamento de Vendas e um CRM**. A resposta deveria ser: "Olá! Nós trabalhamos com consultas particulares para garantir um tempo de atendimento diferenciado e sem pressa para o senhor. O senhor já tem exames de imagem ou é uma primeira avaliação da dor?".
+
+Atrair tráfego é apenas o começo do Funil. Garantir que o paciente percorra todo o caminho até a cadeira do consultório é onde está o verdadeiro jogo do crescimento.
+    `
+  },
+  {
     slug: "como-organizar-whatsapp-para-vendas",
     title: "Como organizar o WhatsApp para Vendas (e parar de perder clientes)",
     excerpt: "Descubra as táticas essenciais para transformar o WhatsApp da sua empresa de uma ferramenta caótica em uma verdadeira máquina de fechamento de negócios.",

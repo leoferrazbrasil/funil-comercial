@@ -8,6 +8,47 @@ export interface GlossarioTerm {
 
 export const glossarioTerms: GlossarioTerm[] = [
   {
+    slug: "seo-local",
+    title: "O que é SEO Local?",
+    description: "Entenda o que é SEO Local e por que ele é a estratégia de marketing mais poderosa para negócios físicos e prestadores de serviços.",
+    content: `
+O **SEO Local** (Search Engine Optimization focado em geografia) é um conjunto de estratégias e técnicas que ajudam a sua empresa a aparecer com destaque nas buscas do Google (e no Google Maps) para clientes que estão fisicamente perto de você ou procurando serviços na sua cidade.
+
+### A diferença entre SEO Tradicional e SEO Local
+Enquanto o SEO tradicional foca em ranquear páginas em nível nacional ou global (ex: "como perder peso"), o SEO Local ataca buscas baseadas em localização, geralmente contendo termos como "perto de mim", "onde tem" ou o nome da cidade (ex: "nutricionista esportivo em Campinas").
+
+Para o dentista, encanador ou advogado, não importa aparecer para alguém do outro lado do país. O SEO Local garante que a sua clínica de estética em Moema seja encontrada por pessoas que estão no bairro de Moema com o celular na mão procurando por "botox".
+
+### Os Pilares do SEO Local
+1. **Google Meu Negócio:** A ficha da sua empresa precisa estar impecável.
+2. **Avaliações (Reviews):** Empresas com mais avaliações positivas dominam as buscas locais.
+3. **Páginas Locais no Site:** Ter landing pages dedicadas a cada serviço e bairro/cidade que você atende, com palavras-chave geolocalizadas.
+    `,
+    relatedTermSlugs: ["google-meu-negocio", "lead"]
+  },
+  {
+    slug: "google-meu-negocio",
+    title: "O que é o Google Meu Negócio?",
+    description: "Saiba como o Perfil de Empresa do Google funciona e por que ele é indispensável para ser encontrado no Google Maps.",
+    content: `
+O **Google Meu Negócio** (agora oficialmente chamado de Perfil da Empresa no Google) é uma ferramenta gratuita que permite que você gerencie como a sua empresa local aparece nos produtos do Google, como o Google Maps e a Pesquisa do Google.
+
+Sabe quando você pesquisa por um restaurante e aparece uma caixinha com o endereço, horário de funcionamento, telefone e avaliações dos clientes, sem nem precisar entrar no site? Aquilo é o Perfil da Empresa.
+
+### Por que ele é fundamental?
+Para negócios locais, ele gera mais conversões (vendas e agendamentos) do que as próprias redes sociais. A pessoa que te acha no Google Maps está com alta **intenção de compra**. Ela só quer ver se você está aberto e apertar o botão de ligar.
+
+### O que o perfil deve conter?
+- Nome real da empresa
+- Categoria de negócio precisa
+- Endereço físico e área de cobertura
+- Horário de funcionamento (sempre atualizado nos feriados)
+- Fotos da fachada e serviços
+- Um link apontando para o seu **Site Estruturado** ou WhatsApp.
+    `,
+    relatedTermSlugs: ["seo-local"]
+  },
+  {
     slug: "funil-de-vendas",
     title: "O que é Funil de Vendas?",
     description: "Descubra o que é um Funil de Vendas e como mapear a jornada do seu cliente desde o primeiro contato até o fechamento.",
