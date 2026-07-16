@@ -8,6 +8,24 @@ export interface GlossarioTerm {
 
 export const glossarioTerms: GlossarioTerm[] = [
   {
+    slug: "funil-de-vendas",
+    title: "O que é Funil de Vendas?",
+    description: "Descubra o que é um Funil de Vendas e como mapear a jornada do seu cliente desde o primeiro contato até o fechamento.",
+    content: `
+O **Funil de Vendas** é a representação visual da jornada que um cliente percorre desde o momento em que descobre a sua empresa até o momento da compra (e pós-compra). Ele é chamado de "funil" porque, naturalmente, muitas pessoas entram no topo (descobrem sua marca), mas apenas uma parte chega ao fundo (compra de fato).
+
+### As Etapas do Funil
+Geralmente, ele é dividido em três fases:
+1. **Topo de Funil (Consciência):** A pessoa tem um problema, mas talvez nem saiba como resolvê-lo. Ela pesquisa no Google por sintomas ou dúvidas. É aqui que o seu Marketing atua, atraindo tráfego.
+2. **Meio de Funil (Consideração):** O potencial cliente já sabe o que precisa e está considerando as opções no mercado. Ele visita o seu site, manda um WhatsApp ou preenche um formulário. Nesse momento, ele vira um **Lead**.
+3. **Fundo de Funil (Decisão):** O lead está pronto para comprar. Ele está avaliando orçamentos, propostas e o atendimento. É aqui que o seu **CRM** e a habilidade de negociação fazem toda a diferença para o fechamento.
+
+### Por que negócios locais precisam de um Funil de Vendas?
+Sem um funil estruturado, a clínica médica ou escritório de advocacia não sabe onde os clientes estão "escapando". Se muita gente chama no WhatsApp (Top/Meio) e poucos agendam consulta (Fundo), o problema não é o Marketing (falta de leads), e sim o processo comercial (falta de fechamento ou lead desqualificado). Mapear o funil permite otimizar o investimento e aumentar a conversão.
+    `,
+    relatedTermSlugs: ["lead", "cac", "crm"]
+  },
+  {
     slug: "cac",
     title: "O que é CAC (Custo de Aquisição de Cliente)?",
     description: "Entenda o conceito de Custo de Aquisição de Cliente e como calcular esse indicador fundamental para a saúde financeira da sua empresa.",
