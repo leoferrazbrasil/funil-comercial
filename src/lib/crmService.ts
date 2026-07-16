@@ -9,6 +9,7 @@ import type {
   CrmSnapshot,
   EditorialQueueItem,
   EditorialQueueStatus,
+  InboxConversationState,
   InboxMessage,
   IntegrationChannel,
   Lead,
@@ -171,6 +172,7 @@ export async function getCrmSnapshot(userId: string): Promise<CrmSnapshot> {
     opportunitiesResult,
     messagesResult,
     channelsResult,
+    statesResult,
   ] = await Promise.all([
     supabase.from("profiles").select("*").eq("id", userId).maybeSingle(),
     supabase
@@ -193,6 +195,10 @@ export async function getCrmSnapshot(userId: string): Promise<CrmSnapshot> {
       .from("integration_channels")
       .select("*")
       .order("created_at", { ascending: false }),
+    supabase
+      .from("inbox_conversation_states")
+      .select("*")
+      .order("updated_at", { ascending: false }),
   ]);
 
   const errors = [
@@ -202,6 +208,7 @@ export async function getCrmSnapshot(userId: string): Promise<CrmSnapshot> {
     opportunitiesResult.error,
     messagesResult.error,
     channelsResult.error,
+    statesResult.error,
   ].filter(Boolean);
 
   if (errors[0]) throw errors[0];
@@ -213,6 +220,7 @@ export async function getCrmSnapshot(userId: string): Promise<CrmSnapshot> {
     opportunities: (opportunitiesResult.data as Opportunity[]) ?? [],
     messages: (messagesResult.data as InboxMessage[]) ?? [],
     channels: (channelsResult.data as IntegrationChannel[]) ?? [],
+    conversationStates: (statesResult.data as InboxConversationState[]) ?? [],
   };
 }
 
@@ -691,6 +699,71 @@ export async function markInboxConversationRead(messageIds: string[]) {
     .in("id", messageIds);
 
   if (error) throw error;
+}
+
+type ConversationArchiveTarget = {
+  owner_id: string;
+  telefone: string;
+  channel_id?: string | null;
+};
+
+export async function archiveInboxConversations(
+  targets: ConversationArchiveTarget[],
+  reason: string,
+) {
+  if (targets.length === 0) return [];
+
+  const supabase = requireSupabase();
+  const { data: userData, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+
+  const archivedBy = userData.user?.id ?? null;
+  const archivedAt = new Date().toISOString();
+  const rows = targets.map((target) => ({
+    owner_id: target.owner_id,
+    telefone: normalizePhone(target.telefone),
+    channel_id: target.channel_id ?? null,
+    archived_at: archivedAt,
+    archived_by: archivedBy,
+    archive_reason: reason.trim() || "Arquivado para organizar a Inbox",
+  }));
+
+  const { data, error } = await supabase
+    .from("inbox_conversation_states")
+    .upsert(rows, { onConflict: "owner_id,telefone,channel_key" })
+    .select();
+
+  if (error) throw error;
+  return (data as InboxConversationState[]) ?? [];
+}
+
+export async function unarchiveInboxConversation(
+  target: ConversationArchiveTarget,
+) {
+  const supabase = requireSupabase();
+  const { data, error } = await supabase
+    .from("inbox_conversation_states")
+    .update({ archived_at: null, archived_by: null, archive_reason: null })
+    .eq("owner_id", target.owner_id)
+    .eq("telefone", normalizePhone(target.telefone))
+    .eq("channel_key", target.channel_id ?? "legacy")
+    .select()
+    .maybeSingle();
+
+  if (error) throw error;
+  return data as InboxConversationState | null;
+}
+
+export async function reopenInboxConversation(
+  ownerId: string,
+  telefone: string,
+  channelId: string | null | undefined,
+) {
+  return unarchiveInboxConversation({
+    owner_id: ownerId,
+    telefone,
+    channel_id: channelId,
+  });
 }
 
 export async function updateInboxConversationLinks(

@@ -104,6 +104,7 @@ export type InboxMessage = {
   owner_id: string
   contact_id: string | null
   lead_id: string | null
+  channel_id?: string | null
   canal: string
   provider: string
   provider_message_id: string | null
@@ -118,6 +119,19 @@ export type InboxMessage = {
   delivery_error?: string | null
   sent_by?: string | null
   created_at: string
+}
+
+export type InboxConversationState = {
+  id: string
+  owner_id: string
+  telefone: string
+  channel_id: string | null
+  channel_key: string
+  archived_at: string | null
+  archived_by: string | null
+  archive_reason: string | null
+  created_at: string
+  updated_at: string
 }
 
 export type IntegrationChannel = {
@@ -139,6 +153,7 @@ export type CrmSnapshot = {
   opportunities: Opportunity[]
   messages: InboxMessage[]
   channels: IntegrationChannel[]
+  conversationStates: InboxConversationState[]
 }
 
 export type CampaignStatus =
