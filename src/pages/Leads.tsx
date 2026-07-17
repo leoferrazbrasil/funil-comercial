@@ -415,6 +415,7 @@ export default function LeadsPage({
   onEditLead: (lead: Lead) => void;
   onOpenModal: (modal: ModalType) => void;
 }) {
+  const navigate = useNavigate();
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
   const [leadToDelete, setLeadToDelete] = useState<Lead | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -668,23 +669,12 @@ export default function LeadsPage({
                 
                 <p className="text-sm font-semibold mb-4 leading-snug">{selectedQ.nextAction}</p>
                 
-                {selectedQ.score >= 80 ? (
-                  <button
-                    className="w-full py-3 px-4 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-bold shadow-xl transition-all flex items-center justify-center gap-2 group"
-                    disabled={isSaving}
-                    onClick={() => onCreateOpportunity(lead)}
-                  >
-                    <CircleDollarSign size={18} className="group-hover:scale-110 transition-transform" /> 
-                    Criar Oportunidade
-                  </button>
-                ) : (
-                  <button
-                    className="w-full py-2 px-4 rounded-xl bg-foreground/10 hover:bg-foreground/20 text-foreground font-semibold text-sm transition-all flex items-center justify-center gap-2"
-                    onClick={() => onEditLead(lead)}
-                  >
-                    <Pencil size={16} /> Completar Cadastro
-                  </button>
-                )}
+                <button
+                  className="w-full py-2 px-4 rounded-xl bg-foreground/10 hover:bg-foreground/20 text-foreground font-semibold text-sm transition-all flex items-center justify-center gap-2"
+                  onClick={() => onEditLead(lead)}
+                >
+                  <Pencil size={16} /> Completar Cadastro
+                </button>
               </div>
             ) : (
               <div className="p-5 rounded-3xl border border-green-500/20 bg-green-500/5 text-center flex flex-col gap-3">
@@ -696,6 +686,33 @@ export default function LeadsPage({
               </div>
             )}
             
+            {/* Ações comerciais: primeiro toque (WhatsApp no Inbox) + evoluir no funil */}
+            <div className="flex flex-col gap-2">
+              {lead.telefone && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    navigate(
+                      `/inbox?to=${lead.telefone.replace(/\D/g, "")}&nome=${encodeURIComponent(lead.nome)}`,
+                    )
+                  }
+                  className="w-full py-3 px-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 hover:bg-emerald-500/20 font-semibold text-sm transition-all flex items-center justify-center gap-2"
+                >
+                  <MessageCircle size={16} /> Falar no WhatsApp
+                </button>
+              )}
+              {!hasOpp && (
+                <button
+                  type="button"
+                  disabled={isSaving}
+                  onClick={() => onCreateOpportunity(lead)}
+                  className="w-full py-3 px-4 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-bold transition-all flex items-center justify-center gap-2 disabled:opacity-60"
+                >
+                  <CircleDollarSign size={16} /> Criar oportunidade
+                </button>
+              )}
+            </div>
+
             {/* Details */}
             <div className="flex flex-col gap-4">
               <h4 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Dados Base</h4>

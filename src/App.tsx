@@ -2059,12 +2059,24 @@ function TextField({
       ? undefined
       : String(defaultValue);
 
+  // Remove o DDI 55 de números salvos em formato internacional, para a máscara
+  // (00) 00000-0000 mostrar o DDD real (e não ler o 55 como DDD, o que truncaria o
+  // número ao salvar). O 55 é re-adicionado ao discar/enviar. Conserta leads e contatos.
+  const phoneDefault = (() => {
+    if (!isPhone || !defaultText) return defaultText;
+    const d = defaultText.replace(/\D/g, "");
+    if (!d.startsWith("55")) return defaultText;
+    if (d.length === 12 || d.length === 13) return d.slice(2);
+    if (d.length === 11 && d[2] !== "9") return d.slice(2);
+    return defaultText;
+  })();
+
   return (
     <label>
       {label}
       {isPhone ? (
         <IMaskInput
-          defaultValue={defaultText}
+          defaultValue={phoneDefault}
           name={name}
           mask="(00) 00000-0000"
           placeholder={placeholder || "(11) 99999-9999"}
