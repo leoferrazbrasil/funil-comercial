@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Settings as SettingsIcon } from "lucide-react";
 import { IntegrationSection } from "../components/IntegrationSection";
 import { TeamSection } from "../components/TeamSection";
+import { Ga4ExportSection } from "../components/Ga4ExportSection";
 import { getMyProfile } from "../lib/crmService";
 import type { Profile } from "../lib/types";
 
@@ -43,6 +44,11 @@ export default function SettingsPage() {
       {/* Seção: Integrações */}
       <div className="panel p-6">
         <IntegrationSection />
+      </div>
+
+      {/* Seção: Exportação para o GA4 */}
+      <div className="panel p-6">
+        <Ga4ExportSection />
       </div>
 
       {/* Seção: Equipe (apenas admin) */}
