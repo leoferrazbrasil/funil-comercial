@@ -631,11 +631,23 @@ export default function LandingPage() {
 
       <footer className="border-t border-white/10 bg-background py-10 md:py-12">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="flex flex-col gap-3 md:gap-4 border-b border-white/10 pb-8 mb-8 text-center md:text-left">
-            <h4 className="text-sm font-bold text-foreground">Principais Regiões Atendidas</h4>
-            <p className="text-xs md:text-sm text-muted-foreground leading-relaxed max-w-4xl">
-              Balneário Camboriú, Itajaí, Blumenau, São Paulo, Campinas, Ribeirão Preto, Sorocaba, São José dos Campos, Rio de Janeiro, Niterói, Duque de Caxias, Nova Iguaçu, Petrópolis, Belo Horizonte, Uberlândia, Contagem, Juiz de Fora, Betim, Curitiba, Londrina, Maringá, Ponta Grossa, Cascavel, Florianópolis, Joinville.
-            </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 border-b border-white/10 pb-8 mb-8 text-center md:text-left">
+            <div className="flex flex-col gap-3 md:gap-4">
+              <h4 className="text-sm font-bold text-foreground">Principais Regiões Atendidas</h4>
+              <p className="text-xs md:text-sm text-muted-foreground leading-relaxed">
+                Balneário Camboriú, Itajaí, Blumenau, São Paulo, Campinas, Ribeirão Preto, Sorocaba, São José dos Campos, Rio de Janeiro, Niterói, Duque de Caxias, Nova Iguaçu, Petrópolis, Belo Horizonte, Uberlândia, Contagem, Juiz de Fora, Betim, Curitiba, Londrina, Maringá, Ponta Grossa, Cascavel, Florianópolis, Joinville.
+              </p>
+            </div>
+            <div className="flex flex-col gap-3 md:gap-4">
+              <h4 className="text-sm font-bold text-foreground">Soluções por Nicho</h4>
+              <div className="flex flex-wrap justify-center md:justify-start gap-x-4 gap-y-2">
+                <Link to="/estrutura-de-vendas-para-nutricionistas" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">Nutricionistas</Link>
+                <Link to="/estrutura-de-vendas-para-psicologas" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">Psicólogas</Link>
+                <Link to="/estrutura-de-vendas-para-dentistas" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">Dentistas</Link>
+                <Link to="/estrutura-de-vendas-para-terapeutas" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">Terapeutas</Link>
+                <Link to="/estrutura-de-vendas-para-massoterapeutas" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">Massoterapeutas</Link>
+              </div>
+            </div>
           </div>
           <div className="flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8">
             <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6 text-center md:text-left">
