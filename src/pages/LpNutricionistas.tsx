@@ -13,7 +13,7 @@ export default function LpNutricionistas() {
       <SeoHead
         title="Estrutura de Vendas para Nutricionistas | Pare de Depender de Indicação"
         description="Você atende bem, mas o site parece amador e os leads somem no WhatsApp? Montamos a estrutura de vendas do seu consultório de nutrição de ponta a ponta."
-        url="https://funilcomercial.com/estrutura-de-vendas-para-nutricionistas"
+        canonicalUrl="https://funilcomercial.com/estrutura-de-vendas-para-nutricionistas"
       />
       
       {/* Header */}

@@ -63,6 +63,7 @@ import { CookieBanner } from "./components/CookieBanner";
 import BlogIndex from "./pages/BlogIndex";
 import LpNutricionistas from "./pages/LpNutricionistas";
 import LpPsicologas from "./pages/LpPsicologas";
+import LpDentistas from "./pages/LpDentistas";
 import BlogPost from "./pages/BlogPost";
 import GlossarioIndex from "./pages/GlossarioIndex";
 import GlossarioTermo from "./pages/GlossarioTermo";
@@ -172,6 +173,7 @@ const PUBLIC_PATHS = [
   "/site-para-nutricionistas",
   "/estrutura-de-vendas-para-nutricionistas",
   "/estrutura-de-vendas-para-psicologas",
+  "/estrutura-de-vendas-para-dentistas",
   "/site-para-psicologas",
   "/privacidade",
   "/termos",
@@ -1154,6 +1156,7 @@ function AppContent() {
           <Route path="/site-para-nutricionistas" element={<NutritionistWebsiteLanding />} />
           <Route path="/estrutura-de-vendas-para-nutricionistas" element={<LpNutricionistas />} />
           <Route path="/estrutura-de-vendas-para-psicologas" element={<LpPsicologas />} />
+          <Route path="/estrutura-de-vendas-para-dentistas" element={<LpDentistas />} />
           <Route path="/site-para-psicologas" element={<PsychologistWebsiteLanding />} />
           <Route path="/privacidade" element={<PrivacyPage />} />
           <Route path="/termos" element={<TermsPage />} />
