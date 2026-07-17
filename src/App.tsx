@@ -61,6 +61,7 @@ import { AnnouncementBar } from "./components/AnnouncementBar";
 import { SeoHead } from "./components/SeoHead";
 import { CookieBanner } from "./components/CookieBanner";
 import BlogIndex from "./pages/BlogIndex";
+import LpNutricionistas from "./pages/LpNutricionistas";
 import BlogPost from "./pages/BlogPost";
 import GlossarioIndex from "./pages/GlossarioIndex";
 import GlossarioTermo from "./pages/GlossarioTermo";
@@ -168,6 +169,7 @@ const PUBLIC_PATHS = [
   "/crm-whatsapp-organizado",
   "/site-para-dentistas",
   "/site-para-nutricionistas",
+  "/estrutura-de-vendas-para-nutricionistas",
   "/site-para-psicologas",
   "/privacidade",
   "/termos",
@@ -1148,6 +1150,7 @@ function AppContent() {
           <Route path="/crm-whatsapp-organizado" element={<CrmWhatsappLanding />} />
 
           <Route path="/site-para-nutricionistas" element={<NutritionistWebsiteLanding />} />
+          <Route path="/estrutura-de-vendas-para-nutricionistas" element={<LpNutricionistas />} />
           <Route path="/site-para-psicologas" element={<PsychologistWebsiteLanding />} />
           <Route path="/privacidade" element={<PrivacyPage />} />
           <Route path="/termos" element={<TermsPage />} />
