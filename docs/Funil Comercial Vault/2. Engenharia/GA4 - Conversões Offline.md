@@ -38,6 +38,17 @@ graph LR
 - **`timestamp_micros`** — Unix em **microssegundos** = `Date.getTime() × 1000`.
 - **Eventos** (alinhados ao **ciclo de lead padrão do GA4** — já são eventos-chave na conta): `close_convert_lead` (oportunidade **Ganho**, `value = valor`) e `qualify_lead` (lead `qualificado`, `value = valor_estimado`). `currency = BRL`. *(Antes: `offline_sale`/`qualified_lead` — trocados para não criar taxonomia paralela.)*
 
+## Taxonomia de eventos web (decisão 17/07/2026)
+> [!important] `generate_lead` = SÓ formulário
+> No site inteiro, o **clique de WhatsApp** dispara **`whatsapp_click`** (evento de **observação**), e **NÃO** `generate_lead`. O `generate_lead` é reservado ao **envio do formulário** (`LeadCaptureForm`) — lead real, com `client_id`.
+
+**Por quê:** o Google Ads otimiza por `generate_lead`. Se o clique de WhatsApp contasse como `generate_lead`, o algoritmo aprenderia a comprar **clique barato** (não lead bom), e a maioria dos "leads" viria **sem `client_id`** — furando o lance por valor.
+
+- **Onde vive:** a instrumentação é injetada pelo codemod `scripts/inject-analytics.cjs` (troca `href={whatsappLink}` por um `onClick` com `trackEvent(...)`). O script foi atualizado para emitir `whatsapp_click`. É um codemod de **uma vez só** — não roda no build; o padrão já está baked nos `.tsx`.
+- **O form emite o evento:** `LeadCaptureForm` chama `trackEvent("generate_lead", { method: "form" })` no envio bem-sucedido. *(Antes NÃO emitia — o `generate_lead` só existia via clique de WhatsApp. Renomear os cliques sem isso zeraria o Principal do Ads.)*
+- **LPs de nicho agora têm formulário:** `/site-para-nutricionistas` e `/estrutura-de-vendas-para-nutricionistas` ganharam o `LeadCaptureForm`. Antes só tinham botão de WhatsApp → **nenhuma conversão mensurável** para tráfego pago. Regra: **só colocar verba em página que converte.**
+- **Consequência no Ads:** o volume de `generate_lead` cai (só formulários). Para dar volume ao algoritmo, registrar `whatsapp_click` no GA4 e usá-lo como **conversão secundária** no Ads, se necessário.
+
 ## ⚠️ Armadilhas que fazem ou quebram tudo
 > [!danger] Ler antes de mexer
 > - **`client_id` é obrigatório** e o GA4 rejeita linha sem ele. Só lead de **formulário web** tem `client_id` (o cookie `_ga` do navegador). Lead de **WhatsApp/prospecção NÃO tem** — e não dá pra inventar. Logo, essa fonte só cobre o **canal de aquisição web**.

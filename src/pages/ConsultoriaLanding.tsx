@@ -82,7 +82,7 @@ export default function ConsultoriaLanding() {
             <Link to="/crm" className="text-muted-foreground hover:text-foreground transition-colors">CRM</Link>
             <Link to="/blog" className="text-muted-foreground hover:text-foreground transition-colors">Blog</Link>
             <a 
-              href={whatsappLink} onClick={(e) => { trackEvent("generate_lead", { method: "whatsapp" }); }} 
+              href={whatsappLink} onClick={(e) => { trackEvent("whatsapp_click", { method: "whatsapp" }); }} 
               target="_blank" 
               rel="noopener noreferrer"
               className="rounded-full bg-primary px-6 py-2.5 text-primary-foreground hover:bg-primary/90 transition-all font-bold shadow-[0_0_20px_rgba(var(--primary),0.3)] hover:shadow-[0_0_30px_rgba(var(--primary),0.5)]"
@@ -106,7 +106,7 @@ export default function ConsultoriaLanding() {
               rel="noopener noreferrer"
               className="mt-2 text-center rounded-full bg-primary px-6 py-3 text-primary-foreground font-bold"
               onClick={(e) => { 
-                trackEvent("generate_lead", { method: "whatsapp" });
+                trackEvent("whatsapp_click", { method: "whatsapp" });
                 setMobileMenuOpen(false);
               }}
             >
@@ -146,7 +146,7 @@ export default function ConsultoriaLanding() {
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <a 
-                href={whatsappLink} onClick={(e) => { trackEvent("generate_lead", { method: "whatsapp" }); }}
+                href={whatsappLink} onClick={(e) => { trackEvent("whatsapp_click", { method: "whatsapp" }); }}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group w-full sm:w-auto flex h-14 items-center justify-center gap-2 rounded-full bg-primary px-8 text-lg font-bold text-primary-foreground transition-all hover:bg-primary/90 hover:scale-105"
@@ -200,7 +200,7 @@ export default function ConsultoriaLanding() {
                 Pare de perder oportunidades por desorganização ou falta de estratégia. Agende uma conversa com nosso time comercial.
               </p>
               <a 
-                href={whatsappLink} onClick={(e) => { trackEvent("generate_lead", { method: "whatsapp" }); }}
+                href={whatsappLink} onClick={(e) => { trackEvent("whatsapp_click", { method: "whatsapp" }); }}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex h-14 items-center justify-center gap-2 rounded-full bg-primary px-10 text-lg font-bold text-primary-foreground transition-all hover:bg-primary/90 hover:scale-105 shadow-[0_0_30px_rgba(var(--primary),0.3)]"

@@ -93,7 +93,7 @@ export default function LocalCityLanding() {
             <Logo iconSize={32} theme="monochrome-white" />
           </Link>
           <a
-            href={whatsappLink} onClick={(e) => { trackEvent("generate_lead", { method: "whatsapp" }); }}
+            href={whatsappLink} onClick={(e) => { trackEvent("whatsapp_click", { method: "whatsapp" }); }}
             target="_blank"
             rel="noreferrer"
             className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-primary px-5 text-sm font-bold text-primary-foreground transition hover:bg-primary/90"
@@ -118,7 +118,7 @@ export default function LocalCityLanding() {
             </p>
             <div className="mt-10 flex justify-center">
               <a
-                href={whatsappLink} onClick={(e) => { trackEvent("generate_lead", { method: "whatsapp" }); }}
+                href={whatsappLink} onClick={(e) => { trackEvent("whatsapp_click", { method: "whatsapp" }); }}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex min-h-14 items-center justify-center gap-2 rounded-full bg-primary px-8 text-lg font-black text-primary-foreground transition hover:bg-primary/90"

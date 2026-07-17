@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Globe, Smartphone, MessageCircle, BarChart3, ShieldCheck } from "lucide-react";
 import Logo from "../components/Logo";
 import { SeoHead } from "../components/SeoHead";
+import { LeadCaptureForm } from "../components/LeadCaptureForm";
 
 const WHATSAPP_NUMBER = "5551996737359";
 const WHATSAPP_MESSAGE = "Olá! Vim pela página da Estrutura de Vendas para Nutricionistas e gostaria de fazer o diagnóstico gratuito do meu consultório.";
@@ -149,6 +150,24 @@ export default function LpNutricionistas() {
                    </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Análise gratuita — formulário web (captura o lead + o GA4 client_id) */}
+        <section id="analise-gratuita" className="py-24">
+          <div className="mx-auto max-w-xl px-6">
+            <div className="rounded-3xl border border-white/5 bg-white/[0.02] p-8 md:p-10">
+              <h2 className="text-2xl md:text-3xl font-bold tracking-tight mb-2">
+                Peça o diagnóstico gratuito do seu consultório
+              </h2>
+              <p className="text-muted-foreground text-sm mb-6">
+                Deixe seu nome e WhatsApp. A gente analisa a sua presença digital e te
+                mostra, sem compromisso, como ficaria a estrutura de vendas do seu
+                consultório de nutrição. Prefere conversar direto? O botão do WhatsApp
+                continua logo abaixo.
+              </p>
+              <LeadCaptureForm />
             </div>
           </div>
         </section>

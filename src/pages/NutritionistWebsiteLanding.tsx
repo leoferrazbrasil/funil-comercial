@@ -23,6 +23,7 @@ import {
   Wrench,
 } from "lucide-react";
 import Logo from "../components/Logo";
+import { LeadCaptureForm } from "../components/LeadCaptureForm";
 
 const WHATSAPP_NUMBER = "5551996737359";
 const WHATSAPP_MESSAGE =
@@ -320,7 +321,7 @@ export default function NutritionistWebsiteLanding() {
             </a>
           </nav>
           <a
-            href={whatsappLink} onClick={(e) => { trackEvent("generate_lead", { method: "whatsapp" }); }}
+            href={whatsappLink} onClick={(e) => { trackEvent("whatsapp_click", { method: "whatsapp" }); }}
             target="_blank"
             rel="noreferrer"
             className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-primary px-5 text-sm font-black text-primary-foreground transition hover:bg-primary/90"
@@ -352,7 +353,7 @@ export default function NutritionistWebsiteLanding() {
               </p>
               <div className="mt-9 flex flex-col gap-3 sm:flex-row">
                 <a
-                  href={whatsappLink} onClick={(e) => { trackEvent("generate_lead", { method: "whatsapp" }); }}
+                  href={whatsappLink} onClick={(e) => { trackEvent("whatsapp_click", { method: "whatsapp" }); }}
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex min-h-14 items-center justify-center gap-2 rounded-full bg-primary px-7 text-base font-black text-primary-foreground transition hover:bg-primary/90"
@@ -436,7 +437,7 @@ export default function NutritionistWebsiteLanding() {
                 </p>
               </div>
               <a
-                href={whatsappLink} onClick={(e) => { trackEvent("generate_lead", { method: "whatsapp" }); }}
+                href={whatsappLink} onClick={(e) => { trackEvent("whatsapp_click", { method: "whatsapp" }); }}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-primary px-6 font-bold text-primary-foreground"
@@ -471,7 +472,7 @@ export default function NutritionistWebsiteLanding() {
                 mantém o site no ar, hospedado, atualizado e com suporte básico.
               </p>
               <a
-                href={whatsappLink} onClick={(e) => { trackEvent("generate_lead", { method: "whatsapp" }); }}
+                href={whatsappLink} onClick={(e) => { trackEvent("whatsapp_click", { method: "whatsapp" }); }}
                 target="_blank"
                 rel="noreferrer"
                 className="mt-8 inline-flex min-h-14 items-center justify-center gap-2 rounded-full bg-primary px-7 text-base font-black text-primary-foreground transition hover:bg-primary/90"
@@ -669,6 +670,23 @@ export default function NutritionistWebsiteLanding() {
           </div>
         </section>
 
+        {/* Análise gratuita — formulário web (captura o lead + o GA4 client_id) */}
+        <section id="analise-gratuita" className="py-20 md:py-28">
+          <div className="mx-auto max-w-xl px-5 md:px-8">
+            <div className="border border-white/10 bg-card/30 p-8 md:p-10">
+              <h2 className="text-3xl font-black leading-tight md:text-4xl">
+                Prefere que a gente te chame?
+              </h2>
+              <p className="mt-4 mb-6 leading-8 text-muted-foreground">
+                Deixe seu nome e WhatsApp. A gente retorna com uma análise da sua
+                presença digital e mostra como ficaria o seu site profissional — sem
+                compromisso.
+              </p>
+              <LeadCaptureForm />
+            </div>
+          </div>
+        </section>
+
         <section className="border-y border-white/10 bg-card/30 py-20 md:py-28">
           <div className="mx-auto max-w-7xl px-5 md:px-8">
             <div className="grid gap-8 border border-primary/30 bg-primary/10 p-6 md:grid-cols-[1fr_auto] md:items-center md:p-10">
@@ -686,7 +704,7 @@ export default function NutritionistWebsiteLanding() {
                 </p>
               </div>
               <a
-                href={whatsappLink} onClick={(e) => { trackEvent("generate_lead", { method: "whatsapp" }); }}
+                href={whatsappLink} onClick={(e) => { trackEvent("whatsapp_click", { method: "whatsapp" }); }}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex min-h-14 items-center justify-center gap-2 rounded-full bg-primary px-7 text-base font-black text-primary-foreground transition hover:bg-primary/90"

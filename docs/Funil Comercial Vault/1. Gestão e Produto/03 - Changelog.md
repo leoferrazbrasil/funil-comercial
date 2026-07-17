@@ -18,6 +18,11 @@ tags:
 - **Captura do `client_id`** (fecha o ciclo de atribuição): formulário web na `Landing.tsx` (`LeadCaptureForm.tsx`) captura o cookie `_ga` e cria o lead via Edge Function pública **`lead-intake`** (service-role + `FUNIL_DEFAULT_OWNER_ID` + honeypot); coluna `leads.ga_client_id` (migração `20260715170000`). **Validado com dado real** (`ga_client_id = 342694340.1784049576`).
 - Armadilhas (janela de 72h, prefixo `event_param.`, WhatsApp sem `client_id`, `opportunities` sem `updated_at`) documentadas em [[GA4 - Conversões Offline]].
 
+### Modificado — Taxonomia de eventos + formulários nas LPs de nicho
+- **`generate_lead` agora = só formulário.** O `LeadCaptureForm` passou a disparar `trackEvent("generate_lead", { method: "form" })` no envio (antes **não emitia** — o evento só existia via clique de WhatsApp).
+- **Clique de WhatsApp → `whatsapp_click`** (evento de observação) no **site inteiro** (home + 12 LPs) e no codemod `scripts/inject-analytics.cjs`. Motivo: não poluir o alvo de lance do Google Ads com clique (clique ≠ lead, e sem `client_id`).
+- **Formulário adicionado** em `/site-para-nutricionistas` (`NutritionistWebsiteLanding.tsx`) e `/estrutura-de-vendas-para-nutricionistas` (`LpNutricionistas.tsx`) — antes só tinham WhatsApp, sem conversão mensurável para tráfego pago. Detalhe em [[GA4 - Conversões Offline]].
+
 ### Adicionado — Brandbook: ICP & Regiões
 - Nova seção no `/brandbook` (`Brandbook.tsx`): Perfil de Cliente Ideal (12 nichos-alvo, fit × fora-do-perfil, dores) + cobertura geográfica (**14 UFs, 113 cidades** de `seoLocations.json`).
 

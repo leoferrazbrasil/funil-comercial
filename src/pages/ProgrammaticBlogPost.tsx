@@ -205,7 +205,7 @@ export default function ProgrammaticBlogPost() {
               <div className="flex flex-col sm:flex-row justify-center gap-4">
                  <a
                   href={whatsappLink}
-                  onClick={() => trackEvent("generate_lead", { method: "whatsapp", source: "programmatic_blog" })}
+                  onClick={() => trackEvent("whatsapp_click", { method: "whatsapp", source: "programmatic_blog" })}
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex min-h-14 items-center justify-center gap-2 rounded-full bg-primary px-8 text-lg font-bold text-primary-foreground transition hover:bg-primary/90"

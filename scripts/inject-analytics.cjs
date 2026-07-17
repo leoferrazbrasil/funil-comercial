@@ -25,12 +25,13 @@ for (const file of new Set(files)) {
   // This is a bit tricky if they already have onClick.
   // We can just add onClick to it if it doesn't have one, or modify existing.
   
-  // Let's just find href={whatsappLink} and append onClick
-  // Actually, we can replace href={whatsappLink} with onClick={() => trackEvent("generate_lead", { method: "whatsapp" })} href={whatsappLink}
-  content = content.replace(/href=\{whatsappLink\}/g, `href={whatsappLink} onClick={(e) => { trackEvent("generate_lead", { method: "whatsapp" }); }}`);
-  
+  // Clique de WhatsApp = whatsapp_click (evento de OBSERVAÇÃO), não generate_lead.
+  // generate_lead é reservado ao envio de formulário (LeadCaptureForm) — lead real
+  // com client_id. Misturar clique aqui poluiria o alvo de lance do Google Ads.
+  content = content.replace(/href=\{whatsappLink\}/g, `href={whatsappLink} onClick={(e) => { trackEvent("whatsapp_click", { method: "whatsapp" }); }}`);
+
   // Handle whatsappInfoLink
-  content = content.replace(/href=\{whatsappInfoLink\}/g, `href={whatsappInfoLink} onClick={(e) => { trackEvent("generate_lead", { method: "whatsapp_info" }); }}`);
+  content = content.replace(/href=\{whatsappInfoLink\}/g, `href={whatsappInfoLink} onClick={(e) => { trackEvent("whatsapp_click", { method: "whatsapp_info" }); }}`);
 
   fs.writeFileSync(filePath, content);
   console.log(`Updated ${file}`);

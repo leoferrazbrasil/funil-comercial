@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { CheckCircle2, Loader2 } from "lucide-react";
+import { trackEvent } from "../lib/analytics";
 
 // O MESMO Measurement ID do gtag em index.html (e do exportador GA4).
 const GA4_MEASUREMENT_ID = "G-NSMD6MKLMK";
@@ -64,6 +65,9 @@ export function LeadCaptureForm() {
         }),
       });
       if (!response.ok) throw new Error(`intake ${response.status}`);
+      // O formulário é a fonte LIMPA de generate_lead (lead real + client_id).
+      // Os cliques de WhatsApp usam whatsapp_click (observação), não este evento.
+      trackEvent("generate_lead", { method: "form" });
       setStatus("done");
     } catch (error) {
       console.error("[LeadCaptureForm] envio falhou", error);
