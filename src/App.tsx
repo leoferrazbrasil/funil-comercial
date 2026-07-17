@@ -65,6 +65,7 @@ import LpNutricionistas from "./pages/LpNutricionistas";
 import LpPsicologas from "./pages/LpPsicologas";
 import LpDentistas from "./pages/LpDentistas";
 import LpTerapeutas from "./pages/LpTerapeutas";
+import LpMassoterapeutas from "./pages/LpMassoterapeutas";
 import BlogPost from "./pages/BlogPost";
 import GlossarioIndex from "./pages/GlossarioIndex";
 import GlossarioTermo from "./pages/GlossarioTermo";
@@ -176,6 +177,7 @@ const PUBLIC_PATHS = [
   "/estrutura-de-vendas-para-psicologas",
   "/estrutura-de-vendas-para-dentistas",
   "/estrutura-de-vendas-para-terapeutas",
+  "/estrutura-de-vendas-para-massoterapeutas",
   "/site-para-psicologas",
   "/privacidade",
   "/termos",
@@ -1160,6 +1162,7 @@ function AppContent() {
           <Route path="/estrutura-de-vendas-para-psicologas" element={<LpPsicologas />} />
           <Route path="/estrutura-de-vendas-para-dentistas" element={<LpDentistas />} />
           <Route path="/estrutura-de-vendas-para-terapeutas" element={<LpTerapeutas />} />
+          <Route path="/estrutura-de-vendas-para-massoterapeutas" element={<LpMassoterapeutas />} />
           <Route path="/site-para-psicologas" element={<PsychologistWebsiteLanding />} />
           <Route path="/privacidade" element={<PrivacyPage />} />
           <Route path="/termos" element={<TermsPage />} />
