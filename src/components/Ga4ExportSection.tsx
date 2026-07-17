@@ -83,9 +83,10 @@ export function Ga4ExportSection() {
           <li>
             Colunas:{" "}
             <span className="font-mono text-xs text-foreground">
-              client_id, event_name, timestamp_micros, value, currency
-            </span>
-            .
+              measurement_id, client_id, event_name, timestamp_micros,
+              event_param.value, event_param.currency
+            </span>{" "}
+            (o measurement_id já sai preenchido).
           </li>
           <li>
             <strong className="text-foreground">

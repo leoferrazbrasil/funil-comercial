@@ -1,16 +1,22 @@
 import { requireSupabase } from "./supabase";
 
-// Exportação de conversões do CRM no formato de "Offline event data import" do GA4.
-// Schema EXATO exigido pelo GA4: client_id, event_name, timestamp_micros, value, currency.
-//
-// ⚠️ client_id: só é preenchido quando a captura do cookie `_ga` num formulário web
-// existir. Hoje o site é WhatsApp-first (sem form), então sai VAZIO — e o GA4 rejeita
-// linhas sem client_id. A exportação só fica válida DEPOIS que a captura existir.
-// ⚠️ Janela: o GA4 aceita apenas eventos das ÚLTIMAS 72h (não serve para backfill).
+// Exportação de conversões do CRM no formato "Offline event data import" do GA4 (Web).
+// Schema EXATO (confirmado na doc do Google e pelo próprio erro do GA4):
+//   measurement_id, client_id, event_name, timestamp_micros,
+//   event_param.value, event_param.currency
+// - measurement_id: OBRIGATÓRIO (ID do fluxo de dados web).
+// - client_id: obrigatório; só é preenchido quando a captura do cookie `_ga` existir.
+//   Hoje o site é WhatsApp-first (sem form web) → sai VAZIO e o GA4 rejeita a linha.
+// - parâmetros de evento usam o prefixo `event_param.` (ex.: event_param.value).
+// - janela: o GA4 aceita apenas eventos recentes (~72h) — não serve para backfill.
+
+// Measurement ID do fluxo web — o MESMO do gtag em index.html (G-NSMD6MKLMK).
+// Se mudar lá, mudar aqui.
+const GA4_MEASUREMENT_ID = "G-NSMD6MKLMK";
+const GA4_WINDOW_MS = 72 * 60 * 60 * 1000;
 
 export type Ga4Opp = {
   valor?: number | null;
-  updated_at?: string | null;
   created_at?: string | null;
   ga_client_id?: string | null;
 };
@@ -24,24 +30,26 @@ export type Ga4Lead = {
 export type Ga4ConversionInput = { opportunities: Ga4Opp[]; leads: Ga4Lead[] };
 
 export type Ga4Row = {
-  client_id: string;
-  event_name: string;
-  timestamp_micros: string;
+  measurementId: string;
+  clientId: string;
+  eventName: string;
+  timestampMicros: string;
   value: string;
   currency: string;
 };
 
-export const GA4_CSV_HEADER = [
-  "client_id",
-  "event_name",
-  "timestamp_micros",
-  "value",
-  "currency",
-] as const;
+// Ordem e cabeçalho EXATOS das colunas do CSV do GA4 (desacoplados dos campos
+// internos porque `event_param.value` não é um identificador JS válido).
+const GA4_COLUMNS: Array<{ header: string; get: (r: Ga4Row) => string }> = [
+  { header: "measurement_id", get: (r) => r.measurementId },
+  { header: "client_id", get: (r) => r.clientId },
+  { header: "event_name", get: (r) => r.eventName },
+  { header: "timestamp_micros", get: (r) => r.timestampMicros },
+  { header: "event_param.value", get: (r) => r.value },
+  { header: "event_param.currency", get: (r) => r.currency },
+];
 
-const GA4_WINDOW_MS = 72 * 60 * 60 * 1000;
-
-// Unix timestamp em MICROSSEGUNDOS (ms × 1000), como o GA4 exige.
+// Unix timestamp em MICROSSEGUNDOS (ms × 1000).
 const toMicros = (iso?: string | null): string => {
   const ms = iso ? new Date(iso).getTime() : NaN;
   return Number.isFinite(ms) ? String(ms * 1000) : "";
@@ -53,13 +61,13 @@ const toMoney = (v?: number | null): string =>
 export function buildGa4Rows(input: Ga4ConversionInput): Ga4Row[] {
   const rows: Ga4Row[] = [];
 
-  // Oportunidades ganhas → offline_sale (o evento de dinheiro; puxa o Google Ads
-  // a otimizar por LUCRO, via value + currency).
+  // Oportunidades ganhas → offline_sale (evento de dinheiro, com value + currency).
   for (const o of input.opportunities) {
     rows.push({
-      client_id: o.ga_client_id?.trim() || "",
-      event_name: "offline_sale",
-      timestamp_micros: toMicros(o.updated_at ?? o.created_at),
+      measurementId: GA4_MEASUREMENT_ID,
+      clientId: o.ga_client_id?.trim() || "",
+      eventName: "offline_sale",
+      timestampMicros: toMicros(o.created_at),
       value: toMoney(o.valor),
       currency: "BRL",
     });
@@ -68,9 +76,10 @@ export function buildGa4Rows(input: Ga4ConversionInput): Ga4Row[] {
   // Leads qualificados → qualified_lead.
   for (const l of input.leads) {
     rows.push({
-      client_id: l.ga_client_id?.trim() || "",
-      event_name: "qualified_lead",
-      timestamp_micros: toMicros(l.created_at),
+      measurementId: GA4_MEASUREMENT_ID,
+      clientId: l.ga_client_id?.trim() || "",
+      eventName: "qualified_lead",
+      timestampMicros: toMicros(l.created_at),
       value: toMoney(l.valor_estimado),
       currency: "BRL",
     });
@@ -97,11 +106,11 @@ export function summarizeGa4Rows(rows: Ga4Row[], now = Date.now()): Ga4Summary {
     within72h: 0,
   };
   for (const r of rows) {
-    if (r.client_id) s.withClientId += 1;
-    const ts = Number(r.timestamp_micros);
+    if (r.clientId) s.withClientId += 1;
+    const ts = Number(r.timestampMicros);
     if (Number.isFinite(ts) && ts >= cutoff) s.within72h += 1;
-    if (r.event_name === "offline_sale") s.offlineSale += 1;
-    else if (r.event_name === "qualified_lead") s.qualifiedLead += 1;
+    if (r.eventName === "offline_sale") s.offlineSale += 1;
+    else if (r.eventName === "qualified_lead") s.qualifiedLead += 1;
   }
   return s;
 }
@@ -110,31 +119,21 @@ const csvCell = (v: string): string =>
   /[",\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v;
 
 export function toGa4Csv(rows: Ga4Row[]): string {
-  const header = GA4_CSV_HEADER.join(",");
+  const header = GA4_COLUMNS.map((c) => c.header).join(",");
   if (rows.length === 0) return `${header}\n`;
   const body = rows
-    .map((r) => GA4_CSV_HEADER.map((k) => csvCell(r[k])).join(","))
+    .map((r) => GA4_COLUMNS.map((c) => csvCell(c.get(r))).join(","))
     .join("\n");
   return `${header}\n${body}\n`;
 }
 
-// Busca as conversões do owner logado (RLS aplica o escopo automaticamente).
-// NOTA: não selecionamos `ga_client_id` porque a coluna ainda não existe (a captura
-// virá depois). Quando existir, adicionar ao select — o restante já está pronto.
+// Busca as conversões do owner logado (RLS aplica o escopo). `opportunities` não tem
+// `updated_at`; usamos `created_at`. `ga_client_id` ainda não existe (captura futura).
 export async function fetchGa4Conversions(): Promise<Ga4ConversionInput> {
   const supabase = requireSupabase();
   const [opps, leads] = await Promise.all([
-    supabase
-      .from("opportunities")
-      // NOTA: `opportunities` não tem `updated_at` (só `created_at`). Como não há
-      // coluna de "data do ganho", usamos `created_at` como timestamp do evento.
-      // Se um dia existir um `ganho_em`, trocar aqui para timing mais preciso.
-      .select("id, valor, created_at")
-      .eq("etapa", "Ganho"),
-    supabase
-      .from("leads")
-      .select("id, valor_estimado, created_at")
-      .eq("status", "qualificado"),
+    supabase.from("opportunities").select("id, valor, created_at").eq("etapa", "Ganho"),
+    supabase.from("leads").select("id, valor_estimado, created_at").eq("status", "qualificado"),
   ]);
   if (opps.error) throw opps.error;
   if (leads.error) throw leads.error;
