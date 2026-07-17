@@ -36,14 +36,14 @@ graph LR
 - **`measurement_id`** — OBRIGATÓRIO. É o `G-NSMD6MKLMK` (o mesmo do gtag em `index.html`). *Faltar isso = erro "campo obrigatório".*
 - **`event_param.value` / `event_param.currency`** — parâmetros de evento usam o **prefixo `event_param.`**. Mandar `value`/`currency` "pelados" = erro "nome de coluna inválido".
 - **`timestamp_micros`** — Unix em **microssegundos** = `Date.getTime() × 1000`.
-- **Eventos:** `offline_sale` (oportunidade **Ganho**, `value = valor`) e `qualified_lead` (lead `qualificado`, `value = valor_estimado`). `currency = BRL`.
+- **Eventos** (alinhados ao **ciclo de lead padrão do GA4** — já são eventos-chave na conta): `close_convert_lead` (oportunidade **Ganho**, `value = valor`) e `qualify_lead` (lead `qualificado`, `value = valor_estimado`). `currency = BRL`. *(Antes: `offline_sale`/`qualified_lead` — trocados para não criar taxonomia paralela.)*
 
 ## ⚠️ Armadilhas que fazem ou quebram tudo
 > [!danger] Ler antes de mexer
 > - **`client_id` é obrigatório** e o GA4 rejeita linha sem ele. Só lead de **formulário web** tem `client_id` (o cookie `_ga` do navegador). Lead de **WhatsApp/prospecção NÃO tem** — e não dá pra inventar. Logo, essa fonte só cobre o **canal de aquisição web**.
 > - **Janela de ~72h:** o import só aceita eventos recentes. **Não serve para backfill** de vendas antigas — é cadência quase-tempo-real.
 > - **`opportunities` NÃO tem `updated_at`** (só `created_at`). O `select` inicial pediu `updated_at` e quebrou (PostgREST 42703). Usamos `created_at`.
-> - **Não existe `ganho_em`:** o `timestamp` do `offline_sale` é a **criação** da oportunidade, não a data do ganho. Um negócio criado há semanas mas ganho hoje cai **fora da janela de 72h**. Melhoria futura: coluna `ganho_em`.
+> - **Não existe `ganho_em`:** o `timestamp` do `close_convert_lead` é a **criação** da oportunidade, não a data do ganho. Um negócio criado há semanas mas ganho hoje cai **fora da janela de 72h**. Melhoria futura: coluna `ganho_em`.
 
 ## As 4 peças
 | # | Peça | Onde |
@@ -66,7 +66,7 @@ graph LR
 1. Migração: `alter table public.leads add column if not exists ga_client_id text;`
 2. Deploy: `npx supabase@latest functions deploy lead-intake --project-ref juvwfxnlusrnvcarkrmc --no-verify-jwt`
 3. Secret **`FUNIL_DEFAULT_OWNER_ID`** = UUID do owner (o `owner_id` que possui os dados do CRM). Sem ele → 500 "Configuração ausente".
-4. **GA4 → Admin → Eventos:** marcar `offline_sale` e `qualified_lead` como **evento-chave**; depois **vincular ao Google Ads**.
+4. **GA4:** `close_convert_lead` e `qualify_lead` **já são eventos-chave** na conta (ciclo de lead padrão) — **nada a marcar**. Só **vincular ao Google Ads** (Admin → Vínculos de produtos) e importar `close_convert_lead` como conversão (aí o `value`/`currency` viram lance por valor). NÃO usar a tela "Criar um evento" (ela cria evento web por trigger de page_view/URL — não serve para import offline).
 
 > [!tip] Ordem importa
 > Deploye a função **antes** de o front ir ao ar — senão o form aparece mas dá **404/CORS** (o preflight bate num 404). Nada quebra, só o form não envia até a função existir.
