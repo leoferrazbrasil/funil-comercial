@@ -1,18 +1,19 @@
 import { requireSupabase } from "./supabase";
 
 // Exportação de conversões do CRM no formato "Offline event data import" do GA4 (Web).
-// Schema EXATO (confirmado na doc do Google e pelo próprio erro do GA4):
-//   measurement_id, client_id, event_name, timestamp_micros,
-//   event_param.value, event_param.currency
-// - measurement_id: OBRIGATÓRIO (ID do fluxo de dados web).
-// - client_id: obrigatório; só é preenchido quando a captura do cookie `_ga` existir.
-//   Hoje o site é WhatsApp-first (sem form web) → sai VAZIO e o GA4 rejeita a linha.
-// - parâmetros de evento usam o prefixo `event_param.` (ex.: event_param.value).
-// - janela: o GA4 aceita apenas eventos recentes (~72h) — não serve para backfill.
+// Schema EXATO: measurement_id, client_id, event_name, timestamp_micros,
+// event_param.value, event_param.currency.
+//
+// Eventos ALINHADOS ao ciclo de lead padrão do GA4 (já são eventos-chave na conta):
+//   - close_convert_lead → venda (oportunidade Ganho)
+//   - qualify_lead       → lead qualificado
+// (Antes usávamos offline_sale/qualified_lead, que não existiam na conta e criariam uma
+// taxonomia paralela.)
+//
+// ⚠️ client_id: só é preenchido quando a captura do cookie _ga (formulário web) existe.
+// ⚠️ Janela: o GA4 aceita apenas eventos recentes (~72h) — não serve para backfill.
 
-// Measurement ID do fluxo web — o MESMO do gtag em index.html (G-NSMD6MKLMK).
-// Se mudar lá, mudar aqui.
-const GA4_MEASUREMENT_ID = "G-NSMD6MKLMK";
+const GA4_MEASUREMENT_ID = "G-NSMD6MKLMK"; // = gtag em index.html. Mudou lá? mudar aqui.
 const GA4_WINDOW_MS = 72 * 60 * 60 * 1000;
 
 export type Ga4Opp = {
@@ -38,8 +39,8 @@ export type Ga4Row = {
   currency: string;
 };
 
-// Ordem e cabeçalho EXATOS das colunas do CSV do GA4 (desacoplados dos campos
-// internos porque `event_param.value` não é um identificador JS válido).
+// Ordem e cabeçalho EXATOS das colunas do CSV (desacoplados dos campos internos porque
+// `event_param.value` não é um identificador JS válido).
 const GA4_COLUMNS: Array<{ header: string; get: (r: Ga4Row) => string }> = [
   { header: "measurement_id", get: (r) => r.measurementId },
   { header: "client_id", get: (r) => r.clientId },
@@ -49,7 +50,6 @@ const GA4_COLUMNS: Array<{ header: string; get: (r: Ga4Row) => string }> = [
   { header: "event_param.currency", get: (r) => r.currency },
 ];
 
-// Unix timestamp em MICROSSEGUNDOS (ms × 1000).
 const toMicros = (iso?: string | null): string => {
   const ms = iso ? new Date(iso).getTime() : NaN;
   return Number.isFinite(ms) ? String(ms * 1000) : "";
@@ -61,24 +61,25 @@ const toMoney = (v?: number | null): string =>
 export function buildGa4Rows(input: Ga4ConversionInput): Ga4Row[] {
   const rows: Ga4Row[] = [];
 
-  // Oportunidades ganhas → offline_sale (evento de dinheiro, com value + currency).
+  // Oportunidades ganhas → close_convert_lead (value + currency alimentam o lance por
+  // valor do Google Ads).
   for (const o of input.opportunities) {
     rows.push({
       measurementId: GA4_MEASUREMENT_ID,
       clientId: o.ga_client_id?.trim() || "",
-      eventName: "offline_sale",
+      eventName: "close_convert_lead",
       timestampMicros: toMicros(o.created_at),
       value: toMoney(o.valor),
       currency: "BRL",
     });
   }
 
-  // Leads qualificados → qualified_lead.
+  // Leads qualificados → qualify_lead.
   for (const l of input.leads) {
     rows.push({
       measurementId: GA4_MEASUREMENT_ID,
       clientId: l.ga_client_id?.trim() || "",
-      eventName: "qualified_lead",
+      eventName: "qualify_lead",
       timestampMicros: toMicros(l.created_at),
       value: toMoney(l.valor_estimado),
       currency: "BRL",
@@ -109,8 +110,8 @@ export function summarizeGa4Rows(rows: Ga4Row[], now = Date.now()): Ga4Summary {
     if (r.clientId) s.withClientId += 1;
     const ts = Number(r.timestampMicros);
     if (Number.isFinite(ts) && ts >= cutoff) s.within72h += 1;
-    if (r.eventName === "offline_sale") s.offlineSale += 1;
-    else if (r.eventName === "qualified_lead") s.qualifiedLead += 1;
+    if (r.eventName === "close_convert_lead") s.offlineSale += 1;
+    else if (r.eventName === "qualify_lead") s.qualifiedLead += 1;
   }
   return s;
 }
@@ -143,20 +144,17 @@ const extractLeadClientId = (leads: unknown): string | null => {
   return typeof id === "string" && id ? id : null;
 };
 
-// Tipo comum pros dois selects (o "rico" com ga_client_id e o fallback sem).
 type QueryRes = {
   data: unknown[] | null;
   error: { code?: string; message?: string } | null;
 };
 
-// Busca as conversões do owner (RLS aplica o escopo). Traz o `ga_client_id`: direto no
-// lead (qualified_lead) e via lead vinculado na oportunidade (offline_sale). Degrada com
-// elegância se a coluna ainda não existir (migração leads_ga_client_id não aplicada).
-// NOTA: `opportunities` não tem `updated_at`; usamos `created_at`.
+// Busca as conversões do owner (RLS aplica o escopo). Traz o ga_client_id: direto no lead
+// (qualify_lead) e via lead vinculado na oportunidade (close_convert_lead). Degrada se a
+// coluna ainda não existir. `opportunities` não tem `updated_at`; usamos created_at.
 export async function fetchGa4Conversions(): Promise<Ga4ConversionInput> {
   const supabase = requireSupabase();
 
-  // Leads qualificados (com ga_client_id se a coluna existir).
   let leadsRes: QueryRes = await supabase
     .from("leads")
     .select("id, valor_estimado, created_at, ga_client_id")
@@ -169,8 +167,6 @@ export async function fetchGa4Conversions(): Promise<Ga4ConversionInput> {
   }
   if (leadsRes.error) throw leadsRes.error;
 
-  // Oportunidades ganhas (client_id via lead vinculado). Fallback amplo: se o join
-  // falhar (coluna/relacionamento ausente), busca sem ele.
   let oppsRes: QueryRes = await supabase
     .from("opportunities")
     .select("id, valor, created_at, leads(ga_client_id)")

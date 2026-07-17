@@ -10,7 +10,7 @@ import {
 
 // Configurações → Exportar conversões para o GA4 (formato de importação de eventos
 // offline). Gera o CSV com o schema exato do GA4 a partir das oportunidades ganhas
-// (offline_sale) e leads qualificados (qualified_lead).
+// (close_convert_lead) e leads qualificados (qualify_lead).
 export function Ga4ExportSection() {
   const [loading, setLoading] = useState(false);
 
@@ -103,8 +103,8 @@ export function Ga4ExportSection() {
             para backfill de vendas antigas.
           </li>
           <li>
-            Eventos: <code>offline_sale</code> (oportunidades ganhas) e{" "}
-            <code>qualified_lead</code> (leads qualificados), com <code>value</code>{" "}
+            Eventos: <code>close_convert_lead</code> (oportunidades ganhas) e{" "}
+            <code>qualify_lead</code> (leads qualificados), com <code>value</code>{" "}
             em <code>BRL</code>.
           </li>
         </ul>
