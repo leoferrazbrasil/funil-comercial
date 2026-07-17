@@ -126,7 +126,10 @@ export async function fetchGa4Conversions(): Promise<Ga4ConversionInput> {
   const [opps, leads] = await Promise.all([
     supabase
       .from("opportunities")
-      .select("id, valor, updated_at, created_at")
+      // NOTA: `opportunities` não tem `updated_at` (só `created_at`). Como não há
+      // coluna de "data do ganho", usamos `created_at` como timestamp do evento.
+      // Se um dia existir um `ganho_em`, trocar aqui para timing mais preciso.
+      .select("id, valor, created_at")
       .eq("etapa", "Ganho"),
     supabase
       .from("leads")
