@@ -59,6 +59,7 @@ import CitiesDirectory from "./pages/CitiesDirectory";
 import ConsultoriaLanding from "./pages/ConsultoriaLanding";
 import { AnnouncementBar } from "./components/AnnouncementBar";
 import { SeoHead } from "./components/SeoHead";
+import { CookieBanner } from "./components/CookieBanner";
 import BlogIndex from "./pages/BlogIndex";
 import BlogPost from "./pages/BlogPost";
 import GlossarioIndex from "./pages/GlossarioIndex";
@@ -2131,6 +2132,7 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <AppContent />
+        <CookieBanner />
       </BrowserRouter>
     </QueryClientProvider>
   );

@@ -11,10 +11,14 @@
             "id": "3012f2a622f885dd",
             "type": "leaf",
             "state": {
-              "type": "graph",
-              "state": {},
-              "icon": "lucide-git-fork",
-              "title": "Visualização em gráfico"
+              "type": "markdown",
+              "state": {
+                "file": "4. Marketing e Growth/SEO/Historico_Commits_SEO.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Historico_Commits_SEO"
             }
           }
         ]
@@ -181,8 +185,29 @@
   },
   "active": "3012f2a622f885dd",
   "lastOpenFiles": [
-    "06 - Design System.md",
+    "4. Marketing e Growth/Linha_Editorial_Funil_Comercial.md",
+    "4. Marketing e Growth/SEO/Historico_Commits_SEO.md",
     "03 - Changelog.md",
+    "4. Marketing e Growth/SEO/Sprint_Julho_2026_Trafego_e_CRM.md",
+    "4. Marketing e Growth/SEO/Estrategia_Teia_de_Relevancia.md",
+    "4. Marketing e Growth/SEO",
+    "4. Marketing e Growth",
+    "3. Design e Experiencia/Brandbook/Diretrizes_Publicacao_5W2H.md",
+    "3. Design e Experiencia/Brandbook",
+    "3. Design e Experiencia/06 - Design System.md",
+    "2. Engenharia/07 - Componentes.md",
+    "2. Engenharia/05 - API e Edge Functions.md",
+    "2. Engenharia/02 - Arquitetura e Design.md",
+    "1. Gestão e Produto/04 - Roadmap.md",
+    "1. Gestão e Produto/03 - Changelog.md",
+    "1. Gestão e Produto/01 - Requisitos.md",
+    "3. Design e Experiencia",
+    "2. Engenharia",
+    "1. Gestão e Produto",
+    "Marketing/SEO/Sprint_Julho_2026_Trafego_e_CRM.md",
+    "Marketing/SEO/Estrategia_Teia_de_Relevancia.md",
+    "Marketing/SEO",
+    "06 - Design System.md",
     "00 - Inicio.md"
   ]
 }

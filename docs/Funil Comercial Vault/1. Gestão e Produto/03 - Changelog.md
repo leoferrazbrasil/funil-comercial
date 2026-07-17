@@ -11,6 +11,33 @@ tags:
 > [!note] Navegação
 > Histórico de mudanças, mais recente primeiro. Contexto do produto em [[01 - Requisitos]]; arquitetura em [[02 - Arquitetura e Design]]; índice em [[00 - Inicio]].
 
+## [2026-07-17] - GA4 Conversões Offline + captura de client_id
+
+### Adicionado — Integração GA4 (fonte de dados de conversões)
+- **Exportador CSV** em Configurações (*Exportar conversões (GA4)*): gera o CSV no schema de *offline event data import* — `measurement_id, client_id, event_name, timestamp_micros, event_param.value, event_param.currency` — a partir de oportunidades **ganhas** (`offline_sale`) e leads **qualificados** (`qualified_lead`). Arquivos: `src/lib/ga4Export.ts`, `src/components/Ga4ExportSection.tsx`.
+- **Captura do `client_id`** (fecha o ciclo de atribuição): formulário web na `Landing.tsx` (`LeadCaptureForm.tsx`) captura o cookie `_ga` e cria o lead via Edge Function pública **`lead-intake`** (service-role + `FUNIL_DEFAULT_OWNER_ID` + honeypot); coluna `leads.ga_client_id` (migração `20260715170000`). **Validado com dado real** (`ga_client_id = 342694340.1784049576`).
+- Armadilhas (janela de 72h, prefixo `event_param.`, WhatsApp sem `client_id`, `opportunities` sem `updated_at`) documentadas em [[GA4 - Conversões Offline]].
+
+### Adicionado — Brandbook: ICP & Regiões
+- Nova seção no `/brandbook` (`Brandbook.tsx`): Perfil de Cliente Ideal (12 nichos-alvo, fit × fora-do-perfil, dores) + cobertura geográfica (**14 UFs, 113 cidades** de `seoLocations.json`).
+
+### Corrigido / Modificado
+- **Estúdio de Peças** (`PieceStudio.tsx`): fundo `#0d1526` (azul, fora da marca) → `#09090B` (Fundo Escuro oficial); amarelo secundário `#EAB308` → `#F59E0B` (Mostarda).
+- **Skills multi-IDE:** 26 skills consolidadas em `.agents/skills` (Antigravity/Codex/Copilot) **e** `.claude/skills` (Claude Code), com `npm run sync-skills` mantendo as duas em sincronia.
+
+## [2026-07-16] - Sprint de SEO Local e Teia de Relevância
+
+### Adicionado — Artigos Estratégicos (Blog e Glossário)
+- Estratégia de "Teia de Relevância" implementada no código-fonte (`blogData.ts` e `glossarioData.ts`) visando construção de Topical Authority e ranqueamento da Home.
+- **Novos Artigos (Meio e Topo de Funil):**
+  1. Google Ads ou Meta Ads: Qual o melhor para Negócios Locais?
+  2. Como Otimizar o Google Meu Negócio em 2026 (Passo a Passo)
+  3. Por que seu consultório não recebe pacientes pelo Google?
+- **Novos Termos (Glossário/Cauda Longa):**
+  1. O que é SEO Local?
+  2. O que é o Google Meu Negócio?
+- Repositório sincronizado remotamente.
+
 ## [2026-07-15] - Conteúdo Topo de Funil: O Glossário (Dicionário de Vendas)
 
 ### Adicionado — Estrutura de Dicionário

@@ -34,6 +34,7 @@ O "backend" do Funil Comercial é **Supabase**: Postgres+RLS (dados) e **Edge Fu
 | `meta-auth` / `meta-publish` | OAuth da Meta (Instagram) e publicação de post. | default |
 | `ai-generate-post` / `ai-recommend-post` | IA de criativos (OpenAI/Gemini). **Presos ao posicionamento antigo** (B2B/SaaS) → Fase B reescreve os prompts. Hoje bloqueadas em prod → o front cai em fallback/mock. | default |
 | `evolution-proxy` | Proxy para a Evolution API (QR multi-instância — adiado). | default |
+| `lead-intake` | **Intake público de leads do formulário web** (`Landing.tsx`). Grava o lead com o **GA4 `client_id`** (`leads.ga_client_id`) via service-role + `FUNIL_DEFAULT_OWNER_ID`; honeypot + validação de telefone; degrada se a coluna não existir. Base da atribuição de conversões offline — ver [[GA4 - Conversões Offline]]. | **false** |
 
 Config de `verify_jwt` em `supabase/config.toml` (off só nos webhooks e no runner).
 

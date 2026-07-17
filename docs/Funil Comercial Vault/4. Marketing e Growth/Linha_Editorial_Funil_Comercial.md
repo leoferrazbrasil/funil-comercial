@@ -173,3 +173,12 @@ Falar como quem entende a rotina do dono de negócio local e resolve o problema 
 
 > A Funil Comercial não vende post. Vende o caminho inteiro entre o cliente te encontrar, chamar no WhatsApp e fechar com você.
 
+---
+
+## 🕸️ Estratégia de Aquisição (SEO)
+
+A linha editorial acima é distribuída organicamente através da nossa **Teia de Relevância**. 
+Para ver o planejamento de Pilares, Satélites e os Sprints de conteúdo técnico aplicados, consulte:
+
+- [[Estrategia_Teia_de_Relevancia]]
+- [[Sprint_Julho_2026_Trafego_e_CRM]]

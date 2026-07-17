@@ -224,6 +224,9 @@ export function PrivacyPage() {
           mensagens por meio da WhatsApp Business Platform;
         </li>
         <li>
+          <strong>Google LLC</strong> — para medição de tráfego, análise de jornada (Google Analytics e Google Signals) e personalização de campanhas publicitárias (Google Ads), incluindo o envio de conversões (Enhanced Conversions) de forma anônima e criptografada (hash);
+        </li>
+        <li>
           <strong>Supabase</strong> — provedor de banco de dados e infraestrutura
           onde os dados são armazenados de forma segura;
         </li>
@@ -282,8 +285,8 @@ export function PrivacyPage() {
       <H2>9. Cookies</H2>
       <P>
         Utilizamos cookies e tecnologias similares estritamente necessárias para
-        autenticação e funcionamento da Plataforma. Você pode gerenciá-los nas
-        configurações do seu navegador; a desativação pode comprometer o
+        autenticação e funcionamento da Plataforma, bem como cookies de terceiros (como os do Google Analytics e Google Ads) para medir a performance do site e personalizar anúncios e campanhas. Ao aceitar nosso Banner de Cookies, você consente com o uso dessas tecnologias de medição e publicidade. Você pode gerenciá-los nas
+        configurações do seu navegador; a desativação dos cookies essenciais pode comprometer o
         funcionamento do serviço.
       </P>
 
