@@ -127,18 +127,76 @@ export function toGa4Csv(rows: Ga4Row[]): string {
   return `${header}\n${body}\n`;
 }
 
-// Busca as conversões do owner logado (RLS aplica o escopo). `opportunities` não tem
-// `updated_at`; usamos `created_at`. `ga_client_id` ainda não existe (captura futura).
+const isMissingColumn = (err: { code?: string; message?: string } | null): boolean => {
+  if (!err) return false;
+  return (
+    err.code === "42703" ||
+    err.code === "PGRST204" ||
+    /column .* does not exist|could not find the .* column/i.test(err.message ?? "")
+  );
+};
+
+const extractLeadClientId = (leads: unknown): string | null => {
+  if (!leads) return null;
+  const rec = Array.isArray(leads) ? leads[0] : leads;
+  const id = (rec as { ga_client_id?: unknown } | null)?.ga_client_id;
+  return typeof id === "string" && id ? id : null;
+};
+
+// Tipo comum pros dois selects (o "rico" com ga_client_id e o fallback sem).
+type QueryRes = {
+  data: unknown[] | null;
+  error: { code?: string; message?: string } | null;
+};
+
+// Busca as conversões do owner (RLS aplica o escopo). Traz o `ga_client_id`: direto no
+// lead (qualified_lead) e via lead vinculado na oportunidade (offline_sale). Degrada com
+// elegância se a coluna ainda não existir (migração leads_ga_client_id não aplicada).
+// NOTA: `opportunities` não tem `updated_at`; usamos `created_at`.
 export async function fetchGa4Conversions(): Promise<Ga4ConversionInput> {
   const supabase = requireSupabase();
-  const [opps, leads] = await Promise.all([
-    supabase.from("opportunities").select("id, valor, created_at").eq("etapa", "Ganho"),
-    supabase.from("leads").select("id, valor_estimado, created_at").eq("status", "qualificado"),
-  ]);
-  if (opps.error) throw opps.error;
-  if (leads.error) throw leads.error;
+
+  // Leads qualificados (com ga_client_id se a coluna existir).
+  let leadsRes: QueryRes = await supabase
+    .from("leads")
+    .select("id, valor_estimado, created_at, ga_client_id")
+    .eq("status", "qualificado");
+  if (leadsRes.error && isMissingColumn(leadsRes.error)) {
+    leadsRes = await supabase
+      .from("leads")
+      .select("id, valor_estimado, created_at")
+      .eq("status", "qualificado");
+  }
+  if (leadsRes.error) throw leadsRes.error;
+
+  // Oportunidades ganhas (client_id via lead vinculado). Fallback amplo: se o join
+  // falhar (coluna/relacionamento ausente), busca sem ele.
+  let oppsRes: QueryRes = await supabase
+    .from("opportunities")
+    .select("id, valor, created_at, leads(ga_client_id)")
+    .eq("etapa", "Ganho");
+  if (oppsRes.error) {
+    oppsRes = await supabase
+      .from("opportunities")
+      .select("id, valor, created_at")
+      .eq("etapa", "Ganho");
+  }
+  if (oppsRes.error) throw oppsRes.error;
+
+  const leadsData = (leadsRes.data ?? []) as Array<Record<string, unknown>>;
+  const oppsData = (oppsRes.data ?? []) as Array<Record<string, unknown>>;
+
   return {
-    opportunities: (opps.data ?? []) as unknown as Ga4Opp[],
-    leads: (leads.data ?? []) as unknown as Ga4Lead[],
+    opportunities: oppsData.map((o) => ({
+      valor: (o.valor as number | null) ?? null,
+      created_at: (o.created_at as string | null) ?? null,
+      ga_client_id: extractLeadClientId(o.leads),
+    })),
+    leads: leadsData.map((l) => ({
+      valor_estimado: (l.valor_estimado as number | null) ?? null,
+      created_at: (l.created_at as string | null) ?? null,
+      ga_client_id:
+        typeof l.ga_client_id === "string" && l.ga_client_id ? l.ga_client_id : null,
+    })),
   };
 }

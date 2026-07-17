@@ -39,6 +39,7 @@ import {
 import Logo from "../components/Logo";
 import { brandConfig } from "../lib/branding";
 import { SeoHead, generateLocalBusinessSchema } from "../components/SeoHead";
+import { LeadCaptureForm } from "../components/LeadCaptureForm";
 
 // Número de WhatsApp comercial dos CTAs: o número aprovado na Meta e conectado
 // ao painel via API Oficial. Ajustar aqui se o canal de atendimento mudar.
@@ -589,6 +590,23 @@ export default function LandingPage() {
                   </div>
                 </details>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ANÁLISE GRATUITA — formulário web (captura o lead + o GA4 client_id) */}
+        <section id="analise-gratuita" className="py-16 md:py-24">
+          <div className="mx-auto max-w-xl px-4">
+            <div className="rounded-3xl border border-white/5 bg-card/40 p-8 md:p-10">
+              <h2 className="text-2xl md:text-3xl font-bold tracking-tight mb-2">
+                Peça sua análise gratuita
+              </h2>
+              <p className="text-muted-foreground text-sm mb-6">
+                Deixe seu nome e WhatsApp — a gente olha a sua presença digital e te
+                mostra, sem compromisso, o que dá pra melhorar pra você ser encontrado e
+                fechar mais.
+              </p>
+              <LeadCaptureForm />
             </div>
           </div>
         </section>
