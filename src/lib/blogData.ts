@@ -904,6 +904,49 @@ Para captar clientes dispostos a investir pesado na aprovação dos seus casos, 
 
 Nesse mercado de alto valor (High Ticket), o site, a página de análise e o fluxo de e-mails de nutrição valem o seu peso em ouro. Confiança é tudo.
     `
+  },
+  {
+    slug: "estrutura-de-vendas-nutricionista",
+    title: "Nutricionista, o seu problema não é competência, é estrutura.",
+    excerpt: "Você atende bem, mas o site parece amador, os leads somem no WhatsApp e a agenda depende de indicação. Descubra a estrutura de vendas que muda o jogo.",
+    date: "2026-07-18",
+    author: "Leonardo Brasil",
+    authorAvatar: "/images/leo-avatar.jpg",
+    category: "Nutrição",
+    imageUrl: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=1200&auto=format&fit=crop",
+    content: `
+A rotina de uma nutricionista de excelência costuma seguir um padrão frustrante: você investe anos em graduação, pós-graduação, cursos de extensão e especializações. Você domina a fisiologia, a prescrição dietética e entrega resultados incríveis para quem senta na sua frente. 
+
+Porém, no fim do mês, quando você olha para o caixa do consultório, a conta não fecha. A agenda tem buracos e a captação de pacientes particulares de alto ticket parece um mistério indecifrável.
+
+Se você se identifica com esse cenário, eu preciso te dizer uma verdade incômoda, mas libertadora: **Nutricionista, o seu problema não é competência, é estrutura comercial.**
+
+### Você atende bem, mas os bastidores são caóticos
+
+Muitas profissionais tentam resolver a falta de pacientes fazendo mais um curso clínico ou postando dicas de receitas fit no Instagram todos os dias. Mas o gargalo que trava o seu crescimento não está na qualidade da sua dieta, está nos três pontos cegos da sua operação:
+
+1. **O seu site parece amador:** Quando um paciente recebe a sua indicação, a primeira coisa que ele faz é jogar o seu nome no Google. Se ele não encontra um site, ou encontra uma página lenta, confusa e que parece ter sido feita há dez anos, a percepção de autoridade despenca. O paciente corporativo, disposto a pagar o preço justo pela sua consulta, julga o seu profissionalismo pela sua embalagem digital.
+2. **Os leads somem no WhatsApp:** Alguém clica no link da sua bio e pergunta o valor da consulta. Você (ou sua secretária) demora algumas horas para responder e manda um texto longo com a tabela de preços. O paciente visualiza e nunca mais responde. O seu WhatsApp não tem um roteiro consultivo nem um sistema de acompanhamento (*follow-up*). Você está queimando oportunidades reais todos os dias.
+3. **A dependência perigosa da indicação:** Viver de "boca a boca" é ótimo para o ego, mas terrível para a previsibilidade do seu negócio. Se chove muito, se é feriado prolongado ou se a economia oscila, as indicações param. Você não tem controle nenhum sobre quando o próximo paciente vai chegar.
+
+### A Estrutura de Vendas que muda o jogo
+
+O antídoto para a montanha-russa financeira do consultório não é "fazer dancinhas" ou vender dietas prontas. O antídoto é construir uma máquina de vendas passiva e profissional. 
+
+Como funciona essa estrutura na prática? 
+
+- **Presença Cirúrgica no Google:** Em vez de falar para quem não quer ouvir, nós posicionamos o seu consultório para ser encontrado por quem já decidiu que precisa de ajuda. Quando alguém digitar "Nutricionista esportiva perto de mim" ou "Nutricionista bariátrica", é o seu nome que vai aparecer no topo.
+- **Uma Página de Alta Conversão:** Substituímos o "link na bio" genérico por uma *Landing Page* projetada com um único objetivo: transformar visitantes em consultas agendadas. Sem distrações, com a sua metodologia clara, provas sociais fortes e um botão de agendamento sem atrito.
+- **WhatsApp Organizado e CRM:** Chega de perder pacientes no vácuo do WhatsApp. Implementamos um processo onde cada contato vira uma oportunidade em um painel visual (CRM). Se o lead não fechou hoje, o sistema avisa para você entrar em contato na semana que vem. Você passa a ter controle total sobre quem chega e quem fecha.
+
+### Menos achismo, mais processo
+
+A medicina e a nutrição são baseadas em protocolos, exames e evidências. A gestão do seu consultório deveria seguir a mesma lógica. 
+
+Quando você tem um funil comercial estruturado, o crescimento deixa de ser uma questão de sorte ou de algoritmo e passa a ser matemática pura. Você sabe exatamente quantos visitantes entraram na sua página, quantos chamaram no WhatsApp e quantos agendaram a consulta. Sem achismos, apenas processos replicáveis.
+
+A sua competência clínica já é incontestável. Agora, chegou a hora de dar ao seu consultório uma estrutura à altura do seu talento.
+    `
   }
 ];
 
