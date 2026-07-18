@@ -35,6 +35,30 @@ function getGa4ClientId(): Promise<string> {
   });
 }
 
+function getCookieValue(name: string) {
+  const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const match = document.cookie.match(new RegExp(`(?:^|; )${escapedName}=([^;]*)`));
+  return match ? decodeURIComponent(match[1]) : "";
+}
+
+function getMetaFbc() {
+  const existing = getCookieValue("_fbc");
+  if (existing) return existing;
+
+  const fbclid = new URLSearchParams(window.location.search).get("fbclid");
+  if (!fbclid) return "";
+
+  return `fb.1.${Date.now()}.${fbclid}`;
+}
+
+function createMetaEventId() {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return `lead_${crypto.randomUUID()}`;
+  }
+
+  return `lead_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+}
+
 export function LeadCaptureForm() {
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
@@ -47,6 +71,7 @@ export function LeadCaptureForm() {
     setStatus("sending");
     try {
       const gaClientId = await getGa4ClientId();
+      const metaEventId = createMetaEventId();
       const baseUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined;
       const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
       if (!baseUrl) throw new Error("VITE_SUPABASE_URL ausente");
@@ -61,6 +86,11 @@ export function LeadCaptureForm() {
           nome,
           telefone,
           ga_client_id: gaClientId,
+          meta_event_id: metaEventId,
+          meta_fbp: getCookieValue("_fbp"),
+          meta_fbc: getMetaFbc(),
+          event_source_url: window.location.href,
+          user_agent: navigator.userAgent,
           website: honeypot,
         }),
       });
@@ -68,7 +98,7 @@ export function LeadCaptureForm() {
       // O formulário é a fonte LIMPA de generate_lead (lead real + client_id).
       // Os cliques de WhatsApp usam whatsapp_click (observação), não este evento.
       trackEvent("generate_lead", { method: "form" });
-      trackMetaEvent("Lead", { method: "form" });
+      trackMetaEvent("Lead", { method: "form" }, { eventID: metaEventId });
       setStatus("done");
     } catch (error) {
       console.error("[LeadCaptureForm] envio falhou", error);

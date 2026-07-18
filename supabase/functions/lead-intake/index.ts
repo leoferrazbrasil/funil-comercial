@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.110.0";
+import { buildMetaLeadEvent, sendMetaLeadEvent } from "./capi.ts";
 
 // Intake público de leads do formulário web. Grava um lead com o GA4 client_id
 // capturado no navegador (para atribuição de conversões offline no GA4). Usa
@@ -18,6 +19,16 @@ const json = (body: unknown, status = 200) =>
   });
 
 const asString = (v: unknown) => (typeof v === "string" && v.trim() ? v.trim() : "");
+
+function getClientIp(req: Request) {
+  const forwardedFor = req.headers.get("x-forwarded-for") ?? "";
+  return (
+    req.headers.get("cf-connecting-ip") ??
+    req.headers.get("x-real-ip") ??
+    forwardedFor.split(",")[0]?.trim() ??
+    ""
+  );
+}
 
 // Telefone BR: só dígitos, garante DDI 55.
 function normalizePhone(raw: string): string {
@@ -47,6 +58,11 @@ Deno.serve(async (req) => {
   const nome = asString(payload["nome"]);
   const telefone = normalizePhone(asString(payload["telefone"]));
   const gaClientId = asString(payload["ga_client_id"]);
+  const metaEventId = asString(payload["meta_event_id"]);
+  const metaFbp = asString(payload["meta_fbp"]);
+  const metaFbc = asString(payload["meta_fbc"]);
+  const eventSourceUrl = asString(payload["event_source_url"]);
+  const userAgent = asString(payload["user_agent"]) || req.headers.get("user-agent") || "";
 
   if (!nome || telefone.length < 12) {
     return json({ error: "Informe nome e um WhatsApp válido." }, 422);
@@ -94,6 +110,37 @@ Deno.serve(async (req) => {
   if (insert.error) {
     console.error("[lead-intake] insert falhou", insert.error);
     return json({ error: "Não foi possível registrar. Tente novamente." }, 500);
+  }
+
+  const metaPixelId = Deno.env.get("META_PIXEL_ID") ?? "1627145085498933";
+  const metaAccessToken = Deno.env.get("META_CAPI_ACCESS_TOKEN") ?? "";
+  const metaApiVersion = Deno.env.get("META_GRAPH_API_VERSION") ?? "v25.0";
+  const metaTestEventCode = Deno.env.get("META_CAPI_TEST_EVENT_CODE") ?? "";
+
+  if (metaAccessToken && metaEventId) {
+    try {
+      const metaEvent = await buildMetaLeadEvent({
+        eventId: metaEventId,
+        eventSourceUrl:
+          eventSourceUrl || req.headers.get("referer") || "https://funilcomercial.com/",
+        fbc: metaFbc,
+        fbp: metaFbp,
+        ipAddress: getClientIp(req),
+        name: nome,
+        phone: telefone,
+        userAgent,
+      });
+
+      await sendMetaLeadEvent({
+        accessToken: metaAccessToken,
+        apiVersion: metaApiVersion,
+        event: metaEvent,
+        pixelId: metaPixelId,
+        testEventCode: metaTestEventCode || undefined,
+      });
+    } catch (error) {
+      console.error("[lead-intake] meta capi falhou", error);
+    }
   }
 
   return json({ ok: true, id: insert.data?.id ?? null });

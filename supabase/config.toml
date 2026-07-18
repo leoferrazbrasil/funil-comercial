@@ -8,9 +8,9 @@
 # two functions makes them publicly reachable; each still authenticates the
 # caller internally (FUNIL_WEBHOOK_SECRET / Z-API instanceId checks).
 #
-# Every other function is intentionally OMITTED here, so it keeps the secure
-# default (verify_jwt = true). whatsapp-manager and whatsapp-send are always
-# invoked from the browser WITH the signed-in user's JWT and must stay protected.
+# Functions omitted here keep the secure default (verify_jwt = true).
+# whatsapp-manager and whatsapp-send are always invoked from the browser WITH
+# the signed-in user's JWT and must stay protected.
 
 project_id = "juvwfxnlusrnvcarkrmc"
 
@@ -25,6 +25,11 @@ verify_jwt = false
 # Runner de campanhas: chamado pelo Supabase Cron (x-campaign-secret) e pelo
 # front (JWT do usuário). Autentica internamente.
 [functions.campaign-runner]
+verify_jwt = false
+
+# Public website lead form intake. The function validates payload/honeypot and
+# uses service-role internally to write the default owner's lead.
+[functions.lead-intake]
 verify_jwt = false
 
 # Admin cria vendedor: chamado pelo navegador com JWT do admin.

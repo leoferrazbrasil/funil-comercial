@@ -28,10 +28,15 @@ export function trackEvent(
  */
 export function trackMetaEvent(
   eventName: string,
-  eventParams?: Record<string, string | number | boolean>
+  eventParams?: Record<string, string | number | boolean>,
+  eventOptions?: Record<string, string | number | boolean>
 ) {
   if (typeof window !== "undefined" && window.fbq) {
     try {
+      if (eventOptions) {
+        window.fbq("track", eventName, eventParams, eventOptions);
+        return;
+      }
       window.fbq("track", eventName, eventParams);
     } catch (e) {
       console.warn("Meta Pixel event failed", e);

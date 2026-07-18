@@ -33,6 +33,20 @@ describe("analytics tracking", () => {
     expect(fbq).toHaveBeenCalledWith("track", "Lead", { method: "form" });
   });
 
+  it("passes Meta Pixel event options for browser and server deduplication", () => {
+    const fbq = vi.fn();
+    vi.stubGlobal("window", { fbq });
+
+    trackMetaEvent("Lead", { method: "form" }, { eventID: "lead-test-1" });
+
+    expect(fbq).toHaveBeenCalledWith(
+      "track",
+      "Lead",
+      { method: "form" },
+      { eventID: "lead-test-1" },
+    );
+  });
+
   it("keeps custom GA4 lead generation separate from WhatsApp click observation", () => {
     const gtag = vi.fn();
     vi.stubGlobal("window", { gtag });
