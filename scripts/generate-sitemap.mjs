@@ -21,6 +21,15 @@ const PUBLIC_ROUTES = [
   '/site-para-nutricionistas',
   '/site-para-psicologas',
   '/cidades-atendidas',
+  '/estrutura-de-vendas-para-nutricionistas',
+  '/estrutura-de-vendas-para-psicologas',
+  '/estrutura-de-vendas-para-dentistas',
+  '/estrutura-de-vendas-para-terapeutas',
+  '/estrutura-de-vendas-para-massoterapeutas',
+  '/estrutura-de-vendas-para-advogados',
+  '/estrutura-de-vendas-para-arquitetos',
+  '/estrutura-de-vendas-para-contabilidade',
+  '/estrutura-de-vendas-para-estetica',
   '/blog'
 ];
 
