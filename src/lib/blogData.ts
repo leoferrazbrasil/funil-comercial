@@ -82,7 +82,7 @@ E não se esqueça: a consistência do seu Nome, Endereço e Telefone (conhecido
     category: "Saúde",
     imageUrl: "https://images.unsplash.com/photo-1576091160550-2173ff9e5e3c?q=80&w=1200&auto=format&fit=crop",
     content: `
-O mercado da saúde é altamente concorrido. Médicos, dentistas e fisioterapeutas muitas vezes investem milhares de reais em agências de marketing e se frustram quando o retorno é apenas um aumento nas "curtidas" do Instagram, mas zero agendamentos particulares no WhatsApp da recepção.
+O mercado da saúde é altamente concorrido. Médicos, [dentistas](/estrutura-de-vendas-para-dentistas) e fisioterapeutas muitas vezes investem milhares de reais em agências de marketing e se frustram quando o retorno é apenas um aumento nas "curtidas" do Instagram, mas zero agendamentos particulares no WhatsApp da recepção.
 
 Se você está passando por isso, o problema não é a falta de pacientes. O problema é que você está invisível no momento em que eles precisam de você. Aqui estão os três motivos clássicos:
 
@@ -329,7 +329,7 @@ E claro, ambas as plataformas devem direcionar o cliente para uma **Landing Page
     category: "Odontologia",
     imageUrl: "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?q=80&w=1200&auto=format&fit=crop",
     content: `
-O mercado odontológico em São Paulo é um dos mais competitivos do mundo. Em bairros como Pinheiros, Moema ou Tatuapé, há uma clínica a cada quarteirão. O grande problema é que a maioria absoluta dessas clínicas comete um erro fatal de posicionamento: elas tentam vender para todo mundo e acabam não vendendo para ninguém.
+O mercado odontológico em São Paulo é um dos mais competitivos do mundo. Em bairros como Pinheiros, Moema ou Tatuapé, há uma clínica a cada quarteirão. O grande problema é que a maioria absoluta dessas clínicas comete um erro fatal de posicionamento em sua [estrutura de vendas](/estrutura-de-vendas-para-dentistas): elas tentam vender para todo mundo e acabam não vendendo para ninguém.
 
 ### A Dor do Convênio
 
@@ -438,7 +438,7 @@ Quando a pessoa clica no anúncio do Google, entra no site, lê suas qualificaç
     content: `
 A dor é comum a quase todas as psicólogas que começam a atender em Belo Horizonte (MG) e região: a dependência dos planos de saúde. No início, o convênio parece uma solução para preencher horários, mas rapidamente se torna uma armadilha. O repasse é irrisório e a sobrecarga mental das sessões em massa leva ao burnout.
 
-Para conseguir cobrar R$ 200, R$ 300 ou R$ 400 por sessão, a psicóloga precisa se posicionar onde estão os pacientes dispostos a pagar pela saúde mental.
+Para conseguir cobrar R$ 200, R$ 300 ou R$ 400 por sessão, a psicóloga precisa ter uma [estrutura de vendas focada em psicólogas](/estrutura-de-vendas-para-psicologas) para se posicionar onde estão os pacientes dispostos a pagar pela saúde mental.
 
 ### A Prova de que o Google é a Melhor Sala de Espera
 
