@@ -177,7 +177,7 @@ A **Funil Comercial** possui uma tecnologia proprietária de SEO Programático c
     slug: "provimento-205-2021-oab",
     title: "O que é o Provimento 205/2021 da OAB?",
     description: "Entenda o Provimento 205/2021 da OAB que regulamenta o marketing jurídico no Brasil e permite a captação de clientes de forma ética no Google.",
-    content: \`
+    content: `
 O **Provimento nº 205/2021** da Ordem dos Advogados do Brasil (OAB) é o marco regulatório que dita as regras do **marketing jurídico** no país. Ele substituiu regras mais antigas e trouxe clareza sobre o que é ou não permitido na publicidade para advogados.
 
 ### O Fim do "Achismo" no Marketing Jurídico
@@ -189,14 +189,14 @@ Isso significa que você não pode fazer anúncios do tipo *"Divórcio rápido, 
 A grande virada de chave para os escritórios de advocacia foi a liberação expressa do uso do Google Ads. Como o Google é focado na **intenção de busca** (o cliente procura pela solução jurídica), o advogado que aparece no topo da pesquisa com uma [Estrutura de Vendas para Advogados](/estrutura-de-vendas-para-advogados) está, de forma totalmente ética, informando ao cliente que possui a qualificação para ajudá-lo. 
 
 A captação ativa e agressiva (ligações frias) continua proibida, mas a **captação passiva e qualificada** através da rede de pesquisa é a maior fonte de contratos de alto valor (High-Ticket) na advocacia moderna.
-    \`,
+    `,
     relatedTermSlugs: ["lead", "funil-de-vendas"]
   },
   {
     slug: "vgv-arquitetura",
     title: "O que é VGV (Valor Geral de Vendas) na Arquitetura?",
     description: "Saiba o que é VGV e como arquitetos e engenheiros utilizam essa métrica para buscar clientes B2B de alto padrão.",
-    content: \`
+    content: `
 O **VGV (Valor Geral de Vendas)** é uma métrica muito comum no mercado imobiliário e na construção civil, que representa o valor total estimado que um empreendimento irá gerar após todas as suas unidades serem vendidas. 
 
 No entanto, no mercado de **Arquitetura e Engenharia**, o termo foi adaptado para representar o **tamanho e a rentabilidade do projeto** ou contrato que o escritório está fechando.
@@ -208,14 +208,14 @@ Muitos escritórios de arquitetura focam a sua energia em ganhar seguidores no I
 Para aumentar o faturamento sem esgotar a equipe, o escritório precisa construir uma [Estrutura de Vendas para Arquitetos](/estrutura-de-vendas-para-arquitetos) focada em interceptar demandas B2B (empresas) ou clientes residenciais de alto padrão no Google. 
 
 Quando um incorporador busca por *"arquiteto para laudo técnico"* ou *"projeto de retrofit comercial"*, ele não está no Instagram. Ele está no Google, com o orçamento aprovado, procurando um escritório sólido para fechar um contrato de **alto VGV**.
-    \`,
+    `,
     relatedTermSlugs: ["cac", "ltv"]
   },
   {
     slug: "migracao-tributaria",
     title: "O que é Migração Tributária (Contabilidade B2B)?",
     description: "Entenda o conceito de Migração Tributária e por que este é o momento de maior faturamento para escritórios contábeis estruturados.",
-    content: \`
+    content: `
 A **Migração Tributária** ocorre quando uma empresa decide mudar o seu enquadramento fiscal (ex: do Simples Nacional para o Lucro Presumido, ou do Lucro Presumido para o Lucro Real) buscando eficiência, ou quando simplesmente decide **trocar de escritório de contabilidade** por falhas na gestão anterior.
 
 ### A Dor da Troca de Contador
@@ -225,14 +225,14 @@ Para o empresário, trocar de contabilidade é comparado a "fazer uma cirurgia".
 Escritórios de contabilidade que brigam por clientes nas redes sociais acabam captando apenas MEIs e empresas iniciantes, com honorários irrisórios. 
 
 Os grandes escritórios utilizam uma [Estrutura de Vendas para Contabilidade](/estrutura-de-vendas-para-contabilidade) focada em tráfego de fundo de funil. Eles anunciam no Google Ads exatamente para empresários que estão pesquisando *"trocar de contabilidade em São Paulo"*. Quando esse lead qualificado clica, ele encontra uma página projetada para **remover o atrito** da migração, garantindo uma transição segura e assumindo a responsabilidade perante o fisco.
-    \`,
+    `,
     relatedTermSlugs: ["lead", "funil-de-vendas"]
   },
   {
     slug: "ltv-estetica-avancada",
     title: "O que é LTV em Clínicas de Estética Avançada?",
     description: "Descubra como o Lifetime Value (LTV) muda o jogo das clínicas de estética que focam em procedimentos premium e fidelização.",
-    content: \`
+    content: `
 Na estética, o **LTV (Lifetime Value)** mede quanto dinheiro uma paciente deixa na clínica ao longo de todo o tempo em que ela frequenta o estabelecimento. 
 
 Enquanto a maioria das clínicas se desespera focando exclusivamente no **CAC** (Custo de Aquisição, ou seja, quanto custou para atrair a paciente através do Meta Ads), as clínicas que escalam o faturamento entendem que a verdadeira margem de lucro está na retenção e no *up-sell* (vender procedimentos mais caros para quem já confia no profissional).
@@ -245,7 +245,7 @@ Para aumentar o LTV, a clínica precisa investir em uma [Estrutura de Vendas par
 1. **Atrair pela dor específica** (pesquisas no Google por Bioestimuladores, Fios de PDO ou Laser).
 2. **Filtrar os curiosos** com um CRM que gerencia o WhatsApp, impedindo que a recepção perca tempo com quem só busca preço.
 3. **Oferecer protocolos anuais** para o paciente que foi bem atendido, garantindo a recorrência e dobrando o LTV daquele contato.
-    \`,
+    `,
     relatedTermSlugs: ["ltv", "cac", "crm"]
   }
 ];
