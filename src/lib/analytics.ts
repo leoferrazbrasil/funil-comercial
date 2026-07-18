@@ -38,3 +38,12 @@ export function trackMetaEvent(
     }
   }
 }
+
+export function trackWhatsappClick(
+  eventParams?: Record<string, string | number | boolean>
+) {
+  const params = { method: "whatsapp", ...eventParams };
+
+  trackEvent("whatsapp_click", params);
+  trackMetaEvent("Contact", params);
+}

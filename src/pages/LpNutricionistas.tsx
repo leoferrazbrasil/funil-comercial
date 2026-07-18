@@ -3,6 +3,7 @@ import { ArrowRight, Globe, Smartphone, MessageCircle, BarChart3, ShieldCheck } 
 import Logo from "../components/Logo";
 import { SeoHead } from "../components/SeoHead";
 import { LeadCaptureForm } from "../components/LeadCaptureForm";
+import { trackWhatsappClick } from "../lib/analytics";
 
 const WHATSAPP_NUMBER = "5551996737359";
 const WHATSAPP_MESSAGE = "Olá! Vim pela página da Estrutura de Vendas para Nutricionistas e gostaria de fazer o diagnóstico gratuito do meu consultório.";
@@ -25,6 +26,9 @@ export default function LpNutricionistas() {
           </Link>
           <a
             href={whatsappLink}
+            onClick={() =>
+              trackWhatsappClick({ source: "estrutura_vendas_nutricionistas" })
+            }
             target="_blank"
             rel="noopener noreferrer"
             className="hidden items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-semibold text-primary transition-colors hover:bg-primary/20 sm:flex"
@@ -51,6 +55,9 @@ export default function LpNutricionistas() {
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <a
                   href={whatsappLink}
+                  onClick={() =>
+                    trackWhatsappClick({ source: "estrutura_vendas_nutricionistas" })
+                  }
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-primary px-8 py-4 text-base font-bold text-primary-foreground transition-all hover:bg-primary/90 shadow-lg shadow-primary/25"
@@ -181,6 +188,9 @@ export default function LpNutricionistas() {
             </p>
             <a
               href={whatsappLink}
+              onClick={() =>
+                trackWhatsappClick({ source: "estrutura_vendas_nutricionistas" })
+              }
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 rounded-xl bg-background px-8 py-5 text-lg font-bold text-foreground transition-all hover:scale-105 hover:opacity-90 shadow-xl"
