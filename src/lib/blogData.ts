@@ -947,6 +947,47 @@ Quando você tem um funil comercial estruturado, o crescimento deixa de ser uma 
 
 A sua competência clínica já é incontestável. Agora, chegou a hora de dar ao seu consultório uma estrutura à altura do seu talento.
     `
+  },
+  {
+    slug: "panfletagem-instagram-vs-captacao-b2b",
+    title: "A diferença entre panfletagem no Instagram e Captação B2B (Para Profissionais Liberais)",
+    excerpt: "Descubra por que o seu escritório ou clínica tem muitos seguidores, mas os contratos de alto valor não fecham. A transição do marketing de vaidade para o Funil de Vendas.",
+    date: "2026-07-18",
+    author: "Leonardo Brasil",
+    authorAvatar: "/images/leo-avatar.jpg",
+    category: "Estratégia",
+    imageUrl: "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=1200&auto=format&fit=crop",
+    content: `
+Muitos profissionais liberais de alto nível — advogados renomados, arquitetos experientes, esteticistas com equipamentos de ponta — sofrem da mesma síndrome: **o excesso de seguidores e a falta de contratos High-Ticket.**
+
+Você investe em uma agência de marketing, faz reuniões de pauta, grava vídeos e o resultado é uma bela "panfletagem digital". O engajamento aumenta, mas quem chama no WhatsApp só quer saber de consultas gratuitas, tirar dúvidas ou pedir orçamentos baratos. O seu cliente ideal, aquele disposto a pagar pelo seu conhecimento, não está vindo.
+
+### Por que a "Panfletagem de Luxo" não converte?
+
+O Instagram é uma rede de atenção e desejo. Ele é fantástico para mostrar portfólio. Porém, a captação de serviços complexos (High-Ticket) depende de **Intenção de Compra** e **Autoridade**. 
+
+Quando uma empresa busca uma reestruturação tributária, o CEO não está rolando o feed do Instagram. Quando um incorporador precisa de um laudo técnico, ele não escolhe o escritório pelo Reels mais criativo. Eles vão ao Google, buscam por soluções e exigem profissionalismo.
+
+### A Transição para a Captação B2B e High-Ticket
+
+A diferença entre a panfletagem e a captação real está na **Estrutura de Vendas**. Você precisa parar de interromper as pessoas e começar a ser encontrado quando elas já precisam de você.
+
+Nós mapeamos os quatro principais nichos que mais sofrem com isso, e desenhamos a solução técnica para cada um:
+
+#### 1. A Advocacia e a OAB
+A OAB proíbe a mercantilização. Fazer posts agressivos no Instagram pode gerar problemas éticos. No entanto, o Google permite a **captação passiva e ética**. O cliente pesquisa a própria dor ("advogado trabalhista"), encontra uma [Estrutura de Vendas para Advogados](/estrutura-de-vendas-para-advogados) e solicita a reunião. Simples, sólido e dentro da lei.
+
+#### 2. A Arquitetura e o VGV
+Arquitetos ganham milhares de curtidas em seus renders 3D, mas o público que interage geralmente não tem caixa para executar a obra. Para escalar, é preciso interceptar o cliente corporativo (B2B) através de campanhas focadas no Google, levando-os para uma [Estrutura de Vendas para Arquitetos](/estrutura-de-vendas-para-arquitetos) que venda segurança técnica e histórico, não apenas fotos bonitas.
+
+#### 3. A Contabilidade e a Guerra de Preços
+O escritório contábil que depende de redes sociais acaba atraindo a base da pirâmide: MEIs em busca de serviços gratuitos ou a contabilidade mais barata possível. As grandes contas (Lucro Real e Presumido) migram silenciosamente. Para capturá-las, o contador precisa de uma [Estrutura de Vendas para Contabilidade](/estrutura-de-vendas-para-contabilidade) focada em tráfego de fundo de funil (intenção de migração) e um CRM para organizar o longo ciclo de vendas.
+
+#### 4. A Estética e o Curioso
+Na estética avançada, o tráfego do Instagram inunda o WhatsApp da clínica. A secretária passa o dia respondendo *"qual o valor?"* e ninguém agenda. O problema não é a falta de lead, é o excesso de curiosos. Implementar uma [Estrutura de Vendas para Clínicas de Estética](/estrutura-de-vendas-para-estetica) significa criar um funil que qualifica a vontade da paciente e automatiza a triagem.
+
+O mercado digital amadureceu. Deixe a panfletagem para os amadores e construa o **Fichário Técnico** do seu negócio.
+    `
   }
 ];
 
