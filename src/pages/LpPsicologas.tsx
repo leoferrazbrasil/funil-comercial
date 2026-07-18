@@ -9,7 +9,7 @@ const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent
 
 export default function LpPsicologas() {
   return (
-    <div className="min-h-screen bg-background font-sans text-foreground selection:bg-primary/30">
+    <div data-theme="dark" className="min-h-screen bg-background font-sans text-foreground selection:bg-primary/30">
       <SeoHead
         title="Estrutura de Captação para Psicólogos | Agenda Previsível e Ética"
         description="Você é excelente na clínica, mas o seu site não transmite autoridade e a agenda depende de indicação? Montamos a máquina de atração do seu consultório."
@@ -164,7 +164,7 @@ export default function LpPsicologas() {
               href={whatsappLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-background px-8 py-5 text-lg font-bold text-foreground transition-all hover:scale-105 hover:bg-white shadow-xl"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-background px-8 py-5 text-lg font-bold text-foreground transition-all hover:scale-105 hover:opacity-90 shadow-xl"
             >
               <Smartphone size={24} />
               Falar com Especialista no WhatsApp

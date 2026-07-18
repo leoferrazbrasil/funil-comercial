@@ -9,7 +9,7 @@ const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent
 
 export default function LpMassoterapeutas() {
   return (
-    <div className="min-h-screen bg-background font-sans text-foreground selection:bg-primary/30">
+    <div data-theme="dark" className="min-h-screen bg-background font-sans text-foreground selection:bg-primary/30">
       <SeoHead
         title="Captação de Pacientes para Massoterapeutas | Agenda Previsível"
         description="A sua maca vive com horários vazios ou você perde pacientes por causa de preço? Montamos a estrutura comercial focada em fidelizar e vender tratamentos."
@@ -164,7 +164,7 @@ export default function LpMassoterapeutas() {
               href={whatsappLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-background px-8 py-5 text-lg font-bold text-foreground transition-all hover:scale-105 hover:bg-white shadow-xl"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-background px-8 py-5 text-lg font-bold text-foreground transition-all hover:scale-105 hover:opacity-90 shadow-xl"
             >
               <Smartphone size={24} />
               Falar com Especialista em Captação

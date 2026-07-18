@@ -9,7 +9,7 @@ const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent
 
 export default function LpTerapeutas() {
   return (
-    <div className="min-h-screen bg-background font-sans text-foreground selection:bg-primary/30">
+    <div data-theme="dark" className="min-h-screen bg-background font-sans text-foreground selection:bg-primary/30">
       <SeoHead
         title="Captação de Pacientes para Terapeutas | Mais Profissionalismo"
         description="Você transforma vidas, mas o seu perfil parece amador e a agenda está vazia? Montamos a estrutura digital que transmite a verdadeira autoridade do seu método terapêutico."
@@ -164,7 +164,7 @@ export default function LpTerapeutas() {
               href={whatsappLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-background px-8 py-5 text-lg font-bold text-foreground transition-all hover:scale-105 hover:bg-white shadow-xl"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-background px-8 py-5 text-lg font-bold text-foreground transition-all hover:scale-105 hover:opacity-90 shadow-xl"
             >
               <HeartHandshake size={24} />
               Falar com Especialista em Captação

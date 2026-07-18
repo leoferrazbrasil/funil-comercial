@@ -10,7 +10,7 @@ const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent
 
 export default function LpNutricionistas() {
   return (
-    <div className="min-h-screen bg-background font-sans text-foreground selection:bg-primary/30">
+    <div data-theme="dark" className="min-h-screen bg-background font-sans text-foreground selection:bg-primary/30">
       <SeoHead
         title="Estrutura de Vendas para Nutricionistas | Pare de Depender de Indicação"
         description="Você atende bem, mas o site parece amador e os leads somem no WhatsApp? Montamos a estrutura de vendas do seu consultório de nutrição de ponta a ponta."
@@ -183,7 +183,7 @@ export default function LpNutricionistas() {
               href={whatsappLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-background px-8 py-5 text-lg font-bold text-foreground transition-all hover:scale-105 hover:bg-white shadow-xl"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-background px-8 py-5 text-lg font-bold text-foreground transition-all hover:scale-105 hover:opacity-90 shadow-xl"
             >
               <Smartphone size={24} />
               Falar com Especialista no WhatsApp
