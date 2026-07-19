@@ -256,26 +256,27 @@ function TabFormatos() {
         <h3 className="text-2xl font-bold border-b border-white/10 pb-2">Margens de Segurança (Safe Zones)</h3>
         <p className="text-sm text-muted-foreground mb-4">Não permita que o grid do Instagram (que exibe apenas 1:1) corte partes críticas das Headlines em artes 4:5.</p>
         
-        <div className="rounded-3xl border border-white/5 bg-card/30 p-8 flex justify-center">
-          {/* Safezone Visualizer */}
-          <div className="w-[300px] h-[375px] bg-[#09090B] border border-white/20 relative rounded-md overflow-hidden flex items-center justify-center">
+        <div className="rounded-3xl border border-white/5 bg-card/30 p-4 sm:p-8 flex justify-center">
+          {/* Safezone Visualizer — largura fluida (max 300px) com alturas internas em %,
+              para escalar sem cortar em telas estreitas (era w-[300px]/h-[375px] fixos). */}
+          <div className="w-full max-w-[300px] aspect-[4/5] bg-[#09090B] border border-white/20 relative rounded-md overflow-hidden flex items-center justify-center">
             {/* 1:1 Safe zone indicator */}
-            <div className="w-full h-[300px] border-y border-dashed border-amber-500/50 bg-amber-500/5 relative flex flex-col justify-between p-6">
+            <div className="w-full h-[80%] border-y border-dashed border-amber-500/50 bg-amber-500/5 relative flex flex-col justify-between p-6">
                <div className="w-full h-8 bg-white/10 rounded flex items-center px-2"><span className="text-[10px] text-white">Headline Principal</span></div>
                <div className="w-full h-24 bg-white/5 rounded mt-2 border border-white/10 flex items-center justify-center text-[10px] text-white/50">Elemento Central</div>
                <div className="flex justify-between items-end mt-auto">
                  <Logo variant="icon-only" iconSize={16}/>
                  <div className="text-[8px] bg-primary text-black px-2 py-1 rounded-sm font-bold">CTA</div>
                </div>
-               
+
                <div className="absolute right-2 top-2 text-[8px] text-amber-500 font-mono">Área segura do Feed (1:1)</div>
             </div>
-            
+
             {/* Danger zones */}
-            <div className="absolute top-0 w-full h-[37.5px] bg-red-500/20 border-b border-red-500/50 flex items-center justify-center">
+            <div className="absolute top-0 w-full h-[10%] bg-red-500/20 border-b border-red-500/50 flex items-center justify-center">
                <span className="text-[8px] text-red-300 font-mono text-center">Área de corte do feed (não coloque texto vital)</span>
             </div>
-            <div className="absolute bottom-0 w-full h-[37.5px] bg-red-500/20 border-t border-red-500/50 flex items-center justify-center">
+            <div className="absolute bottom-0 w-full h-[10%] bg-red-500/20 border-t border-red-500/50 flex items-center justify-center">
                <span className="text-[8px] text-red-300 font-mono text-center">Área de corte do feed (não coloque texto vital)</span>
             </div>
           </div>

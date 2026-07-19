@@ -71,10 +71,10 @@ export default function AvatarGuidelinesSection() {
           Quase todas as plataformas aplicam uma máscara circular sobre o arquivo de upload. Mantenha uma <strong>margem interna de pelo menos 25%</strong> para evitar que o símbolo seja cortado.
         </p>
 
-        <div className="rounded-3xl border border-white/5 bg-card/30 p-8 md:p-16 flex flex-col md:flex-row items-center justify-center gap-12">
-          
+        <div className="rounded-3xl border border-white/5 bg-card/30 p-4 sm:p-8 md:p-16 flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12">
+
           {/* Diagrama de Safe Zone */}
-          <div className="relative w-64 h-64 border-2 border-white/20 bg-[#09090B] flex items-center justify-center group shrink-0">
+          <div className="relative w-48 h-48 sm:w-64 sm:h-64 border-2 border-white/20 bg-[#09090B] flex items-center justify-center group shrink-0">
             {/* Máscara Circular Hover */}
             <div className="absolute inset-0 border-[3px] border-dashed border-amber-500/50 rounded-full scale-95 opacity-50 transition-all duration-700 group-hover:bg-amber-500/10 group-hover:opacity-100" />
             {/* Grid Helper */}

@@ -570,9 +570,9 @@ export default function BrandbookPage() {
                 </div>
                 <div className="space-y-4">
                   <h3 className="text-xl font-semibold border-b border-white/10 pb-2">Tamanho Mínimo</h3>
-                  <div className="rounded-3xl border border-white/5 bg-card p-8 flex flex-col gap-8 items-center justify-center">
-                    <div className="flex items-center gap-8">
-                      <div className="flex items-center gap-4 border-r border-white/10 pr-8">
+                  <div className="rounded-3xl border border-white/5 bg-card p-6 sm:p-8 flex flex-col gap-8 items-center justify-center">
+                    <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-8">
+                      <div className="flex items-center gap-4 sm:border-r sm:border-white/10 sm:pr-8">
                         <Logo iconSize={24} />
                         <span className="text-xs text-muted-foreground">Digital:<br/>120px Largura</span>
                       </div>
