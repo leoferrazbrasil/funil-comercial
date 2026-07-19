@@ -145,7 +145,12 @@ export default function BrandbookPage() {
       </aside>
 
       {/* MAIN CONTENT */}
-      <main className="flex-1 px-4 pb-24 pt-24 lg:pl-72 lg:pr-8 lg:pt-16">
+      {/* min-w-0: por padrão, um item flex tem min-width:auto e se recusa a
+          encolher abaixo do conteúdo mais largo que existir em QUALQUER
+          descendente (mesmo seções mais abaixo da página) — isso forçava o
+          <main> inteiro a ficar mais largo que a tela, cortando texto em
+          todas as seções (não só a que continha o elemento largo). */}
+      <main className="flex-1 min-w-0 px-4 pb-24 pt-24 lg:pl-72 lg:pr-8 lg:pt-16">
         <div className="mx-auto max-w-4xl space-y-32">
           
           {/* HERO */}
