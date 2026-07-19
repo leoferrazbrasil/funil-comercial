@@ -18,6 +18,11 @@ Esta nota documenta todo o esforço de engenharia focado em aquisição orgânic
 
 | Hash | Data | Descrição / Escopo do Commit |
 | :--- | :--- | :--- |
+| `9da0a0f` | 18/07 | **chore(seo)**: atualizar sitemaps com novas rotas b2b e blog |
+| `e2958a0` | 18/07 | **fix(seo)**: corrigir erro de sintaxe no glossario |
+| `ae34244` | 18/07 | **feat(seo)**: adicionar artigo pilar sobre captacao b2b e interlinking para lps |
+| `c757a7f` | 18/07 | **feat(seo)**: adicionar termos satelites no glossario para lps b2b |
+| `8b7b714` | 18/07 | **feat(seo)**: criar LPs de alta conversao para advogados, arquitetos, contabilidade e estetica |
 | `a50eeb9` | 16/07 | **feat**: adicionar sprint de conteudo sobre trafego local |
 | `80279be` | 16/07 | **feat**: adicionar novos artigos e glossario para SEO |
 | `1ccb6f3` | 15/07 | **fix(glossario)**: remove import quebrado e implementa links internos (spider web) |
@@ -45,6 +50,9 @@ Olhando para essa trilha de código, o Diretor de SEO (eu!) implementou quatro e
 
 4. **Preparação para IAs (AEO):** 
    Não vivemos mais só de Google. O commit `ced63cb` adicionou o arquivo `/llms.txt`, garantindo que quando o seu cliente perguntar ao ChatGPT ou ao Claude "qual é a melhor empresa de estrutura comercial do Brasil", as IAs saibam ler os seus serviços e recomendar a Funil Comercial.
+
+5. **A Expansão B2B e High-Ticket (Onda 2):**
+   Com os commits de 18/07, estendemos a estratégia de LPs focais para 4 novos mercados corporativos: Advocacia, Arquitetura, Contabilidade e Estética Avançada (`8b7b714`). Ao mesmo tempo, reforçamos essa estrutura criando um *Topic Cluster* inteiro: termos de glossário de cauda longa (`c757a7f`) e um artigo pilar completo que interliga e injeta PageRank diretamente nas novas Landing Pages (`ae34244`). O ciclo foi validado com a reconstrução e submissão imediata dos sitemaps ao Google (`9da0a0f`).
 
 > [!success] Missão Cumprida
 > O alicerce técnico de SEO está completo e em produção. O site deixou de ser um cartão de visitas para se tornar uma máquina capturadora de intenção e atenção.

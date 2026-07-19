@@ -320,6 +320,13 @@ export async function createLead(ownerId: string, payload: LeadPayload) {
 
 export async function updateLead(leadId: string, payload: LeadPayload) {
   const supabase = requireSupabase();
+
+  const { data: oldLead } = await supabase
+    .from("leads")
+    .select("status, ga_client_id")
+    .eq("id", leadId)
+    .maybeSingle();
+
   const updatePayload = {
     nome: payload.nome.trim(),
     telefone: normalizePhone(payload.telefone),
@@ -342,6 +349,25 @@ export async function updateLead(leadId: string, payload: LeadPayload) {
     .single();
 
   if (error) throw error;
+
+  // Integração Automática GA4 (Measurement Protocol) para MQLs
+  if (
+    oldLead &&
+    oldLead.status !== "qualificado" &&
+    payload.status === "qualificado" &&
+    oldLead.ga_client_id
+  ) {
+    supabase.functions.invoke("ga4-measurement-protocol", {
+      body: {
+        client_id: oldLead.ga_client_id,
+        event_name: "qualify_lead",
+        value: payload.valor_estimado ?? 0,
+        currency: "BRL",
+        timestamp_micros: String(Date.now() * 1000)
+      }
+    }).catch((err) => console.error("GA4 Error:", err));
+  }
+
   return data as Lead;
 }
 
@@ -374,6 +400,13 @@ export async function updateOpportunity(
   payload: OpportunityPayload,
 ) {
   const supabase = requireSupabase();
+
+  const { data: oldOpp } = await supabase
+    .from("opportunities")
+    .select("etapa, leads(ga_client_id)")
+    .eq("id", opportunityId)
+    .maybeSingle();
+
   const { data, error } = await supabase
     .from("opportunities")
     .update({
@@ -390,6 +423,29 @@ export async function updateOpportunity(
     .single();
 
   if (error) throw error;
+
+  // Integração Automática GA4 (Measurement Protocol) para Vendas
+  const gaClientId = Array.isArray(oldOpp?.leads) 
+    ? (oldOpp?.leads[0] as any)?.ga_client_id 
+    : (oldOpp?.leads as any)?.ga_client_id;
+
+  if (
+    oldOpp &&
+    oldOpp.etapa !== "Ganho" &&
+    payload.etapa === "Ganho" &&
+    gaClientId
+  ) {
+    supabase.functions.invoke("ga4-measurement-protocol", {
+      body: {
+        client_id: gaClientId,
+        event_name: "close_convert_lead",
+        value: payload.valor ?? 0,
+        currency: "BRL",
+        timestamp_micros: String(Date.now() * 1000)
+      }
+    }).catch((err) => console.error("GA4 Error:", err));
+  }
+
   return data as Opportunity;
 }
 

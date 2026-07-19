@@ -52,6 +52,22 @@ Abaixo o registro de cada página criada, sua URL e o foco narrativo para facili
 - **URL SEO:** `/estrutura-de-vendas-para-massoterapeutas`
 - **Foco da Copy:** A dor do "paciente de uma sessão só". A página promete estruturar um CRM de follow-up que converte clientes avulsos em **pacotes de tratamento**, acabando com o espaço ocioso da maca.
 
+### Advogados
+- **URL SEO:** `/estrutura-de-vendas-para-advogados`
+- **Foco da Copy:** Captação ética e passiva pelo Google Ads. Resolvendo a dor da proibição da mercantilização pelo Provimento 205/2021 da OAB, focando em clientes High-Ticket em vez de tirar dúvidas no WhatsApp.
+
+### Arquitetos e Engenheiros
+- **URL SEO:** `/estrutura-de-vendas-para-arquitetos`
+- **Foco da Copy:** O combate à "síndrome do render" no Instagram. Focada em atrair clientes B2B, investidores corporativos e projetos de alto VGV, fugindo das reformas mínimas e baratas.
+
+### Contabilidade
+- **URL SEO:** `/estrutura-de-vendas-para-contabilidade`
+- **Foco da Copy:** A migração tributária sem atrito. A estratégia é parar de brigar por honorários mínimos (MEIs) e construir um funil B2B para contas de Lucro Presumido e Lucro Real que exigem segurança.
+
+### Clínicas de Estética Avançada
+- **URL SEO:** `/estrutura-de-vendas-para-estetica`
+- **Foco da Copy:** Blindar a recepção contra "curiosos de promoção". Foco em implementar CRM para filtrar a busca por preço e priorizar agendamentos de LTV alto (Fios de PDO, Laser, Harmonização).
+
 ---
 
 ## 3. Arquitetura Técnica e Indexação (React + SEO)
@@ -67,6 +83,6 @@ Para garantir que o Googlebot (e outros indexadores) leiam as páginas perfeitam
    - As novas rotas estão configuradas para serem captadas pelo script `scripts/generate-sitemap.mjs` que é engatilhado no processo de build, subindo tudo para o arquivo `public/sitemap.xml`.
 
 ## 4. Próximos Passos (Evolução)
-- Criar backlinks internos (Interlinking) em postagens de Blog direcionando para essas páginas focais (Topic Clusters).
 - Monitorar a taxa de conversão do botão principal (Link direto para o WhatsApp).
-- Continuar expansão para nichos complementares (ex: Advogados, Arquitetos, Contabilidade, Estética).
+- Continuar acompanhando a indexação no Search Console para os novos 9 nichos implementados.
+- Planejar a próxima expansão para Corretores de Imóveis e Mercado Financeiro (Onda 3).
