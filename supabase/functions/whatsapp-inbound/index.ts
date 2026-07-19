@@ -1,4 +1,10 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.110.0";
+import {
+  type CtwaReferral,
+  extractCloudReferral,
+  extractZApiReferral,
+  referralToMetadata,
+} from "./ctwa.ts";
 
 type JsonRecord = Record<string, unknown>;
 
@@ -14,6 +20,8 @@ type NormalizedInboundMessage = {
   instanceId?: string;
   rawPhone?: string | null;
   chatLid?: string | null;
+  /** Atribuição Click-to-WhatsApp, quando a conversa nasceu de um anúncio. */
+  referral?: CtwaReferral | null;
 };
 
 type ProcessedMessage = {
@@ -276,6 +284,8 @@ function extractWhatsAppCloudMessages(payload: JsonRecord): NormalizedInboundMes
           senderName: contactNameByPhone(contacts, fromPhone),
           message,
           messageType,
+          // `referral` só vem na 1ª mensagem de uma conversa aberta por anúncio CTWA.
+          referral: extractCloudReferral(rawMessage),
         });
       }
     }
@@ -484,6 +494,8 @@ function extractZApiMessages(payload: JsonRecord): NormalizedInboundMessage[] {
     instanceId: asString(payload.instanceId) || undefined,
     rawPhone: asString(payload.phone),
     chatLid: asString(payload.chatLid),
+    // Z-API não repassa ctwa_clid; no máximo metadados do anúncio (atribuição degradada).
+    referral: extractZApiReferral(payload),
   }];
 }
 
@@ -661,6 +673,46 @@ async function findExistingLead(
   return data;
 }
 
+// Grava a atribuição CTWA no lead e no contato. O ctwa_clid precisa sobreviver
+// até o momento em que o lead for qualificado (dias depois) — por isso fica na
+// linha do lead, não só na mensagem. Nunca sobrescreve um clid já existente:
+// o PRIMEIRO clique é o que a Meta atribui.
+async function persistCtwaAttribution(
+  supabase: SupabaseClientAny,
+  ownerId: string,
+  referral: CtwaReferral,
+  ids: { contactId: string | null; leadId: string | null },
+) {
+  if (!referral.ctwaClid && !referral.sourceId) return;
+
+  const patch = {
+    ctwa_clid: referral.ctwaClid,
+    ctwa_source_id: referral.sourceId,
+    ctwa_clid_at: new Date().toISOString(),
+  };
+
+  for (const [table, id] of [["leads", ids.leadId], ["contacts", ids.contactId]] as const) {
+    if (!id) continue;
+
+    const { error } = await supabase
+      .from(table)
+      .update(patch)
+      .eq("owner_id", ownerId)
+      .eq("id", id)
+      .is("ctwa_clid", null);
+
+    // Coluna ausente (migração não aplicada) degrada em silêncio — o webhook
+    // não pode quebrar por causa de telemetria de atribuição.
+    if (error && !/column .* does not exist|could not find the .* column/i.test(error.message ?? "")) {
+      console.error(JSON.stringify({
+        event: "ctwa_persist_error",
+        table,
+        reason: error.message,
+      }));
+    }
+  }
+}
+
 async function processInboundMessage(
   supabase: SupabaseClientAny,
   inboundMessage: NormalizedInboundMessage,
@@ -715,7 +767,8 @@ async function processInboundMessage(
       direction: inboundMessage.direction ?? "inbound",
       metadata: {
         chat_lid: chatLid,
-        is_lid: isLid
+        is_lid: isLid,
+        ...(inboundMessage.referral ? referralToMetadata(inboundMessage.referral) : {}),
       }
     })
     .select("id, created_at, direction, telefone, channel_id")
@@ -778,6 +831,13 @@ async function processInboundMessage(
       .neq("telefone", finalPhone);
   }
 
+  if (inboundMessage.referral) {
+    await persistCtwaAttribution(supabase, ownerId, inboundMessage.referral, {
+      contactId: contact?.id ?? null,
+      leadId: lead?.id ?? null,
+    });
+  }
+
   console.log(
     JSON.stringify({
       event: "whatsapp_inbound_inserted",
@@ -787,6 +847,10 @@ async function processInboundMessage(
       linked_contact: Boolean(contact),
       linked_lead: Boolean(lead),
       has_provider_message_id: Boolean(inboundMessage.providerMessageId),
+      // Diagnóstico de atribuição: sem ctwa_clid, a CAPI cai em match por telefone.
+      ctwa: inboundMessage.referral
+        ? { has_clid: Boolean(inboundMessage.referral.ctwaClid), provider: inboundMessage.referral.provider }
+        : null,
     }),
   );
 

@@ -24,7 +24,7 @@ O "backend" do Funil Comercial é **Supabase**: Postgres+RLS (dados) e **Edge Fu
 
 | Função | Papel | `verify_jwt` |
 |---|---|---|
-| `whatsapp-inbound` | Webhook de mensagens recebidas (Z-API/Meta). Meta: verificação GET (`hub.challenge`), assinatura (`META_APP_SECRET`), parsing `entry→changes→value→messages`; resolve o dono pelo `phone_number_id`. Também processa `statuses[]` (entrega/leitura/falha → selinho no Inbox). | **false** |
+| `whatsapp-inbound` | Webhook de mensagens recebidas (Z-API/Meta). Meta: verificação GET (`hub.challenge`), assinatura (`META_APP_SECRET`), parsing `entry→changes→value→messages`; resolve o dono pelo `phone_number_id`. Também processa `statuses[]` (entrega/leitura/falha → selinho no Inbox). Captura o **`ctwa_clid`** do `referral` (anúncio Click-to-WhatsApp) e persiste em `leads`/`contacts` — ver [[CTWA - Atribuicao e Conversions API]]. | **false** |
 | `whatsapp-qr-inbound` | Webhook de conexão/desconexão (Z-API `ConnectedCallback`, Evolution). | **false** |
 | `whatsapp-send` | Envia **texto** e **template** (Z-API/Evolution/**Meta** Graph `.../{phone_number_id}/messages`). Usa o canal `ativo` mais recente. Cross-account no handoff. | default |
 | `whatsapp-templates` | Lista templates **aprovados** da Meta (`GET /{WABA_ID}/message_templates`, paginado). Marca não suportados (mídia, header com variável, botão dinâmico, variáveis nomeadas). | default |
@@ -35,6 +35,7 @@ O "backend" do Funil Comercial é **Supabase**: Postgres+RLS (dados) e **Edge Fu
 | `ai-generate-post` / `ai-recommend-post` | IA de criativos (OpenAI/Gemini). **Presos ao posicionamento antigo** (B2B/SaaS) → Fase B reescreve os prompts. Hoje bloqueadas em prod → o front cai em fallback/mock. | default |
 | `evolution-proxy` | Proxy para a Evolution API (QR multi-instância — adiado). | default |
 | `lead-intake` | **Intake público de leads do formulário web** (`Landing.tsx`). Grava o lead com o **GA4 `client_id`** (`leads.ga_client_id`) via service-role + `FUNIL_DEFAULT_OWNER_ID`; honeypot + validação de telefone; degrada se a coluna não existir. Base da atribuição de conversões offline — ver [[GA4 - Conversões Offline]]. | **false** |
+| `meta-capi-messaging` | Devolve à Meta o **desfecho** de lead vindo de anúncio CTWA via Conversions API (`action_source: business_messaging` + `messaging_channel: whatsapp`), usando o `ctwa_clid` capturado no webhook. Dedupe por `lead_id:event_name` + `ctwa_reported_at`. Vai para o **dataset da WABA**, não para o pixel do site — ver [[CTWA - Atribuicao e Conversions API]]. | default |
 
 Config de `verify_jwt` em `supabase/config.toml` (off só nos webhooks e no runner).
 
