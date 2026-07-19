@@ -90,8 +90,15 @@ export default function BrandbookPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary/30 flex">
-      
+    <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary/30 flex overflow-x-hidden transform">
+      {/* `transform` (sem valores = visualmente neutro) faz este div virar o
+          "containing block" dos filhos fixed (header mobile + aside). Sem
+          isso, overflow-x-hidden em html/body NÃO contém fixed — eles
+          ignoram overflow de ancestrais, a não ser que um deles vire esse
+          container via transform/filter/perspective. Bug do Safari/iOS:
+          mesmo com a aside 100% fora da tela (-translate-x-full), a
+          largura dela vazava no cálculo de scroll da página. */}
+
       {/* MOBILE HEADER */}
       <div className="fixed top-0 left-0 right-0 z-50 flex h-16 items-center justify-between border-b border-white/5 bg-background/95 px-4 backdrop-blur-md lg:hidden">
         <div className="flex items-center gap-2">
