@@ -27,7 +27,7 @@ import type { FormEvent, ReactNode } from "react";
 import { Toaster, toast } from "react-hot-toast";
 import { DndContext, useDraggable, useDroppable } from "@dnd-kit/core";
 import { IMaskInput } from "react-imask";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, lazy, Suspense } from "react";
 import {
   BrowserRouter,
   Routes,
@@ -43,47 +43,49 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import LandingPage from "./pages/Landing";
-import CrmLandingPage from "./pages/CrmLanding";
-import BrandbookPage from "./pages/Brandbook";
-import LocalBusinessWebsiteLanding from "./pages/LocalBusinessWebsiteLanding";
-import SalesStructureDiagnosticLanding from "./pages/SalesStructureDiagnosticLanding";
-import GoogleBusinessProfileLanding from "./pages/GoogleBusinessProfileLanding";
-import PaidTrafficLocalBusinessLanding from "./pages/PaidTrafficLocalBusinessLanding";
-import CrmWhatsappLanding from "./pages/CrmWhatsappLanding";
+const LandingPage = lazy(() => import("./pages/Landing"));
+const CrmLandingPage = lazy(() => import("./pages/CrmLanding"));
+const BrandbookPage = lazy(() => import("./pages/Brandbook"));
+const LocalBusinessWebsiteLanding = lazy(() => import("./pages/LocalBusinessWebsiteLanding"));
+const SalesStructureDiagnosticLanding = lazy(() => import("./pages/SalesStructureDiagnosticLanding"));
+const GoogleBusinessProfileLanding = lazy(() => import("./pages/GoogleBusinessProfileLanding"));
+const PaidTrafficLocalBusinessLanding = lazy(() => import("./pages/PaidTrafficLocalBusinessLanding"));
+const CrmWhatsappLanding = lazy(() => import("./pages/CrmWhatsappLanding"));
 
-import NutritionistWebsiteLanding from "./pages/NutritionistWebsiteLanding";
-import PsychologistWebsiteLanding from "./pages/PsychologistWebsiteLanding";
-import LocalCityLanding from "./pages/LocalCityLanding";
-import CitiesDirectory from "./pages/CitiesDirectory";
-import ConsultoriaLanding from "./pages/ConsultoriaLanding";
+const NutritionistWebsiteLanding = lazy(() => import("./pages/NutritionistWebsiteLanding"));
+const PsychologistWebsiteLanding = lazy(() => import("./pages/PsychologistWebsiteLanding"));
+const LocalCityLanding = lazy(() => import("./pages/LocalCityLanding"));
+const CitiesDirectory = lazy(() => import("./pages/CitiesDirectory"));
+const ConsultoriaLanding = lazy(() => import("./pages/ConsultoriaLanding"));
 import { AnnouncementBar } from "./components/AnnouncementBar";
 import { SeoHead } from "./components/SeoHead";
 import { CookieBanner } from "./components/CookieBanner";
-import BlogIndex from "./pages/BlogIndex";
-import LpNutricionistas from "./pages/LpNutricionistas";
-import LpPsicologas from "./pages/LpPsicologas";
-import LpDentistas from "./pages/LpDentistas";
-import LpTerapeutas from "./pages/LpTerapeutas";
-import LpMassoterapeutas from "./pages/LpMassoterapeutas";
-import LpAdvogados from "./pages/LpAdvogados";
-import LpArquitetos from "./pages/LpArquitetos";
-import LpContabilidade from "./pages/LpContabilidade";
-import LpEstetica from "./pages/LpEstetica";
-import BlogPost from "./pages/BlogPost";
-import GlossarioIndex from "./pages/GlossarioIndex";
-import GlossarioTermo from "./pages/GlossarioTermo";
-import ProgrammaticBlogPost from "./pages/ProgrammaticBlogPost";
-import ProgrammaticIntentLanding from "./pages/ProgrammaticIntentLanding";
-import { PrivacyPage, TermsPage, DataDeletionPage } from "./pages/LegalPages";
-import SignUpScreen from "./pages/SignUp";
-import LoginScreen from "./pages/Login";
-import PipelinePage from "./pages/Pipeline";
-import ProfilePage from "./pages/Profile";
-import SettingsPage from "./pages/Settings";
-import EditorialPlannerPage from "./pages/EditorialPlanner";
-import AggregatorsAdminPage from "./pages/AggregatorsAdmin";
-import PieceStudioPage from "./pages/PieceStudio";
+const BlogIndex = lazy(() => import("./pages/BlogIndex"));
+const LpNutricionistas = lazy(() => import("./pages/LpNutricionistas"));
+const LpPsicologas = lazy(() => import("./pages/LpPsicologas"));
+const LpDentistas = lazy(() => import("./pages/LpDentistas"));
+const LpTerapeutas = lazy(() => import("./pages/LpTerapeutas"));
+const LpMassoterapeutas = lazy(() => import("./pages/LpMassoterapeutas"));
+const LpAdvogados = lazy(() => import("./pages/LpAdvogados"));
+const LpArquitetos = lazy(() => import("./pages/LpArquitetos"));
+const LpContabilidade = lazy(() => import("./pages/LpContabilidade"));
+const LpEstetica = lazy(() => import("./pages/LpEstetica"));
+const BlogPost = lazy(() => import("./pages/BlogPost"));
+const GlossarioIndex = lazy(() => import("./pages/GlossarioIndex"));
+const GlossarioTermo = lazy(() => import("./pages/GlossarioTermo"));
+const ProgrammaticBlogPost = lazy(() => import("./pages/ProgrammaticBlogPost"));
+const ProgrammaticIntentLanding = lazy(() => import("./pages/ProgrammaticIntentLanding"));
+const PrivacyPage = lazy(() => import("./pages/LegalPages").then(module => ({ default: module.PrivacyPage })));
+const TermsPage = lazy(() => import("./pages/LegalPages").then(module => ({ default: module.TermsPage })));
+const DataDeletionPage = lazy(() => import("./pages/LegalPages").then(module => ({ default: module.DataDeletionPage })));
+const SignUpScreen = lazy(() => import("./pages/SignUp"));
+const LoginScreen = lazy(() => import("./pages/Login"));
+const PipelinePage = lazy(() => import("./pages/Pipeline"));
+const ProfilePage = lazy(() => import("./pages/Profile"));
+const SettingsPage = lazy(() => import("./pages/Settings"));
+const EditorialPlannerPage = lazy(() => import("./pages/EditorialPlanner"));
+const AggregatorsAdminPage = lazy(() => import("./pages/AggregatorsAdmin"));
+const PieceStudioPage = lazy(() => import("./pages/PieceStudio"));
 import Logo from "./components/Logo";
 import {
   convertContactToLead,
@@ -133,18 +135,18 @@ import type {
   OpportunityStage,
   Route as AppRoute,
 } from "./lib/types";
-import Dashboard from "./pages/Dashboard";
-import InboxPage from "./pages/Inbox";
-import ContactsPage from "./pages/Contacts";
-import LeadsPage from "./pages/Leads";
-import CreativesPage from "./pages/Creatives";
-import CampaignsPage from "./pages/Campaigns";
-import MetaOAuthCallback from "./pages/MetaOAuthCallback";
-import InstagramOAuthCallback from "./pages/InstagramOAuthCallback";
-import WhatsappPage from "./pages/Whatsapp";
-import LinkAggregatorPage from "./pages/LinkAggregator";
-import ResetPasswordPage from "./pages/ResetPassword";
-import ProspectingPreviewPage from "./pages/ProspectingPreview";
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const InboxPage = lazy(() => import("./pages/Inbox"));
+const ContactsPage = lazy(() => import("./pages/Contacts"));
+const LeadsPage = lazy(() => import("./pages/Leads"));
+const CreativesPage = lazy(() => import("./pages/Creatives"));
+const CampaignsPage = lazy(() => import("./pages/Campaigns"));
+const MetaOAuthCallback = lazy(() => import("./pages/MetaOAuthCallback"));
+const InstagramOAuthCallback = lazy(() => import("./pages/InstagramOAuthCallback"));
+const WhatsappPage = lazy(() => import("./pages/Whatsapp"));
+const LinkAggregatorPage = lazy(() => import("./pages/LinkAggregator"));
+const ResetPasswordPage = lazy(() => import("./pages/ResetPassword"));
+const ProspectingPreviewPage = lazy(() => import("./pages/ProspectingPreview"));
 import {
   isProspectingPreviewPath,
   normalizePublicPath,
@@ -1154,7 +1156,7 @@ function AppContent() {
     return (
       <>
         <AnnouncementBar />
-        <Routes>
+        <Suspense fallback={<PageLoader />}><Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/crm" element={<CrmLandingPage />} />
           <Route path="/consultoria" element={<ConsultoriaLanding />} />
@@ -1193,7 +1195,7 @@ function AppContent() {
           <Route path="/l/:slug" element={<LinkAggregatorPage />} />
           <Route path="/:slug" element={<ProspectingPreviewPage />} />
           <Route path="/:slug/index.html" element={<ProspectingPreviewPage />} />
-        </Routes>
+        </Routes></Suspense>
       </>
     );
   }
@@ -1246,7 +1248,7 @@ function AppContent() {
           {isLoadingData && (
             <div className="loading-strip">Atualizando dados do CRM...</div>
           )}
-          <Routes>
+          <Suspense fallback={<PageLoader />}><Routes>
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route
               path="/perfil"
@@ -1357,7 +1359,7 @@ function AppContent() {
             <Route path="/oauth/meta" element={<MetaOAuthCallback />} />
             <Route path="/oauth/instagram" element={<InstagramOAuthCallback />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
-          </Routes>
+          </Routes></Suspense>
         </section>
       </main>
 
@@ -2165,6 +2167,16 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+
+const PageLoader = () => (
+  <div className="flex min-h-[100dvh] items-center justify-center bg-background text-foreground">
+    <div className="flex flex-col items-center gap-4">
+      <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+      <span className="text-sm text-muted-foreground font-medium animate-pulse">Carregando...</span>
+    </div>
+  </div>
+);
 
 export default function App() {
   return (
