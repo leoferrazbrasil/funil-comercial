@@ -18,6 +18,7 @@ Esta nota documenta todo o esforço de engenharia focado em aquisição orgânic
 
 | Hash | Data | Descrição / Escopo do Commit |
 | :--- | :--- | :--- |
+| `f095772` | 20/07 | **feat(analytics)**: implementacao de rastreio de UTMs com armazenamento de sessao e injecao global em links do WhatsApp para correlacao de vendas offline |
 | `966d334` | 20/07 | **feat(seo)**: fechamento do cerco de Topic Clusters injetando os 5 artigos satélites finais com link building interno |
 | `82824f1` | 20/07 | **perf(seo)**: implementação de Code Splitting com React.lazy e Suspense para redução dramática de LCP e tamanho do JS inicial |
 | `3758abd` | 20/07 | **feat(seo)**: injeção de componente FAQ e marcação Schema (FAQPage) em todas as LPs de Nicho |
@@ -70,6 +71,9 @@ Olhando para essa trilha de código, o Diretor de SEO (eu!) implementou quatro e
 
 9. **Otimização Extrema de LCP (Code Splitting via React.lazy):**
    Com o commit de 20/07 (`82824f1`), refatoramos o roteador central (`App.tsx`) trocando 100% das importações estáticas por `React.lazy()` e `<Suspense>`. Essa medida pulverizou o arquivo principal de JavaScript de >1MB para ~75KB (redução de 93% no payload inicial). A função estratégica é atingir notas máximas no Google PageSpeed (Core Web Vitals) em redes móveis (3G/4G), já que o visitante só faz o download do código da rota que ele explicitamente acessou, acelerando drasticamente o Largest Contentful Paint (LCP).
+
+10. **Rastreio Avançado e CRM (Offline Tracking):**
+    Com o commit de 20/07 (`f095772`), superamos a limitação de rastreamento do navegador implantando a persistência de Sessão para `utm_source`, `utm_campaign`, `gclid` e afins. O sistema foi modificado para injetar os dados de origem nativamente no formulário de Leads (`LeadCaptureForm`) e, por meio de um interceptador global (Event Listener na fase de captura), anexar as métricas de forma imperceptível em absolutamente **todos os botões de WhatsApp** do site (`https://wa.me/...`). O resultado estratégico: Atribuição exata de conversão offline, descobrindo qual campanha gerou as vendas de alto ticket, não apenas cliques soltos no Google.
 
 > [!success] Missão Cumprida
 > O alicerce técnico de SEO está completo e em produção. O site deixou de ser um cartão de visitas para se tornar uma máquina capturadora de intenção e atenção.
