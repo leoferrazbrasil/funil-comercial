@@ -18,6 +18,7 @@ Esta nota documenta todo o esforço de engenharia focado em aquisição orgânic
 
 | Hash | Data | Descrição / Escopo do Commit |
 | :--- | :--- | :--- |
+| `c35d494` | 20/07 | **feat(seo)**: sprint de conteúdo satélite para internal linking (Topic Clusters) apontando para LPs de Nicho |
 | `e3e1fd1` | 20/07 | **fix(seo)**: centraliza rotas LPs de Nicho e implementa leitura dinâmica para sitemap e prerender (Puppeteer) |
 | `9da0a0f` | 18/07 | **chore(seo)**: atualizar sitemaps com novas rotas b2b e blog |
 | `e2958a0` | 18/07 | **fix(seo)**: corrigir erro de sintaxe no glossario |
@@ -57,6 +58,9 @@ Olhando para essa trilha de código, o Diretor de SEO (eu!) implementou quatro e
 
 6. **Blindagem de Indexação (Fuga do CSR):**
    Com o commit de 20/07 (`e3e1fd1`), unificamos as rotas e forçamos a pré-renderização estática via Puppeteer para todas as LPs de Nicho documentadas. Isso resolve o problema de LPs sendo servidas apenas com Javascript (CSR) no Vite, garantindo que o Googlebot receba o HTML limpo, melhorando drasticamente a velocidade de indexação e as notas do Core Web Vitals (LCP).
+
+7. **Link Building Interno para LPs (Topic Clusters):**
+   Com o commit de 20/07 (`c35d494`), criamos a primeira leva de artigos satélites no blog (para Odontologia, Psicologia, Estética e Advocacia). A função técnica desses textos é capturar pesquisas de dúvidas (Topo de Funil) e transferir Autoridade de Tópico (PageRank) diretamente para as LPs de conversão (Fundo de Funil) através de hiperlinks *Dofollow* contextuais com âncora exata.
 
 > [!success] Missão Cumprida
 > O alicerce técnico de SEO está completo e em produção. O site deixou de ser um cartão de visitas para se tornar uma máquina capturadora de intenção e atenção.
