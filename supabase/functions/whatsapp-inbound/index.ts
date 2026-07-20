@@ -565,10 +565,18 @@ async function resolveOwnerChannel(
 
   if (message.channelIdentifiers.length > 0) {
     const providers = uniqueStrings([message.provider, "whatsapp", "whatsapp_cloud"]);
+    // Mesma robustez de formato usada para contatos/leads (getPhoneVariations):
+    // o número salvo em integration_channels.numero pode estar num formato
+    // diferente do que a Z-API/Meta reporta (com/sem o 9º dígito) — exigir
+    // match exato fazia a mensagem cair sem channel_id (vira "legado" no
+    // Inbox, some do filtro padrão "ativos" mesmo sendo mensagem nova).
+    const identifierVariations = uniqueStrings(
+      message.channelIdentifiers.flatMap((identifier) => getPhoneVariations(identifier)),
+    );
     const { data, error } = await supabase
       .from("integration_channels")
       .select("id, owner_id")
-      .in("numero", message.channelIdentifiers)
+      .in("numero", identifierVariations)
       .in("provider", providers)
       .limit(1)
       .maybeSingle();
@@ -616,7 +624,7 @@ async function reopenConversationIfNewerInbound(
 }
 
 // Helper to generate phone variations for robust searching
-function getPhoneVariations(phone: string) {
+export function getPhoneVariations(phone: string) {
   if (!phone) return [];
   const variations = new Set<string>();
   variations.add(phone);
