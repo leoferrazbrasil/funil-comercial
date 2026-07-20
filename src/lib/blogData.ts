@@ -988,6 +988,140 @@ Na estética avançada, o tráfego do Instagram inunda o WhatsApp da clínica. A
 
 O mercado digital amadureceu. Deixe a panfletagem para os amadores e construa o **Fichário Técnico** do seu negócio.
     `
+  },
+  {
+    slug: "como-lidar-com-pacientes-que-acham-implante-caro-whatsapp",
+    title: "Como lidar com pacientes que acham o implante dentário caro no WhatsApp",
+    excerpt: "O problema não é o preço do seu implante, é a ausência de um roteiro de vendas consultivo. Aprenda a contornar objeções de valor na odontologia.",
+    date: "2026-07-20",
+    author: "Leonardo Brasil",
+    authorAvatar: "/images/leo-avatar.jpg",
+    category: "Odontologia",
+    imageUrl: "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?q=80&w=1200&auto=format&fit=crop",
+    clusterType: "satellite",
+    pillarSlug: "estrutura-de-vendas-para-dentistas",
+    content: `
+A objeção mais comum que a secretária de uma clínica odontológica ouve no WhatsApp é: *"Nossa, achei muito caro. Vou pensar e te aviso"*. E assim, um paciente que precisava de reabilitação oral some para sempre.
+
+Muitos dentistas acreditam que o problema está no mercado, ou que os pacientes da sua cidade "não têm dinheiro". Mas a verdade comercial é outra: **pacientes pagam R$ 15.000 em um implante quando percebem que o valor do tratamento é maior que o preço cobrado.**
+
+### O Erro do Atendimento Reativo
+
+Se o paciente manda uma mensagem perguntando o preço, e a única resposta que recebe é um número frio, ele vai comparar você com a clínica da esquina usando apenas um critério: preço.
+
+O papel do WhatsApp não é ser uma tabela de preços digital. É ser uma ferramenta de **qualificação e agendamento**.
+
+### O Roteiro de Vendas Consultivo
+
+Para inverter esse jogo, a clínica precisa aplicar as técnicas da [estrutura de vendas para dentistas](/estrutura-de-vendas-para-dentistas). Isso significa que, antes de falar qualquer valor, a secretária deve:
+
+1. **Investigar a Dor:** *"João, o senhor está sentindo dor, ou a busca pelo implante é por estética/mastigação?"*
+2. **Criar Urgência:** *"Entendo. A perda óssea avança rápido quando não temos o dente no local. O Dr. precisa avaliar a sua tomografia."*
+3. **Ancoragem de Valor:** *"A avaliação completa com o nosso especialista em reabilitação dura 45 minutos. Nela, ele não vai apenas te passar um preço, vai desenhar o seu novo sorriso."*
+
+Quando a clínica possui um processo claro e um CRM para não esquecer de fazer o acompanhamento desse paciente nos dias seguintes, a taxa de *"achei caro"* despenca, e a cadeira do consultório enche de pacientes particulares de alto ticket.
+    `
+  },
+  {
+    slug: "captacao-pacientes-psicologia-regras-crp",
+    title: "Captação de pacientes e as regras do CRP: O que a psicóloga pode fazer?",
+    excerpt: "Desmistifique o medo de fazer marketing na psicologia. Entenda como o Google Ads pode lotar sua agenda sem ferir o código de ética do CRP.",
+    date: "2026-07-20",
+    author: "Leonardo Brasil",
+    authorAvatar: "/images/leo-avatar.jpg",
+    category: "Psicologia",
+    imageUrl: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?q=80&w=1200&auto=format&fit=crop",
+    clusterType: "satellite",
+    pillarSlug: "estrutura-de-vendas-para-psicologas",
+    content: `
+O Código de Ética Profissional do Psicólogo (Resolução CFP nº 10/2005) é extremamente claro quanto aos limites da publicidade na psicologia. É expressamente proibido o uso de técnicas de previsão, promoção baseada em sensacionalismo ou promessas de "cura rápida".
+
+Por causa dessas regras, muitas profissionais brilhantes ficam paralisadas. O medo de cometer uma infração ética as faz depender 100% de indicações ou de convênios que pagam valores irrisórios por sessão.
+
+### Marketing Ético: A Diferença entre Promover e Aparecer
+
+Você não pode fazer um anúncio no Instagram dizendo: *"Livre-se da ansiedade em 3 sessões!"*. Isso é mercantilização e promessa de resultado.
+
+No entanto, o CRP **permite e incentiva** a prestação de informações e a oferta de serviços baseados na ciência. E é aqui que a mágica da captação ética acontece.
+
+### O Poder do Google Ads para Psicólogas
+
+A melhor forma de captar pacientes particulares sem ferir a ética é usando a intenção de busca. Se uma pessoa digita no Google *"psicóloga para terapia de casal"*, ela está ativamente procurando ajuda.
+
+Aparecer no topo do Google para essa pessoa não é "forçar uma venda". É **prestar um serviço à sociedade**. A sua [estrutura de vendas para psicólogas](/estrutura-de-vendas-para-psicologas) deve focar em informar:
+
+1. **A abordagem utilizada** (TCC, Psicanálise, Junguiana, etc.).
+2. **A experiência da profissional** e seu número de registro (CRP).
+3. **O formato do acolhimento** (online ou presencial).
+
+Ao configurar campanhas no Google Ads direcionando para uma Landing Page sóbria e focada em acolhimento, você constrói uma agenda previsível de pacientes que valorizam o seu trabalho, cobrando o valor justo pela sua hora clínica, com total tranquilidade ética.
+    `
+  },
+  {
+    slug: "por-que-pacientes-agendam-avaliacao-botox-nao-comparecem",
+    title: "Por que pacientes agendam avaliação de botox e não comparecem?",
+    excerpt: "A taxa de no-show (faltas) está sugando a lucratividade da sua clínica de estética. Veja como resolver esse gargalo no WhatsApp.",
+    date: "2026-07-20",
+    author: "Leonardo Brasil",
+    authorAvatar: "/images/leo-avatar.jpg",
+    category: "Estética",
+    imageUrl: "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?q=80&w=1200&auto=format&fit=crop",
+    clusterType: "satellite",
+    pillarSlug: "estrutura-de-vendas-para-estetica",
+    content: `
+Um dos maiores ralos de dinheiro de uma clínica de estética avançada não é o custo dos produtos (toxina botulínica, ácido hialurônico), mas o custo da **cadeira vazia**.
+
+A campanha de marketing rodou no Instagram, gerou o desejo, a paciente chamou no WhatsApp e agendou a avaliação gratuita para quarta-feira. Chega quarta-feira, a médica está esperando e... a paciente simplesmente não aparece. O famoso *no-show*.
+
+### Por que o No-Show Acontece?
+
+Na estética, o impulso emocional é muito alto. A paciente agenda no calor da emoção ao ver um "Antes e Depois" maravilhoso. Dois dias depois, a rotina esmaga essa emoção, surgem imprevistos, ou ela simplesmente esquece.
+
+O erro da clínica é acreditar que o papel da secretária acaba no momento do agendamento. Na verdade, é aí que a [estrutura de vendas para estética](/estrutura-de-vendas-para-estetica) começa a trabalhar.
+
+### O Protocolo Anti-Falta (Follow-Up em 3 Tempos)
+
+Você não pode depender da memória do paciente. O WhatsApp da clínica precisa rodar um processo de confirmação rígido e elegante, preferencialmente guiado por um sistema de CRM:
+
+1. **Lembrete de 24h (Gatilho de Compromisso):** *"Olá, Maria! Nossa especialista facial já separou a sala para a sua avaliação amanhã às 15h. Por favor, confirme a sua presença com um OK para mantermos o seu horário."*
+2. **Lembrete de 4h (Antecipação):** Enviar um vídeo curto mostrando a clínica ou orientações sobre estacionamento. Isso tangibiliza o compromisso e eleva a percepção de luxo e profissionalismo.
+3. **Regra de Remarcação:** Se a paciente avisar que não vai conseguir, a secretária não pode dizer *"Tudo bem"*. O protocolo exige que a remarcação seja feita na mesma hora, oferecendo apenas duas opções de janela, criando escassez de agenda.
+
+Clínicas que implementam essa esteira comercial conseguem derrubar a taxa de faltas de 40% para menos de 10%, multiplicando o faturamento no final do mês sem investir um centavo a mais em anúncios.
+    `
+  },
+  {
+    slug: "como-qualificar-leads-juridicos-antes-atendimento",
+    title: "Como qualificar leads jurídicos antes do primeiro atendimento (Sem dar consultoria grátis)",
+    excerpt: "Pare de perder tempo tirando dúvidas no WhatsApp. Aprenda a estruturar um funil de qualificação que separa curiosos de clientes pagantes.",
+    date: "2026-07-20",
+    author: "Leonardo Brasil",
+    authorAvatar: "/images/leo-avatar.jpg",
+    category: "Advocacia",
+    imageUrl: "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?q=80&w=1200&auto=format&fit=crop",
+    clusterType: "satellite",
+    pillarSlug: "estrutura-de-vendas-para-advogados",
+    content: `
+Uma das reclamações mais frequentes de advogados que começam a anunciar seus escritórios na internet é o excesso de "curiosos". Pessoas que mandam áudios de 5 minutos no WhatsApp relatando o problema familiar ou trabalhista, e no final, perguntam: *"Doutor, o que eu faço?"*
+
+O advogado responde, explica o direito, orienta os próximos passos e o potencial cliente diz: *"Muito obrigado pela ajuda!"*. Fim. O escritório deu uma consultoria gratuita e não assinou nenhum contrato de honorários.
+
+### O Problema do WhatsApp Aberto
+
+Isso acontece porque o escritório atraiu o lead de forma correta (via Google Ads), mas falhou na etapa de triagem. Quando você deixa o WhatsApp livre para o lead despejar a história dele, você perde o controle da negociação.
+
+Uma [estrutura de vendas para advogados](/estrutura-de-vendas-para-advogados) eficiente insere uma barreira de qualificação antes que o lead tenha acesso ao tempo dos sócios.
+
+### O Funil de Triagem Jurídica
+
+Para acabar com a consultoria gratuita por aplicativo de mensagem, implemente os seguintes passos no atendimento:
+
+1. **Apresentação Institucional:** Assim que o lead chegar, a resposta inicial deve padronizar o contato. *"Olá! Você está falando com o setor de triagem do Escritório [Nome]. Para que um de nossos especialistas avalie a viabilidade do seu caso, precisamos de algumas informações básicas."*
+2. **Formulário de Pré-Análise (O Filtro):** Não deixe o lead falar. Envie um questionário curto ou faça 3 perguntas objetivas para entender a materialidade do direito (ex: se for previdenciário, *"O senhor já teve benefício negado no INSS?"*).
+3. **Agendamento da Consulta:** Se o lead passar na triagem e tiver potencial financeiro e jurídico, a equipe não responde a dúvida no texto. A resposta deve ser: *"Seu caso tem viabilidade jurídica para análise profunda. O valor da nossa consulta com o advogado especialista é R$ X. Posso reservar sua agenda para amanhã às 14h?"*
+
+Ao impor processo e valorizar o seu tempo desde a primeira mensagem, você afasta os curiosos crônicos e atrai clientes que respeitam a sua autoridade e estão dispostos a pagar os seus honorários.
+    `
   }
 ];
 
