@@ -7,31 +7,7 @@ const __dirname = path.dirname(__filename);
 
 const DOMAIN = 'https://funilcomercial.com';
 
-const PUBLIC_ROUTES = [
-  '/',
-  '/crm',
-  '/consultoria',
-  '/brandbook',
-  '/site-para-negocios-locais',
-  '/diagnostico-estrutura-de-vendas',
-  '/google-meu-negocio',
-  '/trafego-pago-negocios-locais',
-  '/crm-whatsapp-organizado',
-  '/site-para-dentistas',
-  '/site-para-nutricionistas',
-  '/site-para-psicologas',
-  '/cidades-atendidas',
-  '/estrutura-de-vendas-para-nutricionistas',
-  '/estrutura-de-vendas-para-psicologas',
-  '/estrutura-de-vendas-para-dentistas',
-  '/estrutura-de-vendas-para-terapeutas',
-  '/estrutura-de-vendas-para-massoterapeutas',
-  '/estrutura-de-vendas-para-advogados',
-  '/estrutura-de-vendas-para-arquitetos',
-  '/estrutura-de-vendas-para-contabilidade',
-  '/estrutura-de-vendas-para-estetica',
-  '/blog'
-];
+import { CORE_ROUTES as PUBLIC_ROUTES } from './core-routes.mjs';
 
 const locationsPath = path.join(__dirname, '..', 'src', 'lib', 'seoLocations.json');
 const locationsData = JSON.parse(fs.readFileSync(locationsPath, 'utf8'));

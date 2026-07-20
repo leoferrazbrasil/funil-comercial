@@ -7,16 +7,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// The routes we specifically want to prerender (High Priority / Top of Funnel)
-const CORE_ROUTES = [
-  '/',
-  '/consultoria',
-  '/cidades-atendidas',
-  '/blog',
-  '/blog/importancia-do-site-para-advogados',
-  '/blog/como-captar-pacientes-odontologia',
-  '/blog/google-ads-vs-meta-ads-negocios-locais'
-];
+import { CORE_ROUTES } from './core-routes.mjs';
 
 async function prerender() {
   const distPath = path.join(__dirname, '..', 'dist');
