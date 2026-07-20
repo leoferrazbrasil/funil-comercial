@@ -18,6 +18,7 @@ Esta nota documenta todo o esforço de engenharia focado em aquisição orgânic
 
 | Hash | Data | Descrição / Escopo do Commit |
 | :--- | :--- | :--- |
+| `3758abd` | 20/07 | **feat(seo)**: injeção de componente FAQ e marcação Schema (FAQPage) em todas as LPs de Nicho |
 | `c35d494` | 20/07 | **feat(seo)**: sprint de conteúdo satélite para internal linking (Topic Clusters) apontando para LPs de Nicho |
 | `e3e1fd1` | 20/07 | **fix(seo)**: centraliza rotas LPs de Nicho e implementa leitura dinâmica para sitemap e prerender (Puppeteer) |
 | `9da0a0f` | 18/07 | **chore(seo)**: atualizar sitemaps com novas rotas b2b e blog |
@@ -61,6 +62,9 @@ Olhando para essa trilha de código, o Diretor de SEO (eu!) implementou quatro e
 
 7. **Link Building Interno para LPs (Topic Clusters):**
    Com o commit de 20/07 (`c35d494`), criamos a primeira leva de artigos satélites no blog (para Odontologia, Psicologia, Estética e Advocacia). A função técnica desses textos é capturar pesquisas de dúvidas (Topo de Funil) e transferir Autoridade de Tópico (PageRank) diretamente para as LPs de conversão (Fundo de Funil) através de hiperlinks *Dofollow* contextuais com âncora exata.
+
+8. **Rich Snippets e Domínio da SERP (FAQPage Schema):**
+   Com o commit de 20/07 (`3758abd`), injetamos uma nova seção de "Perguntas Frequentes" estruturada com `FAQPage Schema` em JSON-LD em todas as 9 Landing Pages de Nicho. O objetivo estratégico é fazer com que o Google mostre as nossas respostas diretamente na página de resultados de busca, dentro da cobiçada caixa *"As pessoas também perguntam" (People Also Ask)*, capturando muito mais cliques e espaço visual da concorrência.
 
 > [!success] Missão Cumprida
 > O alicerce técnico de SEO está completo e em produção. O site deixou de ser um cartão de visitas para se tornar uma máquina capturadora de intenção e atenção.
