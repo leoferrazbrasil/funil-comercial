@@ -18,6 +18,7 @@ Esta nota documenta todo o esforço de engenharia focado em aquisição orgânic
 
 | Hash | Data | Descrição / Escopo do Commit |
 | :--- | :--- | :--- |
+| `966d334` | 20/07 | **feat(seo)**: fechamento do cerco de Topic Clusters injetando os 5 artigos satélites finais com link building interno |
 | `82824f1` | 20/07 | **perf(seo)**: implementação de Code Splitting com React.lazy e Suspense para redução dramática de LCP e tamanho do JS inicial |
 | `3758abd` | 20/07 | **feat(seo)**: injeção de componente FAQ e marcação Schema (FAQPage) em todas as LPs de Nicho |
 | `c35d494` | 20/07 | **feat(seo)**: sprint de conteúdo satélite para internal linking (Topic Clusters) apontando para LPs de Nicho |
@@ -62,7 +63,7 @@ Olhando para essa trilha de código, o Diretor de SEO (eu!) implementou quatro e
    Com o commit de 20/07 (`e3e1fd1`), unificamos as rotas e forçamos a pré-renderização estática via Puppeteer para todas as LPs de Nicho documentadas. Isso resolve o problema de LPs sendo servidas apenas com Javascript (CSR) no Vite, garantindo que o Googlebot receba o HTML limpo, melhorando drasticamente a velocidade de indexação e as notas do Core Web Vitals (LCP).
 
 7. **Link Building Interno para LPs (Topic Clusters):**
-   Com o commit de 20/07 (`c35d494`), criamos a primeira leva de artigos satélites no blog (para Odontologia, Psicologia, Estética e Advocacia). A função técnica desses textos é capturar pesquisas de dúvidas (Topo de Funil) e transferir Autoridade de Tópico (PageRank) diretamente para as LPs de conversão (Fundo de Funil) através de hiperlinks *Dofollow* contextuais com âncora exata.
+   Com os commits de 20/07 (`c35d494` e `966d334`), criamos toda a rede de 9 artigos satélites no blog cobrindo as dores reais de 100% dos nichos alvo (Odontologia, Psicologia, Estética, Advocacia, Nutrição, Arquitetura, Terapia, Massoterapia e Contabilidade). A função técnica desses textos é capturar pesquisas de dúvidas (Topo de Funil) e transferir Autoridade de Tópico (PageRank) diretamente para as LPs de conversão (Fundo de Funil) através de hiperlinks *Dofollow* contextuais com âncora exata.
 
 8. **Rich Snippets e Domínio da SERP (FAQPage Schema):**
    Com o commit de 20/07 (`3758abd`), injetamos uma nova seção de "Perguntas Frequentes" estruturada com `FAQPage Schema` em JSON-LD em todas as 9 Landing Pages de Nicho. O objetivo estratégico é fazer com que o Google mostre as nossas respostas diretamente na página de resultados de busca, dentro da cobiçada caixa *"As pessoas também perguntam" (People Also Ask)*, capturando muito mais cliques e espaço visual da concorrência.
