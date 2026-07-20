@@ -1,19 +1,35 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Brain, Smartphone, MessageCircle, EyeOff, ShieldCheck } from "lucide-react";
 import Logo from "../components/Logo";
-import { SeoHead } from "../components/SeoHead";
+import { SeoHead, generateFAQSchema } from "../components/SeoHead";
 
 const WHATSAPP_NUMBER = "5551996737359";
 const WHATSAPP_MESSAGE = "Olá! Vim pela página da Estrutura de Captação para Psicólogas e gostaria de fazer o diagnóstico gratuito do meu consultório.";
 const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`;
 
 export default function LpPsicologas() {
+  const faqs = [
+    {
+        "question": "O CRP permite fazer anúncios no Google?",
+        "answer": "Sim. Diferente de promessas de 'cura rápida' ou exibição de preços, o anúncio no Google foca na intenção de busca (ex: 'psicóloga TCC'). É informativo, ético e totalmente aderente ao Código de Ética (CFP)."
+    },
+    {
+        "question": "Qual a diferença entre tráfego pago no Instagram e no Google para psicólogas?",
+        "answer": "No Instagram, você interrompe o momento de lazer da pessoa (baixo nível de consciência). No Google, a pessoa digita ativamente que precisa de terapia. A conversão de quem busca ajuda ativamente é infinitamente maior."
+    },
+    {
+        "question": "Preciso ter muito dinheiro para começar?",
+        "answer": "Não. Como a estrutura é focada em conversão (site rápido + CRM básico), você pode iniciar com pequenos orçamentos no Google Ads focados apenas na sua região ou formato online."
+    }
+];
+
   return (
     <div data-theme="dark" className="min-h-screen bg-background font-sans text-foreground selection:bg-primary/30">
       <SeoHead
         title="Estrutura de Captação para Psicólogos | Agenda Previsível e Ética"
         description="Você é excelente na clínica, mas o seu site não transmite autoridade e a agenda depende de indicação? Montamos a máquina de atração do seu consultório."
         canonicalUrl="https://funilcomercial.com/estrutura-de-vendas-para-psicologas"
+        schema={generateFAQSchema(faqs)}
       />
       
       {/* Header */}

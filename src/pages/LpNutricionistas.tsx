@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Globe, Smartphone, MessageCircle, BarChart3, ShieldCheck } from "lucide-react";
 import Logo from "../components/Logo";
-import { SeoHead } from "../components/SeoHead";
+import { SeoHead, generateFAQSchema } from "../components/SeoHead";
 import { LeadCaptureForm } from "../components/LeadCaptureForm";
 import { trackWhatsappClick } from "../lib/analytics";
 
@@ -10,12 +10,28 @@ const WHATSAPP_MESSAGE = "Olá! Vim pela página da Estrutura de Vendas para Nut
 const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`;
 
 export default function LpNutricionistas() {
+  const faqs = [
+    {
+        "question": "Como funciona a captação de pacientes para nutricionistas no Google?",
+        "answer": "Diferente do Instagram, onde você precisa entreter, no Google o paciente já está procurando por você (ex: 'nutricionista esportivo em [cidade]'). A captação funciona colocando você no topo dessa busca e direcionando o clique para um funil focado no WhatsApp."
+    },
+    {
+        "question": "É antiético fazer marketing para nutrição?",
+        "answer": "Absolutamente não. O código de ética do CFN permite a divulgação dos seus serviços e especialidades. Aparecer para quem já busca por ajuda de saúde no Google é a forma mais ética e elegante de captação."
+    },
+    {
+        "question": "Por que meus leads do WhatsApp perguntam o preço e somem?",
+        "answer": "Porque falta processo. Se você responde apenas com o valor da consulta, você vira uma commodity. Ensinamos a usar um roteiro de qualificação (ancoragem de valor) antes de falar de preço."
+    }
+];
+
   return (
     <div data-theme="dark" className="min-h-screen bg-background font-sans text-foreground selection:bg-primary/30">
       <SeoHead
         title="Estrutura de Vendas para Nutricionistas | Pare de Depender de Indicação"
         description="Você atende bem, mas o site parece amador e os leads somem no WhatsApp? Montamos a estrutura de vendas do seu consultório de nutrição de ponta a ponta."
         canonicalUrl="https://funilcomercial.com/estrutura-de-vendas-para-nutricionistas"
+        schema={generateFAQSchema(faqs)}
       />
       
       {/* Header */}
@@ -160,6 +176,33 @@ export default function LpNutricionistas() {
             </div>
           </div>
         </section>
+
+        
+        {/* FAQ Section */}
+        <section className="py-24 bg-white/[0.02] border-y border-white/5">
+          <div className="mx-auto max-w-3xl px-6">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">Perguntas Frequentes</h2>
+              <p className="text-muted-foreground text-lg">Tudo o que você precisa saber sobre a nossa estrutura comercial.</p>
+            </div>
+            <div className="space-y-4">
+              {faqs.map((faq, index) => (
+                <details key={index} className="group border border-white/10 bg-background rounded-2xl overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+                  <summary className="flex cursor-pointer items-center justify-between gap-4 p-6 font-semibold text-lg transition-colors hover:bg-white/[0.02]">
+                    {faq.question}
+                    <span className="transition duration-300 group-open:-rotate-180 text-primary">
+                      <svg fill="none" height="24" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                    </span>
+                  </summary>
+                  <div className="px-6 pb-6 text-muted-foreground leading-relaxed">
+                    <p>{faq.answer}</p>
+                  </div>
+                </details>
+              ))}
+            </div>
+          </div>
+        </section>
+
 
         {/* Análise gratuita — formulário web (captura o lead + o GA4 client_id) */}
         <section id="analise-gratuita" className="py-24">

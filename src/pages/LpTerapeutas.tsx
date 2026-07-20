@@ -1,19 +1,35 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Sparkles, Leaf, HeartHandshake, MessageCircle, Link2Off } from "lucide-react";
 import Logo from "../components/Logo";
-import { SeoHead } from "../components/SeoHead";
+import { SeoHead, generateFAQSchema } from "../components/SeoHead";
 
 const WHATSAPP_NUMBER = "5551996737359";
 const WHATSAPP_MESSAGE = "Olá! Vim pela página da Estrutura de Captação para Terapeutas e gostaria de conversar sobre o meu espaço terapêutico.";
 const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`;
 
 export default function LpTerapeutas() {
+  const faqs = [
+    {
+        "question": "Como um terapeuta integrativo atrai mais clientes sem parecer que está 'vendendo'?",
+        "answer": "Posicionando-se como solução, não como vendedor. Quando alguém busca por soluções para ansiedade ou dores crônicas, sua página entra como um guia acolhedor e informativo, não como um outdoor."
+    },
+    {
+        "question": "Qual a vantagem do tráfego orgânico/pago para terapias?",
+        "answer": "Você atinge a pessoa no momento exato em que ela precisa de ajuda. A taxa de agendamento de uma sessão avulsa ou pacote é infinitamente superior ao público frio das redes sociais."
+    },
+    {
+        "question": "O funil de vendas serve para quem atende apenas online?",
+        "answer": "Perfeitamente. Se o atendimento é online, você pode expandir suas campanhas para o Brasil inteiro ou até brasileiros no exterior, usando a estrutura para gerar confiança digital à distância."
+    }
+];
+
   return (
     <div data-theme="dark" className="min-h-screen bg-background font-sans text-foreground selection:bg-primary/30">
       <SeoHead
         title="Captação de Pacientes para Terapeutas | Mais Profissionalismo"
         description="Você transforma vidas, mas o seu perfil parece amador e a agenda está vazia? Montamos a estrutura digital que transmite a verdadeira autoridade do seu método terapêutico."
         canonicalUrl="https://funilcomercial.com/estrutura-de-vendas-para-terapeutas"
+        schema={generateFAQSchema(faqs)}
       />
       
       {/* Header */}

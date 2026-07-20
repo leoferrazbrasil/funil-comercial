@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Globe, Smartphone, MessageCircle, BarChart3, ShieldCheck } from "lucide-react";
 import Logo from "../components/Logo";
-import { SeoHead } from "../components/SeoHead";
+import { SeoHead, generateFAQSchema } from "../components/SeoHead";
 import { LeadCaptureForm } from "../components/LeadCaptureForm";
 import { trackWhatsappClick } from "../lib/analytics";
 
@@ -10,12 +10,28 @@ const WHATSAPP_MESSAGE = "Olá! Vim pela página da Estrutura de Vendas para Adv
 const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`;
 
 export default function LpAdvogados() {
+  const faqs = [
+    {
+        "question": "Como captar clientes na advocacia sem ferir o provimento da OAB?",
+        "answer": "A OAB proíbe a mercantilização. A solução é a captação passiva e informativa via Google. O cliente pesquisa a própria dor jurídica, encontra sua Landing Page estruturada e solicita a reunião, de forma 100% ética."
+    },
+    {
+        "question": "Por que parei de fechar contratos mesmo recebendo muitas mensagens?",
+        "answer": "Provavelmente você está dando 'consultoria grátis' no WhatsApp. Implementamos um funil de triagem jurídica que separa o curioso do cliente pagante antes do atendimento com os sócios."
+    },
+    {
+        "question": "O que um escritório precisa ter no site para converter?",
+        "answer": "Esqueça sites institucionais lentos falando sobre 'nossa missão'. O cliente quer saber se você resolve o problema dele. O site precisa ter velocidade, clareza técnica e direcionamento imediato para o comercial."
+    }
+];
+
   return (
     <div data-theme="dark" className="min-h-screen bg-background font-sans text-foreground selection:bg-primary/30">
       <SeoHead
         title="Estrutura de Vendas para Advogados | Captação Ética OAB"
         description="A sua captação de clientes não precisa ferir a OAB nem depender apenas de indicações. Estruture seu escritório para captar demandas de alto valor no Google."
         canonicalUrl="https://funilcomercial.com/estrutura-de-vendas-para-advogados"
+        schema={generateFAQSchema(faqs)}
       />
       
       {/* Header */}
@@ -160,6 +176,33 @@ export default function LpAdvogados() {
             </div>
           </div>
         </section>
+
+        
+        {/* FAQ Section */}
+        <section className="py-24 bg-white/[0.02] border-y border-white/5">
+          <div className="mx-auto max-w-3xl px-6">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">Perguntas Frequentes</h2>
+              <p className="text-muted-foreground text-lg">Tudo o que você precisa saber sobre a nossa estrutura comercial.</p>
+            </div>
+            <div className="space-y-4">
+              {faqs.map((faq, index) => (
+                <details key={index} className="group border border-white/10 bg-background rounded-2xl overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+                  <summary className="flex cursor-pointer items-center justify-between gap-4 p-6 font-semibold text-lg transition-colors hover:bg-white/[0.02]">
+                    {faq.question}
+                    <span className="transition duration-300 group-open:-rotate-180 text-primary">
+                      <svg fill="none" height="24" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                    </span>
+                  </summary>
+                  <div className="px-6 pb-6 text-muted-foreground leading-relaxed">
+                    <p>{faq.answer}</p>
+                  </div>
+                </details>
+              ))}
+            </div>
+          </div>
+        </section>
+
 
         {/* Análise gratuita — formulário web */}
         <section id="analise-gratuita" className="py-24">

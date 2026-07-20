@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Globe, Smartphone, MessageCircle, BarChart3, ShieldCheck } from "lucide-react";
 import Logo from "../components/Logo";
-import { SeoHead } from "../components/SeoHead";
+import { SeoHead, generateFAQSchema } from "../components/SeoHead";
 import { LeadCaptureForm } from "../components/LeadCaptureForm";
 import { trackWhatsappClick } from "../lib/analytics";
 
@@ -10,12 +10,28 @@ const WHATSAPP_MESSAGE = "Olá! Vim pela página da Estrutura de Vendas para Cl�
 const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`;
 
 export default function LpEstetica() {
+  const faqs = [
+    {
+        "question": "Por que as pacientes marcam avaliação de botox no WhatsApp e não comparecem?",
+        "answer": "A taxa de no-show é alta quando a compra por impulso no Instagram não é sustentada por um atendimento comercial rígido. Criamos processos de confirmação para blindar sua agenda."
+    },
+    {
+        "question": "Como anunciar procedimentos estéticos sem ter a conta bloqueada no Google?",
+        "answer": "Existe uma forma técnica de estruturar as palavras-chave e a copy da Landing Page para evitar as políticas restritivas do Google sobre estética, focando na clínica e na transformação segura."
+    },
+    {
+        "question": "Qual o erro das clínicas de estética ao tentar vender pelo Instagram?",
+        "answer": "Acreditar que likes e seguidores pagam as contas. A estética de resultado precisa interceptar intenção de compra no Google e reter clientes antigos através de um CRM organizado para LTV (Lifetime Value)."
+    }
+];
+
   return (
     <div data-theme="dark" className="min-h-screen bg-background font-sans text-foreground selection:bg-primary/30">
       <SeoHead
         title="Estrutura de Vendas para Estética | Procedimentos High-Ticket"
         description="A sua clínica lota o WhatsApp de curiosos? Implemente o funil comercial que filtra quem não quer pagar e agenda pacientes focados em estética avançada."
         canonicalUrl="https://funilcomercial.com/estrutura-de-vendas-para-estetica"
+        schema={generateFAQSchema(faqs)}
       />
       
       {/* Header */}
@@ -160,6 +176,33 @@ export default function LpEstetica() {
             </div>
           </div>
         </section>
+
+        
+        {/* FAQ Section */}
+        <section className="py-24 bg-white/[0.02] border-y border-white/5">
+          <div className="mx-auto max-w-3xl px-6">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">Perguntas Frequentes</h2>
+              <p className="text-muted-foreground text-lg">Tudo o que você precisa saber sobre a nossa estrutura comercial.</p>
+            </div>
+            <div className="space-y-4">
+              {faqs.map((faq, index) => (
+                <details key={index} className="group border border-white/10 bg-background rounded-2xl overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+                  <summary className="flex cursor-pointer items-center justify-between gap-4 p-6 font-semibold text-lg transition-colors hover:bg-white/[0.02]">
+                    {faq.question}
+                    <span className="transition duration-300 group-open:-rotate-180 text-primary">
+                      <svg fill="none" height="24" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                    </span>
+                  </summary>
+                  <div className="px-6 pb-6 text-muted-foreground leading-relaxed">
+                    <p>{faq.answer}</p>
+                  </div>
+                </details>
+              ))}
+            </div>
+          </div>
+        </section>
+
 
         {/* Análise gratuita — formulário web */}
         <section id="analise-gratuita" className="py-24">

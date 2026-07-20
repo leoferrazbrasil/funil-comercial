@@ -1,19 +1,35 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, BadgeDollarSign, Smartphone, UserMinus, Activity, CalendarRange } from "lucide-react";
 import Logo from "../components/Logo";
-import { SeoHead } from "../components/SeoHead";
+import { SeoHead, generateFAQSchema } from "../components/SeoHead";
 
 const WHATSAPP_NUMBER = "5551996737359";
 const WHATSAPP_MESSAGE = "Olá! Vim pela página da Estrutura de Captação para Massoterapeutas e gostaria de conversar sobre a minha clínica/espaço.";
 const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`;
 
 export default function LpMassoterapeutas() {
+  const faqs = [
+    {
+        "question": "Como acabar com os buracos na agenda do meu estúdio de massagem?",
+        "answer": "Implementando campanhas ativas de Google Ads para quem procura relaxamento na sua região e, principalmente, um CRM para ativar quem já foi seu cliente com ofertas de pacotes e assinaturas."
+    },
+    {
+        "question": "Como vender planos de recorrência e não apenas sessões avulsas?",
+        "answer": "A estrutura de vendas foca na esteira de produtos. A sessão avulsa é apenas a porta de entrada. A venda do pacote ocorre no pós-atendimento através de processos comerciais amarrados ao WhatsApp."
+    },
+    {
+        "question": "Preciso de um site complexo?",
+        "answer": "Pelo contrário. Você precisa de uma Landing Page rápida e direta, focada em mostrar o ambiente, especialidades e direcionar com 1 clique para o WhatsApp da sua marcação."
+    }
+];
+
   return (
     <div data-theme="dark" className="min-h-screen bg-background font-sans text-foreground selection:bg-primary/30">
       <SeoHead
         title="Captação de Pacientes para Massoterapeutas | Agenda Previsível"
         description="A sua maca vive com horários vazios ou você perde pacientes por causa de preço? Montamos a estrutura comercial focada em fidelizar e vender tratamentos."
         canonicalUrl="https://funilcomercial.com/estrutura-de-vendas-para-massoterapeutas"
+        schema={generateFAQSchema(faqs)}
       />
       
       {/* Header */}

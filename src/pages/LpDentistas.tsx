@@ -1,19 +1,35 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, BadgeDollarSign, Smartphone, MessageCircle, Activity, CheckCircle2 } from "lucide-react";
 import Logo from "../components/Logo";
-import { SeoHead } from "../components/SeoHead";
+import { SeoHead, generateFAQSchema } from "../components/SeoHead";
 
 const WHATSAPP_NUMBER = "5551996737359";
 const WHATSAPP_MESSAGE = "Olá! Vim pela página da Estrutura de Vendas para Dentistas e gostaria de fazer o diagnóstico gratuito da minha clínica.";
 const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`;
 
 export default function LpDentistas() {
+  const faqs = [
+    {
+        "question": "Como contornar o paciente que acha o implante caro pelo WhatsApp?",
+        "answer": "Você nunca deve passar preço de implante ou harmonização pelo WhatsApp. A secretária deve ser treinada para qualificar a dor, gerar urgência e converter o lead em uma avaliação presencial de alto valor."
+    },
+    {
+        "question": "O tráfego pago serve para odontologia de alto padrão?",
+        "answer": "Sim, se feito corretamente. Pacientes de ticket alto pesquisam por 'especialistas' e 'clínicas referência' no Google. Uma Landing Page sofisticada é o que converte esse perfil exigente."
+    },
+    {
+        "question": "Por que meus leads agendam a avaliação, mas não comparecem?",
+        "answer": "Devido à falta de uma cadência de follow-up. Implementamos fluxos de lembretes estruturados (24h e 4h antes) para reduzir a taxa de faltas (no-show) e aumentar a previsibilidade da agenda."
+    }
+];
+
   return (
     <div data-theme="dark" className="min-h-screen bg-background font-sans text-foreground selection:bg-primary/30">
       <SeoHead
         title="Estrutura de Vendas para Dentistas | Pare de Disputar Preço"
         description="O seu consultório atrai apenas pesquisas de 'preço de limpeza' no WhatsApp? Montamos a estrutura comercial focada em tratamentos de alto ticket para a sua clínica."
         canonicalUrl="https://funilcomercial.com/estrutura-de-vendas-para-dentistas"
+        schema={generateFAQSchema(faqs)}
       />
       
       {/* Header */}
