@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import { trackEvent, trackMetaEvent } from "../lib/analytics";
+import { getStoredTrackingData } from "../hooks/useUtmTracking";
 
 // O MESMO Measurement ID do gtag em index.html (e do exportador GA4).
 const GA4_MEASUREMENT_ID = "G-NSMD6MKLMK";
@@ -92,6 +93,7 @@ export function LeadCaptureForm() {
           event_source_url: window.location.href,
           user_agent: navigator.userAgent,
           website: honeypot,
+          ...getStoredTrackingData(),
         }),
       });
       if (!response.ok) throw new Error(`intake ${response.status}`);

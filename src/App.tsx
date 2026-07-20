@@ -60,6 +60,7 @@ const ConsultoriaLanding = lazy(() => import("./pages/ConsultoriaLanding"));
 import { AnnouncementBar } from "./components/AnnouncementBar";
 import { SeoHead } from "./components/SeoHead";
 import { CookieBanner } from "./components/CookieBanner";
+import { useUtmTracking } from "./hooks/useUtmTracking";
 const BlogIndex = lazy(() => import("./pages/BlogIndex"));
 const LpNutricionistas = lazy(() => import("./pages/LpNutricionistas"));
 const LpPsicologas = lazy(() => import("./pages/LpPsicologas"));
@@ -513,6 +514,7 @@ const buildLeadQualification = (lead: Lead): LeadQualification => {
 };
 
 function AppContent() {
+  useUtmTracking();
   const location = useLocation();
   const navigate = useNavigate();
   const route = (location.pathname === "/" ? "dashboard" : location.pathname.slice(1)) as AppRoute;
