@@ -18,6 +18,7 @@ Esta nota documenta todo o esforço de engenharia focado em aquisição orgânic
 
 | Hash | Data | Descrição / Escopo do Commit |
 | :--- | :--- | :--- |
+| `4107ef4` | 22/07 | **feat(seo)**: implementação de Grafo de Entidades Schema (@graph unificando WebSite, Organization, Person e Service) |
 | `f095772` | 20/07 | **feat(analytics)**: implementacao de rastreio de UTMs com armazenamento de sessao e injecao global em links do WhatsApp para correlacao de vendas offline |
 | `966d334` | 20/07 | **feat(seo)**: fechamento do cerco de Topic Clusters injetando os 5 artigos satélites finais com link building interno |
 | `82824f1` | 20/07 | **perf(seo)**: implementação de Code Splitting com React.lazy e Suspense para redução dramática de LCP e tamanho do JS inicial |

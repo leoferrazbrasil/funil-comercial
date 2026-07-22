@@ -11,6 +11,22 @@ tags:
 > [!note] Navegação
 > Histórico de mudanças, mais recente primeiro. Contexto do produto em [[01 - Requisitos]]; arquitetura em [[02 - Arquitetura e Design]]; índice em [[00 - Inicio]].
 
+## [2026-07-22] - SEO: Suporte a Grafo de Entidades (Rich Results & Schema Graph)
+
+### Adicionado — Schema Graph Interconectado (@graph)
+- Implementada a função `generateEntityGraphSchema()` em `src/components/SeoHead.tsx` e injetada na rota raiz `https://funilcomercial.com` (`Landing.tsx`).
+- O schema `@graph` em JSON-LD unifica via `@id` as 4 entidades exigidas para validação em verde no `validator.schema.org` e no Google Rich Results Test:
+  - `WebSite` (`@id: https://funilcomercial.com/#website`)
+  - `Organization` / `LocalBusiness` (`@id: https://funilcomercial.com/#organization`)
+  - `Person` (`@id: https://funilcomercial.com/#person`) — Leonardo Brasil (Fundador & Estrategista Comercial)
+  - `Service` (`@id: https://funilcomercial.com/#service`) — Estrutura de Vendas para Negócios Locais
+
+## [2026-07-20] - Incidente Inbox: mensagem sem canal + migração pendente
+
+### Corrigido — `whatsapp-inbound`
+- **Causa raiz dupla** (código + banco) fazia mensagens novas da Z-API sumirem do filtro padrão do `/inbox` (etiqueta "Legado / sem canal") e, depois do fix de código sozinho, pararem de chegar por completo (`PGRST204`, coluna `channel_id` ausente em produção — migração `20260716180000_inbox_conversation_archiving.sql` nunca tinha sido aplicada). Detalhe completo em [[Inbox - Incidente Canal Ausente (channel_id)]].
+- `resolveOwnerChannel` agora usa `getPhoneVariations` para tolerar o 9º dígito ao casar o canal (`supabase/functions/whatsapp-inbound/index.ts`), com 3 testes novos (`index_test.ts`).
+
 ## [2026-07-17] - GA4 Conversões Offline + captura de client_id
 
 ### Adicionado — Integração GA4 (fonte de dados de conversões)

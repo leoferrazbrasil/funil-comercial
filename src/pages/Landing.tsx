@@ -38,7 +38,7 @@ import {
 } from "lucide-react";
 import Logo from "../components/Logo";
 import { brandConfig } from "../lib/branding";
-import { SeoHead, generateLocalBusinessSchema } from "../components/SeoHead";
+import { SeoHead, generateEntityGraphSchema } from "../components/SeoHead";
 import { LeadCaptureForm } from "../components/LeadCaptureForm";
 
 // Número de WhatsApp comercial dos CTAs: o número aprovado na Meta e conectado
@@ -183,7 +183,7 @@ export default function LandingPage() {
         title="Estrutura de Vendas para Negócios Locais"
         description="Criação de sites, Google Ads, Meta Ads, WhatsApp e CRM integrados. A estrutura completa para seu negócio atrair e fechar clientes todos os dias."
         canonicalUrl="https://funilcomercial.com/"
-        schema={generateLocalBusinessSchema()}
+        schema={generateEntityGraphSchema()}
       />
       <header className="sticky top-0 z-50 w-full border-b border-white/5 bg-background/80 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 h-16 md:h-20 flex items-center justify-between">
