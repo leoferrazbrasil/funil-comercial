@@ -1,4 +1,9 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.110.0";
+import {
+  describeMetaApiError,
+  isMetaProvider,
+  requiresTemplateForMetaInitiation,
+} from "./rules.ts";
 
 type JsonRecord = Record<string, unknown>;
 type SupabaseClientAny = ReturnType<typeof createClient<any, "public", any>>;
@@ -169,7 +174,9 @@ async function sendMetaTextMessage(phoneNumberId: string, toPhone: string, messa
   const responseBody = (await response.json().catch(() => ({}))) as JsonRecord;
   if (!response.ok) {
     const errorCode = isRecord(responseBody.error) ? responseBody.error.code : "unknown";
-    const errorMessage = isRecord(responseBody.error) ? responseBody.error.message : "Desconhecido";
+    const errorMessage = isRecord(responseBody.error)
+      ? String(responseBody.error.message ?? "Desconhecido")
+      : "Desconhecido";
     
     console.error(
       JSON.stringify({
@@ -181,7 +188,7 @@ async function sendMetaTextMessage(phoneNumberId: string, toPhone: string, messa
       }),
     );
 
-    throw new Error(`Meta API Error [${errorCode}]: ${errorMessage}`);
+    throw new Error(describeMetaApiError(errorCode, errorMessage));
   }
 
   return {
@@ -235,7 +242,9 @@ async function sendMetaTemplateMessage(
   const responseBody = (await response.json().catch(() => ({}))) as JsonRecord;
   if (!response.ok) {
     const errorCode = isRecord(responseBody.error) ? responseBody.error.code : "unknown";
-    const errorMessage = isRecord(responseBody.error) ? responseBody.error.message : "Desconhecido";
+    const errorMessage = isRecord(responseBody.error)
+      ? String(responseBody.error.message ?? "Desconhecido")
+      : "Desconhecido";
 
     console.error(
       JSON.stringify({
@@ -248,7 +257,7 @@ async function sendMetaTemplateMessage(
       }),
     );
 
-    throw new Error(`Meta API Error [${errorCode}]: ${errorMessage}`);
+    throw new Error(describeMetaApiError(errorCode, errorMessage));
   }
 
   return { configured: true, response: responseBody };
@@ -404,8 +413,33 @@ Deno.serve(async (request) => {
     }
 
     let messageId: string | null = null;
-    const isMetaChannel =
-      channel.provider === "whatsapp" || channel.provider === "whatsapp_cloud";
+    const isMetaChannel = isMetaProvider(channel.provider);
+
+    const sourceMessage = await getSourceMessage(
+      supabase,
+      conversationOwnerId,
+      payload.source_message_id,
+    );
+    const sourcePhone = normalizePhone(sourceMessage?.telefone);
+    if (sourceMessage && sourcePhone && sourcePhone !== phone) {
+      return jsonResponse({ error: "Mensagem de origem nao pertence ao telefone informado." }, 403);
+    }
+
+    if (
+      requiresTemplateForMetaInitiation({
+        provider: channel.provider,
+        hasTemplate: Boolean(payload.template?.name),
+        hasSourceMessage: Boolean(sourceMessage?.id),
+      })
+    ) {
+      return jsonResponse(
+        {
+          error:
+            "Para iniciar uma conversa pela Meta Cloud API, envie um template aprovado primeiro. Texto livre so e permitido depois que o lead responder dentro da janela de 24h.",
+        },
+        409,
+      );
+    }
 
     if (payload.template?.name) {
       // Envio de TEMPLATE — exclusivo da Meta Cloud API.
@@ -486,16 +520,6 @@ Deno.serve(async (request) => {
         );
       }
       messageId = providerMessageId(metaResult.response);
-    }
-
-    const sourceMessage = await getSourceMessage(
-      supabase,
-      conversationOwnerId,
-      payload.source_message_id,
-    );
-    const sourcePhone = normalizePhone(sourceMessage?.telefone);
-    if (sourceMessage && sourcePhone && sourcePhone !== phone) {
-      return jsonResponse({ error: "Mensagem de origem nao pertence ao telefone informado." }, 403);
     }
 
     const { data: inboxMessage, error: insertError } = await supabase

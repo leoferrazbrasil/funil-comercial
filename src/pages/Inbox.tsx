@@ -509,6 +509,16 @@ export function conversationMatchesChannelFilter(
   return channelId === channelFilter;
 }
 
+export function requiresTemplateForDraftMetaConversation(
+  isDraft: boolean,
+  activeSendProvider: string | null | undefined,
+) {
+  return (
+    isDraft &&
+    (activeSendProvider === "whatsapp" || activeSendProvider === "whatsapp_cloud")
+  );
+}
+
 type ConversationViewModel = {
   key: string;
   latest: InboxMessage;
@@ -861,6 +871,7 @@ export default function InboxPage({
     () => channels.filter((channel) => channel.status === "ativo"),
     [channels],
   );
+  const activeSendProvider = activeChannels[0]?.provider ?? null;
   const activeChannelIds = useMemo(
     () => new Set(activeChannels.map((channel) => channel.id)),
     [activeChannels],
@@ -1008,6 +1019,10 @@ export default function InboxPage({
     (showDraft ? draftConversation! : undefined);
   const selected = selectedConversation?.latest;
   const sourceMessage = selectedConversation?.latestInbound;
+  const mustUseTemplateForDraft = requiresTemplateForDraftMetaConversation(
+    Boolean(selectedConversation?.isDraft),
+    activeSendProvider,
+  );
   
   const recommendation = selectedConversation
     ? buildInboxRecommendation(selectedConversation.latestInbound)
@@ -1565,6 +1580,27 @@ export default function InboxPage({
                 className="shrink-0 whitespace-nowrap px-4 py-2 bg-amber-500 text-amber-950 font-bold text-xs rounded-xl hover:bg-amber-400 transition-colors w-full sm:w-auto"
               >
                 Reconectar WhatsApp
+              </button>
+            </div>
+          ) : mustUseTemplateForDraft ? (
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-2xl bg-primary/10 border border-primary/25 text-foreground max-w-4xl mx-auto">
+              <div className="flex items-start gap-3 text-sm">
+                <span className="shrink-0 w-8 h-8 rounded-full bg-primary/20 text-primary flex items-center justify-center">
+                  <FileText size={16} />
+                </span>
+                <div>
+                  <strong className="block">Use um template aprovado para iniciar.</strong>
+                  <span className="text-muted-foreground">
+                    Pela Meta Cloud API, texto livre sÃ³ pode ser enviado depois que o lead responder.
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setTemplatePickerOpen(true)}
+                className="shrink-0 whitespace-nowrap px-4 py-2 bg-primary text-primary-foreground font-bold text-xs rounded-xl hover:bg-primary/90 transition-colors w-full sm:w-auto"
+              >
+                Enviar template
               </button>
             </div>
           ) : (
