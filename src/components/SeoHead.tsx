@@ -104,7 +104,7 @@ export const generateEntityGraphSchema = () => {
         "inLanguage": "pt-BR"
       },
       {
-        "@type": ["Organization", "LocalBusiness"],
+        "@type": "Organization",
         "@id": "https://funilcomercial.com/#organization",
         "name": brandConfig.name,
         "url": "https://funilcomercial.com",
@@ -126,6 +126,7 @@ export const generateEntityGraphSchema = () => {
         "@type": "Person",
         "@id": "https://funilcomercial.com/#person",
         "name": "Leonardo Brasil",
+        "url": "https://funilcomercial.com",
         "jobTitle": "Fundador & Estrategista Comercial",
         "worksFor": {
           "@id": "https://funilcomercial.com/#organization"
