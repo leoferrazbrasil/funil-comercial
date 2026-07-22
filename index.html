@@ -61,6 +61,69 @@
       fbq('track', 'PageView');
     </script>
     <!-- End Meta Pixel Code -->
+
+    <!-- Structured Data (Schema Graph: Organization, Person, WebSite, Service) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://funilcomercial.com/#website",
+          "url": "https://funilcomercial.com",
+          "name": "Funil Comercial",
+          "description": "Estrutura de Vendas para Negócios Locais",
+          "publisher": {
+            "@id": "https://funilcomercial.com/#organization"
+          },
+          "inLanguage": "pt-BR"
+        },
+        {
+          "@type": ["Organization", "LocalBusiness"],
+          "@id": "https://funilcomercial.com/#organization",
+          "name": "Funil Comercial",
+          "url": "https://funilcomercial.com",
+          "logo": "https://funilcomercial.com/logo.png",
+          "image": "https://funilcomercial.com/logo.png",
+          "telephone": "+5551996737359",
+          "email": "funil@funilcomercial.com",
+          "description": "Montamos a sua estrutura de vendas para negócios locais de ponta a ponta.",
+          "address": {
+            "@type": "PostalAddress",
+            "addressCountry": "BR"
+          },
+          "founder": {
+            "@id": "https://funilcomercial.com/#person"
+          },
+          "priceRange": "$$"
+        },
+        {
+          "@type": "Person",
+          "@id": "https://funilcomercial.com/#person",
+          "name": "Leonardo Brasil",
+          "jobTitle": "Fundador & Estrategista Comercial",
+          "worksFor": {
+            "@id": "https://funilcomercial.com/#organization"
+          },
+          "image": "https://funilcomercial.com/images/leo-avatar.jpg"
+        },
+        {
+          "@type": "Service",
+          "@id": "https://funilcomercial.com/#service",
+          "name": "Estrutura de Vendas para Negócios Locais",
+          "serviceType": "Consultoria e Implementação Comercial",
+          "provider": {
+            "@id": "https://funilcomercial.com/#organization"
+          },
+          "areaServed": {
+            "@type": "Country",
+            "name": "Brasil"
+          },
+          "description": "Implementação completa de infraestrutura comercial: site de alta conversão, tráfego pago (Google & Meta Ads), automação de WhatsApp e CRM de vendas."
+        }
+      ]
+    }
+    </script>
   </head>
   <body>
     <!-- Meta Pixel Code (noscript) -->

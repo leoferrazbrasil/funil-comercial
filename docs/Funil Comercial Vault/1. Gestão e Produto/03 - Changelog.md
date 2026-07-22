@@ -14,7 +14,7 @@ tags:
 ## [2026-07-22] - SEO: Suporte a Grafo de Entidades (Rich Results & Schema Graph)
 
 ### Adicionado — Schema Graph Interconectado (@graph)
-- Implementada a função `generateEntityGraphSchema()` em `src/components/SeoHead.tsx` e injetada na rota raiz `https://funilcomercial.com` (`Landing.tsx`).
+- Injetada a marcação estática `<script type="application/ld+json">` diretamente no `<head>` do `index.html` (além de `SeoHead.tsx`), garantindo leitura imediata por verificadores estáticos sem execução de JavaScript como o `validator.schema.org`.
 - O schema `@graph` em JSON-LD unifica via `@id` as 4 entidades exigidas para validação em verde no `validator.schema.org` e no Google Rich Results Test:
   - `WebSite` (`@id: https://funilcomercial.com/#website`)
   - `Organization` / `LocalBusiness` (`@id: https://funilcomercial.com/#organization`)
