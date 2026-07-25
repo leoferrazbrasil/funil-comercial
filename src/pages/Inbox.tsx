@@ -90,6 +90,10 @@ import {
   buildCommercialRecommendations,
   formatPriority,
 } from "../services/commercialIntelligence";
+import {
+  isWhatsAppGroupMessage,
+  normalizeConversationPhone,
+} from "../lib/inboxConversationRules";
 import { isSupabaseConfigured, supabase } from "../lib/supabase";
 import type {
   Contact,
@@ -198,34 +202,7 @@ const normalizeSearch = (value: string) =>
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase();
 
-const normalizePhone = (value: string) => value.replace(/\D/g, "");
-
-// Helper to unify Brazilian numbers (with or without 9th digit, and missing 55) for grouping
-const unifyPhone = (phone: string | null | undefined) => {
-  if (!phone) return "";
-  let p = normalizePhone(phone);
-  if (!p) return "";
-  
-  // Strip any leading zeros that might come from raw input
-  while (p.startsWith("0")) {
-    p = p.substring(1);
-  }
-  
-  // If it starts with 550, strip the 0
-  while (p.startsWith("550")) {
-    p = "55" + p.substring(3);
-  }
-  
-  if (p.length === 10 || p.length === 11) {
-    p = "55" + p;
-  }
-  
-  if (p.startsWith("55") && p.length === 13 && p[4] === "9") {
-    // Return the 12-digit version (removing the 9th digit)
-    return p.slice(0, 4) + p.slice(5);
-  }
-  return p;
-};
+const unifyPhone = normalizeConversationPhone;
 
 // Reconstrói o 9º dígito para EXIBIÇÃO. As mensagens são gravadas SEM o 9 (formato
 // de agrupamento/RLS), mas o número real do contato tem o 9 — então exibimos com ele.
@@ -640,6 +617,7 @@ export default function InboxPage({
     const grouped = new Map<string, InboxMessage[]>();
 
       for (const message of filteredMessages) {
+        if (isWhatsAppGroupMessage(message)) continue;
         // We prioritize grouping by phone to merge inbound/outbound from same person.
         // If phone is missing, fallback to contact_id or message_id.
         const key = unifyPhone(message.telefone) || message.contact_id || message.id;

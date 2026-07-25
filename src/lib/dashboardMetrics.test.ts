@@ -5,7 +5,7 @@ import {
   clampRate,
   countBusinessDaysInclusive,
 } from "./dashboardMetrics";
-import type { Contact, CrmSnapshot, Lead, Opportunity } from "./types";
+import type { Contact, CrmSnapshot, InboxMessage, Lead, Opportunity } from "./types";
 
 const ownerId = "owner-1";
 const now = new Date("2026-07-14T12:00:00-03:00");
@@ -67,6 +67,32 @@ function opportunity(
     produto,
     motivo_perda: null,
     created_at,
+  };
+}
+
+function inboxMessage(
+  id: string,
+  telefone: string,
+  created_at = "2026-07-14T09:00:00-03:00",
+  overrides: Partial<InboxMessage> = {},
+): InboxMessage {
+  return {
+    id,
+    owner_id: ownerId,
+    contact_id: null,
+    lead_id: null,
+    channel_id: null,
+    canal: "WhatsApp",
+    provider: "z-api",
+    provider_message_id: `wamid-${id}`,
+    remetente_nome: `Mensagem ${id}`,
+    telefone,
+    mensagem: "Ola",
+    status: "Nova conversa",
+    unread_count: 1,
+    direction: "inbound",
+    created_at,
+    ...overrides,
   };
 }
 
@@ -169,6 +195,49 @@ describe("calculateDashboardRealMetrics", () => {
 
     expect(metrics.currentMonth.leadsFromContacts).toBe(2);
     expect(metrics.rates.contactToLead.value).toBe(1);
+  });
+
+  it("counts today's new unpaired inbound conversations from unique first-time phones", () => {
+    const metrics = calculateDashboardRealMetrics(
+      snapshot({
+        messages: [
+          inboxMessage("new-1", "5547991111000", "2026-07-14T08:00:00-03:00"),
+          inboxMessage("new-1-followup", "554791111000", "2026-07-14T08:05:00-03:00"),
+          inboxMessage("new-2", "5547992222000", "2026-07-14T09:00:00-03:00"),
+        ],
+      }),
+      now,
+    );
+
+    expect(metrics.currentDay.newUnpairedConversations).toBe(2);
+  });
+
+  it("does not count returning, outbound-only, linked or group conversations as new today", () => {
+    const metrics = calculateDashboardRealMetrics(
+      snapshot({
+        contacts: [contact("existing", "2026-07-14T07:00:00-03:00")],
+        leads: [lead("existing-lead", null, "2026-07-14T07:30:00-03:00")],
+        messages: [
+          inboxMessage("yesterday", "5547993333000", "2026-07-13T15:00:00-03:00"),
+          inboxMessage("returning", "5547993333000", "2026-07-14T09:00:00-03:00"),
+          inboxMessage("outbound", "5547994444000", "2026-07-14T09:00:00-03:00", {
+            direction: "outbound",
+            unread_count: 0,
+          }),
+          inboxMessage("linked-message", "5547995555000", "2026-07-14T09:00:00-03:00", {
+            contact_id: "existing",
+          }),
+          inboxMessage("existing-contact", "55119999999existing", "2026-07-14T09:00:00-03:00"),
+          inboxMessage("existing-lead", "55118888888existing-lead", "2026-07-14T09:00:00-03:00"),
+          inboxMessage("group", "5547996666000", "2026-07-14T09:00:00-03:00", {
+            remetente_nome: "Pessoa · Grupo Comercial",
+          }),
+        ],
+      }),
+      now,
+    );
+
+    expect(metrics.currentDay.newUnpairedConversations).toBe(0);
   });
 });
 

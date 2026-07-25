@@ -407,9 +407,9 @@ function extractZApiMessages(payload: JsonRecord): NormalizedInboundMessage[] {
   const isNewsletter = payload.isNewsletter === true || rawPhoneStr.includes("@newsletter");
   const isGroup = payload.isGroup === true || rawPhoneStr.includes("@g.us");
 
-  // Newsletters/communities are one-way broadcast channels (ex.: comunicados de
-  // marketing) — não são conversas de atendimento. Ignorados para não poluir o Inbox.
-  if (isNewsletter) return [];
+  // Newsletters, communities and groups are not one-to-one sales conversations.
+  // Keep them out of the operational Inbox and daily acquisition metrics.
+  if (isNewsletter || isGroup) return [];
 
   const providerMessageId = payloadValue(payload, ["messageId", "id"]);
   const toPhone = normalizePhone(asString(payload.connectedPhone));

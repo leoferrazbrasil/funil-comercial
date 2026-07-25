@@ -1,5 +1,9 @@
 import { effectiveValue, monthlyForProduct, priceForProduct, type Product } from "./products";
-import type { CrmSnapshot, Lead, Opportunity } from "./types";
+import {
+  isWhatsAppGroupMessage,
+  normalizeConversationPhone,
+} from "./inboxConversationRules";
+import type { Contact, CrmSnapshot, InboxMessage, Lead, Opportunity } from "./types";
 
 export type MetricStatus = "ok" | "insufficient";
 
@@ -9,6 +13,9 @@ export type RateMetric = {
 };
 
 export type DashboardRealMetrics = {
+  currentDay: {
+    newUnpairedConversations: number;
+  };
   currentMonth: {
     contacts: number;
     leads: number;
@@ -64,6 +71,14 @@ function endOfMonth(date: Date) {
   return new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59, 999);
 }
 
+function startOfDay(date: Date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0);
+}
+
+function endOfDay(date: Date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59, 999);
+}
+
 function isInRange(dateString: string, start: Date, end: Date) {
   const date = new Date(dateString);
   return date >= start && date <= end;
@@ -80,6 +95,55 @@ function wonThisMonth(opportunity: Opportunity) {
 
 function leadHasCurrentMonthContact(lead: Lead, currentMonthContactIds: Set<string>) {
   return Boolean(lead.contact_id && currentMonthContactIds.has(lead.contact_id));
+}
+
+function hasRecordForPhoneBeforeConversation(
+  records: Array<Pick<Contact | Lead, "telefone" | "created_at">>,
+  phoneKey: string,
+  conversationStart: Date,
+) {
+  return records.some((record) => {
+    if (normalizeConversationPhone(record.telefone) !== phoneKey) return false;
+    return new Date(record.created_at).getTime() <= conversationStart.getTime();
+  });
+}
+
+function countNewUnpairedConversationsToday(snapshot: CrmSnapshot, now: Date) {
+  const dayStart = startOfDay(now);
+  const dayEnd = endOfDay(now);
+  const firstInboundByPhone = new Map<string, InboxMessage>();
+
+  for (const message of snapshot.messages) {
+    if (message.direction !== "inbound") continue;
+    if (isWhatsAppGroupMessage(message)) continue;
+
+    const phoneKey = normalizeConversationPhone(message.telefone);
+    if (!phoneKey) continue;
+
+    const currentFirst = firstInboundByPhone.get(phoneKey);
+    if (
+      !currentFirst ||
+      new Date(message.created_at).getTime() < new Date(currentFirst.created_at).getTime()
+    ) {
+      firstInboundByPhone.set(phoneKey, message);
+    }
+  }
+
+  let total = 0;
+  for (const [phoneKey, firstMessage] of firstInboundByPhone) {
+    const firstMessageDate = new Date(firstMessage.created_at);
+    if (firstMessageDate < dayStart || firstMessageDate > dayEnd) continue;
+    if (firstMessage.contact_id || firstMessage.lead_id) continue;
+    if (
+      hasRecordForPhoneBeforeConversation(snapshot.contacts, phoneKey, firstMessageDate) ||
+      hasRecordForPhoneBeforeConversation(snapshot.leads, phoneKey, firstMessageDate)
+    ) {
+      continue;
+    }
+    total += 1;
+  }
+
+  return total;
 }
 
 export function countBusinessDaysInclusive(start: Date, end: Date) {
@@ -150,6 +214,9 @@ export function calculateDashboardRealMetrics(
   );
 
   return {
+    currentDay: {
+      newUnpairedConversations: countNewUnpairedConversationsToday(snapshot, now),
+    },
     currentMonth: {
       contacts: currentMonthContacts.length,
       leads: currentMonthLeads.length,

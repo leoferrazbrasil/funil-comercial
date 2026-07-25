@@ -680,7 +680,7 @@ export default function Dashboard({
           </div>
         </div>
 
-        <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
           <StatCard
             title="Meta de caixa"
             value={formatMoney(monthlyCashGoal)}
@@ -708,6 +708,13 @@ export default function Dashboard({
             icon={RotateCcw}
             tone="success"
             emptyState="Recorrência nova separada do caixa do mês."
+          />
+          <StatCard
+            title="Conversas novas hoje"
+            value={formatNumber(realMetrics.currentDay.newUnpairedConversations)}
+            icon={MessageCircle}
+            tone="neutral"
+            emptyState="Telefones ineditos, inbound e ainda sem contato/lead."
           />
         </section>
       </header>

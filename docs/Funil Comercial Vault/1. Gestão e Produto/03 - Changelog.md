@@ -11,6 +11,15 @@ tags:
 > [!note] Navegação
 > Histórico de mudanças, mais recente primeiro. Contexto do produto em [[01 - Requisitos]]; arquitetura em [[02 - Arquitetura e Design]]; índice em [[00 - Inicio]].
 
+## [2026-07-25] - Inbox sem grupos + metrica de conversas novas
+
+### Corrigido - Inbox operacional
+- Grupos de WhatsApp deixam de aparecer na lista de conversas da `/inbox`. A regra agora e compartilhada em `src/lib/inboxConversationRules.ts` e cobre mensagens atuais (`metadata.is_group`, `@g.us`) e legado Z-API salvo como `Pessoa · Grupo`.
+- O webhook `whatsapp-inbound` tambem passa a ignorar grupos da Z-API antes de gravar em `inbox_messages`, evitando sujeira nova na operacao.
+
+### Adicionado - Dashboard
+- Novo card **Conversas novas hoje** no `/dashboard`: conta telefones unicos cujo primeiro inbound historico aconteceu hoje, sem `contact_id`/`lead_id`, sem contato/lead pre-existente e excluindo grupos. Detalhe em [[Inbox - Grupos e Conversas Novas Hoje]].
+
 ## [2026-07-22] - SEO: Suporte a Grafo de Entidades (Rich Results & Schema Graph)
 
 ### Adicionado — Schema Graph Interconectado (@graph)

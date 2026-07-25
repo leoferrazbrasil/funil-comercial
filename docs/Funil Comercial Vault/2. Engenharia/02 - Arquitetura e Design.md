@@ -38,7 +38,7 @@ date: 2026-07-09
 ## Edge Functions (Deno)
 
 - `whatsapp-manager` — cria instância/QR, consulta status (Z-API `/status` + `/device`), desconecta. Grava `status='ativo'` separado do `numero`.
-- `whatsapp-inbound` — webhook de mensagens recebidas (Z-API/Meta Cloud API). Z-API: resolve o dono por `instanceId`. Meta: verificação GET (`hub.challenge` + `META_WEBHOOK_VERIFY_TOKEN`), assinatura (`META_APP_SECRET`), parsing `entry→changes→value→messages`, resolve o dono pelo `numero` do canal = `phone_number_id`/`display_phone_number`. Normaliza, ignora newsletters, atribui grupos ao participante, grava em `inbox_messages`. **`verify_jwt=false`**.
+- `whatsapp-inbound` — webhook de mensagens recebidas (Z-API/Meta Cloud API). Z-API: resolve o dono por `instanceId`. Meta: verificação GET (`hub.challenge` + `META_WEBHOOK_VERIFY_TOKEN`), assinatura (`META_APP_SECRET`), parsing `entry→changes→value→messages`, resolve o dono pelo `numero` do canal = `phone_number_id`/`display_phone_number`. Normaliza, ignora newsletters/comunidades/grupos e grava conversas um-a-um em `inbox_messages`. **`verify_jwt=false`**.
 - `whatsapp-qr-inbound` — webhook de conexão/desconexão (`ConnectedCallback`) e Evolution. **`verify_jwt=false`**.
 - `whatsapp-send` — envio de **texto** e de **template** pela Z-API/Evolution/**Meta Cloud API** (Graph API `.../{phone_number_id}/messages`). Usa o canal `ativo` mais recente (`getActiveWhatsAppChannel`). Template (`type: "template"`) é exclusivo da Meta.
 - `whatsapp-templates` — lista os templates **APROVADOS** da Meta (`GET /{WABA_ID}/message_templates`, com paginação). Marca como **não suportados** os que o v1 não envia (cabeçalho de mídia, header com variável, botão dinâmico, variáveis nomeadas, sem corpo). Chamada do navegador (**`verify_jwt`** padrão).
@@ -67,7 +67,8 @@ date: 2026-07-09
 ## Fluxos importantes
 
 - **Conexão WhatsApp:** `/perfil` → create (QR) → usuário escaneia → Z-API conecta → (a) webhook `ConnectedCallback` → `whatsapp-qr-inbound` grava `ativo` → realtime → UI; e/ou (b) polling do `status` (live OR db `ativo`). Requer webhooks configurados no painel Z-API.
-- **Mensagem recebida:** Z-API **ou Meta Cloud API** → `whatsapp-inbound` → resolve dono (instanceId / phone_number_id) → insere em `inbox_messages` → realtime → Inbox atualiza sozinho.
+- **Mensagem recebida:** Z-API **ou Meta Cloud API** → `whatsapp-inbound` → resolve dono (instanceId / phone_number_id) → ignora grupos/newsletters → insere conversa um-a-um em `inbox_messages` → realtime → Inbox atualiza sozinho.
+- **Nova conversa hoje:** `dashboardMetrics` conta telefones cujo primeiro inbound histórico aconteceu no dia atual, ainda sem pareamento com contato/lead e sem registro pré-existente no CRM. Ver [[Inbox - Grupos e Conversas Novas Hoje]].
 - **Contato → Lead → Oportunidade:** vínculo por `contact_id`/`lead_id`; oportunidade guarda `produto` (com preço) e alimenta os cards de receita do Funil (único vs MRR, Fechado vs Projeção).
 
 > [!danger] Envio + janela de 24h (Meta)
