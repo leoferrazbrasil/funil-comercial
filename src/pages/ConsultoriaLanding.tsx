@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { trackEvent } from "../lib/analytics";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import {
   MoveRight,
   Menu,

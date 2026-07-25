@@ -1,5 +1,5 @@
 import { useEffect, useState, type CSSProperties } from "react";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import { getAggregator, type AggregatorConfig, type AggregatorLink, type AggregatorLinkIcon } from "../lib/aggregators";
 import { getAggregatorBySlug } from "../lib/crmService";
 import { resolveAggregatorTheme, type CustomThemeInput } from "../lib/aggregatorThemes";

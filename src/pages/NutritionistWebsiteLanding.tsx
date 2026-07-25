@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { trackWhatsappClick } from "../lib/analytics";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import {
   AlertTriangle,
   ArrowRight,

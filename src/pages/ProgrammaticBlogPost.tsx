@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router";
 import { trackEvent } from "../lib/analytics";
 import { MessageCircle, CheckCircle2, Target, PenTool, Lightbulb, Star, ArrowRight } from "lucide-react";
 import Logo from "../components/Logo";

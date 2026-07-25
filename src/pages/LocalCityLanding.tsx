@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { trackEvent } from "../lib/analytics";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router";
 import {
   ArrowRight,
   CheckCircle2,

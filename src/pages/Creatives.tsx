@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import * as htmlToImage from "html-to-image";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router";
 import { Download, LayoutTemplate, Type, Wand2, RefreshCw, Share2, Target, PenTool, ChevronRight, ArrowLeft, Sparkles, Copy, Check, Camera, BrainCircuit, Hash, X, Plus, ListChecks } from "lucide-react";
 import Logo from "../components/Logo";
 import PublishModal from "../components/PublishModal";

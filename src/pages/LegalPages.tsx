@@ -5,7 +5,7 @@
 //
 // Rotas registradas em App.tsx (bloco isPublicRoute): /privacidade e /termos.
 
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { ArrowLeft } from "lucide-react";
 import Logo from "../components/Logo";
 import { brandConfig } from "../lib/branding";

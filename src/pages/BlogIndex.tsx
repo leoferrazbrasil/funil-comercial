@@ -1,4 +1,4 @@
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router";
 import Logo from "../components/Logo";
 import { SeoHead } from "../components/SeoHead";
 import { blogPosts } from "../lib/blogData";

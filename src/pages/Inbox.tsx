@@ -44,7 +44,7 @@ import {
   useLocation,
   useSearchParams,
   Navigate,
-} from "react-router-dom";
+} from "react-router";
 import {
   QueryClient,
   QueryClientProvider,

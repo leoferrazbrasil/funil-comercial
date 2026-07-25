@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { brandConfig } from '../lib/branding';
 import { Check, Copy, ChevronRight, Menu, X, Download, CheckCircle2, ShieldAlert, Target, Users, Briefcase, LayoutGrid, Activity, Building2, Workflow, MapPin, UserCheck } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import Logo from '../components/Logo';
 import SocialMediaSection from '../components/SocialMediaSection';
 import AvatarGuidelinesSection from '../components/AvatarGuidelinesSection';

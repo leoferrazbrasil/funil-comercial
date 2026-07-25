@@ -4,7 +4,7 @@
 
 import { useState, useEffect } from "react";
 import { trackEvent } from "../lib/analytics";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { MoveRight, Lock, LayoutDashboard, MessageCircle, BarChart3, ChevronDown, CheckCircle2, Building2, Briefcase, Zap, Menu, X, Layers } from "lucide-react";
 import Logo from "../components/Logo";
 import { brandConfig } from "../lib/branding";

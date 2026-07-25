@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import seoLocationsData from "../lib/seoLocations.json";
 import { ArrowRight } from "lucide-react";
 

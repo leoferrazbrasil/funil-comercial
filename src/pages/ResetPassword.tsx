@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { CheckCircle2, Eye, EyeOff, RotateCcw, ShieldCheck, XCircle } from "lucide-react";
 import { supabase } from "../lib/supabase";
 import Logo from "../components/Logo";

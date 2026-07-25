@@ -14,7 +14,7 @@ import {
   useLocation,
   Navigate,
   Link,
-} from "react-router-dom";
+} from "react-router";
 import {
   QueryClient,
   QueryClientProvider,

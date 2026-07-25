@@ -1,6 +1,6 @@
 import type { FormEvent } from "react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { MessageCircle, CheckCircle2, Database, MoveRight, Eye, EyeOff, AlertCircle } from "lucide-react";
 import Logo from "../components/Logo";
 import { brandConfig } from "../lib/branding";

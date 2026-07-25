@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { ArrowRight, Brain, Smartphone, MessageCircle, EyeOff, ShieldCheck } from "lucide-react";
 import Logo from "../components/Logo";
 import { SeoHead, generateFAQSchema } from "../components/SeoHead";

@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link } from "react-router";
 import ReactMarkdown from "react-markdown";
 import Logo from "../components/Logo";
 import { SeoHead } from "../components/SeoHead";

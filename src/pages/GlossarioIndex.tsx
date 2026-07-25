@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import Logo from "../components/Logo";
 import { SeoHead } from "../components/SeoHead";
 import { glossarioTerms } from "../lib/glossarioData";
