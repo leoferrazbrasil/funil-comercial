@@ -1285,6 +1285,80 @@ Como o escritório se blinda?
 
 Quando você embute a tecnologia no seu fluxo de atendimento (CRM, WhatsApp ágil) e mantém a face consultiva do contador, o cliente corporativo sente segurança e não liga em pagar honorários 5 ou 10 vezes maiores que as plataformas low-cost.
     `
+  },
+  {
+    slug: "como-agencias-marketing-ajudam-contabilidade-captar-clientes-b2b",
+    title: "Como agências de marketing ajudam escritórios de contabilidade a captar empresas B2B",
+    excerpt: "Chega de receber propostas para MEIs sem margem. Entenda como uma agência de marketing especializada em contabilidade constrói um funil de vendas B2B para atrair contratos corporativos de alto ticket.",
+    date: "2026-07-26",
+    author: "Leonardo Brasil",
+    authorAvatar: "/images/leo-avatar.jpg",
+    category: "Contabilidade",
+    imageUrl: "/images/contabilidade-b2b-marketing-cover.jpg",
+    content: `
+A maioria dos sócios de escritórios de contabilidade no Brasil compartilha a mesma frustração ao contratar uma agência de marketing tradicional: **"Eles até trazem mensagens no WhatsApp, mas é só microempresa querendo tirar dúvida de graça ou pedindo orçamento de R$ 150 por mês."**
+
+Para captar clientes corporativos de alto valor (Lucro Presumido e Lucro Real), a estratégia de marketing precisa mudar radicalmente do modelo "panfletagem nas redes sociais" para o modelo de **Captação de Intenção B2B**.
+
+### O Erro Fatal: Tratar Venda B2B como Venda B2C
+
+Um empresário que fatura milhões por ano não contrata um novo escritório de contabilidade porque viu uma "dancinha" no Reels ou um post sobre a tabela de IR. Ele troca de contabilidade quando enfrenta uma dor operacional crônica: falta de suporte tributário, erros em guias ou atendimento lento.
+
+Uma [agência de marketing para contabilidade](/agencia-de-marketing/contadores/sp/sao-paulo) de elite atua em 4 frentes técnicas:
+
+### 1. Captura da Intenção de Busca no Google Ads
+Quando o diretor financeiro de uma empresa digita *"agência de marketing contábil"*, *"troca de contabilidade no RJ"* ou *"escritório de contabilidade em Vitória"*, ele está pronto para decidir. A campanha no Google Ads deve direcionar esse empresário para uma Landing Page de alta autoridade focada no segmento dele.
+
+### 2. Landing Page B2B de Qualificação
+A página de destino não pode ser um site institucional antigo de 2015. Ela precisa conter:
+- **Proposta de Valor Clara:** "Blindagem tributária e transição contábil sem burocracia para empresas de médio porte."
+- **Provas Sociais:** Marcas e setores atendidos (indústria, varejo, serviços).
+- **Formulário de Pré-Qualificação:** Antes de abrir o WhatsApp, a página pergunta a faixa de faturamento ou regime tributário atual. Isso filtra curiosos na hora.
+
+### 3. Esteira Comercial com o Funil Comercial CRM
+O ciclo de vendas B2B leva semanas. Se a sua equipe comercial não faz acompanhamento (*follow-up*) estruturado, a proposta expira no vácuo. Ao integrar as campanhas ao **Funil Comercial CRM**, o lead é marcado como *Novo Lead*, entra na fase de *Análise Tributária*, evolui para *Proposta Apresentada* e envia notificações automáticas no WhatsApp do contador responsável caso o cliente demore a responder.
+
+### 4. Conteúdo Relevante para Autoridade (SEO Local)
+Além do tráfego pago, a criação de páginas locais estratégicas para municípios específicos (como Vitória, Joinville, Goiânia e Rio de Janeiro) atrai empresários regionais que buscam um parceiro presencial de confiança.
+
+Captar grandes contas B2B não é sorte. É o resultado previsível de ter uma infraestrutura comercial alinhada do primeiro clique ao contrato assinado.
+    `
+  },
+  {
+    slug: "como-nutricionistas-medicos-captam-pacientes-particulares-google",
+    title: "Como nutricionistas e médicos captam pacientes particulares pelo Google",
+    excerpt: "Aprenda o passo a passo de SEO Local e tráfego pago focado em intenção de busca para lotar a agenda da sua clínica com consultas particulares sem depender de convênios.",
+    date: "2026-07-26",
+    author: "Leonardo Brasil",
+    authorAvatar: "/images/leo-avatar.jpg",
+    category: "Saúde",
+    imageUrl: "/images/nutri-google-marketing-cover.jpg",
+    content: `
+Um dos maiores desafios enfrentados por nutricionistas, médicos e clínicas de saúde em capitais como Brasília, São Paulo e Belo Horizonte é a transição do atendimento dependente de convênios para uma **agenda 100% preenchida por consultas particulares**.
+
+Muitos profissionais investem tempo precioso produzindo conteúdo diário no Instagram e se decepcionam com os resultados. O motivo é simples: o paciente que curte um post no Instagram não necessariamente precisa de uma consulta *hoje*.
+
+Para atrair pacientes prontos para agendar e pagar o valor justo pela sua consulta, a sua clínica precisa dominar o ecossistema de busca do **Google**.
+
+### 1. Otimização Agressiva do Google Meu Negócio (SEO Local)
+Quando um paciente pesquisa por *"nutricionista esportivo em Brasília"* ou *"clínica de nutrição perto de mim"*, ele encontra o **Local Pack do Google Maps**. 
+Para aparecer entre as 3 primeiras posições:
+- **Categorias Exatas:** Mantenha a categoria principal impecável e adicione serviços específicos (ex: Nutricionista, Clínica de Nutrição).
+- **Frequência de Avaliações 5 Estrelas:** Configure seu CRM para enviar um pedido de avaliação automática por WhatsApp assim que o paciente encerra o retorno presencial.
+- **Fotografia Profissional:** Adicione fotos de alta resolução do consultório, da recepção e do profissional em atendimento.
+
+### 2. Anúncios no Google Ads (Rede de Pesquisa)
+Enquanto as redes sociais focam em gerar desejo (topo de funil), a Rede de Pesquisa do Google captura a **intenção de compra no fundo de funil**. O anúncio exibe sua clínica exatamente no segundo em que o paciente busca pela solução da dor dele.
+
+Ao direcionar esses cliques para uma Landing Page de rápida conversão (focada em facilidade de agendamento via WhatsApp), a taxa de conversão do anúncio atinge picos de 15% a 25%.
+
+### 3. Atendimento Imediato na Recepção Digital
+O maior gargalo das clínicas médicas não está no anúncio, mas sim no atendimento da recepção. Se o paciente chama no WhatsApp e a secretária demora 30 minutos para responder, ele já agendou com a clínica concorrente.
+
+Com o **Funil Comercial CRM**, o lead é recebido instantaneamente, e a secretária conta com um roteiro consultivo de qualificação para agendar a consulta particular de forma acolhedora e eficiente.
+
+Se você quer libertar sua clínica dos baixos repasses de planos de saúde, construa a sua estrutura de captação onde o paciente ativamente te procura: no Google.
+    `
   }
 ];
 
