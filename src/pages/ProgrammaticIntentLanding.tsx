@@ -82,7 +82,11 @@ export default function ProgrammaticIntentLanding({ intentType }: IntentProps) {
     pathPrefix = "melhor-crm";
   }
   
-  const whatsappMessage = `Olá! Quero saber mais sobre a solução de ${intentType === 'crm' ? 'CRM' : 'Marketing/Captação'} para ${formattedNicho} em ${formattedCidade}.`;
+  let intentLabel = "Marketing e Estrutura de Vendas";
+  if (intentType === 'crm') intentLabel = "Funil Comercial CRM";
+  if (intentType === 'captacao') intentLabel = "Captação de Clientes";
+  
+  const whatsappMessage = `Olá! Gostaria de um diagnóstico da solução de ${intentLabel} para ${formattedNicho} em ${formattedCidade} - ${formattedEstado}.`;
   const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`;
 
   const schema: any[] = [

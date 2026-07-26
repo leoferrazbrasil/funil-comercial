@@ -63,7 +63,7 @@ export default function LocalCityLanding() {
   const title = `Estrutura de Vendas & Site para ${formattedNicho} em ${formattedCidade} - ${formattedEstado}`;
   const description = `Monte a melhor estrutura de vendas para ${formattedNicho} em ${formattedCidade} (${formattedEstado}). Site de alta conversão, Google Ads, SEO Local e CRM no WhatsApp.`;
   
-  const whatsappMessage = `Olá! Quero saber mais sobre a criação de site para ${formattedNicho} em ${formattedCidade}.`;
+  const whatsappMessage = `Olá! Gostaria de um diagnóstico da estrutura de vendas e captação de clientes para ${formattedNicho} em ${formattedCidade} - ${formattedEstado}.`;
   const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`;
 
   const schema: any[] = [
