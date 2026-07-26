@@ -137,7 +137,7 @@ Organizar o WhatsApp é o primeiro passo para escalar suas vendas e garantir um 
     author: "Leonardo Brasil",
     authorAvatar: "/images/leo-avatar.jpg",
     category: "CRM",
-    imageUrl: "https://images.unsplash.com/photo-1552581234-26160f608093?q=80&w=1200&auto=format&fit=crop",
+    imageUrl: "/images/crm-sales-pipeline-cover.jpg",
     content: `
 A palavra **CRM** (Customer Relationship Management) costumava ser associada apenas a grandes corporações de tecnologia. Hoje, se você tem uma clínica médica, um escritório de contabilidade ou uma empresa de reformas, e não usa um CRM, você está perdendo, no mínimo, 30% do seu faturamento mensal para o esquecimento.
 
@@ -170,7 +170,7 @@ Implementar um CRM é sair do amadorismo e transformar sua prestação de servi�
     author: "Leonardo Brasil",
     authorAvatar: "/images/leo-avatar.jpg",
     category: "Guia Completo",
-    imageUrl: "https://images.unsplash.com/photo-1552581234-26160f608093?q=80&w=1200&auto=format&fit=crop",
+    imageUrl: "/images/sales-guide-cover.jpg",
     clusterType: "pillar",
     content: `
 A era em que um negócio local sobrevivia apenas de indicação e panfletagem acabou. Hoje, a jornada do consumidor local começa invariavelmente na tela de um celular.
