@@ -172,20 +172,62 @@ export const generateLocalBusinessSchema = () => {
 };
 
 // Helper to generate Service Schema
-export const generateServiceSchema = (serviceName: string, description: string) => {
+export const generateServiceSchema = (
+  serviceName: string, 
+  description: string,
+  cityName?: string,
+  stateName?: string
+) => {
   return {
     "@context": "https://schema.org",
     "@type": "Service",
+    "name": serviceName,
     "serviceType": serviceName,
     "provider": {
-      "@type": "LocalBusiness",
-      "name": brandConfig.name
+      "@type": "Organization",
+      "name": brandConfig.name,
+      "url": "https://funilcomercial.com",
+      "logo": "https://funilcomercial.com/logo.png"
     },
-    "areaServed": {
+    "areaServed": cityName ? {
+      "@type": "City",
+      "name": cityName,
+      "containedInPlace": {
+        "@type": "AdministrativeArea",
+        "name": stateName || "Brasil"
+      }
+    } : {
       "@type": "Country",
-      "name": "Brazil"
+      "name": "Brasil"
     },
-    "description": description
+    "description": description,
+    "hasOfferCatalog": {
+      "@type": "OfferCatalog",
+      "name": "Estrutura de Vendas Local",
+      "itemListElement": [
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "Site de Alta Conversão & SEO Local"
+          }
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "Tráfego Pago Google Ads & Meta Ads"
+          }
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "Funil Comercial CRM para WhatsApp"
+          }
+        }
+      ]
+    }
   };
 };
 

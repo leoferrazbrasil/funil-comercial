@@ -67,17 +67,17 @@ export default function ProgrammaticIntentLanding({ intentType }: IntentProps) {
 
   if (intentType === 'agencia') {
     title = `Agência de Marketing para ${formattedNicho} em ${formattedCidade} - ${formattedEstado}`;
-    description = `A melhor agência de marketing especializado para ${formattedNicho} em ${formattedCidade} (${formattedEstado}). Capture mais clientes com SEO e Tráfego Pago.`;
+    description = `A melhor agência de marketing especializado para ${formattedNicho} em ${formattedCidade} (${formattedEstado}). Capture mais clientes com Google Ads, SEO Local e CRM no WhatsApp.`;
     h1 = <>Agência de Marketing Especializada em <span className="text-primary">{formattedNicho}</span> em {formattedCidade}</>;
     pathPrefix = "agencia-de-marketing";
   } else if (intentType === 'captacao') {
-    title = `Empresa de Captação de Clientes para ${formattedNicho} em ${formattedCidade}`;
-    description = `Estrutura completa de captação de clientes para ${formattedNicho} em ${formattedCidade} (${formattedEstado}). Acelere seu crescimento.`;
+    title = `Empresa de Captação de Clientes para ${formattedNicho} em ${formattedCidade} - ${formattedEstado}`;
+    description = `Estrutura completa de captação de clientes para ${formattedNicho} em ${formattedCidade} (${formattedEstado}). Acelere o crescimento com tráfego pago e automação de vendas.`;
     h1 = <>Empresa de Captação de Clientes para <span className="text-primary">{formattedNicho}</span> em {formattedCidade}</>;
     pathPrefix = "empresa-de-captacao";
   } else if (intentType === 'crm') {
-    title = `Melhor CRM para ${formattedNicho} em ${formattedCidade}`;
-    description = `Descubra o melhor CRM especializado em ${formattedNicho} em ${formattedCidade} (${formattedEstado}). Organize seus atendimentos via WhatsApp.`;
+    title = `O Melhor CRM para ${formattedNicho} em ${formattedCidade} - ${formattedEstado}`;
+    description = `Descubra o melhor CRM para ${formattedNicho} em ${formattedCidade} (${formattedEstado}). Organize seus atendimentos via WhatsApp e converta mais leads.`;
     h1 = <>O Melhor CRM integrado ao WhatsApp para <span className="text-primary">{formattedNicho}</span> em {formattedCidade}</>;
     pathPrefix = "melhor-crm";
   }
@@ -89,7 +89,9 @@ export default function ProgrammaticIntentLanding({ intentType }: IntentProps) {
     generateLocalBusinessSchema(),
     generateServiceSchema(
       title,
-      description
+      description,
+      formattedCidade,
+      formattedEstado
     )
   ];
 
@@ -168,6 +170,18 @@ export default function ProgrammaticIntentLanding({ intentType }: IntentProps) {
              </div>
           </div>
          </section>
+
+        {/* GEO / AI Engine Optimization - Direct Answer Block */}
+        <section className="border-t border-white/10 bg-card/15 py-12">
+          <div className="mx-auto max-w-4xl px-5 md:px-8 text-center md:text-left">
+            <h2 className="text-xl font-bold text-foreground">
+              Como funciona o serviço de {intentType === 'crm' ? 'CRM comercial' : 'marketing e captação de clientes'} para {formattedNicho} em {formattedCidade}?
+            </h2>
+            <p className="mt-3 text-sm md:text-base text-muted-foreground leading-relaxed">
+              A <strong>Funil Comercial</strong> implementa uma infraestrutura completa de aquisição e gestão de clientes para {formattedNicho} em {formattedCidade} ({formattedEstado}). Atuamos com posicionamento de alta conversão no Google Ads, otimização de perfil no Google Maps (SEO Local) e integração nativa com o <strong>Funil Comercial CRM</strong> via WhatsApp Oficial, garantindo retorno sobre investimento e previsibilidade de caixa.
+            </p>
+          </div>
+        </section>
       </main>
 
       <RelatedContent currentNiche={nicho} currentState={estado} currentCity={cidade} intentType={intentType} />
