@@ -194,7 +194,49 @@ export default function BlogPost() {
             </div>
           )}
 
-          <div className="mt-20 pt-10 border-t border-white/10 text-center">
+          {/* Hub & Spoke: Dynamic links from Blog Post to Local Landing Pages */}
+          {(() => {
+            const categoryNicheMap: Record<string, { slug: string; name: string }> = {
+              "Contabilidade": { slug: "contadores", name: "Contadores" },
+              "Saúde": { slug: "nutricionistas", name: "Nutricionistas" },
+              "Odontologia": { slug: "dentistas", name: "Dentistas" },
+              "Advocacia": { slug: "advogados", name: "Advogados" },
+              "Psicologia": { slug: "psicologas", name: "Psicólogas" },
+              "Fisioterapia": { slug: "fisioterapeutas", name: "Fisioterapeutas" },
+              "Estética": { slug: "estetica", name: "Clínicas de Estética" },
+            };
+
+            const targetNiche = categoryNicheMap[post.category] || { slug: "contadores", name: "Negócios Locais" };
+            const topCities = [
+              { city: "vitoria", state: "es", name: "Vitória - ES" },
+              { city: "sao-paulo", state: "sp", name: "São Paulo - SP" },
+              { city: "rio-de-janeiro", state: "rj", name: "Rio de Janeiro - RJ" },
+              { city: "belo-horizonte", state: "mg", name: "Belo Horizonte - MG" },
+              { city: "brasilia", state: "df", name: "Brasília - DF" },
+              { city: "curitiba", state: "pr", name: "Curitiba - PR" },
+            ];
+
+            return (
+              <div className="mx-auto px-6 md:px-12 mt-14 pt-8 border-t border-white/10">
+                <h4 className="text-lg font-bold text-foreground mb-4">
+                  Encontre a Estrutura de Vendas para {targetNiche.name} na sua Região:
+                </h4>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {topCities.map((c) => (
+                    <Link
+                      key={c.city}
+                      to={`/local/${targetNiche.slug}/${c.state}/${c.city}`}
+                      className="rounded-xl border border-white/5 bg-black/30 p-3 text-xs font-semibold text-muted-foreground hover:text-primary hover:border-primary/30 transition-all text-center"
+                    >
+                      {targetNiche.name} em {c.name}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
+
+          <div className="mt-14 pt-10 border-t border-white/10 text-center">
             <h3 className="text-2xl font-bold mb-4">Gostou deste conteúdo?</h3>
             <p className="text-muted-foreground mb-8">Nós aplicamos exatamente essas estratégias na criação da sua estrutura de vendas.</p>
             <Link 
