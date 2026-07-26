@@ -51,7 +51,7 @@ O cenário ideal de um Funil Comercial perfeito é **usar os dois de forma combi
     author: "Leonardo Brasil",
     authorAvatar: "/images/leo-avatar.jpg",
     category: "SEO Local",
-    imageUrl: "https://images.unsplash.com/photo-1533750516457-a7e9a0a7fa8d?q=80&w=1200&auto=format&fit=crop",
+    imageUrl: "/images/gmb-optimization-cover.jpg",
     content: `
 Se o seu negócio tem um endereço físico ou atende presencialmente em uma região específica, o seu **Google Meu Negócio** (agora chamado de Perfil da Empresa no Google) é muito mais importante que o seu site. Ponto final.
 
@@ -80,7 +80,7 @@ E não se esqueça: a consistência do seu Nome, Endereço e Telefone (conhecido
     author: "Leonardo Brasil",
     authorAvatar: "/images/leo-avatar.jpg",
     category: "Saúde",
-    imageUrl: "https://images.unsplash.com/photo-1576091160550-2173ff9e5e3c?q=80&w=1200&auto=format&fit=crop",
+    imageUrl: "/images/medical-clinic-google-cover.jpg",
     content: `
 O mercado da saúde é altamente concorrido. Médicos, [dentistas](/estrutura-de-vendas-para-dentistas) e fisioterapeutas muitas vezes investem milhares de reais em agências de marketing e se frustram quando o retorno é apenas um aumento nas "curtidas" do Instagram, mas zero agendamentos particulares no WhatsApp da recepção.
 
