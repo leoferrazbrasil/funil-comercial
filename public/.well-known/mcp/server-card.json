@@ -1,0 +1,12 @@
+{
+  "serverInfo": {
+    "name": "funilcomercial-mcp",
+    "version": "1.0.0"
+  },
+  "endpoint": "https://funilcomercial.com/mcp",
+  "capabilities": {
+    "tools": true,
+    "resources": true,
+    "prompts": false
+  }
+}
