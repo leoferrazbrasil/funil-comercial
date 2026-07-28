@@ -67,6 +67,15 @@
           "value": "application/json"
         }
       ]
+    },
+    {
+      "source": "/auth.md",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/markdown"
+        }
+      ]
     }
   ]
 }
