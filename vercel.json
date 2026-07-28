@@ -28,7 +28,7 @@
       "headers": [
         {
           "key": "Link",
-          "value": "</.well-known/llms.txt>; rel=\"service-doc\""
+          "value": "</.well-known/llms.txt>; rel=\"service-doc\", </.well-known/api-catalog>; rel=\"api-catalog\""
         }
       ]
     },

@@ -18,7 +18,7 @@
 [[headers]]
   for = "/"
   [headers.values]
-    Link = "</.well-known/llms.txt>; rel=\"service-doc\""
+    Link = "</.well-known/llms.txt>; rel=\"service-doc\", </.well-known/api-catalog>; rel=\"api-catalog\""
 
 [[headers]]
   for = "/.well-known/http-message-signatures-directory"
