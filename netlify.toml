@@ -34,3 +34,8 @@
   for = "/.well-known/oauth-authorization-server"
   [headers.values]
     Content-Type = "application/json"
+
+[[headers]]
+  for = "/.well-known/oauth-protected-resource"
+  [headers.values]
+    Content-Type = "application/json"

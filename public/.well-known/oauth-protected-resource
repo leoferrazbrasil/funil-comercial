@@ -1,0 +1,10 @@
+{
+  "resource": "https://funilcomercial.com/api",
+  "authorization_servers": [
+    "https://funilcomercial.com"
+  ],
+  "scopes_supported": [
+    "read",
+    "write"
+  ]
+}
