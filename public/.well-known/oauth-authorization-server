@@ -1,0 +1,14 @@
+{
+  "issuer": "https://funilcomercial.com",
+  "authorization_endpoint": "https://funilcomercial.com/oauth/authorize",
+  "token_endpoint": "https://funilcomercial.com/oauth/token",
+  "jwks_uri": "https://funilcomercial.com/.well-known/http-message-signatures-directory",
+  "grant_types_supported": [
+    "authorization_code",
+    "client_credentials"
+  ],
+  "response_types_supported": [
+    "code",
+    "token"
+  ]
+}

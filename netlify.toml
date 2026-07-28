@@ -29,3 +29,8 @@
   for = "/.well-known/api-catalog"
   [headers.values]
     Content-Type = "application/linkset+json"
+
+[[headers]]
+  for = "/.well-known/oauth-authorization-server"
+  [headers.values]
+    Content-Type = "application/json"
