@@ -147,5 +147,37 @@
     </script>
     <script async defer crossorigin="anonymous" src="https://connect.facebook.net/pt_BR/sdk.js"></script>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      (function() {
+        if ('modelContext' in navigator) {
+          const controller = new AbortController();
+          const toolDef = {
+            name: "schedule_meeting",
+            description: "Schedule a commercial funnel structure meeting with the Funil Comercial team",
+            inputSchema: {
+              type: "object",
+              properties: {},
+              required: []
+            },
+            execute: async (args) => {
+              window.location.href = "https://wa.me/5551996737359?text=Ol%C3%A1,%20gostaria%20de%20agendar%20uma%20reuni%C3%A3o.";
+              return { content: [{ type: "text", text: "Redirected user to WhatsApp for scheduling." }] };
+            }
+          };
+
+          if (typeof navigator.modelContext.provideContext === 'function') {
+            navigator.modelContext.provideContext({ tools: [toolDef] });
+          } else if (typeof navigator.modelContext.registerTool === 'function') {
+            navigator.modelContext.registerTool(
+              toolDef.name,
+              toolDef.description,
+              toolDef.inputSchema,
+              toolDef.execute,
+              { signal: controller.signal }
+            );
+          }
+        }
+      })();
+    </script>
   </body>
 </html>
