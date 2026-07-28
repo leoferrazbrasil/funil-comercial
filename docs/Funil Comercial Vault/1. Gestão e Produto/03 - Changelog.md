@@ -281,7 +281,7 @@ tags:
 ## [2026-07-12] - Agregador de links (`/l/:slug`) — bio do Instagram / produto
 
 ### Adicionado — Página de agregador estilo "linktree"
-- Nova rota **pública `/l/:slug`** (agregador de links) — o **Funil Comercial** é a primeira config (`/l/bio` → `funilcomercial.com/l/bio`), usada na **bio do Instagram**: **Diagnóstico no WhatsApp** (CTA ouro, `wa.me/5551996737359` com mensagem pronta) + **Site**. Visual **dark premium** aprovado por mockup: marca-funil em ouro, selo "Disponível para diagnóstico" com ponto esmeralda pulsante, rodapé das 4 camadas.
+- Nova rota **pública `/l/:slug`** (agregador de links) — o **Funil Comercial** é a primeira config (`/l/bio` → `funilcomercial.com/l/bio`), usada na **bio do Instagram**: **Diagnóstico no WhatsApp** (CTA ouro, `wa.me/5551992568861` com mensagem pronta) + **Site**. Visual **dark premium** aprovado por mockup: marca-funil em ouro, selo "Disponível para diagnóstico" com ponto esmeralda pulsante, rodapé das 4 camadas.
 - **Config-driven:** `src/lib/aggregators.ts` (tipos + configs por slug) + `src/pages/LinkAggregator.tsx`. `App.tsx` ganhou a rota + `/l/` no gate público (`isPublicPath`). Spec: `docs/superpowers/specs/2026-07-12-agregador-links-design.md`.
 
 ### Adicionado — Agregador virou produto multi-tenant (admin + temas)
@@ -365,7 +365,7 @@ tags:
 
 ### Mudado — funilcomercial.com vira a home da EMPRESA (CRM → `/crm`)
 - **Posicionamento:** "Não somos mais uma agência. Montamos a sua estrutura de vendas." Público: **negócio local** (liberais, autônomos, prestadores). Método nomeado: **Método Estrutura de Vendas** — 4 camadas (01 Presença: Site+GMN · 02 Aquisição: tráfego · 03 Conversão: CRM+WhatsApp · 04 Escala: IA+rotina); o cliente entra pela camada que precisa.
-- **Home nova** (`Landing.tsx`): hero, visual das camadas, dores locais, método, esteira de serviços (CTA de WhatsApp **por serviço**, número oficial Meta `5551996737359`), segmentos, 3 passos, fundador, FAQ. **Preços não publicados** — valores fechados no diagnóstico (decisão do dono). A antiga landing do CRM virou **`/crm`** (`CrmLanding.tsx`, rota pública). SEO/OG atualizados.
+- **Home nova** (`Landing.tsx`): hero, visual das camadas, dores locais, método, esteira de serviços (CTA de WhatsApp **por serviço**, número oficial Meta `5551992568861`), segmentos, 3 passos, fundador, FAQ. **Preços não publicados** — valores fechados no diagnóstico (decisão do dono). A antiga landing do CRM virou **`/crm`** (`CrmLanding.tsx`, rota pública). SEO/OG atualizados.
 - **Correções da revisão adversarial (parcial — limite de sessão):** removido claim falso "criptografia de ponta a ponta" (FAQ do `/crm` e Login → TLS + repouso + isolamento por conta); corrigido **mojibake `NegociaÃ§Ã£o`** em `isClosingStage` (5 arquivos — o estágio Negociação nunca casava); tráfego explicita "verba à parte".
 
 ## [2026-07-11] - Campanhas Fase 2: persistência + agendamento (envio server-side)

@@ -5,7 +5,7 @@ import { SeoHead, generateFAQSchema } from "../components/SeoHead";
 import { LeadCaptureForm } from "../components/LeadCaptureForm";
 import { trackWhatsappClick } from "../lib/analytics";
 
-const WHATSAPP_NUMBER = "5551996737359";
+const WHATSAPP_NUMBER = "5551992568861";
 const WHATSAPP_MESSAGE = "Olá! Vim pela página da Estrutura de Vendas para Nutricionistas e gostaria de fazer o diagnóstico gratuito do meu consultório.";
 const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`;
 

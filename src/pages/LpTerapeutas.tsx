@@ -3,7 +3,7 @@ import { ArrowRight, Sparkles, Leaf, HeartHandshake, MessageCircle, Link2Off } f
 import Logo from "../components/Logo";
 import { SeoHead, generateFAQSchema } from "../components/SeoHead";
 
-const WHATSAPP_NUMBER = "5551996737359";
+const WHATSAPP_NUMBER = "5551992568861";
 const WHATSAPP_MESSAGE = "Olá! Vim pela página da Estrutura de Captação para Terapeutas e gostaria de conversar sobre o meu espaço terapêutico.";
 const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`;
 

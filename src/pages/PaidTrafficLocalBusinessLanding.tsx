@@ -24,7 +24,7 @@ import {
 import Logo from "../components/Logo";
 import { SeoHead, generateServiceSchema } from "../components/SeoHead";
 
-const WHATSAPP_NUMBER = "5551996737359";
+const WHATSAPP_NUMBER = "5551992568861";
 const WHATSAPP_MESSAGE =
   "Olá! Tenho interesse em tráfego pago com CRM e WhatsApp conectado. Vi que o setup é R$497 e a gestão começa em R$997/mês. Pode me explicar como funciona?";
 const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`;

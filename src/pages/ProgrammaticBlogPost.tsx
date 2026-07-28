@@ -7,7 +7,7 @@ import { seoNicheData, getDefaultNicheData } from "../lib/seoNicheData";
 import { EDITORIAL_PILLARS } from "../lib/editorialPillars";
 import { RelatedContent } from "../components/RelatedContent";
 
-const WHATSAPP_NUMBER = "5551996737359";
+const WHATSAPP_NUMBER = "5551992568861";
 
 // Helper to format strings like "sao-paulo" to "São Paulo"
 function formatLocationName(slug?: string) {

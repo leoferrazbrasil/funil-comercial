@@ -16,7 +16,7 @@ const normalizePhone = (value: string | null | undefined) => {
 
 Deno.test("extractCloudReferral lê o ctwa_clid do referral da Cloud API", () => {
   const referral = extractCloudReferral({
-    from: "5551996737359",
+    from: "5551992568861",
     type: "text",
     referral: {
       source_url: "https://fb.me/abc",
@@ -35,12 +35,12 @@ Deno.test("extractCloudReferral lê o ctwa_clid do referral da Cloud API", () =>
 });
 
 Deno.test("extractCloudReferral devolve null em mensagem comum", () => {
-  assertEquals(extractCloudReferral({ from: "5551996737359", type: "text" }), null);
+  assertEquals(extractCloudReferral({ from: "5551992568861", type: "text" }), null);
 });
 
 Deno.test("extractCloudReferral ignora referral sem identificador útil", () => {
   const referral = extractCloudReferral({
-    from: "5551996737359",
+    from: "5551992568861",
     referral: { headline: "só título, sem id" },
   });
   assertEquals(referral, null);
@@ -53,7 +53,7 @@ Deno.test("extractReferralsByPhone indexa pelo telefone normalizado", () => {
       changes: [{
         value: {
           messages: [{
-            from: "5551996737359",
+            from: "5551992568861",
             referral: { source_id: "120", ctwa_clid: "CLID-A" },
           }],
         },
@@ -68,7 +68,7 @@ Deno.test("extractReferralsByPhone indexa pelo telefone normalizado", () => {
 Deno.test("extractZApiReferral captura o anúncio mas SEM ctwa_clid", () => {
   const referral = extractZApiReferral({
     instanceId: "abc",
-    phone: "5551996737359",
+    phone: "5551992568861",
     referralAd: {
       sourceId: "120210000000000000",
       sourceUrl: "https://fb.me/abc",
@@ -83,5 +83,5 @@ Deno.test("extractZApiReferral captura o anúncio mas SEM ctwa_clid", () => {
 });
 
 Deno.test("extractZApiReferral devolve null quando não há bloco de anúncio", () => {
-  assertEquals(extractZApiReferral({ instanceId: "abc", phone: "5551996737359" }), null);
+  assertEquals(extractZApiReferral({ instanceId: "abc", phone: "5551992568861" }), null);
 });

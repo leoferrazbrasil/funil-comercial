@@ -25,7 +25,7 @@ import {
 import Logo from "../components/Logo";
 import { SeoHead, generateServiceSchema } from "../components/SeoHead";
 
-const WHATSAPP_NUMBER = "5551996737359";
+const WHATSAPP_NUMBER = "5551992568861";
 const WHATSAPP_MESSAGE =
   "Olá! Quero testar o CRM com WhatsApp conectado por 7 dias. Vi que o setup é R$597 e a mensalidade é R$97. Pode me explicar como funciona?";
 const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`;

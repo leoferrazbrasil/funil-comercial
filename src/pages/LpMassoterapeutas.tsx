@@ -3,7 +3,7 @@ import { ArrowRight, BadgeDollarSign, Smartphone, UserMinus, Activity, CalendarR
 import Logo from "../components/Logo";
 import { SeoHead, generateFAQSchema } from "../components/SeoHead";
 
-const WHATSAPP_NUMBER = "5551996737359";
+const WHATSAPP_NUMBER = "5551992568861";
 const WHATSAPP_MESSAGE = "Olá! Vim pela página da Estrutura de Captação para Massoterapeutas e gostaria de conversar sobre a minha clínica/espaço.";
 const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`;
 

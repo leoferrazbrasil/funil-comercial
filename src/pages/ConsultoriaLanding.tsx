@@ -18,7 +18,7 @@ import Logo from "../components/Logo";
 import { brandConfig } from "../lib/branding";
 import { SeoHead } from "../components/SeoHead";
 
-const WHATSAPP_NUMBER = "5551996737359";
+const WHATSAPP_NUMBER = "5551992568861";
 const WHATSAPP_MESSAGE = "Olá! Quero agendar um diagnóstico da minha estrutura comercial.";
 const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`;
 

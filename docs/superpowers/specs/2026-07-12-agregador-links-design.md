@@ -25,7 +25,7 @@ type AggregatorConfig = { slug; name; tagline?; avatarUrl?; status?; footer?; fo
 export const AGGREGATORS: Record<string, AggregatorConfig>;  // FC = "funilcomercial"
 export const getAggregator(slug?): AggregatorConfig | undefined;
 ```
-FC: WhatsApp `wa.me/5551996737359` (com mensagem pronta) + `funilcomercial.com`; status "Disponível para diagnóstico"; footer "Presença · Aquisição · Conversão · Escala" (Conversão em ouro).
+FC: WhatsApp `wa.me/5551992568861` (com mensagem pronta) + `funilcomercial.com`; status "Disponível para diagnóstico"; footer "Presença · Aquisição · Conversão · Escala" (Conversão em ouro).
 
 ### Página — `src/pages/LinkAggregator.tsx`
 - `useParams()` → slug → `getAggregator`. Sem config → "não encontrado" minimalista (link p/ funilcomercial.com).

@@ -5,7 +5,7 @@ import { SeoHead } from "../components/SeoHead";
 import { glossarioTerms } from "../lib/glossarioData";
 import { ArrowLeft, MessageCircle } from "lucide-react";
 
-const WHATSAPP_NUMBER = "5551996737359";
+const WHATSAPP_NUMBER = "5551992568861";
 const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=Ol%C3%A1%2C%20estava%20lendo%20o%20Gloss%C3%A1rio%20e%20gostaria%20de%20ajuda%20para%20aplicar%20isso%20no%20meu%20neg%C3%B3cio.`;
 
 export default function GlossarioTermo() {

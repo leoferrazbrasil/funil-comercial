@@ -32,7 +32,7 @@ Deno.test("buildMessagingEvent hasheia toda PII em SHA-256", async () => {
     eventName: "Lead",
     eventId: "lead-1:Lead",
     eventTime: 1_784_000_000,
-    phone: "51996737359",
+    phone: "51992568861",
     firstName: "Maria",
     lastName: "Souza",
   });
@@ -55,7 +55,7 @@ Deno.test("buildMessagingEvent normaliza telefone BR sem DDI antes do hash", asy
     eventName: "Lead",
     eventId: "a",
     eventTime: 1,
-    phone: "5551996737359",
+    phone: "5551992568861",
   });
   const semDdi = await buildMessagingEvent({
     eventName: "Lead",
@@ -75,7 +75,7 @@ Deno.test("buildMessagingEvent inclui custom_data só quando há valor", async (
     eventName: "Lead",
     eventId: "a",
     eventTime: 1,
-    phone: "51996737359",
+    phone: "51992568861",
   });
   assertEquals(semValor.custom_data, undefined);
 
@@ -83,7 +83,7 @@ Deno.test("buildMessagingEvent inclui custom_data só quando há valor", async (
     eventName: "Purchase",
     eventId: "b",
     eventTime: 1,
-    phone: "51996737359",
+    phone: "51992568861",
     value: 1497,
   });
   assertEquals(comValor.custom_data, { value: 1497, currency: "BRL" });

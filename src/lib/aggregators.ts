@@ -44,7 +44,7 @@ export const AGGREGATORS: Record<string, AggregatorConfig> = {
         icon: "whatsapp",
         label: "Diagnóstico no WhatsApp",
         sublabel: "Grátis · resposta rápida",
-        href: "https://wa.me/5551996737359?text=Quero%20um%20diagn%C3%B3stico%20gratuito%20da%20minha%20estrutura%20de%20vendas",
+        href: "https://wa.me/5551992568861?text=Quero%20um%20diagn%C3%B3stico%20gratuito%20da%20minha%20estrutura%20de%20vendas",
       },
       {
         variant: "secondary",

@@ -12,7 +12,7 @@ import { SeoHead, generateLocalBusinessSchema, generateServiceSchema, generateFA
 import { seoNicheData, getDefaultNicheData } from "../lib/seoNicheData";
 import { RelatedContent } from "../components/RelatedContent";
 
-const WHATSAPP_NUMBER = "5551996737359";
+const WHATSAPP_NUMBER = "5551992568861";
 
 function formatLocationName(slug?: string) {
   if (!slug) return "";

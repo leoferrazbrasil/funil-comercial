@@ -23,7 +23,7 @@ import {
 import Logo from "../components/Logo";
 import { SeoHead, generateLocalBusinessSchema, generateServiceSchema } from "../components/SeoHead";
 
-const WHATSAPP_NUMBER = "5551996737359";
+const WHATSAPP_NUMBER = "5551992568861";
 const WHATSAPP_MESSAGE =
   "Olá! Tenho interesse no site profissional de R$497 + R$37,90/mês. Pode me explicar como funciona?";
 const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`;

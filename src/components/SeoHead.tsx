@@ -110,7 +110,7 @@ export const generateEntityGraphSchema = () => {
         "url": "https://funilcomercial.com",
         "logo": "https://funilcomercial.com/logo.png",
         "image": "https://funilcomercial.com/logo.png",
-        "telephone": "+5551996737359",
+        "telephone": "+5551992568861",
         "email": "funil@funilcomercial.com",
         "description": "Montamos a sua estrutura de vendas para negócios locais de ponta a ponta.",
         "address": {
@@ -160,7 +160,7 @@ export const generateLocalBusinessSchema = () => {
     "image": "https://funilcomercial.com/logo.png",
     "@id": "https://funilcomercial.com",
     "url": "https://funilcomercial.com",
-    "telephone": "+5551996737359",
+    "telephone": "+5551992568861",
     "email": "funil@funilcomercial.com",
     "address": {
       "@type": "PostalAddress",

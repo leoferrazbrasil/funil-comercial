@@ -12,7 +12,7 @@ data: 2026-07-20
 # Inbox — Incidente "Legado / sem canal"
 
 > [!abstract] O que aconteceu
-> Mensagem nova de um lead (Z-API, `5551996737359`) chegou no WhatsApp mas não apareceu no filtro padrão do `/inbox` ("Número atual" / `ativos`) — só aparecia em "Todas". A investigação revelou **duas causas empilhadas**, corrigidas em sequência.
+> Mensagem nova de um lead (Z-API, `5551992568861`) chegou no WhatsApp mas não apareceu no filtro padrão do `/inbox` ("Número atual" / `ativos`) — só aparecia em "Todas". A investigação revelou **duas causas empilhadas**, corrigidas em sequência.
 
 ## Sintomas (ordem em que apareceram)
 1. Mensagem some do filtro padrão, aparece em "Todas" com a etiqueta **"Legado / sem canal"**.

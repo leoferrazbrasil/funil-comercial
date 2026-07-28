@@ -43,7 +43,7 @@ import { LeadCaptureForm } from "../components/LeadCaptureForm";
 
 // Número de WhatsApp comercial dos CTAs: o número aprovado na Meta e conectado
 // ao painel via API Oficial. Ajustar aqui se o canal de atendimento mudar.
-const WHATSAPP_NUMBER = "5551996737359";
+const WHATSAPP_NUMBER = "5551992568861";
 const WHATSAPP_MESSAGE =
   "Olá! Quero um diagnóstico gratuito da estrutura de vendas do meu negócio.";
 const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`;
