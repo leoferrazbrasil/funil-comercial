@@ -25,6 +25,7 @@ import {
   Wrench,
 } from "lucide-react";
 import Logo from "../components/Logo";
+import { SeoHead, generateServiceSchema } from "../components/SeoHead";
 
 const WHATSAPP_NUMBER = "5551996737359";
 const WHATSAPP_MESSAGE =
@@ -157,16 +158,7 @@ const faq = [
   },
 ];
 
-function updateMetaDescription(content: string) {
-  let meta = document.querySelector<HTMLMetaElement>('meta[name="description"]');
-  if (!meta) {
-    meta = document.createElement("meta");
-    meta.name = "description";
-    document.head.appendChild(meta);
-  }
 
-  meta.content = content;
-}
 
 function DiagnosticMap() {
   return (
@@ -203,24 +195,22 @@ function DiagnosticMap() {
 }
 
 export default function SalesStructureDiagnosticLanding() {
-  useEffect(() => {
-    const previousTitle = document.title;
-    const meta = document.querySelector<HTMLMetaElement>('meta[name="description"]');
-    const previousDescription = meta?.content;
-    const description =
-      "Descubra se o seu negócio local está travando na Presença, Aquisição, Conversão ou Escala. Peça um diagnóstico gratuito da sua estrutura de vendas.";
+  const description =
+    "Descubra se o seu negócio local está travando na Presença, Aquisição, Conversão ou Escala. Peça um diagnóstico gratuito da sua estrutura de vendas.";
 
-    document.title = "Diagnóstico Gratuito de Estrutura de Vendas | Funil Comercial";
-    updateMetaDescription(description);
-
-    return () => {
-      document.title = previousTitle;
-      if (previousDescription) updateMetaDescription(previousDescription);
-    };
-  }, []);
+  const schema = generateServiceSchema(
+    "Diagnóstico Gratuito",
+    description
+  );
 
   return (
     <div data-theme="dark" className="min-h-screen bg-background text-foreground">
+      <SeoHead
+        title="Diagnóstico Gratuito de Estrutura de Vendas"
+        description={description}
+        canonicalUrl="https://funilcomercial.com/diagnostico-estrutura-de-vendas"
+        schema={schema}
+      />
       <header className="sticky top-0 z-50 border-b border-white/10 bg-background/90 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 md:h-20 md:px-8">
           <Link to="/" aria-label="Funil Comercial">

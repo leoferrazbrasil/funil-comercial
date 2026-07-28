@@ -23,6 +23,7 @@ import {
   UsersRound,
 } from "lucide-react";
 import Logo from "../components/Logo";
+import { SeoHead, generateServiceSchema } from "../components/SeoHead";
 
 const WHATSAPP_NUMBER = "5551996737359";
 const WHATSAPP_MESSAGE =
@@ -212,16 +213,7 @@ const faq = [
   },
 ];
 
-function updateMetaDescription(content: string) {
-  let meta = document.querySelector<HTMLMetaElement>('meta[name="description"]');
-  if (!meta) {
-    meta = document.createElement("meta");
-    meta.name = "description";
-    document.head.appendChild(meta);
-  }
 
-  meta.content = content;
-}
 
 function ConversionFlowMockup() {
   const flow = [
@@ -305,24 +297,22 @@ function ConversionFlowMockup() {
 }
 
 export default function CrmWhatsappLanding() {
-  useEffect(() => {
-    const previousTitle = document.title;
-    const meta = document.querySelector<HTMLMetaElement>('meta[name="description"]');
-    const previousDescription = meta?.content;
-    const description =
-      "Organize contatos, leads, conversas e oportunidades com o CRM Funil Comercial. WhatsApp conectado incluso, teste grátis de 7 dias, setup R$597 e mensalidade R$97.";
+  const description =
+    "Organize contatos, leads, conversas e oportunidades com o CRM Funil Comercial. WhatsApp conectado incluso, teste grátis de 7 dias, setup R$597 e mensalidade R$97.";
 
-    document.title = "CRM com WhatsApp para Negócios Locais | Funil Comercial";
-    updateMetaDescription(description);
-
-    return () => {
-      document.title = previousTitle;
-      if (previousDescription) updateMetaDescription(previousDescription);
-    };
-  }, []);
+  const schema = generateServiceSchema(
+    "CRM com WhatsApp",
+    description
+  );
 
   return (
     <div data-theme="dark" className="min-h-screen bg-background text-foreground">
+      <SeoHead
+        title="CRM com WhatsApp para Negócios Locais"
+        description={description}
+        canonicalUrl="https://funilcomercial.com/crm-whatsapp-organizado"
+        schema={schema}
+      />
       <header className="sticky top-0 z-50 border-b border-white/10 bg-background/90 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 md:h-20 md:px-8">
           <Link to="/" aria-label="Funil Comercial">

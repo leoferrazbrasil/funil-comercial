@@ -21,6 +21,7 @@ import {
   Wrench,
 } from "lucide-react";
 import Logo from "../components/Logo";
+import { SeoHead, generateServiceSchema } from "../components/SeoHead";
 
 const WHATSAPP_NUMBER = "5551996737359";
 const WHATSAPP_MESSAGE =
@@ -131,16 +132,7 @@ const faq = [
   },
 ];
 
-function updateMetaDescription(content: string) {
-  let meta = document.querySelector<HTMLMetaElement>('meta[name="description"]');
-  if (!meta) {
-    meta = document.createElement("meta");
-    meta.name = "description";
-    document.head.appendChild(meta);
-  }
 
-  meta.content = content;
-}
 
 function LocalProfileMockup() {
   return (
@@ -196,24 +188,22 @@ function LocalProfileMockup() {
 }
 
 export default function GoogleBusinessProfileLanding() {
-  useEffect(() => {
-    const previousTitle = document.title;
-    const meta = document.querySelector<HTMLMetaElement>('meta[name="description"]');
-    const previousDescription = meta?.content;
-    const description =
-      "Otimize o Perfil da Empresa no Google do seu negócio local por R$797, pagamento único e sem mensalidade. Organize serviços, fotos, contatos e presença local.";
+  const description =
+    "Otimize o Perfil da Empresa no Google do seu negócio local por R$797, pagamento único e sem mensalidade. Organize serviços, fotos, contatos e presença local.";
 
-    document.title = "Otimização Google Meu Negócio por R$797 | Funil Comercial";
-    updateMetaDescription(description);
-
-    return () => {
-      document.title = previousTitle;
-      if (previousDescription) updateMetaDescription(previousDescription);
-    };
-  }, []);
+  const schema = generateServiceSchema(
+    "Otimização Google Meu Negócio",
+    description
+  );
 
   return (
     <div data-theme="dark" className="min-h-screen bg-background text-foreground">
+      <SeoHead
+        title="Otimização Google Meu Negócio por R$797"
+        description={description}
+        canonicalUrl="https://funilcomercial.com/google-meu-negocio"
+        schema={schema}
+      />
       <header className="sticky top-0 z-50 border-b border-white/10 bg-background/90 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 md:h-20 md:px-8">
           <Link to="/" aria-label="Funil Comercial">
