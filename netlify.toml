@@ -19,3 +19,13 @@
   for = "/"
   [headers.values]
     Link = "</.well-known/llms.txt>; rel=\"service-doc\""
+
+[[headers]]
+  for = "/.well-known/http-message-signatures-directory"
+  [headers.values]
+    Content-Type = "application/json"
+
+[[headers]]
+  for = "/.well-known/api-catalog"
+  [headers.values]
+    Content-Type = "application/linkset+json"

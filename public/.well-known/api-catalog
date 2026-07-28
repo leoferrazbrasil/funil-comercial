@@ -1,0 +1,25 @@
+{
+  "linkset": [
+    {
+      "anchor": "https://funilcomercial.com/api",
+      "service-desc": [
+        {
+          "href": "https://funilcomercial.com/api/openapi.yaml",
+          "type": "application/vnd.oai.openapi"
+        }
+      ],
+      "service-doc": [
+        {
+          "href": "https://funilcomercial.com/docs/api",
+          "type": "text/html"
+        }
+      ],
+      "status": [
+        {
+          "href": "https://funilcomercial.com/api/health",
+          "type": "application/json"
+        }
+      ]
+    }
+  ]
+}
