@@ -22,6 +22,15 @@
           "value": "1; mode=block"
         }
       ]
+    },
+    {
+      "source": "/",
+      "headers": [
+        {
+          "key": "Link",
+          "value": "</.well-known/llms.txt>; rel=\"service-doc\""
+        }
+      ]
     }
   ]
 }
