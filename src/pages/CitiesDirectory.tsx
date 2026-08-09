@@ -61,24 +61,48 @@ export default function CitiesDirectory() {
                    {citiesByState[estado].map(city => (
                      <div key={city.cidade} className="rounded-xl border border-white/10 bg-card/30 p-6">
                         <h3 className="text-xl font-bold mb-4">{city.nome}</h3>
-                        <ul className="flex flex-col gap-2">
+                        <div className="flex flex-col gap-2">
                            {NICHES.map(niche => (
-                             <li key={niche.slug} className="mb-4">
-                                <Link 
-                                  to={`/local/${niche.slug}/${city.estado}/${city.cidade}`}
-                                  className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-2 before:content-[''] before:w-1 before:h-1 before:bg-primary/50 before:rounded-full hover:before:bg-primary"
-                                >
-                                   Site para {niche.nome} em {city.nome}
-                                </Link>
-                                <Link 
-                                  to={`/blog/guia-de-vendas/${niche.slug}/${city.estado}/${city.cidade}`}
-                                  className="text-xs text-muted-foreground/60 hover:text-primary transition-colors ml-3 mt-1 flex items-center gap-2 before:content-['↳']"
-                                >
-                                   Guia de Atração de {niche.nome}
-                                </Link>
-                             </li>
+                             <div key={niche.slug} className="mb-5 border-b border-white/5 pb-4 last:border-0 last:pb-0">
+                                <h4 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-primary/70"></span>
+                                  {niche.nome}
+                                </h4>
+                                <div className="flex flex-col gap-1.5 ml-3">
+                                  <Link 
+                                    to={`/local/${niche.slug}/${city.estado}/${city.cidade}`}
+                                    className="text-xs text-muted-foreground hover:text-primary transition-colors"
+                                  >
+                                     • Site e Estrutura de Vendas
+                                  </Link>
+                                  <Link 
+                                    to={`/agencia-de-marketing/${niche.slug}/${city.estado}/${city.cidade}`}
+                                    className="text-xs text-muted-foreground hover:text-primary transition-colors"
+                                  >
+                                     • Agência de Marketing Especializada
+                                  </Link>
+                                  <Link 
+                                    to={`/empresa-de-captacao/${niche.slug}/${city.estado}/${city.cidade}`}
+                                    className="text-xs text-muted-foreground hover:text-primary transition-colors"
+                                  >
+                                     • Empresa de Captação de Clientes
+                                  </Link>
+                                  <Link 
+                                    to={`/melhor-crm/${niche.slug}/${city.estado}/${city.cidade}`}
+                                    className="text-xs text-muted-foreground hover:text-primary transition-colors"
+                                  >
+                                     • CRM para {niche.nome}
+                                  </Link>
+                                  <Link 
+                                    to={`/blog/guia-de-vendas/${niche.slug}/${city.estado}/${city.cidade}`}
+                                    className="text-xs text-muted-foreground hover:text-primary transition-colors"
+                                  >
+                                     • Guia de Vendas e Atração
+                                  </Link>
+                                </div>
+                             </div>
                            ))}
-                        </ul>
+                        </div>
                      </div>
                    ))}
                  </div>

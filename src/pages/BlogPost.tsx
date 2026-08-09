@@ -119,7 +119,7 @@ export default function BlogPost() {
             >
                <div className="h-12 w-12 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary text-lg overflow-hidden border-2 border-primary/20">
                  {post.authorAvatar ? (
-                   <img src={post.authorAvatar} alt={post.author} className="h-full w-full object-cover" />
+                   <img src={post.authorAvatar} alt={post.author} className="h-full w-full object-cover" loading="lazy" />
                  ) : (
                    post.author.charAt(0)
                  )}

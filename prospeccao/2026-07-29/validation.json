@@ -1,0 +1,15 @@
+{
+  "date": "2026-07-29",
+  "rows": 30,
+  "columns": 32,
+  "qualified": 30,
+  "uniqueSites": 30,
+  "uniquePhones": 30,
+  "invalidWa": 0,
+  "filledShortUrls": 0,
+  "rejectedCount": 7,
+  "csvPath": "D:\\LEONARDO\\Drive\\Projetos\\funil-comercial\\prospeccao\\2026-07-29\\prospeccao_2026-07-29.csv",
+  "jsonPath": "D:\\LEONARDO\\Drive\\Projetos\\funil-comercial\\prospeccao\\2026-07-29\\qualification-capture.json",
+  "xlsxPath": "D:\\LEONARDO\\Drive\\Projetos\\funil-comercial\\prospeccao\\2026-07-29\\Prospeccao_Ativa_2026-07-29.xlsx",
+  "previewPath": "D:\\LEONARDO\\Drive\\Projetos\\funil-comercial\\prospeccao\\2026-07-29\\preview.png"
+}
