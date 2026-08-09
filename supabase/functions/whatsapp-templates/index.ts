@@ -5,7 +5,7 @@
 // Requer secrets: META_WHATSAPP_ACCESS_TOKEN e META_WABA_ID (ID da conta
 // WhatsApp Business). Mantém verify_jwt=true (padrão) — só usuários autenticados.
 
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.110.0";
+import { createClient } from "npm:@supabase/supabase-js@2.110.0";
 
 type JsonRecord = Record<string, unknown>;
 

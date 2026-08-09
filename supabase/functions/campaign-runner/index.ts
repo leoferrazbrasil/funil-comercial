@@ -6,7 +6,7 @@
 // atomicamente antes do envio; destinatários presos em 'sending' há muito tempo
 // são recuperados. verify_jwt=false (config.toml); autentica internamente.
 
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.110.0";
+import { createClient } from "npm:@supabase/supabase-js@2.110.0";
 
 type JsonRecord = Record<string, unknown>;
 type SupabaseClientAny = ReturnType<typeof createClient<any, "public", any>>;

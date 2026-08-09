@@ -1,4 +1,4 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.110.0";
+import { createClient } from "npm:@supabase/supabase-js@2.110.0";
 import { buildMetaLeadEvent, sendMetaLeadEvent } from "./capi.ts";
 
 // Intake público de leads do formulário web. Grava um lead com o GA4 client_id
