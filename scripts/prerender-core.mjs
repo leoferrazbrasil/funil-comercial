@@ -56,7 +56,8 @@ async function prerender() {
     await page.setRequestInterception(true);
     page.on('request', (req) => {
       const resourceType = req.resourceType();
-      if (['image', 'media', 'font', 'websocket'].includes(resourceType)) {
+      const isAdSenseRequest = req.url().includes('pagead2.googlesyndication.com');
+      if (isAdSenseRequest || ['image', 'media', 'font', 'websocket'].includes(resourceType)) {
         req.abort();
       } else {
         req.continue();
