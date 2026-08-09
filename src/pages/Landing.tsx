@@ -672,6 +672,7 @@ export default function LandingPage() {
               <Link to="/blog" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">Blog</Link>
               <Link to="/cidades-atendidas" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">Cidades Atendidas</Link>
               <Link to="/crm" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">CRM</Link>
+              <Link to="/contato" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">Contato</Link>
               <Link to="/termos" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">Termos</Link>
               <Link to="/privacidade" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">Privacidade</Link>
               <Link to="/exclusao-de-dados" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">Exclusão de Dados</Link>

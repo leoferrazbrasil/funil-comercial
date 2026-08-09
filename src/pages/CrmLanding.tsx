@@ -422,6 +422,7 @@ export default function CrmLandingPage() {
                 <p>Razão social: LEONARDO FERRAZ DA SILVA BRASIL</p>
                 <p>CNPJ: 65.993.728/0001-07</p>
                 <p>E-mail: <a href="mailto:funil@funilcomercial.com" className="hover:text-primary transition-colors">funil@funilcomercial.com</a></p>
+                <p><Link to="/contato" className="hover:text-primary transition-colors">Contato</Link></p>
                 <p>Site: <a href="https://funilcomercial.com" className="hover:text-primary transition-colors">https://funilcomercial.com</a></p>
               </div>
             </div>

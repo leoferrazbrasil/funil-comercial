@@ -20,6 +20,29 @@ const json = (body: unknown, status = 200) =>
 
 const asString = (v: unknown) => (typeof v === "string" && v.trim() ? v.trim() : "");
 
+const isValidOptionalEmail = (email: string) =>
+  !email || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+function buildLeadInterest({
+  origem,
+  motivo,
+  mensagem,
+}: {
+  origem: string;
+  motivo: string;
+  mensagem: string;
+}) {
+  const parts = [
+    motivo ? `Motivo: ${motivo}` : "",
+    mensagem ? `Mensagem: ${mensagem}` : "",
+  ].filter(Boolean);
+
+  if (parts.length > 0) return parts.join("\n\n");
+  return origem === "Página de contato"
+    ? "Solicitou contato pela página de contato"
+    : "Solicitou análise pelo site";
+}
+
 function getClientIp(req: Request) {
   const forwardedFor = req.headers.get("x-forwarded-for") ?? "";
   return (
@@ -57,6 +80,11 @@ Deno.serve(async (req) => {
 
   const nome = asString(payload["nome"]);
   const telefone = normalizePhone(asString(payload["telefone"]));
+  const email = asString(payload["email"]);
+  const rawOrigem = asString(payload["origem"]);
+  const origem = rawOrigem === "Página de contato" ? rawOrigem : "Site";
+  const motivo = asString(payload["interesse"]);
+  const mensagem = asString(payload["mensagem"]);
   const gaClientId = asString(payload["ga_client_id"]);
   const metaEventId = asString(payload["meta_event_id"]);
   const metaFbp = asString(payload["meta_fbp"]);
@@ -66,6 +94,10 @@ Deno.serve(async (req) => {
 
   if (!nome || telefone.length < 12) {
     return json({ error: "Informe nome e um WhatsApp válido." }, 422);
+  }
+
+  if (!isValidOptionalEmail(email)) {
+    return json({ error: "Informe um e-mail válido ou deixe o campo vazio." }, 422);
   }
 
   const url = Deno.env.get("SUPABASE_URL");
@@ -82,9 +114,10 @@ Deno.serve(async (req) => {
     owner_id: ownerId,
     nome,
     telefone,
+    email: email || null,
     status: "novo",
-    origem: "Site",
-    interesse: "Solicitou análise pelo site",
+    origem,
+    interesse: buildLeadInterest({ origem, motivo, mensagem }),
   };
 
   // Grava com ga_client_id se a coluna existir; senão degrada e grava sem (a migração

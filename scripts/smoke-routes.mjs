@@ -9,6 +9,7 @@ const routes = [
   "/",
   "/site-para-negocios-locais",
   "/diagnostico-estrutura-de-vendas",
+  "/contato",
   "/google-meu-negocio",
   "/trafego-pago-negocios-locais",
   "/crm-whatsapp-organizado",

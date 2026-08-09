@@ -57,6 +57,7 @@ const PsychologistWebsiteLanding = lazy(() => import("./pages/PsychologistWebsit
 const LocalCityLanding = lazy(() => import("./pages/LocalCityLanding"));
 const CitiesDirectory = lazy(() => import("./pages/CitiesDirectory"));
 const ConsultoriaLanding = lazy(() => import("./pages/ConsultoriaLanding"));
+const ContactPage = lazy(() => import("./pages/Contact"));
 import { AnnouncementBar } from "./components/AnnouncementBar";
 import { SeoHead } from "./components/SeoHead";
 import { CookieBanner } from "./components/CookieBanner";
@@ -169,6 +170,7 @@ const PUBLIC_PATHS = [
   "/",
   "/cidades-atendidas",
   "/consultoria",
+  "/contato",
   "/blog",
   "/glossario",
   "/crm",
@@ -1162,6 +1164,7 @@ function AppContent() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/crm" element={<CrmLandingPage />} />
           <Route path="/consultoria" element={<ConsultoriaLanding />} />
+          <Route path="/contato" element={<ContactPage />} />
           <Route path="/brandbook" element={<BrandbookPage />} />
           <Route path="/site-para-negocios-locais" element={<LocalBusinessWebsiteLanding />} />
           <Route path="/diagnostico-estrutura-de-vendas" element={<SalesStructureDiagnosticLanding />} />

@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { buildLeadInterest, isValidOptionalEmail } from "./leadIntake";
+import {
+  buildContactLeadFields,
+  buildLeadInterest,
+  isValidOptionalEmail,
+} from "./leadIntake";
 
 describe("lead intake helpers", () => {
   it("combines the selected reason and message for CRM interest", () => {
@@ -16,5 +20,21 @@ describe("lead intake helpers", () => {
     expect(isValidOptionalEmail("")).toBe(true);
     expect(isValidOptionalEmail("leonardo@example.com")).toBe(true);
     expect(isValidOptionalEmail("leonardo@")).toBe(false);
+  });
+
+  it("builds the contact-page fields with the source and combined interest", () => {
+    expect(
+      buildContactLeadFields({
+        email: "leonardo@example.com",
+        origem: "Página de contato",
+        interesse: "Quero melhorar meu site",
+        mensagem: "Preciso de uma página mais clara.",
+      }),
+    ).toEqual({
+      email: "leonardo@example.com",
+      origem: "Página de contato",
+      interesse: "Quero melhorar meu site",
+      mensagem: "Preciso de uma página mais clara.",
+    });
   });
 });

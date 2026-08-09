@@ -2,6 +2,7 @@ export const CORE_ROUTES = [
   '/',
   '/crm',
   '/consultoria',
+  '/contato',
   '/brandbook',
   '/site-para-negocios-locais',
   '/diagnostico-estrutura-de-vendas',

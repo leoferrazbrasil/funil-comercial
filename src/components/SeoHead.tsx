@@ -115,6 +115,10 @@ export const generateEntityGraphSchema = () => {
         "description": "Montamos a sua estrutura de vendas para negócios locais de ponta a ponta.",
         "address": {
           "@type": "PostalAddress",
+          "streetAddress": "Rua Liberal, 1329, 12",
+          "addressLocality": "Porto Alegre",
+          "addressRegion": "RS",
+          "postalCode": "91920-680",
           "addressCountry": "BR"
         },
         "founder": {
@@ -164,6 +168,10 @@ export const generateLocalBusinessSchema = () => {
     "email": "funil@funilcomercial.com",
     "address": {
       "@type": "PostalAddress",
+      "streetAddress": "Rua Liberal, 1329, 12",
+      "addressLocality": "Porto Alegre",
+      "addressRegion": "RS",
+      "postalCode": "91920-680",
       "addressCountry": "BR"
     },
     "description": "Montamos a sua estrutura de vendas para negócios locais de ponta a ponta.",
